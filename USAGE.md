@@ -116,3 +116,6 @@ admin routes)
     end
 + end
 ```
+
+When you run into issues, please have a look at the [Troubleshooting](TROUBLESHOOTING.md)
+

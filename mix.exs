@@ -2,7 +2,7 @@ defmodule Routex.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/BartOtten/routex"
-  @version "0.1.0-alpha.2"
+  @version "0.1.0-alpha.3"
   @name "Phoenix Routes Extension Framework"
 
   def project do
@@ -83,7 +83,7 @@ defmodule Routex.MixProject do
       maintainers: ["Bart Otten"],
       licenses: ["MIT"],
       files: ~w(lib .formatter.exs mix.exs README.md LICENSE.md
-                CHANGELOG.md CONTRIBUTING.md USAGE.md EXTENSIONS.md),
+                CHANGELOG.md CONTRIBUTING.md USAGE.md EXTENSIONS.md TROUBLESHOOTING.md),
       links: %{
         Changelog: "https://hexdocs.pm/routex/changelog.html",
         GitHub: "https://github.com/BartOtten/routex"
@@ -102,7 +102,7 @@ defmodule Routex.MixProject do
       source_url: @source_url,
       assets: "assets",
       before_closing_head_tag: &docs_before_closing_head_tag/1,
-      extras: ["README.md", "USAGE.md", "CHANGELOG.md", "EXTENSIONS.md"],
+      extras: ["README.md", "USAGE.md", "CHANGELOG.md", "EXTENSIONS.md", "TROUBLESHOOTING.md"],
       filter_modules: ~r"Elixir.Routex\..*$",
       groups_for_modules: [
         Routex: ~r"Routex\.?[^.]*$",

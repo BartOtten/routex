@@ -45,11 +45,11 @@ defmodule Routex.Processing do
 
     # Enable to get more descriptive error messages during development.
     # Causes compilation failure when enabled.
-    wrap_in_task = false
+    wrap_in_task = System.get_env("ROUTEX_DEBUG") == "true"
 
     if wrap_in_task do
       IO.warn(
-        "Routex processing is wrapped in a task for debugging purposes. Compilation will fail"
+        "\n\n!! Routex processing is wrapped in a task for debugging purposes. Compilation will fail !!\n\n"
       )
 
       task = Task.async(fn -> execute_callbacks(env) end)

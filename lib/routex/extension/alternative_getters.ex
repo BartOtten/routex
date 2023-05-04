@@ -79,13 +79,13 @@ defmodule Routex.Extension.AlternativeGetters do
   end
 
   defp helper_ast(path, sibling_routes, _env) do
-    pattern = Path.build_path_match(path)
+    pattern = Path.to_match_pattern(path)
 
     dynamic_paths =
       sibling_routes
       |> List.flatten()
       |> Enum.map(fn route ->
-        pattern = Path.build_path_match(route)
+        pattern = Path.to_match_pattern(route)
 
         # unset the :alternatives key as it is redundant
         attrs =

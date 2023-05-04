@@ -58,7 +58,7 @@ defmodule Routex.Extension.AttrGetters do
 
     ast =
       for route <- routes do
-        pattern = Path.build_path_match(route.path)
+        pattern = Path.to_match_pattern(route.path)
 
         quote do
           def attrs(unquote(pattern)) do

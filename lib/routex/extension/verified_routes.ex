@@ -102,7 +102,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     pattern_routes =
       routes
       |> Route.group_by_path()
-      |> Enum.map(fn {path, routes} -> {Path.build_path_match(path), routes} end)
+      |> Enum.map(fn {path, routes} -> {Path.to_match_pattern(path), routes} end)
       |> Map.new()
 
     original_sigil =
@@ -137,7 +137,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   @doc false
   def sigil_callback(route, extra, pattern_routes, caller) do
     {:<<>>, _meta, segments} = route
-    pattern = Path.build_path_match(segments)
+    pattern = Path.to_match_pattern(segments)
     routes_matching_pattern = Map.get(pattern_routes, pattern, [])
 
     # Routex does not handle all routes. Return the original route if we find

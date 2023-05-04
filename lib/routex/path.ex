@@ -104,31 +104,31 @@ defmodule Routex.Path do
       iex> path_binary = "/products/:id/show/edit?_action=delete"
       iex> path_segments = ["products", ":id", "show", "edit?_garg=bar"]
       iex> path_ast = quote do: "/products/#{product}/show/edit?search=baz"
-      iex> build_path_match(path_binary)
+      iex> to_match_pattern(path_binary)
       ["products", {:arg0, [], Routex.Path}, "show", "edit"]
-      iex> build_path_match(path_segments)
+      iex> to_match_pattern(path_segments)
       ["products", {:arg0, [], Routex.Path}, "show", "edit"]
-      iex> build_path_match(path_ast)
+      iex> to_match_pattern(path_ast)
       ["products", {:arg0, [], Routex.Path}, "show", "edit"]
   """
 
-  def build_path_match({:<<>>, [], segments}) when is_list(segments) do
-    build_path_match(segments)
+  def to_match_pattern({:<<>>, [], segments}) when is_list(segments) do
+    to_match_pattern(segments)
   end
 
-  def build_path_match(segments) when is_list(segments) do
+  def to_match_pattern(segments) when is_list(segments) do
     {segments, _binding} =
       segments |> split() |> until_query() |> until_fragments() |> rewrite_segments()
 
     segments
   end
 
-  def build_path_match(path) when is_binary(path), do: build_path_match(path, :match)
+  def to_match_pattern(path) when is_binary(path), do: to_match_pattern(path, :match)
 
-  def build_path_match(%Phoenix.Router.Route{path: path, kind: kind}),
-    do: build_path_match(path, kind)
+  def to_match_pattern(%Phoenix.Router.Route{path: path, kind: kind}),
+    do: to_match_pattern(path, kind)
 
-  def build_path_match(path, kind) do
+  def to_match_pattern(path, kind) do
     url = URI.parse(path)
     path = url.path
 

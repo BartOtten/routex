@@ -88,14 +88,14 @@ defmodule Routex.PathTest do
     end
   end
 
-  describe "build_path_match/1" do
+  describe "to_match_pattern/1" do
     test "builds uniform match for different types of input" do
       path_ast = quote do: "/products/#{product}/baz"
       path_binary = "/products/:id/baz"
       path_list = ["products", ":id", "baz"]
 
-      assert build_path_match(path_binary) == build_path_match(path_list)
-      assert build_path_match(path_binary) == build_path_match(path_ast)
+      assert to_match_pattern(path_binary) == to_match_pattern(path_list)
+      assert to_match_pattern(path_binary) == to_match_pattern(path_ast)
     end
 
     test "builds uniform match for different queries" do
@@ -105,7 +105,7 @@ defmodule Routex.PathTest do
         "/products/:id/show/edit?_action=update"
       ]
 
-      assert all_equal(paths, &build_path_match/1)
+      assert all_equal(paths, &to_match_pattern/1)
     end
 
     test "builds uniform match for different fragments" do
@@ -115,7 +115,7 @@ defmodule Routex.PathTest do
         "/products/:id/show/edit#update"
       ]
 
-      assert all_equal(paths, &build_path_match/1)
+      assert all_equal(paths, &to_match_pattern/1)
     end
 
     test "builds uniform match for different fragments (list)" do
@@ -125,7 +125,7 @@ defmodule Routex.PathTest do
         ["products", ":id", "baz", "#delete"]
       ]
 
-      assert all_equal(paths, &build_path_match/1)
+      assert all_equal(paths, &to_match_pattern/1)
     end
   end
 

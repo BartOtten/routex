@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: [1.13.4]
-        otp: [24.3.4]
+        elixir: [1.13.4, 1.14.4]
+        otp: [24.3.4, 25.3.1]
 
     name: Build and test
     steps:

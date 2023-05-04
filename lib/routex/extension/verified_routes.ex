@@ -90,8 +90,6 @@ defmodule Routex.Extension.VerifiedRoutes do
     Keyword.merge(config, verified_sigil_routex: routex, verified_sigil_original: original)
   end
 
-  defp route_key(route), do: route |> Path.build_path_match()
-
   @impl Routex.Extension
   def create_helpers(routes, cm, _env) do
     config = cm.config()
@@ -104,7 +102,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     pattern_routes =
       routes
       |> Route.group_by_path()
-      |> Enum.map(fn {path, routes} -> {route_key(path), routes} end)
+      |> Enum.map(fn {path, routes} -> {Path.build_path_match(path), routes} end)
       |> Map.new()
 
     original_sigil =
@@ -123,9 +121,10 @@ defmodule Routex.Extension.VerifiedRoutes do
 
     localized_sigil =
       quote location: :keep do
-        defmacro sigil_p({:<<>>, meta, segments} = route, extra) do
-          Routex.Extension.VerifiedRoutes.build_case(
-            segments,
+        defmacro sigil_p(route, extra) do
+          Routex.Extension.VerifiedRoutes.sigil_callback(
+            route,
+            extra,
             unquote(Macro.escape(pattern_routes)),
             __CALLER__
           )
@@ -135,8 +134,25 @@ defmodule Routex.Extension.VerifiedRoutes do
     [original_sigil, localized_sigil]
   end
 
-  def build_case(segments, pattern_routes, caller) do
-    cases = build_case_clauses(segments, pattern_routes)
+  @doc false
+  def sigil_callback(route, extra, pattern_routes, caller) do
+    {:<<>>, _meta, segments} = route
+    pattern = Path.build_path_match(segments)
+    routes_matching_pattern = Map.get(pattern_routes, pattern, [])
+
+    # Routex does not handle all routes. Return the original route if we find
+    # none handled by Routex.
+    if routes_matching_pattern === [] do
+      quote do
+        Phoenix.VerifiedRoutes.sigil_p(unquote(route), unquote(extra))
+      end
+    else
+      build_case(segments, routes_matching_pattern, caller)
+    end
+  end
+
+  defp build_case(segments, routes_matching_pattern, caller) do
+    cases = build_case_clauses(segments, routes_matching_pattern)
     helper_ast = ExtensionUtils.get_helper_ast(caller)
 
     quote do
@@ -146,28 +162,15 @@ defmodule Routex.Extension.VerifiedRoutes do
     end
   end
 
-  def build_case_clauses(segments, pattern_routes) do
-    pattern_routes_key =
-      segments
-      |> route_key()
-
-    routes_matching_pattern = Map.get(pattern_routes, pattern_routes_key, [])
-
-    if routes_matching_pattern === [],
-      do:
-        raise(
-          "#{__MODULE__}: Could not find a route definition matching #{inspect(pattern_routes_key)}"
-        )
-
+  defp build_case_clauses(segments, routes_matching_pattern) do
     for route <- routes_matching_pattern do
       new_segments = route |> Attrs.get(:__origin__) |> Path.recompose(route.path, segments)
 
-      new_route = {:<<>>, [], new_segments}
       helper = route |> Attrs.get(:__order__) |> List.last()
 
       quote do
         {unquote(Macro.escape(segments)), unquote(helper)} ->
-          Phoenix.VerifiedRoutes.sigil_p(unquote(new_route), [])
+          Phoenix.VerifiedRoutes.sigil_p(<<unquote_splicing(new_segments)>>, [])
       end
     end
     |> List.flatten()

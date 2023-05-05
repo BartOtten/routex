@@ -2,7 +2,7 @@ defmodule Routex.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/BartOtten/routex"
-  @version "0.1.0-alpha.4"
+  @version "0.1.0-alpha.5"
   @name "Phoenix Routes Extension Framework"
 
   def project do
@@ -74,7 +74,8 @@ defmodule Routex.MixProject do
       {:excoveralls, "~> 0.14", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:makeup_diff, "~> 0.1.0", only: [:dev]}
+      {:makeup_diff, "~> 0.1.0", only: [:dev]},
+      {:git_ops, "~> 2.5.6", only: [:dev]}
     ]
   end
 

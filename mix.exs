@@ -104,7 +104,7 @@ defmodule Routex.MixProject do
       assets: "assets",
       before_closing_head_tag: &docs_before_closing_head_tag/1,
       extras: ["README.md", "USAGE.md", "CHANGELOG.md", "EXTENSIONS.md", "TROUBLESHOOTING.md"],
-      filter_modules: ~r"Elixir.Routex\..*$",
+      filter_modules: ~r"Elixir.Routex.*$",
       groups_for_modules: [
         Routex: ~r"Routex\.?[^.]*$",
         Extensions: ~r"Routex.Extension\.[^.]*$",

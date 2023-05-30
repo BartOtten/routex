@@ -2,6 +2,14 @@ defmodule Routex.Router do
   @moduledoc """
   Provides macro (callbacks) to alter route definition before
   compilation.
+
+  > #### `use Routex.Router` {: .info}
+  >
+  > When you `use Routex.Router`, the Routex.Router module will
+  > plug `Routex.Processing` between the definition of routes and the
+  > compilation of the router module. It also imports the `preprocess_using`
+  > macro which can be used to mark routes for Routex preprocessing using the
+  > Routex configuration/backend provided as first argument.
   """
 
   @supported_methods [
@@ -26,12 +34,6 @@ defmodule Routex.Router do
     :options
   ]
 
-  @doc """
-  Macro callback that plugs `Routex.Processing` between route definition and
-  compilation of the router module. It also imports the `preprocess_using`
-  macro which can be used to mark routes with a Routex configuration for Routex
-  processing.
-  """
   @spec __using__(opts :: list) :: Macro.output()
   defmacro __using__(_options) do
     quote do

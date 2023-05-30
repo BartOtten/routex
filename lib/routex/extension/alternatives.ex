@@ -56,7 +56,8 @@ defmodule Routex.Extension.Alternatives do
   - scope_opts
   - alternatives (list of `Phoenix.Route.Route`)
   """
-  use Routex.Extension
+  @behaviour Routex.Extension
+
   alias Routex.Attrs
   alias Routex.Extension.Alternatives.Config
   alias Routex.Extension.Alternatives.Scopes

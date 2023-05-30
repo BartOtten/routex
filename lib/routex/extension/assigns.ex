@@ -37,7 +37,7 @@ defmodule Routex.Extension.Assigns do
   bound assigns available to components and controllers.
   """
 
-  use Routex.Extension
+  @behaviour Routex.Extension
 
   @impl Routex.Extension
   def post_transform(routes, cm, _env) do

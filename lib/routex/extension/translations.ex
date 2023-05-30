@@ -43,7 +43,8 @@ defmodule Routex.Extension.Translations do
                           ⇒ /espana/producto/:id/editar         locale = "es"
   """
 
-  use Routex.Extension
+  @behaviour Routex.Extension
+
   alias Routex.Attrs
   alias Routex.Path
   require Logger

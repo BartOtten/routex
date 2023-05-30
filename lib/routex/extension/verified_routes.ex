@@ -57,7 +57,8 @@ defmodule Routex.Extension.VerifiedRoutes do
   - none
   """
 
-  use Routex.Extension
+  @behaviour Routex.Extension
+
   alias Routex.Attrs
   alias Routex.ExtensionUtils
   alias Routex.Path

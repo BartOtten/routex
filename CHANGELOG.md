@@ -5,6 +5,11 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.0-alpha.6](https://github.com/BartOtten/routex/compare/v0.1.0-alpha.5...v0.1.0-alpha.6) (2023-05-30)
+
+
+
+
 ## [v0.1.0-alpha.5](https://github.com/BartOtten/routex/compare/v0.1.0-alpha.5...v0.1.0-alpha.5) (2023-05-05)
 
 

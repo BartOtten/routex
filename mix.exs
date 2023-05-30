@@ -2,7 +2,7 @@ defmodule Routex.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/BartOtten/routex"
-  @version "0.1.0-alpha.5"
+  @version "0.1.0-alpha.6"
   @name "Phoenix Routes Extension Framework"
 
   def project do

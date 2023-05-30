@@ -48,14 +48,4 @@ defmodule Routex.Extension do
   @callback create_helpers(routes, backend, env) :: Macro.output()
 
   @optional_callbacks transform: 3, create_helpers: 3, configure: 2, post_transform: 3
-
-  @doc """
-  Macro use'd by extensions. Requires implementations according to
-  the behaviour specifications and imports `Routex.ExtensionUtils`
-  """
-  defmacro __using__(_opts) do
-    quote do
-      @behaviour Routex.Extension
-    end
-  end
 end

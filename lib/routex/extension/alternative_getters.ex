@@ -46,7 +46,8 @@ defmodule Routex.Extension.AlternativeGetters do
   ]
   ```
   """
-  use Routex.Extension
+  @behaviour Routex.Extension
+
   alias Routex.Attrs
   alias Routex.Path
   alias Routex.Route

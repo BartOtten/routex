@@ -27,7 +27,8 @@ defmodule Routex.Extension.Cloak do
   **Sets**
   - none
   """
-  use Routex.Extension
+  @behaviour Routex.Extension
+
   alias Routex.Path
 
   @interpolate ":"

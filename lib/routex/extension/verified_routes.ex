@@ -102,8 +102,10 @@ defmodule Routex.Extension.VerifiedRoutes do
 
     pattern_routes =
       routes
-      |> Route.group_by_path()
-      |> Enum.map(fn {path, routes} -> {Path.to_match_pattern(path), routes} end)
+      |> Route.group_by_method_and_path()
+      |> Enum.map(fn {{_method, path}, routes} ->
+        {Path.to_match_pattern(path), routes}
+      end)
       |> Map.new()
 
     original_sigil =

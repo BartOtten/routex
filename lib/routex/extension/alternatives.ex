@@ -104,10 +104,10 @@ defmodule Routex.Extension.Alternatives do
 
   @impl Routex.Extension
   def post_transform(routes, _cm, _env) do
-    grouped = Route.group_by_path(routes)
+    grouped = Route.group_by_nesting(routes)
 
     routes =
-      for {_path, groutes} <- grouped, route <- groutes do
+      for {_nesting, groutes} <- grouped, route <- groutes do
         Attrs.put(route, :alternatives, groutes)
       end
 

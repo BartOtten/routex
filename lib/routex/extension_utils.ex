@@ -8,7 +8,7 @@ defmodule Routex.ExtensionUtils do
   `Macro.escape/1` and `IO.inspect/2` the given input. Options are
   passed through to `IO.inspect`. Returns the input.
   """
-  def esc_inspect(ast, opts \\ []) do
+  def esc_inspect(ast, opts \\ [limit: :infinity, structs: false]) do
     ast
     |> Macro.escape()
     |> IO.inspect(opts)

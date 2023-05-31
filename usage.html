@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.7">
+
+    <title>Usage — Phoenix Routes Extension Framework v0.2.0-alpha.7</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-AD2DEA0B.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="extras" class="page-extra">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.7
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+    <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/USAGE.md#L1" title="View Source" class="icon-action" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+
+
+  <span>Usage</span>
+</h1>
+
+<h2 id="requirements" class="section-heading">
+  <a href="#requirements" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">requirements</p>
+  </a>
+  Requirements
+</h2>
+<ul><li>Elixir &gt;=1.11</li><li>Phoenix &gt;= 1.6.0</li><li>Phoenix LiveView &gt;= 0.16 (optional)</li></ul><h2 id="installation" class="section-heading">
+  <a href="#installation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">installation</p>
+  </a>
+  Installation
+</h2>
+<p>You can install this library by adding it to your list of dependencies in <code class="inline">mix.exs</code>:</p><pre><code class="diff">def deps do
+  [
+     ...other deps
++    {:routex, &quot;&gt;= 0.0.0&quot;}
+  ]
+end</code></pre><p>Modify the entrypoint your web interface definition.</p><pre><code class="diff"># file: lib/example_web.ex
+
++  use Routex.Router  # always before Phoenix Router
+   use Phoenix.Router, helpers: true
+
+# in controller
+   unquote(verified_routes())
++  unquote(routex_helpers())
+
+# in live_view
+      unquote(html_helpers())
++     on_mount(ExampleWeb.Router.RoutexHelpers)
+
+# in view_helpers or html_helpers
+   unquote(verified_routes())
++  unquote(routex_helpers())
+
+# insert new private function
++  defp routex_helpers do
++    quote do
++      import ExampleWeb.Router.RoutexHelpers
++    end
++  end</code></pre><p>The on_mount hook is used to attach a <code class="inline">handle_param</code> hook that assigns a few
+(helper) values to the connection or socket. This includes the current url and
+any assigns created by Routex Extensions. When you want to have full control over
+these hooks, you can use something like the snippet below instead.</p><pre><code class="makeup elixir" translate="no"><span class="kd">def</span><span class="w"> </span><span class="nf">on_mount</span><span class="p" data-group-id="8753420217-1">(</span><span class="bp">_</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">session</span><span class="p">,</span><span class="w"> </span><span class="n">socket</span><span class="p" data-group-id="8753420217-1">)</span><span class="w"> </span><span class="k" data-group-id="8753420217-2">do</span><span class="w">
+  </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w">
+    </span><span class="nc">Phoenix.LiveView</span><span class="o">.</span><span class="n">attach_hook</span><span class="p" data-group-id="8753420217-3">(</span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="ss">:set_rtx</span><span class="p">,</span><span class="w"> </span><span class="ss">:handle_params</span><span class="p">,</span><span class="w"> </span><span class="k" data-group-id="8753420217-4">fn</span><span class="w"> </span><span class="c">_params</span><span class="p">,</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">-&gt;</span><span class="w">
+      </span><span class="n">attrs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">ExampleWeb.Route.RoutexHelpers</span><span class="o">.</span><span class="n">attrs</span><span class="p" data-group-id="8753420217-5">(</span><span class="n">url</span><span class="p" data-group-id="8753420217-5">)</span><span class="w">
+      </span><span class="n">rtx_assigns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8753420217-6">[</span><span class="ss">url</span><span class="p">:</span><span class="w"> </span><span class="n">url</span><span class="p">,</span><span class="w"> </span><span class="ss">__order__</span><span class="p">:</span><span class="w"> </span><span class="n">attrs</span><span class="o">.</span><span class="c">__order__</span><span class="p" data-group-id="8753420217-6">]</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="nc">Map</span><span class="o">.</span><span class="n">to_list</span><span class="p" data-group-id="8753420217-7">(</span><span class="n">attrs</span><span class="o">.</span><span class="n">assigns</span><span class="p" data-group-id="8753420217-7">)</span><span class="w">
+
+      </span><span class="p" data-group-id="8753420217-8">{</span><span class="ss">:cont</span><span class="p">,</span><span class="nc">Phoenix.LiveView</span><span class="o">.</span><span class="n">assign</span><span class="p" data-group-id="8753420217-9">(</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">rtx_assigns</span><span class="p" data-group-id="8753420217-9">)</span><span class="p" data-group-id="8753420217-8">}</span><span class="w">
+    </span><span class="k" data-group-id="8753420217-4">end</span><span class="p" data-group-id="8753420217-3">)</span><span class="w">
+
+  </span><span class="p" data-group-id="8753420217-10">{</span><span class="ss">:cont</span><span class="p">,</span><span class="w"> </span><span class="n">socket</span><span class="p" data-group-id="8753420217-10">}</span><span class="w">
+</span><span class="k" data-group-id="8753420217-2">end</span></code></pre><h2 id="configuration" class="section-heading">
+  <a href="#configuration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">configuration</p>
+  </a>
+  Configuration
+</h2>
+<p>To use <a href="Routex.html"><code class="inline">Routex</code></a>, a module that calls <code class="inline">use Routex</code> (referred to below as a
+&quot;backend&quot;) has to be defined. It includes a list with extensions and
+configuration of extensions.</p><pre><code class="makeup elixir" translate="no"><span class="kd">defmodule</span><span class="w"> </span><span class="nc">ExampleWeb.RoutexBackend</span><span class="w"> </span><span class="k" data-group-id="3435119672-1">do</span><span class="w">
+</span><span class="kn">use</span><span class="w"> </span><span class="nc">Routex</span><span class="p">,</span><span class="w">
+  </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3435119672-2">[</span><span class="w">
+  </span><span class="c1"># ...list of extensions...</span><span class="w">
+  </span><span class="p" data-group-id="3435119672-2">]</span><span class="p">,</span><span class="w">
+</span><span class="k" data-group-id="3435119672-1">end</span></code></pre><h2 id="extensions" class="section-heading">
+  <a href="#extensions" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">extensions</p>
+  </a>
+  Extensions
+</h2>
+<p>Routex relies on extensions to provide features. Each extension provides a
+single feature. The extensions have their own documentation which specifies how
+to configure and use the extension.</p><h2 id="preprocess-routes-with-routex" class="section-heading">
+  <a href="#preprocess-routes-with-routex" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">preprocess-routes-with-routex</p>
+  </a>
+  Preprocess routes with Routex
+</h2>
+<p><a href="Routex.html"><code class="inline">Routex</code></a> will preprocess any route wrapped in a <code class="inline">preprocess_using</code> block;
+either direct or indirect. It uses the backend passed as the first argument.
+This allows the use of multiple backends (e.g. to use different extensions for
+admin routes)</p><pre><code class="diff"># file: router.ex
+  scope &quot;/&quot;, ExampleWeb, host: &quot;admin.&quot;, as: :admin do
+    pipe_through :browser
+
++    preprocess_using ExampleWeb.RoutexBackendAdmin do
+      # [...routes...]
++    end
+  end
+
++ preprocess_using ExampleWeb.RoutexBackend do
+    scope &quot;/&quot;, ExampleWeb do
+      pipe_through [:browser, :redirect_if_user_is_authenticated]
+      # [...routes...]
+    end
+
+    scope &quot;/&quot;, ExampleWeb do
+      pipe_through [:browser, :require_authenticated_user]
+      # [...routes...]
+    end
++ end</code></pre><p>When you run into issues, please have a look at the <a href="troubleshooting.html">Troubleshooting</a></p>
+<div class="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="readme.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+README
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="changelog.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Change Log
+        </span>
+      </a>
+
+  </div>
+</div>
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.7" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7/show/USAGE.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

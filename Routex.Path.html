@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.7">
+
+    <title>Routex.Path — Phoenix Routes Extension Framework v0.2.0-alpha.7</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-AD2DEA0B.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="modules" class="page-module">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.7
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+    <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L2" title="View Source" class="icon-action" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+
+  <span translate="no">Routex.Path</span> 
+  <small class="app-vsn" translate="no">(Phoenix Routes Extension Framework v0.2.0-alpha.7)</small>
+
+</h1>
+
+
+  <section id="moduledoc">
+<p>Provides functions that work with both a binary path and a
+list of segments; unless explicitly stated otherwise.</p>
+  </section>
+
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+      Summary
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#add_prefix/2" translate="no">add_prefix(input, prefix)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Prepends given <code class="inline">prefix</code> to <code class="inline">input</code>. Returns the same type as
+the input type.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#join/1" translate="no">join(segments)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Joins a (nested) list of path segments into a binary path..</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#join_statics/1" translate="no">join_statics(segments)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Joins consecutive static segments using the path separator. Splits at
+interpolation placeholders when provided with a path.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#recompose/3" translate="no">recompose(orig_path, new_path, sigil_segments)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#split/1" translate="no">split(input)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Converts the <code class="inline">input</code> to a list of segments. It's a convenience wrapper for
+Plug.Router.Utils.split/1 to also handle nil value and segment lists.
+Additionally queries will always have their own segment.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#to_match_pattern/1" translate="no">to_match_pattern(segments)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Creates a match pattern for binary path, segments list and AST. The result
+is input type agnostic.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#to_match_pattern/2" translate="no">to_match_pattern(path, kind)</a>
+
+      </div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+Functions
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="add_prefix/2">
+
+  <div class="detail-header">
+    <a href="#add_prefix/2" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">add_prefix(input, prefix)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L88" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Prepends given <code class="inline">prefix</code> to <code class="inline">input</code>. Returns the same type as
+the input type.</p>
+  </section>
+</section>
+<section class="detail" id="join/1">
+
+  <div class="detail-header">
+    <a href="#join/1" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">join(segments)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L20" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Joins a (nested) list of path segments into a binary path..</p>
+  </section>
+</section>
+<section class="detail" id="join_statics/1">
+
+  <div class="detail-header">
+    <a href="#join_statics/1" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">join_statics(segments)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L247" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Joins consecutive static segments using the path separator. Splits at
+interpolation placeholders when provided with a path.</p>
+  </section>
+</section>
+<section class="detail" id="recompose/3">
+
+  <div class="detail-header">
+    <a href="#recompose/3" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">recompose(orig_path, new_path, sigil_segments)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L212" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="split/1">
+
+  <div class="detail-header">
+    <a href="#split/1" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">split(input)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L52" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Converts the <code class="inline">input</code> to a list of segments. It's a convenience wrapper for
+Plug.Router.Utils.split/1 to also handle nil value and segment lists.
+Additionally queries will always have their own segment.</p><p><strong>Examples</strong></p><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="n">split</span><span class="p" data-group-id="3384493226-1">(</span><span class="no">nil</span><span class="p" data-group-id="3384493226-1">)</span><span class="w">
+</span><span class="p" data-group-id="3384493226-2">[</span><span class="p" data-group-id="3384493226-2">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">split</span><span class="p" data-group-id="3384493226-3">(</span><span class="s">&quot;/foo/bar/?baz=qux&quot;</span><span class="p" data-group-id="3384493226-3">)</span><span class="w">
+</span><span class="p" data-group-id="3384493226-4">[</span><span class="s">&quot;foo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bar&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;?baz=qux&quot;</span><span class="p" data-group-id="3384493226-4">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">split</span><span class="p" data-group-id="3384493226-5">(</span><span class="p" data-group-id="3384493226-6">[</span><span class="s">&quot;/foo/bar&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/baz&quot;</span><span class="p" data-group-id="3384493226-6">]</span><span class="p" data-group-id="3384493226-5">)</span><span class="w">
+</span><span class="p" data-group-id="3384493226-7">[</span><span class="s">&quot;foo&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bar&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;baz&quot;</span><span class="p" data-group-id="3384493226-7">]</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="to_match_pattern/1">
+
+  <div class="detail-header">
+    <a href="#to_match_pattern/1" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">to_match_pattern(segments)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L115" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Creates a match pattern for binary path, segments list and AST. The result
+is input type agnostic.</p><p>Provides an option to bind parameters. This is disabled by default as it
+may cause &quot;unused variables&quot; warnings and the result is less compatible.
+Notice how the last example binds to <code class="inline">product</code> as <code class="inline">id</code> is not known.</p><p><strong>Options</strong></p><ul><li><code class="inline">bind</code>: bind any parameter to a named variable. (default: <code class="inline">false</code>)</li></ul><p><strong>Example</strong></p><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="n">path_binary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/products/:id/show/edit?_action=delete&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">path_segments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0954491837-1">[</span><span class="s">&quot;products&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;show&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edit?_garg=bar&quot;</span><span class="p" data-group-id="0954491837-1">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">path_ast</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">quote</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/products/</span><span class="si" data-group-id="0954491837-2">#{</span><span class="n">product</span><span class="si" data-group-id="0954491837-2">}</span><span class="s">/show/edit?search=baz&quot;</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">to_match_pattern</span><span class="p" data-group-id="0954491837-3">(</span><span class="n">path_binary</span><span class="p" data-group-id="0954491837-3">)</span><span class="w">
+</span><span class="p" data-group-id="0954491837-4">[</span><span class="s">&quot;products&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0954491837-5">{</span><span class="ss">:arg0</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0954491837-6">[</span><span class="p" data-group-id="0954491837-6">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Path</span><span class="p" data-group-id="0954491837-5">}</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;show&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edit&quot;</span><span class="p" data-group-id="0954491837-4">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">to_match_pattern</span><span class="p" data-group-id="0954491837-7">(</span><span class="n">path_segments</span><span class="p" data-group-id="0954491837-7">)</span><span class="w">
+</span><span class="p" data-group-id="0954491837-8">[</span><span class="s">&quot;products&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0954491837-9">{</span><span class="ss">:arg0</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0954491837-10">[</span><span class="p" data-group-id="0954491837-10">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Path</span><span class="p" data-group-id="0954491837-9">}</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;show&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edit&quot;</span><span class="p" data-group-id="0954491837-8">]</span><span class="w">
+</span><span class="gp unselectable">iex&gt; </span><span class="n">to_match_pattern</span><span class="p" data-group-id="0954491837-11">(</span><span class="n">path_ast</span><span class="p" data-group-id="0954491837-11">)</span><span class="w">
+</span><span class="p" data-group-id="0954491837-12">[</span><span class="s">&quot;products&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0954491837-13">{</span><span class="ss">:arg0</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0954491837-14">[</span><span class="p" data-group-id="0954491837-14">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Path</span><span class="p" data-group-id="0954491837-13">}</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;show&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;edit&quot;</span><span class="p" data-group-id="0954491837-12">]</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="to_match_pattern/2">
+
+  <div class="detail-header">
+    <a href="#to_match_pattern/2" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">to_match_pattern(path, kind)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/lib/routex/path.ex#L131" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.7" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7/show/lib/routex/path.ex">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

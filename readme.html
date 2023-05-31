@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.7">
+
+    <title>README — Phoenix Routes Extension Framework v0.2.0-alpha.7</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-AD2DEA0B.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="extras" class="page-extra">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.7
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+    <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.7/README.md#L1" title="View Source" class="icon-action" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+
+
+  <span>README</span>
+</h1>
+
+<p><img src="https://img.shields.io/coveralls/github/BartOtten/routex" alt="Coveralls"/>
+<a href="https://github.com/BartOtten/routex/actions/workflows/elixir.yml"><img src="https://github.com/BartOtten/routex/actions/workflows/elixir.yml/badge.svg?event=push" alt="Build Status"/></a>
+<a href="https://github.com/BartOtten/routex/commits/main"><img src="https://img.shields.io/github/last-commit/BartOtten/routex.svg" alt="Last Updated"/></a>
+<a href="https://hex.pm/packages/routex"><img src="https://img.shields.io/hexpm/v/routex" alt="Hex.pm"/></a>
+<img src="https://img.shields.io/hexpm/l/routex" alt="Hex.pm"/></p><h1>Routex</h1><p>Routex is a framework to extend the functionality of Phoenix Frameworks'
+router. Using a pluggable extension system it can transform routes, create
+alternative routes and generate helper functions based on routes in your
+Phoenix Framework app. It acts as middleware between route definition and route
+compilation by Phoenix; in order to have minimal impact on run-time
+performance.</p><p>It ships with a small set of extensions and provides helper functions for
+writing your own custom Phoenix router features.</p><h2 id="top-features-and-benefits" class="section-heading">
+  <a href="#top-features-and-benefits" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">top-features-and-benefits</p>
+  </a>
+  Top Features and Benefits
+</h2>
+<ul><li>none to minimal run-time performance penalty (depending on extensions).</li><li>adding router features is plug-and-play.</li><li>include only features you need in your product; less code is less bugs.</li><li>write powerful extensions without the plumbing.</li></ul><h2 id="example" class="section-heading">
+  <a href="#example" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">example</p>
+  </a>
+  Example
+</h2>
+<p>Localize your Phoenix website with multilingual URLs and custom template
+assigns; enhancing user engagement and content relevance. This example combines
+a few extensions: Alternatives, Translations, Assigns and Verified
+Routes.</p><pre><code class="makeup elixir" translate="no"><span class="w">                    </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                      </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;en_US&quot;</span><span class="w">
+</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">eu</span><span class="o">/</span><span class="n">nederland</span><span class="o">/</span><span class="n">producten</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">bewerken</span><span class="w">    </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;nl_NL&quot;</span><span class="w">
+                    </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">eu</span><span class="o">/</span><span class="n">espana</span><span class="o">/</span><span class="n">producto</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">editar</span><span class="w">          </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;es_ES&quot;</span><span class="w">
+                    </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">gb</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                   </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;en_GB&quot;</span></code></pre><ul><li>Alternatives: the URL format is <a href="#alternatives">customizable</a> (no mandatory <em>website.com/[locale]/page</em>)</li><li>Translation: URLs <a href="#multilingual-routes">match the language of content</a>; enhancing user
+engagement and content relevance.</li><li>Assigns: the value of <code class="inline">locale</code> is specified per scope by the configuration of the Alternatives extension.
+The value is made available in components and controllers in namespace <code class="inline">loc</code> as <code class="inline">@loc.locale</code></li><li>Verified Routes allows you to use use <code class="inline">~p&quot;/products/#{product}/edit&quot;</code> in your code. At run-time
+the route is combined with the set <code class="inline">locale</code> to pick the localized alternative route.</li></ul><h2 id="documentation" class="section-heading">
+  <a href="#documentation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">documentation</p>
+  </a>
+  Documentation
+</h2>
+<p><a href="https://hexdocs.pm/routex">HexDocs</a> (stable)
+and <a href="https://bartotten.github.io/routex">GitHub Pages</a> (development).</p><h2 id="requirements-and-installation" class="section-heading">
+  <a href="#requirements-and-installation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">requirements-and-installation</p>
+  </a>
+  Requirements and Installation
+</h2>
+<p>See the <a href="usage.html">Usage Guide</a> for the requirements and installation instructions.</p><h2 id="extensions" class="section-heading">
+  <a href="#extensions" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">extensions</p>
+  </a>
+  Extensions
+</h2>
+<p>Routex relies on extensions to provide features. Each extension provides a
+single feature and should minimize hard dependencies on other extensions.
+Instead, Routex advises to make use of <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> to share attributes;
+allowing extensions to work together whithout being coupled.</p><p>The documentation of each extension lists any provided or
+required <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a>.</p><h3 id="alternatives" class="section-heading">
+  <a href="#alternatives" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">alternatives</p>
+  </a>
+  Alternatives
+</h3>
+<p>Create alternative routes based on <code class="inline">scopes</code> configured in
+a Routex backend module. Scopes can be nested and each scope can provide
+it's values to be shared with other extensions.</p><p><a href="Routex.Extension.Alternatives.html">Alternatives Documentation</a></p><h3 id="translations" class="section-heading">
+  <a href="#translations" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">translations</p>
+  </a>
+  Translations
+</h3>
+<p>This extension extracts segments of a routes' path to a <code class="inline">routes.po</code> file for
+translation. At compile-time it combines the translated segments to translate
+routes. As a result, users can enter URLs using localized terms which can
+enhance user engagement and content relevance.</p><p><a href="Routex.Extension.Translations.html">Translations Documentation</a></p><h3 id="multilingual-routes" class="section-heading">
+  <a href="#multilingual-routes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">multilingual-routes</p>
+  </a>
+  Multilingual Routes
+</h3>
+<p>The Alternatives extension can be combined with the Translations extension to
+create multilingual routes. The Alternatives extension provides the :locale
+attribute used by the Translations extension.</p><h3 id="verified-routes" class="section-heading">
+  <a href="#verified-routes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">verified-routes</p>
+  </a>
+  Verified Routes
+</h3>
+<p>This extension creates a sigil (default: <code class="inline">~l</code>) with the ability to branch based
+on the current alternative scope of a user. It is able to verify routes even
+when thy have been transformed by Routex extensions. Optionally this sigil can
+be set to <code class="inline">~p</code> (Phoenix' default) as it is a drop-in replacement.</p><p><a href="Routex.Extension.VerifiedRoutes.html">Verified Routes Documentation</a></p><h3 id="route-helpers" class="section-heading">
+  <a href="#route-helpers" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">route-helpers</p>
+  </a>
+  Route Helpers
+</h3>
+<p>Creates Phoenix Helpers that have the ability to branch based on the current
+alternative scope of a user. Optionally these helpers can replace the original
+Phoenix Route Helpers as they are drop-ins.</p><p><a href="Routex.Extension.RouteHelpers.html">Route Helpers Documentation</a></p><h3 id="assigns" class="section-heading">
+  <a href="#assigns" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">assigns</p>
+  </a>
+  Assigns
+</h3>
+<p>With this extension you can add (a subset of) attributes set by other
+extensions to Phoenix' assigns making them available in components and
+controllers with the <code class="inline">@</code> assigns operator (optionally under a namespace)</p><pre><code class="makeup elixir" translate="no"><span class="na">@namespace</span><span class="o">.</span><span class="n">area</span><span class="w">   </span><span class="p">=&gt;</span><span class="w">  </span><span class="ss">:eu_nl</span></code></pre><p><a href="Routex.Extension.Assigns.html">Assigns Documentation</a></p><h3 id="alternative-getters" class="section-heading">
+  <a href="#alternative-getters" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">alternative-getters</p>
+  </a>
+  Alternative Getters
+</h3>
+<p>Creates a helper function <code class="inline">alternatives/1</code> to get a list of alternative slugs
+and their routes attributes. As <a href="Routex.html"><code class="inline">Routex</code></a> sets the <code class="inline">@url</code> assign you can simply
+get other routes to the current page with <code class="inline">alternatives(@url)</code>.</p><p><a href="Routex.Extension.AlternativeGetters.html">Alternative Getters Documentation</a></p><h3 id="attribute-getters" class="section-heading">
+  <a href="#attribute-getters" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">attribute-getters</p>
+  </a>
+  Attribute Getters
+</h3>
+<p>Creates a helper function <code class="inline">attrs/1</code> to get all <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> of a route. As
+<a href="Routex.html"><code class="inline">Routex</code></a> sets the <code class="inline">@url</code> assign you can simply get all attributes for the
+current page with <code class="inline">attrs(@url)</code>.</p><p>This way the <code class="inline">assigns</code> can be a subset of the full list of attributes but the
+full list can be lazy loaded when needed.</p><p><a href="Routex.Extension.AttrGetters.html">Attribute Getters Documentation</a></p><h3 id="cloak-only-for-experiments" class="section-heading">
+  <a href="#cloak-only-for-experiments" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">cloak-only-for-experiments</p>
+  </a>
+  Cloak (only for experiments)
+</h3>
+<p>Transforms routes to be unrecognizable. This extension is a show case and may
+change at any given moment to generate other routes without prior notice.</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="mi">1</span><span class="w">
+  </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="mi">2</span><span class="w">      </span><span class="err">⇒</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="ss">browser</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="w"> </span><span class="n">etc</span><span class="n">...</span><span class="w">
+  </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="mi">3</span><span class="w">   </span><span class="err">⇒</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="ss">browser</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="n">c</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="w"> </span><span class="n">etc</span><span class="n">...</span></code></pre><p><a href="Routex.Extension.Cloak.html">Attribute Getters Documentation</a></p>
+<div class="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="api-reference.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+API Reference
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="usage.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Usage
+        </span>
+      </a>
+
+  </div>
+</div>
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.7" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7/show/README.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.7">
+
+    <title>API Reference — Phoenix Routes Extension Framework v0.2.0-alpha.7</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-AD2DEA0B.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="extras" class="page-extra">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.7
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+
+  <span>API Reference <small class="app-vsn">Phoenix Routes Extension Framework v0.2.0-alpha.7</small></span>
+</h1>
+
+
+  <section class="details-list">
+    <h2 id="modules" class="section-heading">
+  <a href="#modules" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">modules</p>
+  </a>
+  Modules
+</h2>
+
+    <div class="summary">
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.html" translate="no">Routex</a>
+
+  </div>
+
+    <div class="summary-synopsis"><blockquote><h4 class="info"><code class="inline">use Routex</code></h4><p>When use'd this module generates a Routext backend module and
+a configuration struct using  the <code class="inline">configure/2</code> callbacks of
+the extensions provided in <code class="inline">opts</code>.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Attrs.html" translate="no">Routex.Attrs</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>  Provides an interface to access and update Routex attributes.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.html" translate="no">Routex.Extension</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Specification for composable Routex extensions.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.AlternativeGetters.html" translate="no">Routex.Extension.AlternativeGetters</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Creates helper functions to get a list of alternative slugs and their routes
+attributes given a binary url or a list of path segments and a binary url.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.html" translate="no">Routex.Extension.Alternatives</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Creates alternative routes based on <code class="inline">scopes</code> configured in a Routex backend
+module. Scopes can be nested and each scope can provide <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> to be shared
+with other extensions.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.Config.html" translate="no">Routex.Extension.Alternatives.Config</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Module to create and validate a Config struct</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.Exceptions.html" translate="no">Routex.Extension.Alternatives.Exceptions</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.Exceptions.AttrsMismatchError.html" translate="no">Routex.Extension.Alternatives.Exceptions.AttrsMismatchError</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Raised when the custom attributes of scopes do not have the same keys.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.Exceptions.MissingRootSlugError.html" translate="no">Routex.Extension.Alternatives.Exceptions.MissingRootSlugError</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Raised when the scope map does not start with the root scope &quot;/&quot;.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.Scope.Flat.html" translate="no">Routex.Extension.Alternatives.Scope.Flat</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Struct for flattened scope</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Alternatives.Scope.Nested.html" translate="no">Routex.Extension.Alternatives.Scope.Nested</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Struct for scope with optionally nested scopes</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Assigns.html" translate="no">Routex.Extension.Assigns</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Extracts <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> from the route and makes them available in components
+and controllers with the <code class="inline">@</code> assigns operator (optionally under a namespace).</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.AttrGetters.html" translate="no">Routex.Extension.AttrGetters</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Creates helper functions to get the <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> given a binary url or a
+list of path segments. This way the attributes for route can be lazily
+loaded.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Cloak.html" translate="no">Routex.Extension.Cloak</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Transforms routes to be unrecognizable.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.RouteHelpers.html" translate="no">Routex.Extension.RouteHelpers</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides route helpers with support for automatic selecting alternatives
+routes. The helpers can be used to override Phoenix' defaults as they are
+a drop-in replacements.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.Translations.html" translate="no">Routex.Extension.Translations</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Enables users to enter URLs using localized terms which can enhance user engagement
+and content relevance.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Extension.VerifiedRoutes.html" translate="no">Routex.Extension.VerifiedRoutes</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides route generation with compile-time verification.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.ExtensionUtils.html" translate="no">Routex.ExtensionUtils</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides utility funtions for extension development.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Path.html" translate="no">Routex.Path</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides functions that work with both a binary path and a
+list of segments; unless explicitly stated otherwise.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Processing.html" translate="no">Routex.Processing</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>This module provides everything needed to process Phoenix routes. It executes
+the <code class="inline">transform</code> callbacks from extensions to transform <code class="inline">Phoenix.Router.Route</code>
+structs and <code class="inline">create_helpers</code> callbacks to create one unified Helper module.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Route.html" translate="no">Routex.Route</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Function for working with Phoenix Routes</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Router.html" translate="no">Routex.Router</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Provides macro (callbacks) to alter route definition before
+compilation.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Test.Fixtures.html" translate="no">Routex.Test.Fixtures</a>
+
+  </div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Routex.Test.Fixtures.Assigns.html" translate="no">Routex.Test.Fixtures.Assigns</a>
+
+  </div>
+
+</div>
+
+    </div>
+  </section>
+
+
+<div class="bottom-actions">
+  <div class="bottom-actions-item">
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="readme.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+README
+        </span>
+      </a>
+
+  </div>
+</div>
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.7" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.7">Hex Preview</a>
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

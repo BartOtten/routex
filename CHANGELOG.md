@@ -5,6 +5,19 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.0-alpha.7](https://github.com/BartOtten/routex/compare/v0.1.0-alpha.7...v0.2.0-alpha.7) (2023-05-31)
+
+
+
+
+### Features:
+
+* utils: use verbose defaults for esc_inspect/2
+
+### Bug Fixes:
+
+* route: swallowed routes due to nonunique map key
+
 ## [v0.1.0-alpha.6](https://github.com/BartOtten/routex/compare/v0.1.0-alpha.5...v0.1.0-alpha.6) (2023-05-30)
 
 

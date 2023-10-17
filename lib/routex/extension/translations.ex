@@ -59,7 +59,7 @@ defmodule Routex.Extension.Translations do
       Mix.Project.get!().project() |> Access.get(:compilers, []) |> Enum.member?(:gettext)
 
     unless Version.match?(System.version(), ">= 1.14.0") or gt_in_compilers do
-      Logger.warn(
+      Logger.warning(
         "When route translations are updated, run `mix compile --force [MyWebApp].Route"
       )
     end
@@ -88,6 +88,38 @@ defmodule Routex.Extension.Translations do
 
       %{route | path: path}
     end
+  end
+
+  @impl Routex.Extension
+  # creates gettext triggers so route segments are extracted into a translation file
+  def create_helpers(routes, config_backend, _env) do
+    config = config_backend.config()
+    backend = config.translations_backend
+    domain = config.translations_domain
+
+    is_original_fn = &(&1 |> Attrs.get(:__order__) |> List.last() == 0)
+
+    uniq_segments =
+      routes
+      |> Enum.filter(is_original_fn)
+      |> Enum.map(&Path.split(&1.path))
+      |> List.flatten()
+      |> Enum.uniq()
+
+    prelude =
+      quote do
+        require unquote(backend)
+      end
+
+    triggers_ast =
+      Enum.map(uniq_segments, fn
+        @catch_all -> nil
+        @interpolate <> _rest -> nil
+        segment when not is_binary(segment) -> nil
+        segment -> quote do: unquote(backend).dgettext(unquote(domain), unquote(segment))
+      end)
+
+    [prelude | triggers_ast]
   end
 
   defp translate(path, locale, backend, domain)

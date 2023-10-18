@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.0-alpha.8](https://github.com/BartOtten/routex/compare/v0.2.0-alpha.7...v0.2.0-alpha.8) (2023-10-18)
+
+
+
+
+### Bug Fixes:
+
+* translations: reliably extract segments to translate
+
 ## [v0.2.0-alpha.7](https://github.com/BartOtten/routex/compare/v0.1.0-alpha.7...v0.2.0-alpha.7) (2023-05-31)
 
 

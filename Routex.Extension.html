@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.8">
+
+    <title>Routex.Extension — Phoenix Routes Extension Framework v0.2.0-alpha.8</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-9B301691.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="modules" class="page-behaviour">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.8
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+    <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L1" title="View Source" class="icon-action" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+
+  <span translate="no">Routex.Extension</span> <small>behaviour</small>
+  <small class="app-vsn" translate="no">(Phoenix Routes Extension Framework v0.2.0-alpha.8)</small>
+
+</h1>
+
+
+  <section id="moduledoc">
+<p>Specification for composable Routex extensions.</p><p>Optional callbacks:</p><ul><li>configure</li><li>transform</li><li>create_helpers</li></ul><p>See also: <a href="extensions.html">Routex Extensions</a></p>
+  </section>
+
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+      Summary
+    </h1>
+<div class="summary-types summary">
+  <h2>
+    <a href="#types">Types</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:backend/0" translate="no">backend()</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:env/0" translate="no">env()</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:opts/0" translate="no">opts()</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:routes/0" translate="no">routes()</a>
+
+      </div>
+
+    </div>
+
+</div>
+<div class="summary-callbacks summary">
+  <h2>
+    <a href="#callbacks">Callbacks</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#c:configure/2" translate="no">configure(opts, backend)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The <code class="inline">configure/2</code> callback is called in the first stage with the options
+provided to <a href="Routex.html"><code class="inline">Routex</code></a> and the name of the Routext backend. It is expected to
+return a new list of options.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#c:create_helpers/3" translate="no">create_helpers(routes, backend, env)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The <code class="inline">create_helpers/3</code> callback is called in the last stage with a list of
+routes belonging to a Routext backend, the name of the Routext backend and
+the current environment. It is expected to return Elixir AST.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#c:post_transform/3" translate="no">post_transform(routes, backend, env)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The <code class="inline">post_transform/1</code> callback is called in the third stage with a list of
+routes belonging to a Routext backend. It is expected to return a list of
+Phoenix.Router.Route structs almost identical to the input, only adding
+<a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> -for own usage- is allowed.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#c:transform/3" translate="no">transform(routes, backend, env)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>The <code class="inline">transform/3</code> callback is called in the second stage with a list of
+routes belonging to a Routext backend, the name of the configuration model
+and the current environment. It is expected to return a list of
+Phoenix.Router.Route structs with flattened <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a>.</p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="types" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#types">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+Types
+    </h1>
+    <div class="types-list">
+<section class="detail" id="t:backend/0">
+
+  <div class="detail-header">
+    <a href="#t:backend/0" class="detail-link" title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">backend()</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L13" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> backend() :: <a href="Routex.html#t:t/0">Routex.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="t:env/0">
+
+  <div class="detail-header">
+    <a href="#t:env/0" class="detail-link" title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">env()</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L14" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> env() :: <a href="https://hexdocs.pm/elixir/Macro.Env.html#t:t/0">Macro.Env.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="t:opts/0">
+
+  <div class="detail-header">
+    <a href="#t:opts/0" class="detail-link" title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">opts()</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L15" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> opts() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">list</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="t:routes/0">
+
+  <div class="detail-header">
+    <a href="#t:routes/0" class="detail-link" title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">routes()</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L16" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> routes() :: [Phoenix.Router.Route.t()]</pre>
+
+      </div>
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+  <section id="callbacks" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#callbacks">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+Callbacks
+    </h1>
+    <div class="callbacks-list">
+<section class="detail" id="c:configure/2">
+
+  <div class="detail-header">
+    <a href="#c:configure/2" class="detail-link" title="Link to this callback">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this callback</span>
+    </a>
+    <h1 class="signature" translate="no">configure(opts, backend)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L23" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+      <span class="note">(optional)</span>
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@callback</span> configure(<a href="#t:opts/0">opts</a>(), <a href="#t:backend/0">backend</a>()) :: <a href="#t:opts/0">opts</a>()</pre>
+
+      </div>
+
+<p>The <code class="inline">configure/2</code> callback is called in the first stage with the options
+provided to <a href="Routex.html"><code class="inline">Routex</code></a> and the name of the Routext backend. It is expected to
+return a new list of options.</p>
+  </section>
+</section>
+<section class="detail" id="c:create_helpers/3">
+
+  <div class="detail-header">
+    <a href="#c:create_helpers/3" class="detail-link" title="Link to this callback">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this callback</span>
+    </a>
+    <h1 class="signature" translate="no">create_helpers(routes, backend, env)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L48" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+      <span class="note">(optional)</span>
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@callback</span> create_helpers(<a href="#t:routes/0">routes</a>(), <a href="#t:backend/0">backend</a>(), <a href="#t:env/0">env</a>()) :: <a href="https://hexdocs.pm/elixir/Macro.html#t:output/0">Macro.output</a>()</pre>
+
+      </div>
+
+<p>The <code class="inline">create_helpers/3</code> callback is called in the last stage with a list of
+routes belonging to a Routext backend, the name of the Routext backend and
+the current environment. It is expected to return Elixir AST.</p><p>The AST is included in <code class="inline">MyAppWeb.Router.RoutexHelpers</code>.</p>
+  </section>
+</section>
+<section class="detail" id="c:post_transform/3">
+
+  <div class="detail-header">
+    <a href="#c:post_transform/3" class="detail-link" title="Link to this callback">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this callback</span>
+    </a>
+    <h1 class="signature" translate="no">post_transform(routes, backend, env)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L39" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+      <span class="note">(optional)</span>
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@callback</span> post_transform(<a href="#t:routes/0">routes</a>(), <a href="#t:backend/0">backend</a>(), <a href="#t:env/0">env</a>()) :: <a href="#t:routes/0">routes</a>()</pre>
+
+      </div>
+
+<p>The <code class="inline">post_transform/1</code> callback is called in the third stage with a list of
+routes belonging to a Routext backend. It is expected to return a list of
+Phoenix.Router.Route structs almost identical to the input, only adding
+<a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> -for own usage- is allowed.</p>
+  </section>
+</section>
+<section class="detail" id="c:transform/3">
+
+  <div class="detail-header">
+    <a href="#c:transform/3" class="detail-link" title="Link to this callback">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this callback</span>
+    </a>
+    <h1 class="signature" translate="no">transform(routes, backend, env)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension.ex#L31" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+      <span class="note">(optional)</span>
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@callback</span> transform(<a href="#t:routes/0">routes</a>(), <a href="#t:backend/0">backend</a>(), <a href="#t:env/0">env</a>()) :: <a href="#t:routes/0">routes</a>()</pre>
+
+      </div>
+
+<p>The <code class="inline">transform/3</code> callback is called in the second stage with a list of
+routes belonging to a Routext backend, the name of the configuration model
+and the current environment. It is expected to return a list of
+Phoenix.Router.Route structs with flattened <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a>.</p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.8" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.8">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.8/show/lib/routex/extension.ex">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

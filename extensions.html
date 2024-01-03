@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.8">
+
+    <title>Routex Extensions — Phoenix Routes Extension Framework v0.2.0-alpha.8</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-9B301691.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="extras" class="page-extra">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.8
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+    <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/EXTENSIONS.md#L1" title="View Source" class="icon-action" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+
+
+  <span>Routex Extensions</span>
+</h1>
+
+<p>Routex Extensions extend the functionality provided by Routex to transform routes or
+generate new route based helper functions. Each extension is a module which adopts the
+<a href="Routex.Extension.html"><code class="inline">Routex.Extension</code></a> specification. It has to implement one or multiple public functions:</p><ul><li>configure/2</li><li>transform/3</li><li>post_transform/3</li><li>create_helpers/3</li></ul><p>Routex will call those public functions at different stages before
+the Routex hands-off the result to <a href="https://hexdocs.pm/phoenix/1.7.2/Phoenix.Router.html"><code class="inline">Phoenix.Router</code></a> for compilation.</p><h2 id="callbacks-and-stages" class="section-heading">
+  <a href="#callbacks-and-stages" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">callbacks-and-stages</p>
+  </a>
+  Callbacks and stages
+</h2>
+<h3 id="stage-1-configure" class="section-heading">
+  <a href="#stage-1-configure" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">stage-1-configure</p>
+  </a>
+  Stage 1: Configure
+</h3>
+<p>This stage enables extensions to pre-process options upfront.</p><p>The <code class="inline">configure/2</code> callback is called with the options provided to <a href="Routex.html"><code class="inline">Routex</code></a> and
+the name of the Routext backend. It is expected to return a new list of
+options.</p><p>Routex collects all options in this stage for subsequent stages. Therefore,
+extensions should add any fallback/default they might use themselves to the
+options in this stage.</p><p>To aid in code completion, the final configuration is passed as a struct to
+subsequent stages.</p><h3 id="stage-2-transform" class="section-heading">
+  <a href="#stage-2-transform" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">stage-2-transform</p>
+  </a>
+  Stage 2: Transform
+</h3>
+<p>This stage is meant to adapt the properties of <code class="inline">Phoenix.Router.Route</code>
+structs. The routes are grouped by Routext backend and processed
+per group, allowing an extension to use accumulating values within
+one iteration.</p><p>The <code class="inline">transform/3</code> callback is called with a list of routes belonging to
+a Routext backend, the name of the configuration model and the
+current environment. It is expected to return a list of Phoenix.Router.Route
+structs.</p><h4>Flattening option values</h4><p>Extensions can make use of <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> provided by Routex itself, Routex
+backends and other extensions.</p><p>To make the availability of the attributes as predictable as possible, Routex
+uses a flat structure which is stored in a routes' <code class="inline">private.routex</code> field.
+However, using a flat structure might conflict with developer experience;
+sometimes a nested structure to provide configuration options might be more
+suitable.</p><p>One responsibility of the <code class="inline">transform/3</code> callback is to flatten the structure of
+attributes they use for each route they receive, so other extensions can use
+attributes set by the current extension without knowledge of the configuration
+structure.</p><p><strong>Example</strong>
+The Alternatives extension uses nested options and allows inheritance
+of properties from parent scopes.</p><pre><code class="makeup elixir" translate="no"><span class="ss">alternatives</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8689222022-1">%{</span><span class="w">
+  </span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w">
+    </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+    </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">scopes</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8689222022-2">%{</span><span class="w">
+      </span><span class="s">&quot;nl&quot;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p" data-group-id="8689222022-3">%{</span><span class="w">
+          </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p">,</span><span class="w">
+          </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="w">
+        </span><span class="p" data-group-id="8689222022-3">}</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;gb&quot;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p" data-group-id="8689222022-4">%{</span><span class="w">
+        </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;gb&quot;</span><span class="p">,</span><span class="w">
+        </span><span class="p" data-group-id="8689222022-4">}</span><span class="w">
+    </span><span class="p" data-group-id="8689222022-2">}</span><span class="w">
+</span><span class="p" data-group-id="8689222022-1">}</span></code></pre><p>The Alternatives module is therefor responsible for flattening those for
+(itself and) other extensions to use. To take the route responsible for the
+&quot;gb&quot; scope as an example, the extension should add flattened attributes in the
+Route struct. It can do so using the helper function <a href="Routex.Attrs.html#put/2"><code class="inline">Routex.Attrs.put/2</code></a>.</p><pre><code class="makeup elixir" translate="no"><span class="nc">Routex.Attrs</span><span class="o">.</span><span class="n">put</span><span class="p" data-group-id="0758157412-1">(</span><span class="n">route</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="0758157412-2">[</span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en_GB&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;gb&quot;</span><span class="p" data-group-id="0758157412-2">]</span><span class="p" data-group-id="0758157412-1">)</span></code></pre><p>Now the <code class="inline">Translation</code> extension can search for the option <code class="inline">:locale</code> in the
+route's opts, unaware of how that locale was initially configured.</p><h3 id="stage-3-post-transform" class="section-heading">
+  <a href="#stage-3-post-transform" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">stage-3-post-transform</p>
+  </a>
+  Stage 3: Post Transform
+</h3>
+<p>The <code class="inline">post_transform</code> stage is meant to set <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> knowing all other
+properties of a route are final.</p><h3 id="stage-4-create-helpers" class="section-heading">
+  <a href="#stage-4-create-helpers" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">stage-4-create-helpers</p>
+  </a>
+  Stage 4: Create helpers
+</h3>
+<p>In this stage helper functions can be generated which will be added to
+<code class="inline">MyAppWeb.Router.RoutexHelpers</code>.</p><p>The <code class="inline">create_helpers/3</code> callback is called with a list of routes belonging to a
+Routext backend, the name of the Routext backend and the current environment.
+It is expected to return Elixir AST.</p><p>As a result the developer only has to <code class="inline">import MyAppWeb.Router.RoutexHelpers</code>
+for all helpers generated by extensions to be included in the app.</p><h2 id="guidelines" class="section-heading">
+  <a href="#guidelines" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">guidelines</p>
+  </a>
+  Guidelines
+</h2>
+<ul><li>make functions not defined by the <a href="Routex.Extension.html"><code class="inline">Routex.Extension</code></a> behaviour private.</li><li>provide as many options as possible; other extensions might use the information.</li><li>provide additional options as flat list(s) so other extensions don't have to guess structure.</li><li>as other extensions might use options set by your extension, try to keep their availability stable.</li></ul><h3 id="documentation" class="section-heading">
+  <a href="#documentation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">documentation</p>
+  </a>
+  Documentation
+</h3>
+<pre><code class="makeup elixir" translate="no"><span class="na">@moduledoc</span><span class="w"> </span><span class="s">&quot;&quot;&quot;
+Summary of feature provided.
+
+## Options
+- `name` - description
+
+## Example configuration
+```diff
+# file /lib/example_web/routex_backend.ex
+defmodule ExampleWeb.RoutexBackend do
+  use Routex,
+  extensions: [
++   Routex.Extension.Name
+],
++ name: [name_opt: &quot;value&quot;]
+```
+
+## Pseudo result
+    /products/:id/edit  ⇒ /products/:id/edit
+
+## `Routex.Attrs`
+**Requires**
+- none
+
+**Sets**
+- none
+
+## Helpers
+function_name(arg1 :: type) :: type
+&quot;&quot;&quot;</span></code></pre>
+<div class="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="changelog.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Change Log
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="troubleshooting.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Troubleshooting
+        </span>
+      </a>
+
+  </div>
+</div>
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.8" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.8">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.8/show/EXTENSIONS.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.29.4">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.2.0-alpha.8">
+
+    <title>Routex.Extension.RouteHelpers — Phoenix Routes Extension Framework v0.2.0-alpha.8</title>
+    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-XWGFFSCD.js"></script>
+    <script src="dist/sidebar_items-9B301691.js"></script>
+
+      <script src="docs_config.js"></script>
+
+    <script async src="dist/html-JDI3AVDD.js"></script>
+
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="modules" class="page-module">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="main">
+
+<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<section class="sidebar">
+  <form class="sidebar-search" action="search.html">
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
+    </button>
+    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
+      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
+    </button>
+    <label class="search-label">
+      <p class="sr-only">Search</p>
+      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    </label>
+  </form>
+
+  <div class="autocomplete">
+    <div class="autocomplete-results">
+    </div>
+  </div>
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-projectDetails">
+      <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+      </a>
+      <div class="sidebar-projectVersion" translate="no">
+        v0.2.0-alpha.8
+      </div>
+    </div>
+    <ul class="sidebar-listNav">
+      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+
+        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+
+
+    </ul>
+  </div>
+
+  <div class="gradient"></div>
+  <ul id="full-list"></ul>
+</section>
+
+<section class="content">
+  <output role="status" id="toast"></output>
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+<h1>
+<button class="icon-action display-settings">
+  <i class="ri-settings-3-line"></i>
+  <span class="sr-only">Settings</span>
+</button>
+
+
+    <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension/route_helpers.ex#L1" title="View Source" class="icon-action" rel="help">
+      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+      <span class="sr-only">View Source</span>
+    </a>
+
+  <span translate="no">Routex.Extension.RouteHelpers</span> 
+  <small class="app-vsn" translate="no">(Phoenix Routes Extension Framework v0.2.0-alpha.8)</small>
+
+</h1>
+
+
+  <section id="moduledoc">
+<p>Provides route helpers with support for automatic selecting alternatives
+routes. The helpers can be used to override Phoenix' defaults as they are
+a drop-in replacements.</p><p>Only use this extension when you  make use of extensions generating alternative
+routes, as otherwise the result will be the same as the official helpers.</p><h2 id="module-configuration" class="section-heading">
+  <a href="#module-configuration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">configuration</p>
+  </a>
+  Configuration
+</h2>
+<pre><code class="diff"># file /lib/example_web/routex_backend.ex
+defmodule ExampleWeb.RoutexBackend do
+  use Routex,
+  extensions: [
++   Routex.Extension.RouteHelpers,
+],</code></pre><p>Phoenix &lt; 1.7 created an alias <a href="Routes.html"><code class="inline">Routes</code></a> by default. You can either replace it
+or add an alias for RoutexHelpers. Phoenix &gt;= 1.7 deprecated the helpers
+in favor of Verified Routes.</p><p>In the example below we 'override' the default <a href="Routes.html"><code class="inline">Routes</code></a> alias to use
+Routex' Route Helpers as a drop-in replacement, but keep the original helpers
+functions available by using alias <code class="inline">OriginalRoutes</code>.</p><pre><code class="diff"># file /lib/example_web.ex
+defp routex_helpers do
+
++ alias ExampleWeb.Router.Helpers, as: OriginalRoutes
++ alias ExampleWeb.Router.RoutexHelpers, as: Routes
+
+end</code></pre><h2 id="module-pseudo-result" class="section-heading">
+  <a href="#module-pseudo-result" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">pseudo-result</p>
+  </a>
+  Pseudo result
+</h2>
+<pre><code class="makeup elixir" translate="no"><span class="c1"># When alternatives are created it uses auto-selection to keep the user &#39;in scope&#39;.</span><span class="w">
+
+</span><span class="c1"># in (h)eex template</span><span class="w">
+</span><span class="o">&lt;</span><span class="n">a</span><span class="w"> </span><span class="n">href</span><span class="o">=</span><span class="p" data-group-id="0690294942-1">{</span><span class="nc">Routes</span><span class="o">.</span><span class="n">product_index_path</span><span class="p" data-group-id="0690294942-2">(</span><span class="na">@socket</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="p">,</span><span class="w"> </span><span class="n">product</span><span class="p" data-group-id="0690294942-2">)</span><span class="p" data-group-id="0690294942-1">}</span><span class="o">&gt;</span><span class="nc">Product</span><span class="w"> </span><span class="c1">#1&lt;/a&gt;</span><span class="w">
+
+</span><span class="c1"># is replaced during during compilation with:</span><span class="w">
+</span><span class="k">case</span><span class="w"> </span><span class="n">alternative</span><span class="w"> </span><span class="k" data-group-id="0690294942-3">do</span><span class="w">
+   </span><span class="no">nil</span><span class="w"> </span><span class="err">⇒</span><span class="w">  </span><span class="s">&quot;/products/</span><span class="si" data-group-id="0690294942-4">#{</span><span class="n">product</span><span class="si" data-group-id="0690294942-4">}</span><span class="s">&quot;</span><span class="w">
+  </span><span class="s">&quot;en&quot;</span><span class="w"> </span><span class="err">⇒</span><span class="w">  </span><span class="s">&quot;/products/</span><span class="si" data-group-id="0690294942-5">#{</span><span class="n">product</span><span class="si" data-group-id="0690294942-5">}</span><span class="s">&quot;</span><span class="w">
+  </span><span class="s">&quot;nl&quot;</span><span class="w"> </span><span class="err">⇒</span><span class="w">  </span><span class="s">&quot;/europe/nl/products/</span><span class="si" data-group-id="0690294942-6">#{</span><span class="n">product</span><span class="si" data-group-id="0690294942-6">}</span><span class="s">&quot;</span><span class="w">
+  </span><span class="s">&quot;be&quot;</span><span class="w"> </span><span class="err">⇒</span><span class="w">  </span><span class="s">&quot;/europe/be/products/</span><span class="si" data-group-id="0690294942-7">#{</span><span class="n">product</span><span class="si" data-group-id="0690294942-7">}</span><span class="s">&quot;</span><span class="w">
+</span><span class="k" data-group-id="0690294942-3">end</span></code></pre><h2 id="module-routex-attrs" class="section-heading">
+  <a href="#module-routex-attrs" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i>
+  <p class="sr-only">routex-attrs</p>
+  </a>
+  <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a>
+</h2>
+<p><strong>Requires</strong></p><ul><li>none</li></ul><p><strong>Sets</strong></p><ul><li>none</li></ul>
+  </section>
+
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+      Summary
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#build_case/1" translate="no">build_case(list)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#build_case_clauses/4" translate="no">build_case_clauses(routes, router, suffix, args)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#dynamic_delegate_with_arity/3" translate="no">dynamic_delegate_with_arity(helper_module, fn_name, fn_args)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#dynamic_fn_with_arity/3" translate="no">dynamic_fn_with_arity(fn_name, fn_args, opts)</a>
+
+      </div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+        <span class="sr-only">Link to this section</span>
+      </a>
+Functions
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="build_case/1">
+
+  <div class="detail-header">
+    <a href="#build_case/1" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">build_case(list)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension/route_helpers.ex#L115" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="build_case_clauses/4">
+
+  <div class="detail-header">
+    <a href="#build_case_clauses/4" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">build_case_clauses(routes, router, suffix, args)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension/route_helpers.ex#L126" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="dynamic_delegate_with_arity/3">
+
+  <div class="detail-header">
+    <a href="#dynamic_delegate_with_arity/3" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">dynamic_delegate_with_arity(helper_module, fn_name, fn_args)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension/route_helpers.ex#L152" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="dynamic_fn_with_arity/3">
+
+  <div class="detail-header">
+    <a href="#dynamic_fn_with_arity/3" class="detail-link" title="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <h1 class="signature" translate="no">dynamic_fn_with_arity(fn_name, fn_args, opts)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.2.0-alpha.8/lib/routex/extension/route_helpers.ex#L140" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+      <footer class="footer">
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/0.2.0-alpha.8" class="footer-hex-package">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.8">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/0.2.0-alpha.8/show/lib/routex/extension/route_helpers.ex">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+              Search HexDocs
+            </button>
+
+              <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.29.4) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+
+
+  </body>
+</html>

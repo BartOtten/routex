@@ -8,10 +8,9 @@
 # Routex
 Routex is a framework to extend the functionality of Phoenix Frameworks'
 router. Using a pluggable extension system it can transform routes, create
-alternative routes and generate helper functions based on routes in your
-Phoenix Framework app. It acts as middleware between route definition and route
-compilation by Phoenix; in order to have minimal impact on run-time
-performance.
+alternative routes and generate helper functions based on routes in your Phoenix
+Framework app. It acts as middleware between route definition and route
+compilation by Phoenix; in order to have minimal impact on run-time performance.
 
 It ships with a small set of extensions and provides helper functions for
 writing your own custom Phoenix router features.
@@ -25,30 +24,33 @@ writing your own custom Phoenix router features.
 ## Example
 Localize your Phoenix website with multilingual URLs and custom template
 assigns; enhancing user engagement and content relevance. This example combines
-a few extensions: Alternatives, Translations, Assigns and Verified
-Routes.
+a few extensions: Alternatives, Translations, Assigns and Verified Routes.
 
                         ⇒ /products/:id/edit                      @loc.locale = "en_US"
     /products/:id/edit  ⇒ /eu/nederland/producten/:id/bewerken    @loc.locale = "nl_NL"
                         ⇒ /eu/espana/producto/:id/editar          @loc.locale = "es_ES"
                         ⇒ /gb/products/:id/edit                   @loc.locale = "en_GB"
 
-- Alternatives: the URL format is [customizable](#alternatives) (no mandatory _website.com/[locale]/page_)
-- Translation: URLs [match the language of content](#multilingual-routes); enhancing user
-  engagement and content relevance.
-- Assigns: the value of `locale` is specified per scope by the configuration of the Alternatives extension.
-  The value is made available in components and controllers in namespace `loc` as `@loc.locale`
-- Verified Routes allows you to use use `~p"/products/#{product}/edit"` in your code. At run-time
-  the route is combined with the set `locale` to pick the localized alternative route.
+- Alternatives: the URL format is [customizable](#alternatives) (no mandatory
+  _website.com/[locale]/page_)
+- Translation: URLs [match the language of content](#multilingual-routes);
+  enhancing user engagement and content relevance.
+- Assigns: the value of `locale` is specified per scope by the configuration of
+  the Alternatives extension.  The value is made available in components and
+  controllers in namespace `loc` as `@loc.locale`
+- Verified Routes allows you to use use `~p"/products/#{product}/edit"` in your
+  code. At run-time the route is combined with the set `locale` to pick the
+  localized alternative route.
 
 ## Documentation
 
-[HexDocs](https://hexdocs.pm/routex) (stable)
-and [GitHub Pages](https://bartotten.github.io/routex) (development).
+[HexDocs](https://hexdocs.pm/routex) (stable) and [GitHub
+Pages](https://bartotten.github.io/routex) (development).
 
 ## Requirements and Installation
 
-See the [Usage Guide](USAGE.md) for the requirements and installation instructions.
+See the [Usage Guide](USAGE.md) for the requirements and installation
+instructions.
 
 ## Extensions
 
@@ -57,14 +59,14 @@ single feature and should minimize hard dependencies on other extensions.
 Instead, Routex advises to make use of `Routex.Attrs` to share attributes;
 allowing extensions to work together whithout being coupled.
 
-The documentation of each extension lists any provided or
-required `Routex.Attrs`.
+The documentation of each extension lists any provided or required
+`Routex.Attrs`.
 
 ### Alternatives
 
-Create alternative routes based on `scopes` configured in
-a Routex backend module. Scopes can be nested and each scope can provide
-it's values to be shared with other extensions.
+Create alternative routes based on `scopes` configured in a Routex backend
+module. Scopes can be nested and each scope can provide it's values to be shared
+with other extensions.
 
 [Alternatives Documentation](`Routex.Extension.Alternatives`)
 
@@ -102,9 +104,9 @@ Phoenix Route Helpers as they are drop-ins.
 
 ### Assigns
 
-With this extension you can add (a subset of) attributes set by other
-extensions to Phoenix' assigns making them available in components and
-controllers with the `@` assigns operator (optionally under a namespace)
+With this extension you can add (a subset of) attributes set by other extensions
+to Phoenix' assigns making them available in components and controllers with the
+`@` assigns operator (optionally under a namespace)
 
     @namespace.area   =>  :eu_nl
 

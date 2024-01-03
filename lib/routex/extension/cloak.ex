@@ -2,8 +2,12 @@ defmodule Routex.Extension.Cloak do
   @moduledoc """
   Transforms routes to be unrecognizable.
 
-  This module is intended for testing and demonstration purposes. Do not use
-  this for other purposes.
+
+  > #### Warning {: .warning}
+  >
+  > This extension is intended for testing and demonstration. It's
+  > behavior may change over time.
+
 
   ## Configuration
   ```diff

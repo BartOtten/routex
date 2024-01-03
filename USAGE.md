@@ -47,10 +47,10 @@ Modify the entrypoint your web interface definition.
 +  end
 ```
 
-The on_mount hook is used to attach a `handle_param` hook that assigns a few
-(helper) values to the connection or socket. This includes the current url and
-any assigns created by Routex Extensions. When you want to have full control over
-these hooks, you can use something like the snippet below instead.
+The `on_mount` hook attaches a `handle_param` which in turn assigns a few
+(helper) values to the connection and/or socket. This includes the current url
+and any assigns created by Routex Extensions. When you want to have full control
+over these hooks, you can use something like the snippet below instead.
 
 ```elixir
 def on_mount(_, params, session, socket) do
@@ -83,16 +83,16 @@ end
 
 ## Extensions
 
-Routex relies on extensions to provide features. Each extension provides a
-single feature. The extensions have their own documentation which specifies how
-to configure and use the extension.
+Routex is merely a framework and relies on extensions to provide features. Each
+extension provides a single feature. The extensions have their own documentation
+which specifies how to configure and use them.
 
 ## Preprocess routes with Routex
 
-`Routex` will preprocess any route wrapped in a `preprocess_using` block;
-either direct or indirect. It uses the backend passed as the first argument.
-This allows the use of multiple backends (e.g. to use different extensions for
-admin routes)
+`Routex` will preprocess any route wrapped in a `preprocess_using` block; either
+direct or indirect. It uses the backend passed as the first argument.  This
+allows the use of multiple backends (e.g. to use different extensions for admin
+routes)
 
 ```diff
 # file: router.ex

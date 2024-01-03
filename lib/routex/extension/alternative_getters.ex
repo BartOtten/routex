@@ -34,14 +34,16 @@ defmodule Routex.Extension.AlternativeGetters do
     attrs: %{
       __line__: 32,
       __order__: [0, 12, 1],
-      __origin__: "/products/:id"
+      __origin__: "/products/:id",
+      [...attributes set by other extensions...]
     }},
    %Routex.Extension.AlternativeGetters{
     slug: "/asia/products/12/?foo=baz",
     attrs: %{
       __line__: 32,
       __order__: [0, 12, 1],
-      __origin__: "/products/:id"
+      __origin__: "/products/:id",
+      [...attributes set by other extensions...]
     }},
   ]
   ```

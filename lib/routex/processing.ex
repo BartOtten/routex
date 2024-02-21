@@ -197,6 +197,12 @@ defmodule Routex.Processing do
         quote do
           opts = unquote(module).attrs(url)
 
+          socket =
+            %{
+              socket
+              | private: Map.put(socket.private, :routex, %{url: url, __order__: opts.__order__})
+            }
+
           {:cont,
            Phoenix.LiveView.assign(
              socket,
@@ -207,6 +213,12 @@ defmodule Routex.Processing do
       else
         quote do
           opts = unquote(module).attrs(url)
+
+          socket =
+            %{
+              socket
+              | private: Map.put(socket.private, :routex, %{url: url, __order__: opts.__order__})
+            }
 
           {:cont,
            Phoenix.Component.assign(

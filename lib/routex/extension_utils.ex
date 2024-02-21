@@ -3,6 +3,7 @@ defmodule Routex.ExtensionUtils do
   @moduledoc """
   Provides utility funtions for extension development.
   """
+  require Logger
 
   @doc """
   `Macro.escape/1` and `IO.inspect/2` the given input. Options are
@@ -53,9 +54,15 @@ defmodule Routex.ExtensionUtils do
       |> Enum.map(fn {{var, _}, _} -> var end)
 
     cond do
-      :socket in vars ->
+      :assigns in vars ->
         quote do
-          var!(socket).private.routex.__order__ |> List.last()
+          case var!(assigns) do
+            %{conn: %{private: %{routex: %{__order__: order}}}} ->
+              List.last(order)
+
+            %{__order__: order} ->
+              List.last(order)
+          end
         end
 
       :conn in vars ->
@@ -63,12 +70,27 @@ defmodule Routex.ExtensionUtils do
           var!(conn).private.routex.__order__ |> List.last()
         end
 
-      :assigns in vars ->
+      :socket in vars ->
         quote do
-          if is_map_key(var!(assigns), :conn) do
-            var!(assigns).conn.private.routex.__order__ |> List.last()
-          else
-            var!(assigns).__order__ |> List.last()
+          case var!(socket) do
+            %{private: %{routex: %{__order__: order}}} ->
+              List.last(order)
+
+            %{private: %{connect_info: %{private: %{routex: %{__order__: order}}}}} ->
+              List.last(order)
+
+            _ ->
+              require Logger
+
+              Logger.warning("""
+              Using branching verified routes in `mount/3` is not supported.
+              Please move the code to the `handle_params/3`.
+              """)
+
+              {:current_stacktrace, st} = Process.info(self(), :current_stacktrace)
+              st |> tl |> Exception.format_stacktrace() |> Logger.warning()
+
+              0
           end
         end
     end

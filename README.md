@@ -6,25 +6,28 @@
 
 
 # Routex
-Routex is a framework to extend the functionality of Phoenix Frameworks'
-router. Using a pluggable extension system it can transform routes, create
-alternative routes and generate helper functions based on routes in your Phoenix
-Framework app. It acts as middleware between route definition and route
-compilation by Phoenix; in order to have minimal impact on run-time performance.
+Routex serves as a framework designed to extend the capabilities of Phoenix'
+router. Leveraging a flexible extension system, it is able to transform routes,
+generate alternative routes, and generate helper functions based on routes
+within you Phoenix Framework application. Positioned as middleware between route
+definition and compilation by Phoenix, Routex ensures (close to) zero impact on
+runtime performance.
 
-It ships with a small set of extensions and provides helper functions for
-writing your own custom Phoenix router features.
+It ships with a concise selection of extensions and utility functions enabling
+you to craft custom features for your Phoenix router when the need arises.
 
 ## Top Features and Benefits
-- none to minimal run-time performance penalty (depending on extensions).
+- (close to) zero runtime performance impact; depending on enabled extensions.
 - adding router features is plug-and-play.
-- include only features you need in your product; less code is less bugs.
 - write powerful extensions without the plumbing.
+- cherry pick what you need; less code == less potential bugs.
+
 
 ## Example
 Localize your Phoenix website with multilingual URLs and custom template
 assigns; enhancing user engagement and content relevance. This example combines
-a few extensions: Alternatives, Translations, Assigns and Verified Routes.
+a few of the included extensions: Alternatives, Translations, Assigns and
+Verified Routes.
 
                         ⇒ /products/:id/edit                      @loc.locale = "en_US"
     /products/:id/edit  ⇒ /eu/nederland/producten/:id/bewerken    @loc.locale = "nl_NL"
@@ -38,9 +41,9 @@ a few extensions: Alternatives, Translations, Assigns and Verified Routes.
 - Assigns: the value of `locale` is specified per scope by the configuration of
   the Alternatives extension.  The value is made available in components and
   controllers in namespace `loc` as `@loc.locale`
-- Verified Routes allows you to use use `~p"/products/#{product}/edit"` in your
-  code. At run-time the route is combined with the set `locale` to pick the
-  localized alternative route.
+- Branching Verified Routes allows you to use use
+  `~p"/products/#{product}/edit"` in your code. At run-time the route is
+  combined with the set `locale` to pick the localized alternative route.
 
 ## Documentation
 
@@ -142,3 +145,72 @@ change at any given moment to generate other routes without prior notice.
 
 
 [Attribute Getters Documentation](`Routex.Extension.Cloak`)
+
+## Routex vs CLDR Routes vs Phoenix Localized Routes
+
+The capabilities and advancements within `Routex` surpass those of `Phoenix
+Localized Routes`, offering a comprehensive array of features. As Phoenix
+Localized Routes has stagnated in its development, developers are strongly
+advised to transition to Routex for a more robust solution.
+
+When considering `Routex` against `CLDR Routes`, it's akin to comparing Apple to
+Linux. CLDR Routes maintains a fixed scope and enjoys a shared configuration
+with other CLDR packages. Routex on the other hand boasts a dynamic scope
+providing maximum freedom. Its primary advantages over CLDR Routes include its
+expansive scope facilitated by its extension mechanism and the minimized
+necessity for code modifications throughout a codebase.
+
+### History
+
+Embarking into 2022, the introduction of `Phoenix Localized Routes` brought an
+innovative approach to route generation within the Phoenix ecosystem. This
+library reimagined website route generation and introduced features such as
+alternative route creation, the ability to translate URL segments using Gettext,
+and easy route based template assignments.
+
+The unveiling of Phoenix Localized Routes (PLR) captured the attention of the
+main author behind CLDR. Recognizing its potential, he discerned that the lack
+of modularity in PLR did not align with the requirements of CLDR. Consequently,
+CLDR forked PLR, birthing `CLDR-routes`, tailored precisely to meet their unique
+objectives. Initially, there was a spirit of collaboration between the two
+endeavors, with shared code fostering mutual progress. However, over time, the
+natural evolution of each project led to increasing disparities, hindering
+further cooperation.
+
+The debut of Phoenix 1.7, featuring verified routes, underscored the challenges
+confronted by maintainers of PLR and CLDR-routes alike. The heavy reliance on
+complex macros posed significant hurdles in adapting to this new
+paradigm. Moreover, the growing divide between their codebases made the exchange
+of solutions impractical.
+
+In response to these obstacles, the creator of PLR took the initiative to
+develop `Routex`. Inspired by the simplicity and versatility of Plug, Routex
+embraces extensions, offering ease of maintenance and seamless integration into
+diverse projects. Its modular design empowers developers to extend functionality
+effortlessly, paving the way for the streamlined development of tailored
+solutions.
+
+### Comparison table
+
+| Feature             | Routex     | PLR        | CLDR Routes  |
+|---------------------|------------|------------|--------------|
+| Scope detection     | URL   [^1] | Session    | Session      |
+| Route encapsulation | Free  [^2] | Restricted | Restricted   |
+| Route manipulation  | Full  [^3] | Limited    | Limited      |
+| Alternative Routes  | Free       | Free       | CLDR |
+| Translation         | X          | X          | X            |
+| Verified Routes     | X          | X          | X            |
+| Route Helpers       | X          | X          | X            |
+| Drop-in replacement | X     [^4] | X          | -            |
+| Single-dep Phoenix  | X          | X          | -            |
+| Modular             | X          |            | -            |
+| Extendable          | X          |            | -            |
+
+[^1]: Routex uses pattern matching to match the current URL to a scope
+[^2]: Routex' `preprocesss_using` can encapsulate any code / is not bound within
+    (session) scopes
+[^3]: [Crazy example](https://github.com/BartOtten/routex/blob/main/lib/routex/extension/cloak.ex)
+[^4]: Routex *can* be configured to shim original Phoenix functionality (for
+    example: `~p` and `url/2`) while CLDR Routes mandates code modifications
+    (for example: `~p` -> `~q` and `url/2` -> `url_q/2`)
+

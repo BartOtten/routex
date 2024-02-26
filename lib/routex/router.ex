@@ -79,7 +79,7 @@ defmodule Routex.Router do
 
   # Example:
   # :resources lack the :private option and their line numbers after expansion
-  # does not match the line number of their 'parent' definition.
+  # do not match the line number of their 'parent' definition.
 
   defp wrap_in_scope(node, backend, opts) do
     quote do

@@ -68,8 +68,8 @@ The documentation of each extension lists any provided or required
 ### Alternatives
 
 Create alternative routes based on `scopes` configured in a Routex backend
-module. Scopes can be nested and each scope can provide it's values to be shared
-with other extensions.
+module. Scopes can be nested and each scope can provide it's own attributes to
+be shared with other extensions.
 
 [Alternatives Documentation](`Routex.Extension.Alternatives`)
 
@@ -101,6 +101,8 @@ This extension creates a sigil (default: `~l`) with the ability to branch based
 on the current alternative scope of a user. It is able to verify routes even
 when thy have been transformed by Routex extensions. Optionally this sigil can
 be set to `~p` (Phoenix' default) as it is a drop-in replacement.
+
+It also provides branching variants of `url/{2,3,4}` and `path/{2,3}`.
 
 [Verified Routes Documentation](`Routex.Extension.VerifiedRoutes`)
 
@@ -199,19 +201,20 @@ solutions.
 
 ### Comparison table
 
-| Feature             | Routex     | PLR        | CLDR Routes  |
-|---------------------|------------|------------|--------------|
-| Scope detection     | URL   [^1] | Session    | Session      |
-| Route encapsulation | Free  [^2] | Restricted | Restricted   |
-| Route manipulation  | Full  [^3] | Limited    | Limited      |
-| Alternative Routes  | Free       | Free       | CLDR |
-| Translation         | X          | X          | X            |
-| Verified Routes     | X          | X          | X            |
-| Route Helpers       | X          | X          | X            |
-| Drop-in replacement | X     [^4] | X          | -            |
-| Single-dep Phoenix  | X          | X          | -            |
-| Modular             | X          |            | -            |
-| Extendable          | X          |            | -            |
+| Feature             | Routex     | PLR        | CLDR Routes |
+|---------------------|------------|------------|-------------|
+| Scope detection     | URL   [^1] | Session    | Session     |
+| Route encapsulation | Free  [^2] | Restricted | Restricted  |
+| Route manipulation  | Full  [^3] | Limited    | Limited     |
+| Route interpolation | Free       | -          | Limited     |
+| Alternative Routes  | Free       | Free       | CLDR        |
+| Translation         | X          | X          | X           |
+| Verified Routes     | X          | X          | X           |
+| Route Helpers       | X          | X          | X           |
+| Drop-in replacement | X     [^4] | X          | -           |
+| Single-dep Phoenix  | X          | X          | -           |
+| Modular             | X          |            | -           |
+| Extendable          | X          |            | -           |
 
 [^1]: Routex uses pattern matching to match the current URL to a scope
 [^2]: Routex' `preprocesss_using` can encapsulate any code / is not bound within

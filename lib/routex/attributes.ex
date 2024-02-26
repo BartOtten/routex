@@ -4,8 +4,7 @@ defmodule Routex.Attrs do
 
     Extensions can make use of `Routex.Attrs` values provided by Routex itself,
   Routex backends and other extensions. As those values are attributes to a
-  route extension B can use values attributed to to a route by (pre)processing
-  extension A.
+  route, extension B can use values attributed to a route by extension A.
 
     * To make the availability of the attributes as predictable as possible, Routex
     uses a flat structure.

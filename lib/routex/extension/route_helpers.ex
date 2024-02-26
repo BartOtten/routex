@@ -4,7 +4,7 @@ defmodule Routex.Extension.RouteHelpers do
   routes. The helpers can be used to override Phoenix' defaults as they are
   a drop-in replacements.
 
-  Only use this extension when you  make use of extensions generating alternative
+  Only use this extension when you make use of extensions generating alternative
   routes, as otherwise the result will be the same as the official helpers.
 
   ## Configuration

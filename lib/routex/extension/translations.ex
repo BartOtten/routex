@@ -14,7 +14,7 @@ defmodule Routex.Extension.Translations do
   + Routex.Extension.Translations
   ]
   + translations_backend: MyApp.Gettext,
-  + translations_domain: "routes.po",
+  + translations_domain: "routes",
   ```
 
   ## Pseudo result
@@ -80,7 +80,7 @@ defmodule Routex.Extension.Translations do
           route,
           :locale,
           "#{route |> Attrs.get(:backend) |> to_string()} lists this extention but no
-          :locale was found in private.routex of route #{inspect(Macro.escape(route))}."
+          :locale was found in private.routex of route #{inspect(Macro.escape(route), pretty: true)}."
         )
 
       path =

@@ -1,5 +1,8 @@
 # Routex Extensions
 
+> #### List of extensions {: .info}
+> A [list of included extensions](README.md#extensions) can be found in the README.
+
 Routex Extensions extend the functionality provided by Routex to transform routes or
 generate new route based helper functions. Each extension is a module which adopts the
 `Routex.Extension` specification. It has to implement one or multiple public functions:

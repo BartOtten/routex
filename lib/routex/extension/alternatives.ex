@@ -22,7 +22,7 @@ defmodule Routex.Extension.Alternatives do
   extensions: [
   + Routex.Extension.Alternatives
   ],
-  + scopes: %{
+  + alternatives: %{
   +    "/" => %{
   +      attrs: %AltAttrs{contact: "root@example.com"},
   +      scopes: %{
@@ -35,7 +35,8 @@ defmodule Routex.Extension.Alternatives do
   +        },
   +      "/gb" => %{attrs: %AltAttrs{contact: "sales@example.com"}
   +    }
-  +  }
+  +  },
+  + alternatives_prefix: false  # whether to automatically prefix routes, defaults to true
   ```
 
   ## Pseudo result
@@ -115,8 +116,18 @@ defmodule Routex.Extension.Alternatives do
   end
 
   defp expand_route(route, config) do
+    global_prefix? = Map.get(config, :alternatives_prefix, true)
+
     for {{_scope, scope_opts}, suborder} <- Enum.with_index(config.scopes) do
-      path = Path.add_prefix(route.path, scope_opts.scope_prefix)
+      path_prefix? = Map.get(route.private.routex, :alternatives_prefix, global_prefix?)
+
+      path =
+        if path_prefix? do
+          Path.add_prefix(route.path, scope_opts.scope_prefix)
+        else
+          route.path
+        end
+
       helper = helper_name(route.helper, scope_opts.scope_alias)
 
       %{route | path: path, helper: helper}

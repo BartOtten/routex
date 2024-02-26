@@ -73,6 +73,13 @@ with other extensions.
 
 [Alternatives Documentation](`Routex.Extension.Alternatives`)
 
+### Interpolation
+
+With this extension enabled, *any* attribute assigned to a route can be used 
+for route interpolation. This allows for routes such as `/product/#{territory}/:id/#{language}`.
+
+[Interpolation Documentation](`Routex.Extension.Interpolation`)
+
 ### Translations
 
 This extension extracts segments of a routes' path to a `routes.po` file for

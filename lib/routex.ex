@@ -2,7 +2,7 @@ defmodule Routex do
   @moduledoc """
   > #### `use Routex` {: .info}
   > When use'd this module generates a Routext backend module and
-  > a configuration struct using  the `configure/2` callbacks of
+  > a configuration struct using the `configure/2` callbacks of
   > the extensions provided in `opts`.
   >
   > See also: [Routex Extensions](EXTENSIONS.md).
@@ -25,6 +25,11 @@ defmodule Routex do
          verified_sigil_original: "~o"
        }
 
+  Values in the configuration can be overridden by providing an override map to the `:private` option of a scope or route.
+
+  **Example**
+
+      live /products, MyApp.Web.ProductIndexLive, :index, private: %{rtx: %{overridden_key: value}}
   """
 
   alias Routex.Processing
@@ -39,7 +44,7 @@ defmodule Routex do
     opts = process_opts(opts, __CALLER__)
     extensions = Keyword.get(opts, :extensions, [])
 
-    # Cheat by adding the struct fields to the map as the actual struct is
+    # Workaround: Manually create a fake struct as the actual struct is
     # not yet defined
     config = opts |> Map.new() |> Map.put(:__struct__, __CALLER__.module)
 

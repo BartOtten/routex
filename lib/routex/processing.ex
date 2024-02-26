@@ -122,7 +122,10 @@ defmodule Routex.Processing do
       |> Map.put(:__line__, route.line)
       |> Map.put(:__order__, [0, index])
 
-    Attrs.merge(route, meta)
+    overrides = Map.get(route.private, :rtx, %{})
+    values = Map.merge(meta, overrides)
+
+    Attrs.merge(route, values)
   end
 
   @spec helper_mod_name(Macro.Env.t()) :: module

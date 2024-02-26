@@ -251,7 +251,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         end
       end
 
-    url_catchall_ast =
+    catchall_url_ast =
       quote do
         defmacro url(other), do: raise_invalid_route(other)
 
@@ -262,7 +262,7 @@ defmodule Routex.Extension.VerifiedRoutes do
           do: raise_invalid_route(other)
       end
 
-    path_catchall_ast =
+    catchall_path_ast =
       quote do
         defmacro path(_conn_or_socket_or_endpoint_or_uri, other),
           do: raise_invalid_route(other)
@@ -308,10 +308,10 @@ defmodule Routex.Extension.VerifiedRoutes do
       routex_sigil_ast,
       original_url_ast,
       branching_url_ast,
-      url_catchall_ast,
+      catchall_url_ast,
       original_path_ast,
       branching_path_ast,
-      path_catchall_ast,
+      catchall_path_ast,
       phoenix_clones_ast
     ]
   end
@@ -329,12 +329,12 @@ defmodule Routex.Extension.VerifiedRoutes do
         unquote(callback.(route))
       end
     else
-      clauses = build_branches(segments, routes_matching_pattern, callback)
-      build_tree(segments, clauses, caller)
+      clauses = build_case_clauses(segments, routes_matching_pattern, callback)
+      build_case(segments, clauses, caller)
     end
   end
 
-  defp build_tree(segments, clauses, caller) do
+  defp build_case(segments, clauses, caller) do
     helper_ast = ExtensionUtils.get_helper_ast(caller)
 
     quote do
@@ -344,7 +344,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     end
   end
 
-  defp build_branches(segments, routes_matching_pattern, callback) do
+  defp build_case_clauses(segments, routes_matching_pattern, callback) do
     for route <- routes_matching_pattern do
       new_segments = route |> Attrs.get(:__origin__) |> Path.recompose(route.path, segments)
       helper = route |> Attrs.get(:__order__) |> List.last()

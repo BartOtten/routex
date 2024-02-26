@@ -192,19 +192,20 @@ solutions.
 
 ### Comparison table
 
-| Feature             | Routex     | PLR        | CLDR Routes  |
-|---------------------|------------|------------|--------------|
-| Scope detection     | URL   [^1] | Session    | Session      |
-| Route encapsulation | Free  [^2] | Restricted | Restricted   |
-| Route manipulation  | Full  [^3] | Limited    | Limited      |
-| Alternative Routes  | Free       | Free       | CLDR |
-| Translation         | X          | X          | X            |
-| Verified Routes     | X          | X          | X            |
-| Route Helpers       | X          | X          | X            |
-| Drop-in replacement | X     [^4] | X          | -            |
-| Single-dep Phoenix  | X          | X          | -            |
-| Modular             | X          |            | -            |
-| Extendable          | X          |            | -            |
+| Feature             | Routex     | PLR        | CLDR Routes |
+|---------------------|------------|------------|-------------|
+| Scope detection     | URL   [^1] | Session    | Session     |
+| Route encapsulation | Free  [^2] | Restricted | Restricted  |
+| Route manipulation  | Full  [^3] | Limited    | Limited     |
+| Route interpolation | Free       | -          | Limited     |
+| Alternative Routes  | Free       | Free       | CLDR        |
+| Translation         | X          | X          | X           |
+| Verified Routes     | X          | X          | X           |
+| Route Helpers       | X          | X          | X           |
+| Drop-in replacement | X     [^4] | X          | -           |
+| Single-dep Phoenix  | X          | X          | -           |
+| Modular             | X          |            | -           |
+| Extendable          | X          |            | -           |
 
 [^1]: Routex uses pattern matching to match the current URL to a scope
 [^2]: Routex' `preprocesss_using` can encapsulate any code / is not bound within

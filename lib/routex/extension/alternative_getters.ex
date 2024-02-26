@@ -1,4 +1,3 @@
-#
 defmodule Routex.Extension.AlternativeGetters do
   @moduledoc """
   Creates helper functions to get a list of alternative slugs and their routes

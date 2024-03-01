@@ -5,6 +5,7 @@ defmodule Routex.Extension do
   Optional callbacks:
   - configure
   - transform
+  - post_transform
   - create_helpers
 
   See also: [Routex Extensions](EXTENSIONS.md)

@@ -14,7 +14,6 @@ definition and compilation by Phoenix, Routex ensures (close to) zero impact on
 runtime performance.
 
 It ships with a concise selection of extensions and utility functions enabling
-you to craft custom features for your Phoenix router when the need arises.
 
 ## Top Features and Benefits
 - (close to) zero runtime performance impact; depending on enabled extensions.
@@ -68,8 +67,8 @@ The documentation of each extension lists any provided or required
 ### Alternatives
 
 Create alternative routes based on `scopes` configured in a Routex backend
-module. Scopes can be nested and each scope can provide it's values to be shared
-with other extensions.
+module. Scopes can be nested and each scope can provide it's own attributes to
+be shared with other extensions.
 
 [Alternatives Documentation](`Routex.Extension.Alternatives`)
 

@@ -8,7 +8,7 @@ defmodule Routex.Extension.CloakTest do
     use(Routex, extensions: [Routex.Extension.Cloak], cloak_character: ".")
   end
 
-  test "simple test" do
+  test "should cloak routes" do
     routes = [
       %Phoenix.Router.Route{path: "/foo"},
       %Phoenix.Router.Route{path: "/foo/:id"},
@@ -18,7 +18,7 @@ defmodule Routex.Extension.CloakTest do
       %Phoenix.Router.Route{path: "/bar/:id/edit"}
     ]
 
-    new = Cloak.transform(routes, Conf1, nil)
+    transformed_routes = Cloak.transform(routes, Conf1, nil)
 
     ListAssertions.assert_unordered(
       [
@@ -29,7 +29,7 @@ defmodule Routex.Extension.CloakTest do
         %{path: "/c/:id/4"},
         %{path: "/c/:id/5"}
       ],
-      new
+      transformed_routes
     )
   end
 end

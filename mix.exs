@@ -22,6 +22,7 @@ defmodule Routex.MixProject do
       docs: docs(),
       package: package(),
       test_coverage: [tool: ExCoveralls],
+      consolidate_protocols: Mix.env() != :test,
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,

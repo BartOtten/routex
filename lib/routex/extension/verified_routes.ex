@@ -21,8 +21,9 @@ defmodule Routex.Extension.VerifiedRoutes do
   applied.
 
   ## Options
-  - `verified_sigil_routex`: Sigil to use for Routex verified routes (default: "~l")
-  - `verified_sigil_original`: Sigil for original routes when `verified_sigil_routex` is set to "~p". (default: "~o")
+  - `verified_sigil_routex`: Sigil to use for Routex verified routes (default "~l")
+  - `verified_sigil_original`: Sigil for original routes when `verified_sigil_routex`
+    is set to "~p". (default: "~o")
 
   When `verified_sigil_routex` is set to "~p" an additional change must be made.
 
@@ -55,13 +56,15 @@ defmodule Routex.Extension.VerifiedRoutes do
       ~l"/products/#{product}"   ⇒  ~p"/transformed/products/#{product}"
 
       # given another extension has generated branches / alternative routes
-      ~o"/products/#{product}"   ⇒  ~p"/products/#{products}"
-      ~l"/products/#{product}"  ⇒ case branch do
-                                     nil ⇒  ~p"/products/#{product}"
-                                    "en" ⇒  ~p"/products/en/#{product}"
-                                    "eu_nl" ⇒  ~p"/europe/nl/products/#{product}"
-                                    "eu_be" ⇒  ~p"/europe/be/products/#{product}"
-                                  end
+      ~o"/products/#{product}"  ⇒  ~p"/products/#{products}"
+
+      ~l"/products/#{product}"  ⇒
+              case branch do
+                nil ⇒  ~p"/products/#{product}"
+                "en" ⇒  ~p"/products/en/#{product}"
+                "eu_nl" ⇒  ~p"/europe/nl/products/#{product}"
+                "eu_be" ⇒  ~p"/europe/be/products/#{product}"
+              end
 
   ## `Routex.Attrs`
   **Requires**
@@ -217,7 +220,7 @@ defmodule Routex.Extension.VerifiedRoutes do
               Phoenix.VerifiedRoutes.url(
                 unquote(endpoint),
                 unquote(router),
-                sigil_p(unquote(route), unquote(rest))
+                unquote({:sigil_p, meta, [route | rest]})
               )
             end
           end
@@ -249,7 +252,7 @@ defmodule Routex.Extension.VerifiedRoutes do
               Phoenix.VerifiedRoutes.path(
                 unquote(endpoint),
                 unquote(router),
-                sigil_p(unquote(route), unquote(rest))
+                unquote({:sigil_p, meta, [route | rest]})
               )
             end
           end
@@ -289,7 +292,7 @@ defmodule Routex.Extension.VerifiedRoutes do
 
         defp raise_invalid_route(ast) do
           raise ArgumentError,
-                "expected compile-time ~l path string, got: #{Macro.to_string(ast)}\n" <>
+                "expected compile-time #{unquote(verified_sigil_routex)} path string, got: #{Macro.to_string(ast)}\n" <>
                   "Use unverified_path/2 and unverified_url/2 if you need to build an arbitrary path."
         end
 
@@ -337,6 +340,8 @@ defmodule Routex.Extension.VerifiedRoutes do
     # Routex does not handle all routes. Use the fallback if we find
     # none handled by Routex.
     if routes_matching_pattern === [] do
+      # TODO: Do warn when no route matches; see disabled tests
+
       quote do
         unquote(callback.(route))
       end

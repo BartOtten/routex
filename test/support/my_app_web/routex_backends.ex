@@ -1,6 +1,6 @@
 defmodule Router.Attrs do
   @moduledoc false
-  defstruct [:contact, lang: "en"]
+  defstruct [:contact, language: "en"]
 end
 
 defmodule MyAppWeb.RoutexBackend do
@@ -19,13 +19,13 @@ defmodule MyAppWeb.RoutexBackend do
             scopes: %{
               "/nl" => %{
                 attrs: %Attrs{
-                  lang: "nl",
+                  language: "nl",
                   contact: "verkoop@example.nl"
                 }
               },
               "/be" => %{
                 attrs: %Attrs{
-                  lang: "nl",
+                  language: "nl",
                   contact: "handel@example.be"
                 }
               }
@@ -59,10 +59,10 @@ defmodule MyAppWeb.MultiLangRoutes do
             attrs: %Attrs{contact: "europe@example.com"},
             scopes: %{
               "/nl" => %{
-                attrs: %Attrs{lang: "nl", contact: "verkoop@example.nl"}
+                attrs: %Attrs{language: "nl", contact: "verkoop@example.nl"}
               },
               "/be" => %{
-                attrs: %Attrs{lang: "nl", contact: "handel@example.be"}
+                attrs: %Attrs{language: "nl", contact: "handel@example.be"}
               }
             }
           },
@@ -71,7 +71,7 @@ defmodule MyAppWeb.MultiLangRoutes do
       }
     },
     translations_backend: MyAppWeb.Gettext,
-    assigns: %{namespace: :rtx, attrs: [:scope_helper, :lang, :contact, :name]},
+    assigns: %{namespace: :rtx, attrs: [:scope_helper, :language, :contact, :name]},
     extensions: [
       Routex.Extension.Alternatives,
       Routex.Extension.Translations,

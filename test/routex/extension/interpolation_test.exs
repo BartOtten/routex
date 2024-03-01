@@ -8,27 +8,27 @@ defmodule Routex.Extension.InterpolationTest do
   @routes [
     %Route{
       line: 1,
-      path: "/path/[rtx.lang]",
+      path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/path", lang: :nl}}
+      private: %{routex: %{__origin__: "/path", language: :nl}}
     },
     %Route{
       line: 8,
-      path: "/path/[rtx.lang]",
+      path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/path", lang: :en}}
+      private: %{routex: %{__origin__: "/path", language: :en}}
     },
     %Route{
       line: 12,
-      path: "/path/[rtx.lang]",
+      path: "/path/[rtx.language]",
       verb: :post,
-      private: %{routex: %{__origin__: "/path", lang: :en}}
+      private: %{routex: %{__origin__: "/path", language: :en}}
     },
     %Route{
       line: 20,
-      path: "/path/[rtx.lang]",
+      path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/foo", lang: :en}}
+      private: %{routex: %{__origin__: "/foo", language: :en}}
     }
   ]
 

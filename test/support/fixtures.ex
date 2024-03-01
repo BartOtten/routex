@@ -1,5 +1,5 @@
 defmodule Routex.Test.Fixtures.Assigns do
-  defstruct [:key, locale: "en", opt_attr: "default"]
+  defstruct [:key, lang: "en", opt_attr: "default"]
 end
 
 defmodule Routex.Test.Fixtures do
@@ -9,18 +9,18 @@ defmodule Routex.Test.Fixtures do
   def scopes_with_map_attrs,
     do: %{
       "/" => %{
-        attrs: %{key: :root, locale: "en", opt_attr: "default"},
+        attrs: %{key: :root, lang: "en", opt_attr: "default"},
         scopes: %{
           "/foo" => %{
             attrs: %{
-              locale: "en",
+              lang: "en",
               key: :root
             },
             scopes: %{
               "/nested" => %{
-                attrs: %{key: :n1, locale: "en"},
+                attrs: %{key: :n1, lang: "en"},
                 scopes: %{
-                  "/nested2" => %{attrs: %{key: :n2, locale: "en"}}
+                  "/nested2" => %{attrs: %{key: :n2, lang: "en"}}
                 }
               }
             }
@@ -32,18 +32,18 @@ defmodule Routex.Test.Fixtures do
   def scopes,
     do: %{
       "/" => %{
-        attrs: %Assigns{key: :root, locale: "en"},
+        attrs: %Assigns{key: :root, lang: "en"},
         scopes: %{
           "/foo" => %{
             attrs: %Assigns{
-              locale: "en",
+              lang: "en",
               key: :root
             },
             scopes: %{
               "/nested" => %{
-                attrs: %Assigns{key: :n1, locale: "en"},
+                attrs: %Assigns{key: :n1, lang: "en"},
                 scopes: %{
-                  "/nested2" => %{attrs: %Assigns{key: :n2, locale: "en"}}
+                  "/nested2" => %{attrs: %Assigns{key: :n2, lang: "en"}}
                 }
               }
             }
@@ -55,18 +55,18 @@ defmodule Routex.Test.Fixtures do
   def scopes_precomputed,
     do: %{
       nil => %Scope.Nested{
-        attrs: %{scope_helper: nil, key: :root, locale: "en", opt_attr: "default"},
+        attrs: %{scope_helper: nil, key: :root, lang: "en", opt_attr: "default"},
         scope_path: [],
         scope_alias: nil,
         scope_prefix: "/",
         scopes: %{
           "foo" => %Scope.Nested{
-            attrs: %{opt_attr: "default", locale: "en", key: :root, scope_helper: "foo"},
+            attrs: %{opt_attr: "default", lang: "en", key: :root, scope_helper: "foo"},
             scopes: %{
               "nested" => %Scope.Nested{
                 attrs: %{
                   opt_attr: "default",
-                  locale: "en",
+                  lang: "en",
                   key: :n1,
                   scope_helper: "foo_nested"
                 },
@@ -74,7 +74,7 @@ defmodule Routex.Test.Fixtures do
                   "nested2" => %Scope.Nested{
                     attrs: %{
                       opt_attr: "default",
-                      locale: "en",
+                      lang: "en",
                       key: :n2,
                       scope_helper: "foo_nested_nested2"
                     },
@@ -100,27 +100,27 @@ defmodule Routex.Test.Fixtures do
   def scopes_flat,
     do: %{
       nil => %Scope.Flat{
-        attrs: %{scope_helper: nil, key: :root, locale: "en", opt_attr: "default"},
+        attrs: %{scope_helper: nil, key: :root, lang: "en", opt_attr: "default"},
         scope_path: [],
         scope_alias: nil,
         scope_prefix: "/"
       },
       "foo" => %Scope.Flat{
         scope_path: ["foo"],
-        attrs: %{opt_attr: "default", locale: "en", key: :root, scope_helper: "foo"},
+        attrs: %{opt_attr: "default", lang: "en", key: :root, scope_helper: "foo"},
         scope_alias: :foo,
         scope_prefix: "/foo"
       },
       "foo_nested" => %Scope.Flat{
         scope_path: ["foo", "nested"],
-        attrs: %{opt_attr: "default", locale: "en", key: :n1, scope_helper: "foo_nested"},
+        attrs: %{opt_attr: "default", lang: "en", key: :n1, scope_helper: "foo_nested"},
         scope_alias: :foo_nested,
         scope_prefix: "/foo/nested"
       },
       "foo_nested_nested2" => %Scope.Flat{
         attrs: %{
           opt_attr: "default",
-          locale: "en",
+          lang: "en",
           key: :n2,
           scope_helper: "foo_nested_nested2"
         },

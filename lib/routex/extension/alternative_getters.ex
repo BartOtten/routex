@@ -105,7 +105,7 @@ defmodule Routex.Extension.AlternativeGetters do
           unquote(dynamic_paths)
           |> Enum.map(
             &%Routex.Extension.AlternativeGetters{
-              slug: Path.join([elem(&1, 0), "?#{query}"]),
+              slug: Path.join([elem(&1, 0), "?#{query}"] |> Path.absname()),
               attrs: elem(&1, 1)
             }
           )

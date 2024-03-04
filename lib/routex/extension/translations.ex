@@ -138,6 +138,7 @@ defmodule Routex.Extension.Translations do
     |> Path.split()
     |> translate_segments(locale, backend, domain)
     |> Path.join()
+    |> Path.absname()
   end
 
   defp translate_segments(segments, locale, backend, domain) do

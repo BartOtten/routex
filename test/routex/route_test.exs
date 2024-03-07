@@ -14,10 +14,16 @@ defmodule Routex.RouteTest do
     assert [] == Route.get_nesting(route, -1)
   end
 
-  test "group_by_nesting" do
+  test "group_by_nesting within a scope" do
     routes = [
-      %Phoenix.Router.Route{path: "/", private: %{routex: %{__order__: [0, 0]}}},
-      %Phoenix.Router.Route{path: "/page", private: %{routex: %{__order__: [0, 1, 0]}}},
+      %Phoenix.Router.Route{
+        path: "/",
+        private: %{routex: %{__order__: [0, 0]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page",
+        private: %{routex: %{__order__: [0, 1, 0]}}
+      },
       %Phoenix.Router.Route{
         path: "/page/edit",
         private: %{routex: %{__order__: [0, 2, 0]}}
@@ -37,9 +43,17 @@ defmodule Routex.RouteTest do
     ]
 
     expected = %{
-      [0] => [%Phoenix.Router.Route{path: "/", private: %{routex: %{__order__: [0, 0]}}}],
+      [0] => [
+        %Phoenix.Router.Route{
+          path: "/",
+          private: %{routex: %{__order__: [0, 0]}}
+        }
+      ],
       [0, 1] => [
-        %Phoenix.Router.Route{path: "/page", private: %{routex: %{__order__: [0, 1, 0]}}},
+        %Phoenix.Router.Route{
+          path: "/page",
+          private: %{routex: %{__order__: [0, 1, 0]}}
+        },
         %Phoenix.Router.Route{
           path: "/page_alt1",
           private: %{routex: %{__order__: [0, 1, 1]}}
@@ -64,9 +78,64 @@ defmodule Routex.RouteTest do
     assert expected == Route.group_by_nesting(routes)
   end
 
-  test "group_by_method_and_path" do
+  test "group_by_nesting without a scope" do
     routes = [
-      %Phoenix.Router.Route{path: "/", verb: :get, private: %{routex: %{__order__: [0, 0]}}},
+      %Phoenix.Router.Route{
+        path: "/page",
+        private: %{routex: %{__order__: [0, 0]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page/edit",
+        private: %{routex: %{__order__: [1, 0]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page_alt1",
+        private: %{routex: %{__order__: [0, 1]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page_alt2",
+        private: %{routex: %{__order__: [0, 2]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page/edit_alt1",
+        private: %{routex: %{__order__: [1, 1]}}
+      }
+    ]
+
+    expected = %{
+      [0] => [
+        %Phoenix.Router.Route{path: "/page", private: %{routex: %{__order__: [0, 0]}}},
+        %Phoenix.Router.Route{
+          path: "/page_alt1",
+          private: %{routex: %{__order__: [0, 1]}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page_alt2",
+          private: %{routex: %{__order__: [0, 2]}}
+        }
+      ],
+      [1] => [
+        %Phoenix.Router.Route{
+          path: "/page/edit",
+          private: %{routex: %{__order__: [1, 0]}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page/edit_alt1",
+          private: %{routex: %{__order__: [1, 1]}}
+        }
+      ]
+    }
+
+    assert expected == Route.group_by_nesting(routes)
+  end
+
+  test "group_by_method_and_path in a scope" do
+    routes = [
+      %Phoenix.Router.Route{
+        path: "/",
+        verb: :get,
+        private: %{routex: %{__order__: [0, 0]}}
+      },
       %Phoenix.Router.Route{
         path: "/page",
         verb: :get,
@@ -101,7 +170,11 @@ defmodule Routex.RouteTest do
 
     expected = %{
       {:get, "/"} => [
-        %Phoenix.Router.Route{path: "/", verb: :get, private: %{routex: %{__order__: [0, 0]}}}
+        %Phoenix.Router.Route{
+          path: "/",
+          verb: :get,
+          private: %{routex: %{__order__: [0, 0]}}
+        }
       ],
       {:get, "/page"} => [
         %Phoenix.Router.Route{
@@ -142,5 +215,157 @@ defmodule Routex.RouteTest do
     }
 
     assert expected == Route.group_by_method_and_path(routes)
+  end
+
+  test "group_by_method_and_path outside a scope" do
+    routes = [
+      %Phoenix.Router.Route{
+        path: "/page",
+        verb: :get,
+        private: %{routex: %{__order__: [1, 0]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page/edit",
+        verb: :get,
+        private: %{routex: %{__order__: [2, 0]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page_alt1",
+        verb: :get,
+        private: %{routex: %{__order__: [1, 1]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page_alt2",
+        verb: :get,
+        private: %{routex: %{__order__: [1, 2]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page/edit_alt1",
+        verb: :get,
+        private: %{routex: %{__order__: [2, 1]}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page",
+        verb: :post,
+        private: %{routex: %{__order__: [3, 0]}}
+      }
+    ]
+
+    expected = %{
+      {:get, "/page"} => [
+        %Phoenix.Router.Route{
+          path: "/page",
+          verb: :get,
+          private: %{routex: %{__order__: [1, 0]}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page_alt1",
+          verb: :get,
+          private: %{routex: %{__order__: [1, 1]}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page_alt2",
+          verb: :get,
+          private: %{routex: %{__order__: [1, 2]}}
+        }
+      ],
+      {:get, "/page/edit"} => [
+        %Phoenix.Router.Route{
+          path: "/page/edit",
+          verb: :get,
+          private: %{routex: %{__order__: [2, 0]}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page/edit_alt1",
+          verb: :get,
+          private: %{routex: %{__order__: [2, 1]}}
+        }
+      ],
+      {:post, "/page"} => [
+        %Phoenix.Router.Route{
+          path: "/page",
+          verb: :post,
+          private: %{routex: %{__order__: [3, 0]}}
+        }
+      ]
+    }
+
+    assert expected == Route.group_by_method_and_path(routes)
+  end
+
+  test "group_by_method_and_origin outside a scope" do
+    routes = [
+      %Phoenix.Router.Route{
+        path: "/page",
+        verb: :get,
+        private: %{routex: %{__order__: [1, 0], __origin__: "/page"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page/edit",
+        verb: :get,
+        private: %{routex: %{__order__: [2, 0], __origin__: "/page/edit"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page_alt1",
+        verb: :get,
+        private: %{routex: %{__order__: [1, 1], __origin__: "/page"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page_alt2",
+        verb: :get,
+        private: %{routex: %{__order__: [1, 2], __origin__: "/page"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page/edit_alt1",
+        verb: :get,
+        private: %{routex: %{__order__: [2, 1], __origin__: "/page/edit"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/page",
+        verb: :post,
+        private: %{routex: %{__order__: [3, 0], __origin__: "/page"}}
+      }
+    ]
+
+    expected = %{
+      {:get, "/page"} => [
+        %Phoenix.Router.Route{
+          path: "/page",
+          verb: :get,
+          private: %{routex: %{__order__: [1, 0], __origin__: "/page"}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page_alt1",
+          verb: :get,
+          private: %{routex: %{__order__: [1, 1], __origin__: "/page"}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page_alt2",
+          verb: :get,
+          private: %{routex: %{__order__: [1, 2], __origin__: "/page"}}
+        }
+      ],
+      {:get, "/page/edit"} => [
+        %Phoenix.Router.Route{
+          path: "/page/edit",
+          verb: :get,
+          private: %{routex: %{__order__: [2, 0], __origin__: "/page/edit"}}
+        },
+        %Phoenix.Router.Route{
+          path: "/page/edit_alt1",
+          verb: :get,
+          private: %{routex: %{__order__: [2, 1], __origin__: "/page/edit"}}
+        }
+      ],
+      {:post, "/page"} => [
+        %Phoenix.Router.Route{
+          path: "/page",
+          verb: :post,
+          private: %{routex: %{__order__: [3, 0], __origin__: "/page"}}
+        }
+      ]
+    }
+
+    assert expected == Route.group_by_method_and_origin(routes)
   end
 end

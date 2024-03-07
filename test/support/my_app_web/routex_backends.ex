@@ -76,7 +76,7 @@ defmodule MyAppWeb.MultiLangRoutes do
       Routex.Extension.Alternatives,
       Routex.Extension.Translations,
       Routex.Extension.AlternativeGetters,
-      Routex.Extension.RouteHelpers,
+      # Routex.Extension.RouteHelpers,
       Routex.Extension.AttrGetters,
       Routex.Extension.Assigns
     ]

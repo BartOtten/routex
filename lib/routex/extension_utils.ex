@@ -93,6 +93,16 @@ defmodule Routex.ExtensionUtils do
               0
           end
         end
+
+      ExUnit.Callbacks in caller.requires ->
+        # IO.inspect(caller.versioned_vars)
+        Logger.warning("No match for helper AST, set manual __order__")
+        0
+
+      true ->
+        Logger.critical("Check HELPER AST")
+        IO.inspect(caller.requires)
+        0
     end
   end
 end

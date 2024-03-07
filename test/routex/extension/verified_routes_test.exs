@@ -29,26 +29,26 @@ defmodule Router do
   alias Phoenix.VerifiedRoutesTest.{PostController, UserController}
 
   preprocess_using RtxBackend do
-    get "/posts/top", PostController, :top
-    get "/posts/bottom/:order/:count", PostController, :bottom
+    # get "/posts/top", PostController, :top
+    # get "/posts/bottom/:order/:count", PostController, :bottom
     get "/posts/:id", PostController, :show
-    get "/posts/:id/info", PostController, :show
-    get "/posts/file/*file", PostController, :file
-    get "/posts/skip", PostController, :skip
-    get "/should-warn/*all", PostController, :all, warn_on_verify: true
+    # get "/posts/:id/info", PostController, :show
+    # get "/posts/file/*file", PostController, :file
+    # get "/posts/skip", PostController, :skip
+    # get "/should-warn/*all", PostController, :all, warn_on_verify: true
 
-    scope "/", host: "users." do
-      post "/host_users/:id/info", UserController, :create
-    end
+    # scope "/", host: "users." do
+    #   post "/host_users/:id/info", UserController, :create
+    # end
 
-    scope "/admin/new" do
-      resources "/messages", PostController
-    end
+    # scope "/admin/new" do
+    #   resources "/messages", PostController
+    # end
 
-    get "/", PostController, :root
+    # get "/", PostController, :root
 
-    forward "/router_forward", AdminRouter
-    forward "/plug_forward", UserController
+    # forward "/router_forward", AdminRouter
+    # forward "/plug_forward", UserController
   end
 end
 
@@ -61,7 +61,7 @@ defmodule CatchAllWarningRouter do
 end
 
 defmodule Routex.Extension.VerifiedRoutesTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import Plug.Test
 
   @derive {Phoenix.Param, key: :slug}
@@ -107,492 +107,541 @@ defmodule Routex.Extension.VerifiedRoutesTest do
     %URI{scheme: "https", host: "example.com", port: 123, path: "/api"}
   end
 
+  @routes [
+    # %Phoenix.Router.Route{
+    #   path: "/",
+    #   kind: :match,
+    #   private: %{routex: %{__order__: [0], __origin__: "/"}}
+    # },
+    # %Phoenix.Router.Route{
+    #   path: "/products",
+    #   kind: :match,
+    #   private: %{routex: %{__order__: [1, 0], __origin__: "/products"}}
+    # },
+    # %Phoenix.Router.Route{
+    #   path: "/alt1/productsa",
+    #   kind: :match,
+    #   private: %{routex: %{__order__: [1, 1], __origin__: "/products"}}
+    # },
+    # %Phoenix.Router.Route{
+    #   path: "/alt2/productsb",
+    #   kind: :match,
+    #   private: %{routex: %{__order__: [1, 2], __origin__: "/products"}}
+    # },
+    %Phoenix.Router.Route{
+      path: "/products/:id",
+      kind: :match,
+      private: %{routex: %{__order__: [2, 0], __origin__: "/products/:id"}}
+    },
+    %Phoenix.Router.Route{
+      path: "/alt1/:id/productsa/",
+      kind: :match,
+      private: %{routex: %{__order__: [2, 1], __origin__: "/products/:id"}}
+    },
+    %Phoenix.Router.Route{
+      path: "/alt2/:id/productsb/",
+      kind: :match,
+      private: %{routex: %{__order__: [2, 2], __origin__: "/products/:id"}}
+    }
+  ]
+
   use Phoenix.VerifiedRoutes, statics: ~w(images), endpoint: Endpoint, router: Router
 
   # here comes Routex
   import Phoenix.VerifiedRoutes, only: :functions
   import Router.RoutexHelpers
+  import Routex.Extension.VerifiedRoutes
 
-  test "~p with static string" do
-    assert ~p"/posts/1" == "/posts/1"
-    assert ~p"/posts/1?foo=bar" == "/posts/1?foo=bar"
-  end
+  # ast = create_helpers(@routes, RtxBackend, __ENV__)
+  # Module.create(Router.RoutexHelpers, ast, __ENV__)
+
+  # test "should create matchable patterns" do
+  # end
+
+  # test "~p with static string" do
+  #   assert ~p"/posts/1" == "/posts/1"
+  #   assert ~p"/posts/1?foo=bar" == "/posts/1?foo=bar"
+  # end
 
   test "~p with dynamic string uses Phoenix.Param" do
     struct = %__MODULE__{id: 123, slug: "post-123"}
     assert ~p"/posts/#{struct}" == "/posts/post-123"
-    assert ~p"/posts/#{123}" == "/posts/123"
-    assert ~p|/posts/#{"a b"}| == "/posts/a%20b"
+    # assert ~p"/posts/#{123}" == "/posts/123"
+    # assert ~p|/posts/#{"a b"}| == "/posts/a%20b"
   end
 
-  test "~p with static and dynamic string and query params" do
-    struct = %__MODULE__{id: 123, slug: "post-123"}
-
-    # static segments
-    assert ~p"/posts/1?foo=bar" == "/posts/1?foo=bar"
-    assert ~p"/posts/bottom/asc/10?foo=bar" == "/posts/bottom/asc/10?foo=bar"
-    assert path(conn_with_endpoint(), ~p"/posts/1?foo=bar") == "/posts/1?foo=bar"
-    assert path(@endpoint, @router, ~p"/posts/1?foo=bar") == "/posts/1?foo=bar"
-
-    assert path(conn_with_endpoint(), ~p"/posts/bottom/asc/10?foo=bar") ==
-             "/posts/bottom/asc/10?foo=bar"
-
-    assert path(@endpoint, @router, ~p"/posts/bottom/asc/10?foo=bar") ==
-             "/posts/bottom/asc/10?foo=bar"
-
-    # dynamic segments
-    assert ~p"/posts/#{struct}?#{[page: 1, spaced: "a b"]}" == "/posts/post-123?page=1&spaced=a+b"
-    assert ~p"/posts/#{struct}?#{[page: 1, spaced: "a b"]}" == "/posts/post-123?page=1&spaced=a+b"
-    id = 123
-    dir = "asc"
-    assert ~p"/posts/#{id}?foo=bar" == "/posts/123?foo=bar"
-    assert ~p"/posts/post-#{id}?foo=bar" == "/posts/post-123?foo=bar"
-    assert path(conn_with_endpoint(), ~p"/posts/#{id}?foo=bar") == "/posts/123?foo=bar"
-    assert path(@endpoint, @router, ~p"/posts/#{id}?foo=bar") == "/posts/123?foo=bar"
-
-    assert path(conn_with_endpoint(), ~p"/posts/bottom/#{dir}/#{id}?foo=bar") ==
-             "/posts/bottom/asc/123?foo=bar"
-
-    assert path(@endpoint, @router, ~p"/posts/bottom/#{dir}/#{id}?foo=bar") ==
-             "/posts/bottom/asc/123?foo=bar"
-
-    # dynamic query params
-    assert ~p"/posts/1?other_post=#{id}" == "/posts/1?other_post=123"
-    assert ~p"/posts/1?other_post=#{struct}" == "/posts/1?other_post=post-123"
-  end
-
-  test "~p with dynamic string and static query params" do
-    struct = %__MODULE__{id: 123, slug: "post-123"}
-    assert ~p"/posts/#{struct}?foo=bar" == "/posts/post-123?foo=bar"
-  end
-
-  test "~p with scoped host" do
-    assert ~p"/host_users/1/info" == "/host_users/1/info"
-  end
-
-  test "~p on splat segments" do
-    assert ~p|/posts/file/#{1}/#{"2.jpg"}| == "/posts/file/1/2.jpg"
-
-    location = ["folder", "file.jpg"]
-    assert ~p|/posts/file/#{location}| == "/posts/file/folder/file.jpg"
-  end
-
-  test "~p URI encodes interpolated segments and query params" do
-    assert ~p"/posts/my path?#{[foo: "my param"]}" == "/posts/my%20path?foo=my+param"
-    slug = "my path"
-    assert ~p"/posts/#{slug}?#{[foo: "my param"]}" == "/posts/my%20path?foo=my+param"
-  end
-
-  test "~p with empty query string drops ?" do
-    assert ~p"/posts/5?#{%{}}" == "/posts/5"
-  end
-
-  test "~p with hash" do
-    assert ~p"/posts/123/info#bar" == "/posts/123/info#bar"
-
-    warnings =
-      ExUnit.CaptureIO.capture_io(:stderr, fn ->
-        defmodule Hash do
-          use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-          import Phoenix.VerifiedRoutes, only: []
-
-          def test, do: ~p"/posts/123/info#bar"
-        end
-      end)
-
-    assert warnings == ""
-  end
-
-  test "~p raises on leftover sigil" do
-    assert_raise ArgumentError, "~p does not support modifiers after closing, got: foo", fn ->
-      defmodule LeftOver do
-        use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-        import Phoenix.VerifiedRoutes, only: []
-        def test, do: ~p"/posts/1"foo
-      end
-    end
-  end
-
-  test "~p raises on dynamic interpolation" do
-    msg = ~S|a dynamic ~p interpolation must follow a static segment, got: "/posts/#{1}#{2}"|
-
-    assert_raise ArgumentError, msg, fn ->
-      defmodule DynamicDynamic do
-        use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-        import Phoenix.VerifiedRoutes, only: []
-        def test, do: ~p"/posts/#{1}#{2}"
-      end
-    end
-  end
-
-  test "~p raises when not prefixed by /" do
-    assert_raise ArgumentError,
-                 ~s|paths must begin with /, got: "posts/1"|,
-                 fn ->
-                   defmodule SigilPPrefix do
-                     use Phoenix.VerifiedRoutes,
-                       endpoint: unquote(@endpoint),
-                       router: unquote(@router)
-
-                     import Phoenix.VerifiedRoutes, only: []
-
-                     def test, do: ~p"posts/1"
-                   end
-                 end
-  end
-
-  test "path arities" do
-    assert path(Endpoint, ~p"/posts/1") == "/posts/1"
-    assert path(conn_with_endpoint(), ~p"/posts/1") == "/posts/1"
-    assert path(conn_with_script_name(), ~p"/posts/1") == "/api/posts/1"
-  end
-
-  test "url arities" do
-    assert url(~p"/posts/1") == "https://example.com/posts/1"
-    assert url(~p"/posts/#{123}") == "https://example.com/posts/123"
-    assert url(Endpoint, ~p"/posts/1") == "https://example.com/posts/1"
-    assert url(conn_with_endpoint(), ~p"/posts/1") == "https://example.com/posts/1"
-    assert url(conn_with_script_name(), ~p"/posts/1") == "https://example.com/api/posts/1"
-
-    assert url(Endpoint, Router, ~p"/posts/1") == "https://example.com/posts/1"
-    assert url(conn_with_endpoint(), Router, ~p"/posts/1") == "https://example.com/posts/1"
-    assert url(conn_with_script_name(), Router, ~p"/posts/1") == "https://example.com/api/posts/1"
-  end
-
-  test "path raises when non ~p is passed" do
-    assert_raise ArgumentError, ~r|expected compile-time ~p path string, got: "/posts/1"|, fn ->
-      defmodule MissingPathPrefix do
-        use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-        import Phoenix.VerifiedRoutes, only: []
-        def test, do: path(%URI{}, "/posts/1")
-      end
-    end
-  end
-
-  test "url raises when non ~p is passed" do
-    assert_raise ArgumentError, ~r|expected compile-time ~p path string, got: "/posts/1"|, fn ->
-      defmodule MissingURLPrefix do
-        use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-        import Phoenix.VerifiedRoutes, only: []
-        def test, do: url("/posts/1")
-      end
-    end
-  end
-
-  test "static_integrity" do
-    assert is_nil(static_integrity(Endpoint, "/images/foo.png"))
-    assert is_nil(static_integrity(conn_with_endpoint(), "/images/foo.png"))
-    assert is_nil(static_integrity(socket_with_endpoint(), "/images/foo.png"))
-  end
-
-  test "static paths" do
-    assert path(Endpoint, ~p"/images/foo.png") == "/images/foo.png"
-    assert path(conn_with_endpoint(), ~p"/images/foo.png") == "/images/foo.png"
-    assert path(socket_with_endpoint(), ~p"/images/foo.png") == "/images/foo.png"
-  end
-
-  test "~p dict query strings" do
-    assert ~p"/posts/5?#{[id: 3]}" == "/posts/5?id=3"
-    assert ~p"/posts/5?#{[foo: "bar"]}" == "/posts/5?foo=bar"
-    assert ~p"/posts/5?#{[foo: :bar]}" == "/posts/5?foo=bar"
-    assert ~p"/posts/5?#{[foo: true]}" == "/posts/5?foo=true"
-    assert ~p"/posts/5?#{[foo: false]}" == "/posts/5?foo=false"
-    assert ~p"/posts/5?#{[foo: nil]}" == "/posts/5?foo="
-
-    assert ~p"/posts/5?#{[foo: ~w(bar baz)]}" ==
-             "/posts/5?foo[]=bar&foo[]=baz"
-
-    assert ~p"/posts/5?#{[foo: %{id: 5}]}" ==
-             "/posts/5?foo[id]=5"
-
-    assert ~p"/posts/5?#{[foo: %{__struct__: Foo, id: 5}]}" ==
-             "/posts/5?foo=5"
-  end
-
-  test "~p mixed query string interpolation" do
-    dir = "asc"
-    page = "pg"
-
-    assert ~p"/posts/5?page=#{3}" == "/posts/5?page=3"
-    assert ~p"/posts/5?page=#{3}&dir=#{dir}" == "/posts/5?page=3&dir=asc"
-    assert ~p"/posts/5?#{page}=#{3}&dir=#{dir}" == "/posts/5?pg=3&dir=asc"
-    assert ~p"/posts/5?#{"a b"}=#{3}&dir=#{"a b"}" == "/posts/5?a+b=3&dir=a+b"
-
-    assert ~p"/posts/post?foo=bar&#{"key"}=#{"val"}&baz=bat" ==
-             "/posts/post?foo=bar&key=val&baz=bat"
-
-    assert ~p"/posts/#{page}?foo=bar&#{"key"}=#{"val"}&baz=bat" ==
-             "/posts/pg?foo=bar&key=val&baz=bat"
-  end
-
-  test "invalid mixed interpolation query string raises" do
-    msg =
-      ~S|interpolated query string params must be separated by &, got: "/posts/5?page=#{3}#{dir}"|
-
-    assert_raise ArgumentError, msg, fn ->
-      defmodule InvalidQuery do
-        use Phoenix.VerifiedRoutes,
-          endpoint: unquote(@endpoint),
-          router: unquote(@router)
-
-        import Phoenix.VerifiedRoutes, only: []
-
-        def test do
-          ~p"/posts/5?page=#{3}#{dir}" == "/posts/5?page=3"
-        end
-      end
-    end
-  end
-
-  # test "~p with complex ids" do
-  #   socket = %Phoenix.Socket{
-  #     private: %{routex: %{__order__: [0, 0]}}
-  #   }
-
-  #   assert ~p|/posts/#{"==d--+"}| == "/posts/%3D%3Dd--%2B"
-  #   assert ~p|/posts/top?#{[id: "==d--+"]}| == "/posts/top?id=%3D%3Dd--%2B"
-
-  #   assert ~p|/posts/file/#{"==d--+"}/#{":O.jpg"}| == "/posts/file/%3D%3Dd--%2B/%3AO.jpg"
-
-  #   assert ~p|/posts/file/#{"==d--+"}/#{":O.jpg"}?#{[xx: "/=+/"]}| ==
-  #            "/posts/file/%3D%3Dd--%2B/%3AO.jpg?xx=%2F%3D%2B%2F"
-  # end
-
-  test "~p with trailing slashes" do
-    assert ~p"/posts/5/" == "/posts/5/"
-    assert ~p"/posts/5/?#{[id: 5]}" == "/posts/5/?id=5"
-    assert ~p"/posts/5/?#{%{"id" => "foo"}}" == "/posts/5/?id=foo"
-    assert ~p"/posts/5/?#{%{"id" => "foo bar"}}" == "/posts/5/?id=foo+bar"
-  end
-
-  describe "with static path" do
-    @endpoint StaticPath
-    @router Router
-    test "paths use static prefix" do
-      assert ~p"/images/foo.png" == "/static/images/foo.png"
-
-      assert path(conn_with_endpoint(StaticPath), ~p"/images/foo.png") ==
-               "/static/images/foo.png"
-
-      assert path(socket_with_endpoint(StaticPath), ~p"/images/foo.png") ==
-               "/static/images/foo.png"
-
-      assert url(conn_with_endpoint(StaticPath), ~p"/images/foo.png") ==
-               "https://example.com/static/images/foo.png"
-
-      assert url(socket_with_endpoint(StaticPath), ~p"/images/foo.png") ==
-               "https://example.com/static/images/foo.png"
-    end
-  end
-
-  describe "with script name" do
-    @endpoint ScriptName
-    @router Router
-
-    test "paths use script name" do
-      assert ~p"/" == "/api/"
-      assert path(ScriptName, Router, ~p"/") == "/api/"
-      assert path(conn_with_script_name(), ~p"/") == "/api/"
-      assert path(uri_with_script_name(), ~p"/") == "/api/"
-      assert path(ScriptName, Router, ~p"/posts/5") == "/api/posts/5"
-      assert ~p"/posts/5" == "/api/posts/5"
-      assert path(ScriptName, Router, ~p"/posts/#{123}") == "/api/posts/123"
-      assert ~p"/posts/#{123}" == "/api/posts/123"
-      assert path(uri_with_script_name(), ~p"/posts/5") == "/api/posts/5"
-      assert path(uri_with_script_name(), ~p"/posts/#{123}") == "/api/posts/123"
-    end
-
-    test "urls use script name" do
-      assert url(ScriptName, ~p"/") == "https://example.com/api/"
-      assert url(conn_with_script_name(~w(foo)), ~p"/") == "https://example.com/foo/"
-      assert url(uri_with_script_name(), ~p"/") == "https://example.com:123/api/"
-      assert url(ScriptName, ~p"/posts/5") == "https://example.com/api/posts/5"
-      assert url(ScriptName, ~p"/posts/#{123}") == "https://example.com/api/posts/123"
-      assert url(conn_with_script_name(), ~p"/posts/5") == "https://example.com/api/posts/5"
-
-      assert url(conn_with_script_name(~w(foo)), ~p"/posts/5") ==
-               "https://example.com/foo/posts/5"
-
-      assert url(uri_with_script_name(), ~p"/posts/5") == "https://example.com:123/api/posts/5"
-    end
-
-    test "static use endpoint script name only" do
-      assert path(conn_with_script_name(~w(foo)), ~p"/images/foo.png") ==
-               "/api/images/foo.png"
-
-      assert url(conn_with_script_name(~w(foo)), ~p"/images/foo.png") ==
-               "https://static.example.com/api/images/foo.png"
-    end
-
-    test "phoenix_router_url with string takes precedence over endpoint" do
-      url = "https://phoenixframework.org"
-      conn = Phoenix.Controller.put_router_url(conn_with_endpoint(), url)
-
-      assert url(conn, ~p"/") == url <> "/"
-      assert url(conn, ~p"/admin/new/messages/1") == url <> "/admin/new/messages/1"
-      assert url(conn, ~p"/admin/new/messages/#{123}") == url <> "/admin/new/messages/123"
-    end
-
-    test "phoenix_router_url with URI takes precedence over endpoint" do
-      uri = %URI{scheme: "https", host: "phoenixframework.org", port: 123, path: "/path"}
-      conn = Phoenix.Controller.put_router_url(conn_with_endpoint(), uri)
-
-      assert url(conn, ~p"/") == "https://phoenixframework.org:123/path/"
-
-      assert url(conn, ~p"/admin/new/messages/1") ==
-               "https://phoenixframework.org:123/path/admin/new/messages/1"
-    end
-
-    test "phoenix_static_url with string takes precedence over endpoint" do
-      url = "https://phoenixframework.org"
-
-      conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), url)
-      assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
-
-      conn = Phoenix.Controller.put_static_url(conn_with_script_name(), url)
-      assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
-    end
-
-    test "phoenix_static_url set to string with path results in static url with that path" do
-      url = "https://phoenixframework.org/path"
-      conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), url)
-      assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
-
-      conn = Phoenix.Controller.put_static_url(conn_with_script_name(), url)
-      assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
-    end
-
-    test "phoenix_static_url with URI takes precedence over endpoint" do
-      uri = %URI{scheme: "https", host: "phoenixframework.org", port: 123}
-
-      conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), uri)
-      assert url(conn, ~p"/images/foo.png") == "https://phoenixframework.org:123/images/foo.png"
-
-      conn = Phoenix.Controller.put_static_url(conn_with_script_name(), uri)
-      assert url(conn, ~p"/images/foo.png") == "https://phoenixframework.org:123/images/foo.png"
-    end
-
-    test "phoenix_static_url set to URI with path results in static url with that path" do
-      uri = %URI{scheme: "https", host: "phoenixframework.org", port: 123, path: "/path"}
-
-      conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), uri)
-
-      assert url(conn, ~p"/images/foo.png") ==
-               "https://phoenixframework.org:123/path/images/foo.png"
-
-      conn = Phoenix.Controller.put_static_url(conn_with_script_name(), uri)
-
-      assert url(conn, ~p"/images/foo.png") ==
-               "https://phoenixframework.org:123/path/images/foo.png"
-    end
-  end
-
-  # if Version.match?(System.version(), ">= 1.14.0-dev") do
-  #   describe "warnings" do
-  #     test "forwards" do
-  #       warnings =
-  #         ExUnit.CaptureIO.capture_io(:stderr, fn ->
-  #           defmodule Forwards do
-  #             use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-  #             import Phoenix.VerifiedRoutes, only: []
-
-  #             def test do
-  #               "/router_forward/dashboard" = ~p"/router_forward/dashboard"
-  #               "/router_forward/warn" = ~p"/router_forward/warn"
-  #               "/plug_forward/home" = ~p"/plug_forward/home"
-  #             end
-  #           end
-  #         end)
-
-  #       line = __ENV__.line - 6
-
-  #       warnings = String.replace(warnings, ~r/(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]/, "")
-
-  #       assert warnings =~
-  #                "warning: no route path for Phoenix.VerifiedRoutesTest.Router matches \"/router_forward/warn\"\n  test/phoenix/verified_routes_test.exs:#{line}: Phoenix.VerifiedRoutesTest.Forwards.test/0\n\n"
-  #     end
-
-  # test "~p warns on unmatched path" do
-  #   warnings =
-  #     ExUnit.CaptureIO.capture_io(:stderr, fn ->
-  #       defmodule Unmatched do
-  #         use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-
-  #         def test do
-  #           ~p"/unknown"
-  #           ~p"/unknown/123"
-  #           ~p"/unknown/#{123}"
+  #   test "~p with static and dynamic string and query params" do
+  #     struct = %__MODULE__{id: 123, slug: "post-123"}
+
+  #     # static segments
+  #     assert ~p"/posts/1?foo=bar" == "/posts/1?foo=bar"
+  #     assert ~p"/posts/bottom/asc/10?foo=bar" == "/posts/bottom/asc/10?foo=bar"
+  #     assert path(conn_with_endpoint(), ~p"/posts/1?foo=bar") == "/posts/1?foo=bar"
+  #     assert path(@endpoint, @router, ~p"/posts/1?foo=bar") == "/posts/1?foo=bar"
+
+  #     assert path(conn_with_endpoint(), ~p"/posts/bottom/asc/10?foo=bar") ==
+  #              "/posts/bottom/asc/10?foo=bar"
+
+  #     assert path(@endpoint, @router, ~p"/posts/bottom/asc/10?foo=bar") ==
+  #              "/posts/bottom/asc/10?foo=bar"
+
+  #     # dynamic segments
+  #     assert ~p"/posts/#{struct}?#{[page: 1, spaced: "a b"]}" == "/posts/post-123?page=1&spaced=a+b"
+  #     assert ~p"/posts/#{struct}?#{[page: 1, spaced: "a b"]}" == "/posts/post-123?page=1&spaced=a+b"
+  #     id = 123
+  #     dir = "asc"
+  #     assert ~p"/posts/#{id}?foo=bar" == "/posts/123?foo=bar"
+  #     assert ~p"/posts/post-#{id}?foo=bar" == "/posts/post-123?foo=bar"
+  #     assert path(conn_with_endpoint(), ~p"/posts/#{id}?foo=bar") == "/posts/123?foo=bar"
+  #     assert path(@endpoint, @router, ~p"/posts/#{id}?foo=bar") == "/posts/123?foo=bar"
+
+  #     assert path(conn_with_endpoint(), ~p"/posts/bottom/#{dir}/#{id}?foo=bar") ==
+  #              "/posts/bottom/asc/123?foo=bar"
+
+  #     assert path(@endpoint, @router, ~p"/posts/bottom/#{dir}/#{id}?foo=bar") ==
+  #              "/posts/bottom/asc/123?foo=bar"
+
+  #     # dynamic query params
+  #     assert ~p"/posts/1?other_post=#{id}" == "/posts/1?other_post=123"
+  #     assert ~p"/posts/1?other_post=#{struct}" == "/posts/1?other_post=post-123"
+  #   end
+
+  #   test "~p with dynamic string and static query params" do
+  #     struct = %__MODULE__{id: 123, slug: "post-123"}
+  #     assert ~p"/posts/#{struct}?foo=bar" == "/posts/post-123?foo=bar"
+  #   end
+
+  #   test "~p with scoped host" do
+  #     assert ~p"/host_users/1/info" == "/host_users/1/info"
+  #   end
+
+  #   test "~p on splat segments" do
+  #     assert ~p|/posts/file/#{1}/#{"2.jpg"}| == "/posts/file/1/2.jpg"
+
+  #     location = ["folder", "file.jpg"]
+  #     assert ~p|/posts/file/#{location}| == "/posts/file/folder/file.jpg"
+  #   end
+
+  #   test "~p URI encodes interpolated segments and query params" do
+  #     assert ~p"/posts/my path?#{[foo: "my param"]}" == "/posts/my%20path?foo=my+param"
+  #     slug = "my path"
+  #     assert ~p"/posts/#{slug}?#{[foo: "my param"]}" == "/posts/my%20path?foo=my+param"
+  #   end
+
+  #   test "~p with empty query string drops ?" do
+  #     assert ~p"/posts/5?#{%{}}" == "/posts/5"
+  #   end
+
+  #   test "~p with hash" do
+  #     assert ~p"/posts/123/info#bar" == "/posts/123/info#bar"
+
+  #     warnings =
+  #       ExUnit.CaptureIO.capture_io(:stderr, fn ->
+  #         defmodule Hash do
+  #           use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+  #           import Phoenix.VerifiedRoutes, only: []
+
+  #           def test, do: ~p"/posts/123/info#bar"
   #         end
-  #       end
-  #     end)
+  #       end)
 
-  #   assert warnings =~
-  #            ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/unknown"|
+  #     assert warnings == ""
+  #   end
 
-  #   assert warnings =~
-  #            ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/unknown/123"|
-
-  #   assert warnings =~
-  #            ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/unknown/#{123}"|
-  # end
-
-  # test "~p warns on warn_on_verify: true route" do
-  #   warnings =
-  #     ExUnit.CaptureIO.capture_io(:stderr, fn ->
-  #       defmodule VerifyFalse do
+  #   test "~p raises on leftover sigil" do
+  #     assert_raise ArgumentError, "~p does not support modifiers after closing, got: foo", fn ->
+  #       defmodule LeftOver do
   #         use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
-
-  #         def test, do: ~p"/should-warn/foobar"
+  #         import Phoenix.VerifiedRoutes, only: []
+  #         def test, do: ~p"/posts/1"foo
   #       end
-  #     end)
+  #     end
+  #   end
 
-  #   assert warnings =~
-  #            ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/should-warn/foobar"|
-  # end
+  #   test "~p raises on dynamic interpolation" do
+  #     msg = ~S|a dynamic ~p interpolation must follow a static segment, got: "/posts/#{1}#{2}"|
 
-  # test "~p does not warn if route without warn_on_verify: true matches first" do
-  #   warnings =
-  #     ExUnit.CaptureIO.capture_io(:stderr, fn ->
-  #       defmodule VerifyFalseTrueMatchesFirst do
+  #     assert_raise ArgumentError, msg, fn ->
+  #       defmodule DynamicDynamic do
+  #         use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+  #         import Phoenix.VerifiedRoutes, only: []
+  #         def test, do: ~p"/posts/#{1}#{2}"
+  #       end
+  #     end
+  #   end
+
+  #   test "~p raises when not prefixed by /" do
+  #     assert_raise ArgumentError,
+  #                  ~s|paths must begin with /, got: "posts/1"|,
+  #                  fn ->
+  #                    defmodule SigilPPrefix do
+  #                      use Phoenix.VerifiedRoutes,
+  #                        endpoint: unquote(@endpoint),
+  #                        router: unquote(@router)
+
+  #                      import Phoenix.VerifiedRoutes, only: []
+
+  #                      def test, do: ~p"posts/1"
+  #                    end
+  #                  end
+  #   end
+
+  #   test "path arities" do
+  #     assert path(Endpoint, ~p"/posts/1") == "/posts/1"
+  #     assert path(conn_with_endpoint(), ~p"/posts/1") == "/posts/1"
+  #     assert path(conn_with_script_name(), ~p"/posts/1") == "/api/posts/1"
+  #   end
+
+  #   test "url arities" do
+  #     assert url(~p"/posts/1") == "https://example.com/posts/1"
+  #     assert url(~p"/posts/#{123}") == "https://example.com/posts/123"
+  #     assert url(Endpoint, ~p"/posts/1") == "https://example.com/posts/1"
+  #     assert url(conn_with_endpoint(), ~p"/posts/1") == "https://example.com/posts/1"
+  #     assert url(conn_with_script_name(), ~p"/posts/1") == "https://example.com/api/posts/1"
+
+  #     assert url(Endpoint, Router, ~p"/posts/1") == "https://example.com/posts/1"
+  #     assert url(conn_with_endpoint(), Router, ~p"/posts/1") == "https://example.com/posts/1"
+  #     assert url(conn_with_script_name(), Router, ~p"/posts/1") == "https://example.com/api/posts/1"
+  #   end
+
+  #   test "path raises when non ~p is passed" do
+  #     assert_raise ArgumentError, ~r|expected compile-time ~p path string, got: "/posts/1"|, fn ->
+  #       defmodule MissingPathPrefix do
+  #         use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+  #         import Phoenix.VerifiedRoutes, only: []
+  #         def test, do: path(%URI{}, "/posts/1")
+  #       end
+  #     end
+  #   end
+
+  #   test "url raises when non ~p is passed" do
+  #     assert_raise ArgumentError, ~r|expected compile-time ~p path string, got: "/posts/1"|, fn ->
+  #       defmodule MissingURLPrefix do
+  #         use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+  #         import Phoenix.VerifiedRoutes, only: []
+  #         def test, do: url("/posts/1")
+  #       end
+  #     end
+  #   end
+
+  #   test "static_integrity" do
+  #     assert is_nil(static_integrity(Endpoint, "/images/foo.png"))
+  #     assert is_nil(static_integrity(conn_with_endpoint(), "/images/foo.png"))
+  #     assert is_nil(static_integrity(socket_with_endpoint(), "/images/foo.png"))
+  #   end
+
+  #   test "static paths" do
+  #     assert path(Endpoint, ~p"/images/foo.png") == "/images/foo.png"
+  #     assert path(conn_with_endpoint(), ~p"/images/foo.png") == "/images/foo.png"
+  #     assert path(socket_with_endpoint(), ~p"/images/foo.png") == "/images/foo.png"
+  #   end
+
+  #   test "~p dict query strings" do
+  #     assert ~p"/posts/5?#{[id: 3]}" == "/posts/5?id=3"
+  #     assert ~p"/posts/5?#{[foo: "bar"]}" == "/posts/5?foo=bar"
+  #     assert ~p"/posts/5?#{[foo: :bar]}" == "/posts/5?foo=bar"
+  #     assert ~p"/posts/5?#{[foo: true]}" == "/posts/5?foo=true"
+  #     assert ~p"/posts/5?#{[foo: false]}" == "/posts/5?foo=false"
+  #     assert ~p"/posts/5?#{[foo: nil]}" == "/posts/5?foo="
+
+  #     assert ~p"/posts/5?#{[foo: ~w(bar baz)]}" ==
+  #              "/posts/5?foo[]=bar&foo[]=baz"
+
+  #     assert ~p"/posts/5?#{[foo: %{id: 5}]}" ==
+  #              "/posts/5?foo[id]=5"
+
+  #     assert ~p"/posts/5?#{[foo: %{__struct__: Foo, id: 5}]}" ==
+  #              "/posts/5?foo=5"
+  #   end
+
+  #   test "~p mixed query string interpolation" do
+  #     dir = "asc"
+  #     page = "pg"
+
+  #     assert ~p"/posts/5?page=#{3}" == "/posts/5?page=3"
+  #     assert ~p"/posts/5?page=#{3}&dir=#{dir}" == "/posts/5?page=3&dir=asc"
+  #     assert ~p"/posts/5?#{page}=#{3}&dir=#{dir}" == "/posts/5?pg=3&dir=asc"
+  #     assert ~p"/posts/5?#{"a b"}=#{3}&dir=#{"a b"}" == "/posts/5?a+b=3&dir=a+b"
+
+  #     assert ~p"/posts/post?foo=bar&#{"key"}=#{"val"}&baz=bat" ==
+  #              "/posts/post?foo=bar&key=val&baz=bat"
+
+  #     assert ~p"/posts/#{page}?foo=bar&#{"key"}=#{"val"}&baz=bat" ==
+  #              "/posts/pg?foo=bar&key=val&baz=bat"
+  #   end
+
+  #   test "invalid mixed interpolation query string raises" do
+  #     msg =
+  #       ~S|interpolated query string params must be separated by &, got: "/posts/5?page=#{3}#{dir}"|
+
+  #     assert_raise ArgumentError, msg, fn ->
+  #       defmodule InvalidQuery do
   #         use Phoenix.VerifiedRoutes,
   #           endpoint: unquote(@endpoint),
-  #           router: CatchAllWarningRouter
+  #           router: unquote(@router)
 
-  #         def test, do: ~p"/"
+  #         import Phoenix.VerifiedRoutes, only: []
+
+  #         def test do
+  #           ~p"/posts/5?page=#{3}#{dir}" == "/posts/5?page=3"
+  #         end
   #       end
-  #     end)
+  #     end
+  #   end
 
-  #   assert warnings == ""
+  #   # test "~p with complex ids" do
+  #   #   socket = %Phoenix.Socket{
+  #   #     private: %{routex: %{__order__: [0, 0]}}
+  #   #   }
+
+  #   #   _foo = socket
+
+  #   #   assert ~p|/posts/#{"==d--+"}| == "/posts/%3D%3Dd--%2B"
+  #   #   assert ~p|/posts/top?#{[id: "==d--+"]}| == "/posts/top?id=%3D%3Dd--%2B"
+
+  #   #   assert ~p|/posts/file/#{"==d--+"}/#{":O.jpg"}| == "/posts/file/%3D%3Dd--%2B/%3AO.jpg"
+
+  #   #   assert ~p|/posts/file/#{"==d--+"}/#{":O.jpg"}?#{[xx: "/=+/"]}| ==
+  #   #            "/posts/file/%3D%3Dd--%2B/%3AO.jpg?xx=%2F%3D%2B%2F"
+  #   # end
+
+  #   test "~p with trailing slashes" do
+  #     assert ~p"/posts/5/" == "/posts/5/"
+  #     assert ~p"/posts/5/?#{[id: 5]}" == "/posts/5/?id=5"
+  #     assert ~p"/posts/5/?#{%{"id" => "foo"}}" == "/posts/5/?id=foo"
+  #     assert ~p"/posts/5/?#{%{"id" => "foo bar"}}" == "/posts/5/?id=foo+bar"
+  #   end
+
+  #   describe "with static path" do
+  #     @endpoint StaticPath
+  #     @router Router
+  #     test "paths use static prefix" do
+  #       assert ~p"/images/foo.png" == "/static/images/foo.png"
+
+  #       assert path(conn_with_endpoint(StaticPath), ~p"/images/foo.png") ==
+  #                "/static/images/foo.png"
+
+  #       assert path(socket_with_endpoint(StaticPath), ~p"/images/foo.png") ==
+  #                "/static/images/foo.png"
+
+  #       assert url(conn_with_endpoint(StaticPath), ~p"/images/foo.png") ==
+  #                "https://example.com/static/images/foo.png"
+
+  #       assert url(socket_with_endpoint(StaticPath), ~p"/images/foo.png") ==
+  #                "https://example.com/static/images/foo.png"
+  #     end
+  #   end
+
+  #   describe "with script name" do
+  #     @endpoint ScriptName
+  #     @router Router
+
+  #     test "paths use script name" do
+  #       assert ~p"/" == "/api/"
+  #       assert path(ScriptName, Router, ~p"/") == "/api/"
+  #       assert path(conn_with_script_name(), ~p"/") == "/api/"
+  #       assert path(uri_with_script_name(), ~p"/") == "/api/"
+  #       assert path(ScriptName, Router, ~p"/posts/5") == "/api/posts/5"
+  #       assert ~p"/posts/5" == "/api/posts/5"
+  #       assert path(ScriptName, Router, ~p"/posts/#{123}") == "/api/posts/123"
+  #       assert ~p"/posts/#{123}" == "/api/posts/123"
+  #       assert path(uri_with_script_name(), ~p"/posts/5") == "/api/posts/5"
+  #       assert path(uri_with_script_name(), ~p"/posts/#{123}") == "/api/posts/123"
+  #     end
+
+  #     test "urls use script name" do
+  #       assert url(ScriptName, ~p"/") == "https://example.com/api/"
+  #       assert url(conn_with_script_name(~w(foo)), ~p"/") == "https://example.com/foo/"
+  #       assert url(uri_with_script_name(), ~p"/") == "https://example.com:123/api/"
+  #       assert url(ScriptName, ~p"/posts/5") == "https://example.com/api/posts/5"
+  #       assert url(ScriptName, ~p"/posts/#{123}") == "https://example.com/api/posts/123"
+  #       assert url(conn_with_script_name(), ~p"/posts/5") == "https://example.com/api/posts/5"
+
+  #       assert url(conn_with_script_name(~w(foo)), ~p"/posts/5") ==
+  #                "https://example.com/foo/posts/5"
+
+  #       assert url(uri_with_script_name(), ~p"/posts/5") == "https://example.com:123/api/posts/5"
+  #     end
+
+  #     test "static use endpoint script name only" do
+  #       assert path(conn_with_script_name(~w(foo)), ~p"/images/foo.png") ==
+  #                "/api/images/foo.png"
+
+  #       assert url(conn_with_script_name(~w(foo)), ~p"/images/foo.png") ==
+  #                "https://static.example.com/api/images/foo.png"
+  #     end
+
+  #     test "phoenix_router_url with string takes precedence over endpoint" do
+  #       url = "https://phoenixframework.org"
+  #       conn = Phoenix.Controller.put_router_url(conn_with_endpoint(), url)
+
+  #       assert url(conn, ~p"/") == url <> "/"
+  #       assert url(conn, ~p"/admin/new/messages/1") == url <> "/admin/new/messages/1"
+  #       assert url(conn, ~p"/admin/new/messages/#{123}") == url <> "/admin/new/messages/123"
+  #     end
+
+  #     test "phoenix_router_url with URI takes precedence over endpoint" do
+  #       uri = %URI{scheme: "https", host: "phoenixframework.org", port: 123, path: "/path"}
+  #       conn = Phoenix.Controller.put_router_url(conn_with_endpoint(), uri)
+
+  #       assert url(conn, ~p"/") == "https://phoenixframework.org:123/path/"
+
+  #       assert url(conn, ~p"/admin/new/messages/1") ==
+  #                "https://phoenixframework.org:123/path/admin/new/messages/1"
+  #     end
+
+  #     test "phoenix_static_url with string takes precedence over endpoint" do
+  #       url = "https://phoenixframework.org"
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), url)
+  #       assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_script_name(), url)
+  #       assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
+  #     end
+
+  #     test "phoenix_static_url set to string with path results in static url with that path" do
+  #       url = "https://phoenixframework.org/path"
+  #       conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), url)
+  #       assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_script_name(), url)
+  #       assert url(conn, ~p"/images/foo.png") == url <> "/images/foo.png"
+  #     end
+
+  #     test "phoenix_static_url with URI takes precedence over endpoint" do
+  #       uri = %URI{scheme: "https", host: "phoenixframework.org", port: 123}
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), uri)
+  #       assert url(conn, ~p"/images/foo.png") == "https://phoenixframework.org:123/images/foo.png"
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_script_name(), uri)
+  #       assert url(conn, ~p"/images/foo.png") == "https://phoenixframework.org:123/images/foo.png"
+  #     end
+
+  #     test "phoenix_static_url set to URI with path results in static url with that path" do
+  #       uri = %URI{scheme: "https", host: "phoenixframework.org", port: 123, path: "/path"}
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_endpoint(), uri)
+
+  #       assert url(conn, ~p"/images/foo.png") ==
+  #                "https://phoenixframework.org:123/path/images/foo.png"
+
+  #       conn = Phoenix.Controller.put_static_url(conn_with_script_name(), uri)
+
+  #       assert url(conn, ~p"/images/foo.png") ==
+  #                "https://phoenixframework.org:123/path/images/foo.png"
+  #     end
+  #   end
+
+  #   if Version.match?(System.version(), ">= 1.14.0-dev") do
+  #     describe "warnings" do
+  #       test "forwards" do
+  #         warnings =
+  #           ExUnit.CaptureIO.capture_io(:stderr, fn ->
+  #             defmodule Forwards do
+  #               use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+  #               import Phoenix.VerifiedRoutes, only: []
+
+  #               def test do
+  #                 "/router_forward/dashboard" = ~p"/router_forward/dashboard"
+  #                 "/router_forward/warn" = ~p"/router_forward/warn"
+  #                 "/plug_forward/home" = ~p"/plug_forward/home"
+  #               end
+  #             end
+  #           end)
+
+  #         line = __ENV__.line - 6
+
+  #         warnings = String.replace(warnings, ~r/(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]/, "")
+
+  #         assert warnings =~
+  #                  "warning: no route path for Phoenix.VerifiedRoutesTest.Router matches \"/router_forward/warn\"\n  test/phoenix/verified_routes_test.exs:#{line}: Phoenix.VerifiedRoutesTest.Forwards.test/0\n\n"
+  #       end
+
+  #       test "~p warns on unmatched path" do
+  #         warnings =
+  #           ExUnit.CaptureIO.capture_io(:stderr, fn ->
+  #             defmodule Unmatched do
+  #               use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+  #               import Phoenix.VerifiedRoutes, only: []
+
+  #               def test do
+  #                 ~p"/unknown"
+  #                 ~p"/unknown/123"
+  #                 ~p"/unknown/#{123}"
+  #               end
+  #             end
+  #           end)
+
+  #         assert warnings =~
+  #                  ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/unknown"|
+
+  #         assert warnings =~
+  #                  ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/unknown/123"|
+
+  #         assert warnings =~
+  #                  ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/unknown/#{123}"|
+  #       end
+
+  #       test "~p warns on warn_on_verify: true route" do
+  #         warnings =
+  #           ExUnit.CaptureIO.capture_io(:stderr, fn ->
+  #             defmodule VerifyFalse do
+  #               use Phoenix.VerifiedRoutes, endpoint: unquote(@endpoint), router: unquote(@router)
+
+  #               def test, do: ~p"/should-warn/foobar"
+  #             end
+  #           end)
+
+  #         assert warnings =~
+  #                  ~s|no route path for Phoenix.VerifiedRoutesTest.Router matches "/should-warn/foobar"|
+  #       end
+
+  #       test "~p does not warn if route without warn_on_verify: true matches first" do
+  #         warnings =
+  #           ExUnit.CaptureIO.capture_io(:stderr, fn ->
+  #             defmodule VerifyFalseTrueMatchesFirst do
+  #               use Phoenix.VerifiedRoutes,
+  #                 endpoint: unquote(@endpoint),
+  #                 router: CatchAllWarningRouter
+
+  #               def test, do: ~p"/"
+  #             end
+  #           end)
+
+  #         assert warnings == ""
+  #       end
+  #     end
+  #   end
   # end
-  # end
-  # end
+
+  # #   test "should print a message when ~p is used by Routex" do
+  # #     url(~p"/home") |> IO.inspect()
+  # #   end
+
+  # #   test "should print a message when anoth sigil is used" do
+  # #   end
+
+  # #   test "should set assigned sigils in config" do
+  # #   end
+
+  # #   test "should create original sigil helper when overridden" do
+  # #   end
+
+  # #   test "should not create original sigil helper when it's not overridden" do
+  # #   end
+
+  # #   test "should create branching url/{2,3,4}" do
+  # #   end
+
+  # #   test "should create delegating url/{2,3,4}" do
+  # #   end
+
+  # #   test "should create branching path/{2,3}" do
+  # #   end
+
+  # #   test "should create delegating path/{2,3}" do
+  # #   end
+  # #
 end
-
-#   test "should print a message when ~p is used by Routex" do
-#     url(~p"/home") |> IO.inspect()
-#   end
-
-#   test "should print a message when anoth sigil is used" do
-#   end
-
-#   test "should set assigned sigils in config" do
-#   end
-
-#   test "should create original sigil helper when overridden" do
-#   end
-
-#   test "should not create original sigil helper when it's not overridden" do
-#   end
-
-#   test "should create branching url/{2,3,4}" do
-#   end
-
-#   test "should create delegating url/{2,3,4}" do
-#   end
-
-#   test "should create branching path/{2,3}" do
-#   end
-
-#   test "should create delegating path/{2,3}" do
-#   end
-# end

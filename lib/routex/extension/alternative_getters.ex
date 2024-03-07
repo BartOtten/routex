@@ -62,7 +62,7 @@ defmodule Routex.Extension.AlternativeGetters do
         def alternatives(url) when is_binary(url) do
           uri = URI.parse(url)
           segments = Path.split(uri.path)
-          alternatives(segments, uri.query)
+          alternatives(segments, uri.query, uri.fragment)
         end
       end
 
@@ -101,11 +101,14 @@ defmodule Routex.Extension.AlternativeGetters do
 
     result =
       quote do
-        def alternatives(unquote(pattern), query) do
+        def alternatives(unquote(pattern), query, fragment) do
+          query = (query && "?" <> query) || ""
+          fragment = (fragment && "#" <> fragment) || ""
+
           unquote(dynamic_paths)
           |> Enum.map(
             &%Routex.Extension.AlternativeGetters{
-              slug: Path.join([elem(&1, 0), "?#{query}"] |> Path.absname()),
+              slug: Path.join([elem(&1, 0), query, fragment] |> Path.absname()),
               attrs: elem(&1, 1)
             }
           )

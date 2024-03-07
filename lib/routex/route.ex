@@ -33,11 +33,20 @@ defmodule Routex.Route do
   route. By default groups by parent. This can be adjusted by providing a
   negative depth offset.
   """
+
   def group_by_method_and_path(routes, offset \\ @default_nesting_offset) when offset <= 0 do
     routes
     |> group_by_nesting(offset)
-    |> Enum.map(fn {_nesting, groutes} -> {{hd(groutes).verb, hd(groutes).path}, groutes} end)
+    |> Enum.map(fn
+      {_nesting, groutes} -> {{hd(groutes).verb, hd(groutes).path}, groutes}
+    end)
+    |> List.flatten()
     |> Map.new()
+  end
+
+  @doc "Returns routes grouped by a combination method and origin path"
+  def group_by_method_and_origin(routes) do
+    routes |> Enum.group_by(&{&1.verb, &1.private.routex.__origin__})
   end
 
   @doc """

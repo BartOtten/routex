@@ -120,7 +120,7 @@ defmodule Routex.Processing do
       Map.new()
       |> Map.put(:__origin__, route.path)
       |> Map.put(:__line__, route.line)
-      |> Map.put(:__order__, [0, index])
+      |> Map.put(:__order__, [index])
 
     overrides = Map.get(route.private, :rtx, %{})
     values = Map.merge(meta, overrides)

@@ -111,11 +111,12 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   require Phoenix.VerifiedRoutes
 
-  defp uniform_path_match(input) do
+  defp uniform_path_matchspec(input) do
     input
     |> Path.absname()
-    |> Path.to_match_pattern()
-    |> Path.join_statics()
+    |> Path.route_pattern()
+
+    # |> Path.to_match_pattern()
   end
 
   @impl true
@@ -135,37 +136,65 @@ defmodule Routex.Extension.VerifiedRoutes do
       routes
       |> Route.group_by_method_and_origin()
       |> Enum.map(fn {{_method, path}, routes} ->
-        pattern = uniform_path_match(path)
+        pattern = uniform_path_matchspec(path)
 
         {pattern, routes}
       end)
       |> Map.new()
 
     [
-      branch_macro(pattern_routes, Phoenix.VerifiedRoutes, :sigil_p, as: :sigil_p, replace: 1),
-      branch_macro(pattern_routes, Phoenix.VerifiedRoutes, :url, as: :url, replace: 1),
-      branch_macro(pattern_routes, Phoenix.VerifiedRoutes, :path, as: :path, replace: 1)
+      branch_macro(pattern_routes, Phoenix.VerifiedRoutes, :sigil_p,
+        as: :sigil_p,
+        orig: :sigil_o,
+        arg_pos: fn arity -> arity - 1 end
+      ),
+      branch_macro(pattern_routes, Phoenix.VerifiedRoutes, :url,
+        as: :url,
+        orig: :url_o,
+        arg_pos: fn arity -> arity - 1 end
+      ),
+      branch_macro(pattern_routes, Phoenix.VerifiedRoutes, :path,
+        as: :path,
+        orig: :path_o,
+        arg_pos: fn arity -> arity - 1 end
+      )
     ]
   end
 
-  defp branch_macro(pattern_routes, module, fun, opts) when is_atom(module) and is_atom(fun) do
-    fnname = Keyword.get(opts, :as, fun)
+  def branch_macro(pattern_routes, module, fun, opts \\ [])
+      when is_map(pattern_routes) and is_atom(module) and is_atom(fun) and is_list(opts) do
+    IO.inspect(pattern_routes)
+    as_fun = Keyword.get(opts, :as, fun)
+    orig_fun = Keyword.get(opts, :orig, fun)
     arities = Keyword.get_values(module.__info__(:macros), fun)
 
     arities_str =
-      if length(arities) > 1,
-        do: "{#{Enum.join(arities, ",")}}",
-        else: "#{hd(arities)}"
+      if length(arities) == 1, do: "#{hd(arities)}", else: "{#{Enum.join(arities, ",")}}"
 
-    IO.puts("BRANCHING #{module}.#{fun}/#{arities_str}")
+    Logger.info("Create branching variant of: #{module}.#{fun}/#{arities_str}")
 
     for arity <- arities do
       args = Macro.generate_arguments(arity, __MODULE__)
 
+      # anonymous functions can't enter the world of AST. That's why we
+      # evaluate the option and replace it with the resulting value.
+      opts = Keyword.update(opts, :arg_pos, 1, & &1.(arity))
+
       quote do
-        defmacro unquote(fnname)(unquote_splicing(args)) do
+        require Routex.Extension.VerifiedRoutes
+
+        defmacro unquote(orig_fun)(unquote_splicing(args)) do
+          Routex.Extension.VerifiedRoutes.build_default(
+            unquote(module),
+            unquote(fun),
+            unquote(args)
+          )
+        end
+
+        defmacro unquote(as_fun)(unquote_splicing(args)) do
           Routex.Extension.VerifiedRoutes.build_case(
             unquote(Macro.escape(pattern_routes)),
+            __CALLER__,
             unquote(module),
             unquote(fun),
             unquote(args),
@@ -176,74 +205,51 @@ defmodule Routex.Extension.VerifiedRoutes do
     end
   end
 
-  def build_case(pattern_routes, module, fun, args, opts) do
-    helper = 1
+  def build_default(module, fun, args) do
+    quote do
+      unquote(module).unquote(fun)(unquote_splicing(args))
+    end
+  end
 
-    # auto_select = fn args ->
-    #   Enum.find_index(args, fn
-    #     {:<<>>, _, _} ->
-    #       true
+  defp fetch_segments(str) when is_binary(str), do: {:segments, Path.split(str)}
+  defp fetch_segments({:<<>>, _, segments}), do: {:segments, segments}
+  defp fetch_segments({:sigil_p, _, [{:<<>>, _, segments}, []]}), do: {:sigil, segments}
 
-    #     {:sigil_p, _,
-    #      [
-    #        {:<<>>, _, _},
-    #        []
-    #      ]} ->
-    #       true
+  def build_case(pattern_routes, caller, module, fun, args, opts) do
+    helper_ast = ExtensionUtils.get_helper_ast(caller)
+    route_arg_pos = Keyword.get(opts, :arg_pos) - 1
+    route_arg = Enum.at(args, route_arg_pos)
+    {type, route_segments} = fetch_segments(route_arg)
+    {d_length, d_map} = uniform_path_matchspec(route_segments)
 
-    #     _ ->
-    #       false
-    #   end)
-    # end
+    routes_matching_pattern =
+      Enum.flat_map(pattern_routes, fn
+        {{^d_length, map}, routes} ->
+          all_statics_match? = Enum.all?(map, fn {k, v} -> d_map[k] == v end)
 
-    # replace_arg_idx = Keyword.get(opts, :replace, auto_select(args))
+          if all_statics_match?, do: routes, else: []
 
-    # replace_args = Enum.at(args, replace_arg_idx)
-
-    # Enum.__info__
-
-    # route_segments =
-    #   Enum.map(
-    #     args(fn
-    #       {:<<>>, _, segments} ->
-    #         segments
-
-    #       {:sigil_p, meta,
-    #        [
-    #          {:<<>>, _, segments},
-    #          []
-    #        ]} ->
-    #         segments
-    #     end)
-    #   )
-
-    route_segments =
-      Enum.find_value(args, fn
-        {:<<>>, _, segments} ->
-          segments
-
-        {:sigil_p, meta,
-         [
-           {:<<>>, _, segments},
-           []
-         ]} ->
-          segments
+        _ ->
+          []
       end)
-
-    pattern = uniform_path_match(route_segments)
-    routes_matching_pattern = Map.get(pattern_routes, pattern)
 
     clauses =
       for route <- routes_matching_pattern do
-        recomposed_args =
-          route
-          |> Attrs.get!(:__origin__)
-          |> Path.recompose(route.path, args)
+        orig_path = Attrs.get!(route, :__origin__)
+        helper = Attrs.get!(route, :__order__) |> List.last()
 
-        helper = route |> Attrs.get!(:__order__) |> List.last()
-        # pattern = uniform_path_match(path)
+        recomposed_route =
+          Path.recompose(orig_path, route.path, route_segments)
+          |> Path.join_statics()
+          |> then(&{:<<>>, [], &1})
 
-        # IO.inspect(recomposed_args)
+        recomposed_route_arg =
+          case type do
+            :sigil -> {:sigil_p, [], [recomposed_route, []]}
+            :segments -> recomposed_route
+          end
+
+        recomposed_args = List.replace_at(args, route_arg_pos, recomposed_route_arg)
 
         quote do
           unquote(helper) -> unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
@@ -251,9 +257,14 @@ defmodule Routex.Extension.VerifiedRoutes do
       end
       |> List.flatten()
 
-    quote do
-      case unquote(helper) do
-        unquote(clauses)
+    if clauses == [] do
+      Logger.critical("Failed to create branches for #{inspect(args)}")
+      []
+    else
+      quote do
+        case unquote(helper_ast) do
+          unquote(clauses)
+        end
       end
     end
     |> Routex.ExtensionUtils.inspect_ast()

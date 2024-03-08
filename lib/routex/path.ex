@@ -64,8 +64,8 @@ defmodule Routex.Path do
         segment when is_atom(segment) ->
           ":" <> to_string(segment)
 
-        # segment when is_ast(segment) ->
-        #   get_interpol_binding(segment)
+        segment when is_ast(segment) ->
+          get_interpol_binding(segment)
 
         other ->
           other
@@ -146,20 +146,20 @@ defmodule Routex.Path do
               [String.replace_suffix(interpol, "/", ""), trailing, h | t]
           end
 
-        # "_{" <> rest, acc ->
-        #   trailing = (preserve? && String.ends_with?(rest, "}/") && "/") || ""
+        "_{" <> rest, acc ->
+          trailing = (preserve? && String.ends_with?(rest, "}/") && "/") || ""
 
-        #   binding =
-        #     rest
-        #     |> String.replace_suffix("/", "")
-        #     |> String.replace_suffix("}", "")
-        #     |> String.to_atom()
-        #     |> set_interpol_binding()
+          binding =
+            rest
+            |> String.replace_suffix("/", "")
+            |> String.replace_suffix("}", "")
+            |> String.to_atom()
+            |> set_interpol_binding()
 
-        #   case acc do
-        #     [h | t] -> [binding, (preserve? && @path_separator) || "", h | t]
-        #     [] -> [binding, trailing]
-        #   end
+          case acc do
+            [h | t] -> [binding, (preserve? && @path_separator) || "", h | t]
+            [] -> [binding, trailing]
+          end
 
         x, acc ->
           [x | acc]
@@ -195,6 +195,29 @@ defmodule Routex.Path do
   def add_prefix(input, prefix) when is_list(input), do: [prefix | input]
   def add_prefix(input, prefix), do: join([prefix, input])
 
+  @doc """
+  iex> route_pattern("/foo/3/show")
+  {3, %{0 => "foo", 1 => "3", 2 => "show"}}
+  iex> route_pattern("/foo/:id/show")
+  {3, %{0 => "foo", 2 => "show"}}
+  """
+
+  def route_pattern(input) do
+    segments =
+      split(input)
+      |> until_query()
+
+    static_map =
+      Enum.with_index(segments, fn k, v -> {v, k} end)
+      |> Enum.reject(fn {_idx, segment} ->
+        is_tuple(segment) or String.starts_with?(segment, ":")
+      end)
+      |> Map.new()
+
+    {length(segments), static_map}
+  end
+
+  # TODO: outdated docs
   @doc ~S"""
   Creates a match pattern for binary path, segments list and AST. The result
   is input type agnostic.
@@ -218,14 +241,16 @@ defmodule Routex.Path do
       ["products", {:arg0, [], Routex.Path}, "show", "edit"]
   """
 
-  def to_match_pattern({:<<>>, [], segments}) when is_list(segments) do
-    to_match_pattern(segments)
+  def to_match_pattern(segments, opts \\ [])
+
+  def to_match_pattern({:<<>>, [], segments}, opts) when is_list(segments) do
+    to_match_pattern(segments, opts)
   end
 
-  def to_match_pattern(segments) when is_list(segments) do
+  def to_match_pattern(segments, opts) when is_list(segments) do
     {segments, _binding} =
       segments
-      |> split(preserve_separator: true)
+      |> split(opts)
       |> until_query()
       |> until_fragments()
       |> rewrite_segments()
@@ -233,14 +258,12 @@ defmodule Routex.Path do
     segments
   end
 
-  def to_match_pattern(path) when is_binary(path), do: to_match_pattern(path, :match)
+  def to_match_pattern(path, opts) when is_binary(path), do: to_match_pattern(path, :match, opts)
 
-  def to_match_pattern(%Phoenix.Router.Route{path: path, kind: kind}),
-    do: to_match_pattern(path, kind)
+  def to_match_pattern(%Phoenix.Router.Route{path: path, kind: kind}, opts),
+    do: to_match_pattern(path, kind, opts)
 
-  def to_match_pattern(path, kind) do
-    alias Plug.Router.Utils
-
+  def to_match_pattern(path, kind, opts) do
     url = URI.parse(path)
     path = url.path || "/"
 
@@ -253,13 +276,11 @@ defmodule Routex.Path do
     #       Utils.build_path_match(path)
     #   end
 
-    segments = split(path, preserve_separator: true) |> join_statics()
-
-    IO.inspect(segments, label: :PM)
+    segments = split(path, opts) |> join_statics()
 
     {segments, _binding} =
       segments
-      |> split(preserve_separator: true)
+      |> split(opts)
       |> until_query()
       |> until_fragments()
       |> rewrite_segments()
@@ -335,24 +356,7 @@ defmodule Routex.Path do
     )
   end
 
-  def recompose(orig_path, new_path, args) do
-    Enum.map(args, fn
-      {:<<>>, _, segments} ->
-        do_recompose(orig_path, new_path, segments)
-
-      {:sigil_p, meta,
-       [
-         {:<<>>, _, segments},
-         []
-       ]} ->
-        {:sigil_p, meta, [do_recompose(orig_path, new_path, segments), []]}
-
-      other ->
-        other
-    end)
-  end
-
-  def do_recompose(orig_path, new_path, sigil_segments) do
+  def recompose(orig_path, new_path, sigil_segments) do
     orig_seg = split(orig_path, preserve_separator: true)
     new_seg = split(new_path, preserve_separator: true)
 
@@ -363,31 +367,23 @@ defmodule Routex.Path do
       |> Enum.with_index()
       |> Map.new()
 
-    # IO.inspect(orig_seg, label: :ORIG_SEG)
-    # IO.inspect(path_bindings, label: :BINDINGS)
-    # IO.inspect(new_seg, label: :NESWEG)
-
     split_sigil_segments = split(sigil_segments, preserve_separator: true)
     query_part = after_query(split_sigil_segments)
     fragments_part = after_fragments(split_sigil_segments)
 
     # IO.inspect(split_sigil_segments, label: :SIGILSEG)
 
-    saga =
-      Enum.map(new_seg, fn
-        ":" <> _ = segment ->
-          idx = path_bindings[segment]
-          Enum.at(split_sigil_segments, idx)
+    Enum.map(new_seg, fn
+      ":" <> _ = segment ->
+        idx = path_bindings[segment]
+        Enum.at(split_sigil_segments, idx)
 
-        segment ->
-          segment
-      end)
-      |> List.flatten()
-      |> Enum.concat([query_part, fragments_part])
-      |> List.flatten()
-      |> join_statics()
-
-    {:<<>>, [], saga}
+      segment ->
+        segment
+    end)
+    |> List.flatten()
+    |> Enum.concat([query_part, fragments_part])
+    |> List.flatten()
   end
 
   @doc """

@@ -87,7 +87,9 @@ defmodule Routex.Extension.AlternativeGetters do
       sibling_routes
       |> List.flatten()
       |> Enum.map(fn route ->
-        pattern = Path.to_match_pattern(route)
+        pattern =
+          Path.to_match_pattern(route)
+          |> IO.inspect()
 
         # unset the :alternatives key as it is redundant
         attrs =

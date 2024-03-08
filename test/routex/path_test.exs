@@ -210,6 +210,7 @@ defmodule Routex.PathTest do
       assert ["foo/bar/#frag"] == join_statics(["foo", "bar", "/#frag"])
       assert ["3/bar/#frag"] == join_statics([3, "bar", "/#frag"])
       assert ["foo/3#frag"] == join_statics(["foo", 3, "#frag"])
+      assert ["/foo/3#frag"] == join_statics(["/foo", 3, "#frag"])
     end
 
     test "does not join interpolation values" do
@@ -261,7 +262,7 @@ defmodule Routex.PathTest do
           "/products/show/#{x1}/edit/#{some}"
         end
 
-      assert expected == recompose(orig_path, new_path, segments)
+      assert expected == recompose(orig_path, new_path, segments) |> join_statics()
     end
 
     test "returns correct order" do
@@ -278,7 +279,7 @@ defmodule Routex.PathTest do
           "/#{x1}/#{some}/products/show/edit"
         end
 
-      assert expected == recompose(orig_path, new_path, segments)
+      assert expected == recompose(orig_path, new_path, segments) |> join_statics()
     end
 
     test "keeps query params" do
@@ -295,7 +296,7 @@ defmodule Routex.PathTest do
           "/#{x1}/#{some}/products/show/edit?query_param=baz"
         end
 
-      assert expected == recompose(orig_path, new_path, segments)
+      assert expected == recompose(orig_path, new_path, segments) |> join_statics()
     end
 
     test "keeps fragments" do
@@ -312,7 +313,7 @@ defmodule Routex.PathTest do
           "/#{x1}/#{some}/products/show/edit#fragment"
         end
 
-      assert expected == recompose(orig_path, new_path, segments)
+      assert expected == recompose(orig_path, new_path, segments) |> join_statics()
     end
 
     test "keeps interpolated query params" do
@@ -329,7 +330,7 @@ defmodule Routex.PathTest do
           "/#{x1}/#{some}/products/show/edit/?#{%{foo: "bar"}}"
         end
 
-      assert expected == recompose(orig_path, new_path, segments)
+      assert expected == recompose(orig_path, new_path, segments) |> join_statics()
     end
   end
 end

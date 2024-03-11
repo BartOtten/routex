@@ -1,9 +1,15 @@
 # credo:disable-for-this-file
+defmodule Routex.Path.Segments do
+  defstruct length: 0, static: [], dynamic: []
+end
+
 defmodule Routex.Path do
   @moduledoc """
   Provides functions that work with both a binary path and a
   list of segments; unless explicitly stated otherwise.
   """
+
+  alias __MODULE__.Segments
 
   @interpolate ":"
   @catch_all "*"
@@ -15,20 +21,44 @@ defmodule Routex.Path do
   defguard is_ast(input) when is_tuple(input) and tuple_size(input) == 3
 
   @doc """
-  Returns an absolute path, while preserving (absence of) a trailing slash.
+  Returns an absolute variant of the given input, preserving the (absence of) a
+    trailing slash. Supports both binary and list input.
+
+  **Examples**
+      iex> absname("/")
+      "/"
+      iex> absname("foo/bar/")
+      "/foo/bar/"
+      iex> absname(["/"])
+      ["/"]
+      iex> absname(["foo/", "bar/"])
+      ["/", "foo/", "bar/"]
   """
   def absname(@root <> _ = path), do: path
+  def absname(path) when is_binary(path), do: @root <> path
   def absname([@root <> _ | _] = segments), do: segments
-  def absname(segments) when is_binary(segments), do: @root <> segments
-  def absname(segments) when is_list(segments), do: ["/" | segments]
+  def absname(segments) when is_list(segments), do: [@root | segments]
 
   @doc """
-  Returns a relative path, while preserving (absence of) a trailing slash.
+  Returns an relative variant of the given input, preserving the (absence of) a
+    trailing slash. Supports both binary and list input.
+
+  **Examples**
+      iex> relative("/")
+      ""
+      iex> relative("/foo/bar")
+      "foo/bar"
+      iex> relative("D:/foo/bar/")
+      "foo/bar/"
+      iex> relative(["/"])
+      []
+      iex> relative(["/", "foo", "bar"])
+      ["foo", "bar"]
   """
   def relative(<<_drive, ?:, ?/, rest::binary>>), do: rest
   def relative(@root <> rest), do: rest
+  def relative([@root | t]), do: t
   def relative([@root <> rest | t]), do: [rest | t]
-  def relative(path), do: path
 
   @doc ~S"""
   Joins a (nested) list of path segments into a binary path.
@@ -71,6 +101,7 @@ defmodule Routex.Path do
           other
       end)
       |> Enum.split_with(fn
+        # prevent splitting at #{}
         @fragment_separator <> "{" <> _ -> true
         @fragment_separator <> _ -> false
         @query_separator <> _ -> false
@@ -120,7 +151,7 @@ defmodule Routex.Path do
   def split(input, opts) when is_binary(input) do
     preserve? = Keyword.get(opts, :preserve_separator, false)
 
-    # replace interpolation #{} as it deceives URI.parse fragment
+    # replace interpolation #{} as it deceives parse fragment
     input = String.replace(input, ~S"#{", "_{")
     url = URI.parse(input)
 
@@ -192,29 +223,128 @@ defmodule Routex.Path do
   """
 
   def add_prefix(input, nil), do: input
-  def add_prefix(input, prefix) when is_list(input), do: [prefix | input]
-  def add_prefix(input, prefix), do: join([prefix, input])
+  def add_prefix([_ | _] = input, prefix) when is_list(input), do: [prefix | input]
+  def add_prefix(<<_::binary>> = input, <<_::binary>> = prefix), do: prefix <> input
 
   @doc """
-  iex> route_pattern("/foo/3/show")
-  {3, %{0 => "foo", 1 => "3", 2 => "show"}}
-  iex> route_pattern("/foo/:id/show")
-  {3, %{0 => "foo", 2 => "show"}}
+  Removes given `prefix` from `input`. Returns the same type as
+  the input type.
   """
 
-  def route_pattern(input) do
+  def remove_prefix(input, nil), do: input
+  def remove_prefix([prefix | rest], prefix), do: rest
+
+  def remove_prefix(<<_::binary>> = input, <<_::binary>> = prefix),
+    do: String.replace_prefix(input, prefix, "")
+
+  def remove_prefix(input, _prefix), do: input
+
+  @doc ~S"""
+  Takes a path or a list of segments and creates a unique pattern which can be used to compare paths in different formats.
+
+  **Examples**
+
+    iex> path_map("/foo/:id/show")
+    %Routex.Path.Segments{length: 3, dynamic: %{1 => ":id"}, static: %{0 => "foo", 2 => "show"}}
+    iex> path_map("/foo/3/show")
+    %Routex.Path.Segments{length: 3, dynamic: %{}, static: %{0 => "foo", 1 => "3", 2 => "show"}}
+    iex> path_map(["/foo/", ":id", "/show"])
+    %Routex.Path.Segments{length: 3, dynamic: %{1 => ":id"}, static: %{0 => "foo", 2 => "show"}}
+    iex> ast = quote do: "#{ast}"
+    iex> path_map(["/foo/", ast, "/show"])
+    %Routex.Path.Segments{
+    length: 3,
+    dynamic: %{
+      1 => {:<<>>, [],
+       [
+         {:"::", [],
+          [
+            {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+             [{:ast, [],  Routex.PathTest}]},
+            {:binary, [],  Routex.PathTest}
+          ]}
+       ]}
+    },
+    static: %{0 => "foo", 2 => "show"}
+    }
+  """
+
+  def path_map(input) do
     segments =
-      split(input)
+      input
+      |> split()
       |> until_query()
+      |> until_fragments()
 
-    static_map =
+    grouped =
       Enum.with_index(segments, fn k, v -> {v, k} end)
-      |> Enum.reject(fn {_idx, segment} ->
-        is_tuple(segment) or String.starts_with?(segment, ":")
+      |> Enum.group_by(fn
+        {_idx, v} when is_tuple(v) -> :dynamic
+        {_idx, ":" <> _} -> :dynamic
+        {_idx, _} -> :static
       end)
-      |> Map.new()
 
-    {length(segments), static_map}
+    %Segments{
+      length: length(segments),
+      static: Map.new(grouped[:static] || []),
+      dynamic: Map.new(grouped[:dynamic] || [])
+    }
+  end
+
+  @doc """
+  Also handles segment lists (with AST)
+  """
+
+  defstruct [:path, :query, :fragment]
+
+  def parse(input) when is_binary(input), do: input |> split() |> parse()
+
+  def parse(segments) when is_list(segments) do
+    {before, fragment} = segments |> List.flatten() |> split_at_fragments
+    {path, query} = before |> split_at_query
+
+    %__MODULE__{path: path, query: query, fragment: fragment}
+  end
+
+  def to_binary(%__MODULE__{} = map) do
+    to_string(map.path) <> to_string(map.query) <> to_string(map.fragment)
+  end
+
+  def to_list(%__MODULE__{} = map) do
+    Enum.concat([map.path, map.query, map.fragment])
+  end
+
+  def recompose(path, from, to) when is_binary(path),
+    do: recompose(split(path, preserve_separator: true), from, to)
+
+  def recompose(segments, from, to) do
+    from_segments_template = split(from, preserve_separator: true)
+    to_segments_template = split(to, preserve_separator: true)
+    path = parse(segments)
+    path_segments = split(path.path, preserve_separator: true)
+
+    new_path =
+      Enum.map(to_segments_template, fn
+        ":" <> _ = segment ->
+          idx = Enum.find_index(from_segments_template, &(&1 == segment))
+
+          # Binding values might be suffixed by a slash. This should be removed
+          # during recomposition as in templates the suffix slash of a binding
+          # is separated as a new element.
+
+          case new_segment = Enum.at(path_segments, idx) do
+            <<x::binary>> ->
+              String.replace_suffix(x, "/", "")
+
+            _ ->
+              new_segment
+          end
+
+        segment ->
+          segment
+      end)
+
+    [new_path, path.query, path.fragment] |> List.flatten()
   end
 
   # TODO: outdated docs
@@ -241,43 +371,22 @@ defmodule Routex.Path do
       ["products", {:arg0, [], Routex.Path}, "show", "edit"]
   """
 
-  def to_match_pattern(segments, opts \\ [])
+  def to_match_pattern(input, opts \\ [])
 
-  def to_match_pattern({:<<>>, [], segments}, opts) when is_list(segments) do
+  def to_match_pattern(path, opts) when is_binary(path) do
+    path
+    |> parse()
+    |> Map.get(:path)
+    |> split(opts)
+    |> join_statics()
+    |> to_match_pattern()
+  end
+
+  def to_match_pattern({:<<>>, [], segments}, opts) do
     to_match_pattern(segments, opts)
   end
 
   def to_match_pattern(segments, opts) when is_list(segments) do
-    {segments, _binding} =
-      segments
-      |> split(opts)
-      |> until_query()
-      |> until_fragments()
-      |> rewrite_segments()
-
-    segments
-  end
-
-  def to_match_pattern(path, opts) when is_binary(path), do: to_match_pattern(path, :match, opts)
-
-  def to_match_pattern(%Phoenix.Router.Route{path: path, kind: kind}, opts),
-    do: to_match_pattern(path, kind, opts)
-
-  def to_match_pattern(path, kind, opts) do
-    url = URI.parse(path)
-    path = url.path || "/"
-
-    # {_params, segments} =
-    #   case kind do
-    #     :forward ->
-    #       Utils.build_path_match(path <> "/*_forward_path_info")
-
-    #     :match ->
-    #       Utils.build_path_match(path)
-    #   end
-
-    segments = split(path, opts) |> join_statics()
-
     {segments, _binding} =
       segments
       |> split(opts)
@@ -317,18 +426,11 @@ defmodule Routex.Path do
     before
   end
 
-  defp after_query(segments) do
-    {_before, rest} = split_at_query(segments)
-
-    rest
-  end
-
-  defp split_at_query(segments) do
+  def split_at_query(segments) do
     Enum.split_while(
       segments,
-      &(is_tuple(&1) or
-          (is_binary(&1) and
-             !String.starts_with?(&1, [@query_separator, @path_separator <> @query_separator])))
+      &(not (is_binary(&1) and
+               String.starts_with?(&1, [@query_separator, @path_separator <> @query_separator])))
     )
   end
 
@@ -338,52 +440,15 @@ defmodule Routex.Path do
     before
   end
 
-  defp after_fragments(segments) do
-    {_before, rest} = split_at_fragments(segments)
-
-    rest
-  end
-
-  defp split_at_fragments(segments) do
+  def split_at_fragments(segments) do
     Enum.split_while(
       segments,
-      &(is_tuple(&1) or
-          (is_binary(&1) and
-             !String.starts_with?(&1, [
-               @fragment_separator,
-               @path_separator <> @fragment_separator
-             ])))
+      &(not (is_binary(&1) and
+               String.starts_with?(&1, [
+                 @fragment_separator,
+                 @path_separator <> @fragment_separator
+               ])))
     )
-  end
-
-  def recompose(orig_path, new_path, sigil_segments) do
-    orig_seg = split(orig_path, preserve_separator: true)
-    new_seg = split(new_path, preserve_separator: true)
-
-    path_bindings =
-      orig_seg
-      # |> join_statics()
-      # |> Enum.filter(&String.starts_with?(&1, ":"))
-      |> Enum.with_index()
-      |> Map.new()
-
-    split_sigil_segments = split(sigil_segments, preserve_separator: true)
-    query_part = after_query(split_sigil_segments)
-    fragments_part = after_fragments(split_sigil_segments)
-
-    # IO.inspect(split_sigil_segments, label: :SIGILSEG)
-
-    Enum.map(new_seg, fn
-      ":" <> _ = segment ->
-        idx = path_bindings[segment]
-        Enum.at(split_sigil_segments, idx)
-
-      segment ->
-        segment
-    end)
-    |> List.flatten()
-    |> Enum.concat([query_part, fragments_part])
-    |> List.flatten()
   end
 
   @doc """
@@ -396,7 +461,8 @@ defmodule Routex.Path do
 
   def join_statics([]), do: ["/"]
 
-  def join_statics(segments), do: join_statics(segments, []) |> Enum.reverse()
+  def join_statics(segments),
+    do: segments |> List.flatten() |> join_statics([]) |> Enum.reverse()
 
   def join_statics(segments, acc) do
     {l1, l2} =

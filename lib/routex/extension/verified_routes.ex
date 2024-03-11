@@ -113,8 +113,8 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   defp uniform_path_matchspec(input) do
     input
-    |> Path.absname()
-    |> Path.route_pattern()
+    # |> Path.absname()
+    |> Path.path_map()
 
     # |> Path.to_match_pattern()
   end
@@ -163,7 +163,6 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   def branch_macro(pattern_routes, module, fun, opts \\ [])
       when is_map(pattern_routes) and is_atom(module) and is_atom(fun) and is_list(opts) do
-    IO.inspect(pattern_routes)
     as_fun = Keyword.get(opts, :as, fun)
     orig_fun = Keyword.get(opts, :orig, fun)
     arities = Keyword.get_values(module.__info__(:macros), fun)
@@ -220,12 +219,12 @@ defmodule Routex.Extension.VerifiedRoutes do
     route_arg_pos = Keyword.get(opts, :arg_pos) - 1
     route_arg = Enum.at(args, route_arg_pos)
     {type, route_segments} = fetch_segments(route_arg)
-    {d_length, d_map} = uniform_path_matchspec(route_segments)
+    %{length: d_length, static: d_static} = uniform_path_matchspec(route_segments)
 
     routes_matching_pattern =
       Enum.flat_map(pattern_routes, fn
-        {{^d_length, map}, routes} ->
-          all_statics_match? = Enum.all?(map, fn {k, v} -> d_map[k] == v end)
+        {%{length: ^d_length, static: static}, routes} ->
+          all_statics_match? = Enum.all?(static, fn {k, v} -> d_static[k] == v end)
 
           if all_statics_match?, do: routes, else: []
 
@@ -239,7 +238,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         helper = Attrs.get!(route, :__order__) |> List.last()
 
         recomposed_route =
-          Path.recompose(orig_path, route.path, route_segments)
+          Path.recompose(route_segments, orig_path, route.path)
           |> Path.join_statics()
           |> then(&{:<<>>, [], &1})
 

@@ -49,8 +49,8 @@ defmodule Routex.MixProject do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:dev), do: ["lib"]
-
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  # , "test/support"]
+  defp elixirc_paths(:test), do: ["lib"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp compilers(:test), do: Mix.compilers()
@@ -78,7 +78,8 @@ defmodule Routex.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:makeup_diff, "~> 0.1.0", only: [:dev]},
       {:git_ops, "~> 2.5.6", only: [:dev]},
-      {:mix_test_interactive, "~> 2.0", only: :dev, runtime: false}
+      {:mix_test_interactive, "~> 2.0", only: :dev, runtime: false},
+      {:benchee, "~> 1.0", only: :dev}
     ]
   end
 

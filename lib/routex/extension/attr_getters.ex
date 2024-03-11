@@ -50,10 +50,15 @@ defmodule Routex.Extension.AttrGetters do
   def create_helpers(routes, _cm, _env) do
     prelude =
       quote do
+        @doc """
+        Returns Routex attributes of given URL
+        """
         def attrs(url) when is_binary(url) do
-          path = URI.parse(url).path
-          segments = Path.split(path)
-          attrs(segments)
+          url
+          |> URI.parse()
+          |> Map.get(:path)
+          |> Path.split()
+          |> attrs()
         end
       end
 

@@ -73,23 +73,22 @@ defmodule Routex.Extension.AlternativeGetters do
       |> Enum.group_by(& &1, &Map.get(sibling_groups, Route.get_nesting(&1)))
 
     funs =
-      for {path, sibling_routes} <- route_groups do
-        helper_ast(path, sibling_routes, :ignored)
+      for {route, sibling_routes} <- route_groups do
+        helper_ast(route, sibling_routes, :ignored)
       end
 
     [prelude | funs]
   end
 
-  defp helper_ast(path, sibling_routes, _env) do
-    pattern = Path.to_match_pattern(path)
+  defp helper_ast(route, sibling_routes, _env) do
+    pattern = Path.to_match_pattern(route.path)
 
     dynamic_paths =
       sibling_routes
       |> List.flatten()
       |> Enum.map(fn route ->
         pattern =
-          Path.to_match_pattern(route)
-          |> IO.inspect()
+          Path.to_match_pattern(route.path)
 
         # unset the :alternatives key as it is redundant
         attrs =
@@ -104,13 +103,15 @@ defmodule Routex.Extension.AlternativeGetters do
     result =
       quote do
         def alternatives(unquote(pattern), query, fragment) do
-          query = (query && "?" <> query) || ""
-          fragment = (fragment && "#" <> fragment) || ""
-
           unquote(dynamic_paths)
           |> Enum.map(
             &%Routex.Extension.AlternativeGetters{
-              slug: Path.join([elem(&1, 0), query, fragment] |> Path.absname()),
+              slug:
+                URI.to_string(%URI{
+                  path: elem(&1, 0) |> Path.absname() |> Path.join(),
+                  query: query,
+                  fragment: fragment
+                }),
               attrs: elem(&1, 1)
             }
           )

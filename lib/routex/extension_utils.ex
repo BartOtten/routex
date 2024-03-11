@@ -96,13 +96,18 @@ defmodule Routex.ExtensionUtils do
 
       ExUnit.Callbacks in caller.requires ->
         # IO.inspect(caller.versioned_vars)
-        Logger.warning("No match for helper AST, set manual __order__")
-        0
+        quote do
+          require Logger
+          Logger.warning("No match for helper AST, set manual __order__")
+          0
+        end
 
       true ->
-        Logger.critical("Check HELPER AST")
-        IO.inspect(caller.requires)
-        0
+        quote do
+          require Logger
+          Logger.critical("No helper ast found. Using process key :rtx_scope")
+          Process.get(:rtx_scope, 0)
+        end
     end
   end
 end

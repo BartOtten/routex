@@ -225,7 +225,7 @@ defmodule Routex.Path do
   """
 
   def add_prefix(input, nil), do: input
-  def add_prefix([_ | _] = input, prefix) when is_list(input), do: [prefix | input]
+  def add_prefix([_ | _] = input, prefix), do: [prefix | input]
   def add_prefix(<<_::binary>> = input, <<_::binary>> = prefix), do: prefix <> input
 
   @doc """

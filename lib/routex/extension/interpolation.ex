@@ -69,7 +69,7 @@ defmodule Routex.Extension.Interpolation do
           end
 
         """
-        Interpolation caused duplicated paths. Please make sure the set of interpolations
+        Interpolation caused duplicated paths. Please make sure the set of interpolated values
         form a unique combination.
 
         Path: #{path}

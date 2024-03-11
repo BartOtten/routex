@@ -19,22 +19,16 @@ defmodule Routex.Extension.InterpolationTest do
       private: %{routex: %{__origin__: "/path", language: :en}}
     },
     %Route{
-      line: 12,
-      path: "/path/[rtx.language]",
-      verb: :post,
-      private: %{routex: %{__origin__: "/path", language: :en}}
-    },
-    %Route{
-      line: 20,
-      path: "/path/[rtx.language]",
+      line: 30,
+      path: "/path/new",
       verb: :get,
-      private: %{routex: %{__origin__: "/foo", language: :en}}
+      private: %{routex: %{__origin__: "/no/interpolation"}}
     }
   ]
 
   test "should interpolate when attrs provided" do
-    [r1, r2 | _] = @routes
-    assert [%{path: "/path/nl"}, %{path: "/path/en"}] = transform([r1, r2], nil, nil)
+    assert [%{path: "/path/nl"}, %{path: "/path/en"}, %{path: "/path/new"}] =
+             transform(@routes, nil, nil)
   end
 
   test "should fail when attrs missing" do
@@ -45,9 +39,19 @@ defmodule Routex.Extension.InterpolationTest do
   end
 
   test "should raise on duplicate routes after interpolation" do
+    routes = [
+      %Route{
+        line: 20,
+        path: "/path/[rtx.language]",
+        verb: :get,
+        private: %{routex: %{__origin__: "/foo", language: :en}}
+      }
+      | @routes
+    ]
+
     exception =
       assert_raise Routex.Extension.Interpolation.NonUniqError, fn ->
-        transform(@routes, nil, nil)
+        transform(routes, nil, nil)
       end
 
     assert [

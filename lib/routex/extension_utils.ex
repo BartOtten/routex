@@ -38,6 +38,13 @@ defmodule Routex.ExtensionUtils do
   end
 
   @doc """
+  Prints an indented text. Should be used to
+  print messages in the terminal during compile time.
+  """
+  @spec print(input :: iodata) :: binary
+  def print(input), do: IO.puts(">> #{input}")
+
+  @doc """
   Returns the ast to get the last value in the order list
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
@@ -95,7 +102,6 @@ defmodule Routex.ExtensionUtils do
         end
 
       ExUnit.Callbacks in caller.requires ->
-        # IO.inspect(caller.versioned_vars)
         quote do
           require Logger
           Logger.warning("No match for helper AST, set manual __order__")
@@ -105,7 +111,7 @@ defmodule Routex.ExtensionUtils do
       true ->
         quote do
           require Logger
-          Logger.critical("No helper ast found. Using process key :rtx_scope")
+          Logger.critical("No helper ast found. Fall back to process key :rtx_scope")
           Process.get(:rtx_scope, 0)
         end
     end

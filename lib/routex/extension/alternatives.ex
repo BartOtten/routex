@@ -123,7 +123,9 @@ defmodule Routex.Extension.Alternatives do
 
       path =
         if path_prefix? do
-          Path.add_prefix(route.path, scope_opts.scope_prefix)
+          route.path
+          |> Path.add_prefix(scope_opts.scope_prefix)
+          |> String.replace_prefix("//", "/")
         else
           route.path
         end

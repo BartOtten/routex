@@ -32,13 +32,17 @@ defmodule Routex.PathTest do
       assert "foo/bar/8/:atom" == join(["foo", "bar", 8, :atom])
     end
 
-    test "should not remove trailing query separator or fragment seperator" do
+    test "should not remove trailing query separator or fragment separator" do
       assert "test?" == join([nil, "test", nil, "?"])
       assert "test#" == join([nil, "test", nil, "#"])
     end
 
-    test "should deduplicate path seperators" do
-      assert "/test/foo" == join(["//test/", "/foo"])
+    test "should not deduplicate path separators in strict mode" do
+      assert "test//foo/" == join(["test/", "/", "foo/"], strict: true)
+    end
+
+    test "should deduplicate path separators in non strict mode" do
+      assert "test/foo/" == join(["test/", "/", "foo/"])
     end
 
     test "should preserve trailing slashes" do
@@ -49,6 +53,10 @@ defmodule Routex.PathTest do
     test "should support both absolute and relative paths" do
       assert "test/foo" == join(["test", "foo"])
       assert "/test/foo" == join(["/test", "foo"])
+    end
+
+    test "should not add a separator in strict mode" do
+      assert "testfoo" == join(["test", "foo"], strict: true)
     end
 
     test "should seperate segments by the correct separator" do
@@ -98,9 +106,9 @@ defmodule Routex.PathTest do
     end
 
     test "preserves slashes when asked to" do
-      assert ["/", "foo/", "bar/"] == split("/foo/bar/", preserve_separator: true)
-      assert ["/", "foo/", "bar"] == split("/foo/bar", preserve_separator: true)
-      assert ["foo/", "bar"] == split("foo/bar", preserve_separator: true)
+      assert ["/", "foo/", "bar/"] == split("/foo/bar/", strict: true)
+      assert ["/", "foo/", "bar"] == split("/foo/bar", strict: true)
+      assert ["foo/", "bar"] == split("foo/bar", strict: true)
     end
 
     test "returns empty list when root is given" do
@@ -121,10 +129,10 @@ defmodule Routex.PathTest do
 
     test "pushes trailing slash of interpolated to a new segment" do
       assert ["test/", ":interpolated", "/", "bar"] =
-               split("test/:interpolated/bar", preserve_separator: true)
+               split("test/:interpolated/bar", strict: true)
 
       assert ["test/", ":interpolated", "/", ":some", "/", ":more", "/", "bar"] =
-               split("test/:interpolated/:some/:more/bar", preserve_separator: true)
+               split("test/:interpolated/:some/:more/bar", strict: true)
 
       ast =
         quote do
@@ -132,13 +140,36 @@ defmodule Routex.PathTest do
         end
 
       assert ["/", "test/", ast, "/", ":some", "/", "bar"] ==
-               split(~S"/test/#{interpolate}/:some/bar", preserve_separator: true)
+               split(~S"/test/#{interpolate}/:some/bar", strict: true)
+    end
+
+    test "on separator" do
+      {:<<>>, _, segments} =
+        quote do
+          "/products/show/edit/#{some_type}/#top"
+        end
+
+      assert {["/products/show/edit/", _, "/"], ["#top"]} = split_at_separator(segments, "#")
+
+      assert {"/products/show/edit/", "#top"} =
+               split_at_separator("/products/show/edit/#top", "#")
+
+      {:<<>>, _, segments} =
+        quote do
+          "/products/show/edit/#{some_type}/?foo=bar#top"
+        end
+
+      assert {["/products/show/edit/", _, "/"], ["?foo=bar#top"]} =
+               split_at_separator(segments, "?")
+
+      assert {"/products/show/edit/", "?foo=bar#top"} =
+               split_at_separator("/products/show/edit/?foo=bar#top", "?")
     end
   end
 
   describe "split and join" do
-    test "are matching molds" do
-      urls = [
+    test "are matching molds in strict mode" do
+      paths = [
         "/foo/bar",
         "/foo/bar?baz=12",
         "/foo/bar/?baz=12",
@@ -151,9 +182,8 @@ defmodule Routex.PathTest do
         ~S"/foo/#{binding}"
       ]
 
-      for url <- urls do
-        assert url |> split(preserve_separator: true) |> join() == url
-        assert url |> relative() |> split(preserve_separator: true) |> join() == url |> relative()
+      for path <- paths, p <- [path, relative(path)] do
+        assert p |> split(strict: true) |> join(strict: true) == p
       end
     end
   end
@@ -201,20 +231,20 @@ defmodule Routex.PathTest do
 
   describe "join_statics" do
     test "simple forms" do
-      assert ["foo/bar"] == join_statics(["foo", "bar"])
-      assert ["foo/bar/3"] == join_statics(["foo", "bar", 3])
-      assert ["foo/bar/4"] == join_statics(["foo", "bar", "4"])
-      assert ["foo/bar?foo=bar"] == join_statics(["foo", "bar", "?foo=bar"])
-      assert ["foo/bar/?foo=bar"] == join_statics(["foo", "bar", "/?foo=bar"])
-      assert ["foo/bar#frag"] == join_statics(["foo", "bar", "#frag"])
-      assert ["foo/bar/#frag"] == join_statics(["foo", "bar", "/#frag"])
-      assert ["3/bar/#frag"] == join_statics([3, "bar", "/#frag"])
-      assert ["foo/3#frag"] == join_statics(["foo", 3, "#frag"])
-      assert ["/foo/3#frag"] == join_statics(["/foo", 3, "#frag"])
+      assert ["foo/bar"] == join_statics(["foo/", "bar"])
+      assert ["foo/bar/3"] == join_statics(["foo/", "bar/", 3])
+      assert ["foo/bar/4"] == join_statics(["foo/", "bar/", "4"])
+      assert ["foo/bar?foo=bar"] == join_statics(["foo/", "bar", "?foo=bar"])
+      assert ["foo/bar/?foo=bar"] == join_statics(["foo/", "bar/", "?foo=bar"])
+      assert ["foo/bar#frag"] == join_statics(["foo/", "bar", "#frag"])
+      assert ["foo/bar/#frag"] == join_statics(["foo/", "bar/", "#frag"])
+      assert ["3/bar/#frag"] == join_statics([3, "/bar/", "#frag"])
+      assert ["foo/3/#frag"] == join_statics(["foo/", 3, "/#frag"])
+      assert ["/foo/3#frag"] == join_statics(["/", "foo/", 3, "#frag"])
     end
 
     test "does not join interpolation values" do
-      assert ["foo/bar", ":id", "baz"] == join_statics(["foo", "bar", ":id", "baz"])
+      assert ["foo/bar", ":id", "baz"] == join_statics(["foo/", "bar", ":id", "baz"])
     end
 
     test "accepts binary path" do
@@ -313,24 +343,27 @@ defmodule Routex.PathTest do
           "/#{x1}/#{some}/products/show/edit#fragment"
         end
 
-      assert expected == recompose(segments, orig_path, new_path) |> join_statics()
+      assert expected == recompose(segments, orig_path, new_path) |> join_statics(strict: true)
     end
 
     test "keeps interpolated query params" do
-      orig_path = "/products/show/:id/edit/:foo"
-      new_path = "/:id/:foo/products/show/edit/"
+      orig_path = "/products/show/:id/edit/:type"
+      new_path = "/:type/:id/products/show/edit/"
 
       {:<<>>, [], segments} =
         quote do
-          "/products/show/#{x1}/edit/#{some}/?#{%{foo: "bar"}}"
+          "/products/show/#{some_id}/edit/#{some_type}/?#{%{foo: "bar"}}"
         end
 
       {:<<>>, [], expected} =
         quote do
-          "/#{x1}/#{some}/products/show/edit/?#{%{foo: "bar"}}"
+          "/#{some_type}/#{some_id}/products/show/edit/?#{%{foo: "bar"}}"
         end
 
-      assert expected == recompose(segments, orig_path, new_path) |> join_statics()
+      assert expected ==
+               segments
+               |> recompose(orig_path, new_path)
+               |> join_statics(strict: true)
     end
   end
 end

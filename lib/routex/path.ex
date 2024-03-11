@@ -60,20 +60,37 @@ defmodule Routex.Path do
   def relative([@root | t]), do: t
   def relative([@root <> rest | t]), do: [rest | t]
 
+  defp segs_to_binaries(segments),
+    do:
+      segments
+      |> List.flatten()
+      |> Enum.reject(&is_nil/1)
+      |> Enum.map(&seg_to_binary/1)
+
+  defp seg_to_binary(segment) when is_integer(segment), do: to_string(segment)
+  defp seg_to_binary(segment) when is_atom(segment), do: ":" <> to_string(segment)
+  defp seg_to_binary(segment) when is_ast(segment), do: get_interpol_binding(segment)
+  defp seg_to_binary(segment) when is_binary(segment), do: segment
+
   @doc ~S"""
   Joins a (nested) list of path segments into a binary path.
 
   ** Features**
   - preserves trailing slashes
-  - deduplicates consecutive slashes
   - convers atoms and integers to binary
   - converts interpolation AST to a binary representation
   - returns a path when an empty list is provided
   - skips `nil` elements
 
+  ** Opts
+
+  - `strict` - Join segments without path separator injection nor deduplication (default: `false`).
+
   ** Examples
-    iex> join(["test", "path"])
+    iex> join(["test/", "/", "path"])
     "test/path"
+    iex> join(["test/", "/", "path"], strict: true)
+    "test//path"
     iex> join(["/", "/test", "path/"])
     "/test/path/"
     iex> ast = quote do: "#{interpol}"
@@ -82,48 +99,33 @@ defmodule Routex.Path do
 
   """
 
-  def join(segments) do
-    {path_segments, other} =
-      segments
-      |> List.flatten()
-      |> Enum.reject(&is_nil/1)
-      |> Enum.map(fn
-        segment when is_integer(segment) ->
-          to_string(segment)
+  def join(segments, opts \\ []) do
+    strict? = Keyword.get(opts, :strict, false)
 
-        segment when is_atom(segment) ->
-          ":" <> to_string(segment)
+    uri = parse(segments)
 
-        segment when is_ast(segment) ->
-          get_interpol_binding(segment)
+    path_segments = segs_to_binaries(uri.path)
+    query_segments = segs_to_binaries(uri.query)
+    fragment_segments = segs_to_binaries(uri.fragment)
 
-        other ->
-          other
-      end)
-      |> Enum.split_with(fn
-        # prevent splitting at #{}
-        @fragment_separator <> "{" <> _ -> true
-        @fragment_separator <> _ -> false
-        @query_separator <> _ -> false
-        _ -> true
-      end)
+    path_binary =
+      if strict? do
+        Enum.join(path_segments, "")
+      else
+        Enum.join(path_segments, @path_separator) |> dedup_separator()
+      end
 
-    path =
-      path_segments
-      |> List.flatten()
-      |> Enum.join(@path_separator)
-
-    query_and_fragments =
-      other
-      |> Enum.join()
-
-    (path <> query_and_fragments) |> dedup_separator()
+    to_string([path_binary, query_segments, fragment_segments])
   end
 
   @doc """
   Converts the `input` to a list of segments. It's a convenience wrapper for
   Plug.Router.Utils.split/1 to also handle nil value and segment lists. Additionally, non path
   segments will always be concatenated in a separate segment.
+
+   ** Opts
+
+  - `strict` - Preserve path separators (default: `false`)
 
   **Examples**
       iex> split(nil)
@@ -149,7 +151,7 @@ defmodule Routex.Path do
   end
 
   def split(input, opts) when is_binary(input) do
-    preserve? = Keyword.get(opts, :preserve_separator, false)
+    strict? = Keyword.get(opts, :strict, false)
 
     # replace interpolation #{} as it deceives parse fragment
     input = String.replace(input, ~S"#{", "_{")
@@ -161,12 +163,12 @@ defmodule Routex.Path do
       |> Enum.reject(&(&1 == ""))
       |> Enum.reverse()
       |> Enum.map(fn
-        x when preserve? -> x
+        x when strict? -> x
         x -> String.replace_suffix(x, "/", "")
       end)
       |> Enum.reduce([], fn
         # pushes trailing slash from interpolation to a new segment
-        @interpolate <> _ = interpol, acc when preserve? ->
+        @interpolate <> _ = interpol, acc when strict? ->
           trailing = (String.ends_with?(interpol, "/") && "/") || ""
 
           case acc do
@@ -178,7 +180,7 @@ defmodule Routex.Path do
           end
 
         "_{" <> rest, acc ->
-          trailing = (preserve? && String.ends_with?(rest, "}/") && "/") || ""
+          trailing = (strict? && String.ends_with?(rest, "}/") && "/") || ""
 
           binding =
             rest
@@ -188,7 +190,7 @@ defmodule Routex.Path do
             |> set_interpol_binding()
 
           case acc do
-            [h | t] -> [binding, (preserve? && @path_separator) || "", h | t]
+            [h | t] -> [binding, (strict? && @path_separator) || "", h | t]
             [] -> [binding, trailing]
           end
 
@@ -273,8 +275,8 @@ defmodule Routex.Path do
     segments =
       input
       |> split()
-      |> until_query()
-      |> until_fragments()
+      |> until_separator(@query_separator)
+      |> until_separator(@fragment_separator)
 
     grouped =
       Enum.with_index(segments, fn k, v -> {v, k} end)
@@ -297,11 +299,11 @@ defmodule Routex.Path do
 
   defstruct [:path, :query, :fragment]
 
-  def parse(input) when is_binary(input), do: input |> split() |> parse()
+  def parse(input) when is_binary(input), do: input |> split(strict: true) |> parse()
 
   def parse(segments) when is_list(segments) do
-    {before, fragment} = segments |> List.flatten() |> split_at_fragments
-    {path, query} = before |> split_at_query
+    {before, fragment} = segments |> List.flatten() |> split_at_separator(@fragment_separator)
+    {path, query} = before |> split_at_separator(@query_separator)
 
     %__MODULE__{path: path, query: query, fragment: fragment}
   end
@@ -315,29 +317,29 @@ defmodule Routex.Path do
   end
 
   def recompose(path, from, to) when is_binary(path),
-    do: recompose(split(path, preserve_separator: true), from, to)
+    do: recompose(split(path, strict: true), from, to)
 
   def recompose(segments, from, to) do
-    from_segments_template = split(from, preserve_separator: true)
-    to_segments_template = split(to, preserve_separator: true)
+    from_segments_template = split(from, strict: true)
+    to_segments_template = split(to, strict: true)
     path = parse(segments)
-    path_segments = split(path.path, preserve_separator: true)
+    path_segments = split(path.path, strict: true)
 
     new_path =
       Enum.map(to_segments_template, fn
         ":" <> _ = segment ->
           idx = Enum.find_index(from_segments_template, &(&1 == segment))
 
+          interpol_segment = Enum.at(path_segments, idx)
           # Binding values might be suffixed by a slash. This should be removed
           # during recomposition as in templates the suffix slash of a binding
-          # is separated as a new element.
-
-          case new_segment = Enum.at(path_segments, idx) do
-            <<x::binary>> ->
-              String.replace_suffix(x, "/", "")
+          # is included as a separate element.
+          case interpol_segment do
+            <<_::binary>> ->
+              String.replace_suffix(interpol_segment, "/", "")
 
             _ ->
-              new_segment
+              interpol_segment
           end
 
         segment ->
@@ -371,27 +373,27 @@ defmodule Routex.Path do
       ["products", {:arg0, [], Routex.Path}, "show", "edit"]
   """
 
-  def to_match_pattern(input, opts \\ [])
+  def to_match_pattern(input)
 
-  def to_match_pattern(path, opts) when is_binary(path) do
+  def to_match_pattern(path) when is_binary(path) do
     path
     |> parse()
     |> Map.get(:path)
-    |> split(opts)
-    |> join_statics()
+    |> split()
+    |> join_statics(strict: false)
     |> to_match_pattern()
   end
 
-  def to_match_pattern({:<<>>, [], segments}, opts) do
-    to_match_pattern(segments, opts)
+  def to_match_pattern({:<<>>, [], segments}) do
+    to_match_pattern(segments)
   end
 
-  def to_match_pattern(segments, opts) when is_list(segments) do
+  def to_match_pattern(segments) when is_list(segments) do
     {segments, _binding} =
       segments
-      |> split(opts)
-      |> until_query()
-      |> until_fragments()
+      |> split()
+      |> until_separator(@query_separator)
+      |> until_separator(@fragment_separator)
       |> rewrite_segments()
 
     segments
@@ -420,51 +422,51 @@ defmodule Routex.Path do
     {segments, binding}
   end
 
-  defp until_query(segments) do
-    {before, _rest} = split_at_query(segments)
+  def until_separator(path, sep) when is_binary(path),
+    do: path |> split() |> until_separator(sep) |> join()
 
+  def until_separator(segments, sep) do
+    {before, _rest} = split_at_separator(segments, sep)
     before
   end
 
-  def split_at_query(segments) do
-    Enum.split_while(
-      segments,
-      &(not (is_binary(&1) and
-               String.starts_with?(&1, [@query_separator, @path_separator <> @query_separator])))
-    )
+  def split_at_separator(path, sep) when is_binary(path) do
+    {b, a} = path |> split(strict: true) |> split_at_separator(sep)
+    {join(b), join(a)}
   end
 
-  defp until_fragments(segments) do
-    {before, _rest} = split_at_fragments(segments)
+  @ps @path_separator
+  def split_at_separator(segments, sep) do
+    # b(efore)
+    # a(fter)
+    # s(segment)
+    {b, f} =
+      Enum.reduce(segments, {[], []}, fn
+        ^sep <> _ = s, {b, []} -> {b, [s | []]}
+        @ps <> ^sep <> rest, {b, []} -> {[@ps | b], [sep <> rest]}
+        s, {b, []} -> {[s | b], []}
+        s, {b, a} -> {b, [s | a]}
+      end)
 
-    before
-  end
-
-  def split_at_fragments(segments) do
-    Enum.split_while(
-      segments,
-      &(not (is_binary(&1) and
-               String.starts_with?(&1, [
-                 @fragment_separator,
-                 @path_separator <> @fragment_separator
-               ])))
-    )
+    {Enum.reverse(b), Enum.reverse(f)}
   end
 
   @doc """
   Joins consecutive static segments using the path separator. Splits at
   interpolation placeholders when provided with a path.
   """
-  def join_statics(segments) when is_binary(segments) do
-    segments |> split(preserve_separator: true) |> join_statics()
+  def join_statics(segments, opts \\ [strict: true])
+
+  def join_statics(segments, opts) when is_binary(segments) do
+    segments |> split(opts) |> join_statics(opts)
   end
 
-  def join_statics([]), do: ["/"]
+  def join_statics([], _), do: ["/"]
 
-  def join_statics(segments),
-    do: segments |> List.flatten() |> join_statics([]) |> Enum.reverse()
+  def join_statics(segments, opts),
+    do: segments |> List.flatten() |> do_join_statics([], opts) |> Enum.reverse()
 
-  def join_statics(segments, acc) do
+  defp do_join_statics(segments, acc, opts) do
     {l1, l2} =
       Enum.split_while(segments, fn
         @interpolate <> _ -> false
@@ -476,8 +478,8 @@ defmodule Routex.Path do
 
     cond do
       l1 == [] and l2 == [] -> acc
-      l1 == [] -> join_statics(tl(l2), [hd(l2) | acc])
-      true -> join_statics(l2, [join(l1) | acc])
+      l1 == [] -> do_join_statics(tl(l2), [hd(l2) | acc], opts)
+      true -> do_join_statics(l2, [join(l1, opts) | acc], opts)
     end
   end
 

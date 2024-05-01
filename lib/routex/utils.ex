@@ -1,50 +1,16 @@
-# credo:disable-for-this-file /\.Io/
-defmodule Routex.ExtensionUtils do
+defmodule Routex.Utils do
   @moduledoc """
-  Provides utility funtions for extension development.
+  Provides an interface to functions which can be used in extensions.
   """
-  require Logger
 
   @doc """
-  `Macro.escape/1` and `IO.inspect/2` the given input. Options are
-  passed through to `IO.inspect`. Returns the input.
-  """
-  def esc_inspect(ast, opts \\ [limit: :infinity, structs: false]) do
-    ast
-    |> Macro.escape()
-    |> IO.inspect(opts)
-  end
-
-  @doc """
-  Helper function to inspect AST as formatted code. Returns the
-  input.
-
-  **Example**
-
-      iex> ast = quote do: Map.put(my_map, :key, value)
-      iex> inspect_ast(ast)
-      Map.put(my_map, :key, value)
-      ...actual AST...
-  """
-  @spec inspect_ast(ast :: Macro.t()) :: Macro.t()
-  def inspect_ast(ast, env \\ __ENV__) do
-    ast
-    |> Macro.expand(env)
-    |> Macro.to_string()
-    |> Code.format_string!()
-    |> IO.puts()
-
-    ast
-  end
-
-  @doc """
-  Prints an indented text. Should be used to
-  print messages in the terminal during compile time.
+  Prints an indented text. Should be used when printing messages in
+  the terminal during compile time.
   """
   @spec print(input :: iodata) :: binary
   def print(input), do: IO.puts(">> #{input}")
 
-  @doc """
+    @doc """
   Returns the ast to get the last value in the order list
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
@@ -116,4 +82,7 @@ defmodule Routex.ExtensionUtils do
         end
     end
   end
+
+ 
+
 end

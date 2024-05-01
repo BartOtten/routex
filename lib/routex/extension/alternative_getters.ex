@@ -50,7 +50,6 @@ defmodule Routex.Extension.AlternativeGetters do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Path
   alias Routex.Route
 
   defstruct [:slug, :attrs]
@@ -60,9 +59,8 @@ defmodule Routex.Extension.AlternativeGetters do
     prelude =
       quote do
         def alternatives(url) when is_binary(url) do
-          uri = URI.parse(url)
-          segments = Path.split(uri.path)
-          alternatives(segments, uri.query, uri.fragment)
+					uri = Routex.URI.to_matchable(url)
+          alternatives(uri)
         end
       end
 
@@ -75,20 +73,21 @@ defmodule Routex.Extension.AlternativeGetters do
     funs =
       for {route, sibling_routes} <- route_groups do
         helper_ast(route, sibling_routes, :ignored)
-      end
+      end |> Enum.reverse()
 
     [prelude | funs]
   end
 
   defp helper_ast(route, sibling_routes, _env) do
-    pattern = Path.to_match_pattern(route.path)
+    pattern = route |> Routex.Route.to_matchable()
+		
 
     dynamic_paths =
       sibling_routes
       |> List.flatten()
       |> Enum.map(fn route ->
         pattern =
-          Path.to_match_pattern(route.path)
+          Routex.Path.to_match_pattern(route.path)
 
         # unset the :alternatives key as it is redundant
         attrs =
@@ -102,16 +101,13 @@ defmodule Routex.Extension.AlternativeGetters do
 
     result =
       quote do
-        def alternatives(unquote(pattern), query, fragment) do
+        def alternatives(unquote(pattern)) do
           unquote(dynamic_paths)
           |> Enum.map(
             &%Routex.Extension.AlternativeGetters{
-              slug:
-                URI.to_string(%URI{
-                  path: elem(&1, 0) |> Path.absname() |> Path.join(),
-                  query: query,
-                  fragment: fragment
-                }),
+						slug: elem(&1, 0)
+						|> Routex.Path.absname()
+						|> Path.join() |> then(fn x -> x <> Enum.join(unquote(Macro.var(:tl, Routex.Path))) end),
               attrs: elem(&1, 1)
             }
           )

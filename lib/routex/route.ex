@@ -66,4 +66,9 @@ defmodule Routex.Route do
       apply(Route, :exprs, [route])
     end
   end
+
+	def to_matchable(route) do
+		route.path |> Routex.Path.to_match_pattern() |> Routex.Path.with_tail()
+		
+	end
 end

@@ -18,7 +18,7 @@ defmodule Routex.Attrs do
   Returns true when the provided key or attribute is private.
   """
   @spec is_private({atom, any} | atom) :: boolean()
-  def is_private({key, _}), do: is_private(key)
+  def is_private({key, _v}), do: is_private(key)
   def is_private(key), do: key |> Atom.to_string() |> String.starts_with?("__")
 
   @doc """

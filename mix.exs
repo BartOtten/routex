@@ -71,7 +71,7 @@ defmodule Routex.MixProject do
     [
       {:jason, "~> 1.0", only: [:dev, :test], optional: true},
       {:ex_doc, "~> 0.29", only: [:dev, :test]},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},

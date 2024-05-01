@@ -61,7 +61,7 @@ defmodule Routex.Extension.RouteHelpers do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.ExtensionUtils
+  alias Routex.Utils
   alias Routex.Route
   require Logger
 
@@ -94,12 +94,12 @@ defmodule Routex.Extension.RouteHelpers do
           orig_helper_module = Module.concat(router, :Helpers)
 
           case {route.path == Attrs.get(route, :__origin__), route.plug == Phoenix.LiveView.Plug} do
-            {false, _} ->
+            {false, _lv?} ->
               quote do
                 unquote(dynamic_delegate_with_arity(orig_helper_module, orig_fun_name, fn_args))
               end
 
-            {true, _} ->
+            {true, _lv?} ->
               quote do
                 unquote(
                   dynamic_fn_with_arity(orig_fun_name, fn_args, [esc_routes, router, suffix])
@@ -114,7 +114,7 @@ defmodule Routex.Extension.RouteHelpers do
 
   def build_case([[caller, routes, router, suffix], args]) do
     cases = build_case_clauses(routes, router, suffix, args)
-    helper_ast = ExtensionUtils.get_helper_ast(caller)
+    helper_ast = Utils.get_helper_ast(caller)
 
     quote do
       case unquote(helper_ast) do

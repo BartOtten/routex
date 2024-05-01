@@ -1,4 +1,5 @@
 defmodule Mix.Tasks.Gettext.Extract.Routex do
+  @shortdoc "Force translatable segments extraction"
   @moduledoc """
   A Mix task to force extraction of Gettext translatable segments.
   """

@@ -45,6 +45,7 @@ defmodule Routex.Extension.AttrGetters do
 
   alias Routex.Attrs
   alias Routex.Path
+  #alias Routex.MatchMap
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
@@ -55,24 +56,33 @@ defmodule Routex.Extension.AttrGetters do
         """
         def attrs(url) when is_binary(url) do
           url
-          |> URI.parse()
-          |> Map.get(:path)
-          |> Path.split()
+          |> Routex.URI.to_matchable()
           |> attrs()
         end
       end
 
-    ast =
+    case_clauses =
       for route <- routes do
-        pattern = Path.to_match_pattern(route.path)
-
+        pattern = Routex.Route.to_matchable(route)
+				
         quote do
-          def attrs(unquote(pattern)) do
+          unquote(pattern) ->
             unquote(route |> Attrs.get() |> Macro.escape())
+        end
+      end
+      |> List.flatten()
+
+    ast =
+      quote do
+        def attrs(match) do
+          case match do
+            unquote(case_clauses)
           end
         end
       end
 
-    [prelude | ast]
+		#Routex.Dev.esc_inspect(ast)
+		
+    [prelude, ast]
   end
 end

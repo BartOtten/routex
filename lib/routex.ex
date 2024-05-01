@@ -65,7 +65,7 @@ defmodule Routex do
   end
 
   defp process_opts(opts, env) do
-    {opts, _} = Code.eval_quoted(opts, [], env)
+    {opts, _binding} = Code.eval_quoted(opts, [], env)
 
     for extension <- opts[:extensions], extension != [], reduce: opts do
       acc ->

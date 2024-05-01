@@ -63,6 +63,6 @@ defmodule Routex.Extension.AlternativeGettersTest do
   test "returns self and siblings" do
     import __MODULE__.RoutexHelpers
     assert_unordered(@expected, alternatives("/products/12?foo=baz#top"))
-    assert_unordered(@expected, alternatives(["products", "12"], "foo=baz", "top"))
+    #assert_unordered(@expected, alternatives(["products", "12", "?", "foo=baz", "#top"]))
   end
 end

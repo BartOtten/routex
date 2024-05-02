@@ -1,5 +1,3 @@
-
-
 defmodule Routex.Match do
   @moduledoc """
   hosts: the list of request hosts or host prefixes
@@ -23,10 +21,9 @@ defmodule Routex.Match do
   @doc """
   Converts a binary URL, `Phoenix.Router.Route` or sigil into a Match record. 
   """
-  def new(input) when is_binary(input), do:
-    input |> URI.parse() |> new()
+  def new(input) when is_binary(input), do: input |> URI.parse() |> new()
 
-	def new(%URI{} = uri) do
+  def new(%URI{} = uri) do
     match(
       hosts: [uri.host],
       segments: split_path(uri.path) |> unify_segments(),
@@ -34,7 +31,7 @@ defmodule Routex.Match do
       fragment: uri.fragment,
       trailing_slash?: trailing?(uri.path)
     )
-	end
+  end
 
   def new(%Phoenix.Router.Route{} = route) do
     match(
@@ -68,30 +65,34 @@ defmodule Routex.Match do
     match(segments: segments, trailing_slash?: trailing_slash?)
   end
 
-
-
   @doc """
-  Creates a function named `name` which one argument which pattern matches
-  a specific Match record pattern.
+  Creates a function named `name` which the first argument matching
+  a Match record pattern. Other arguments can be given with either a
+	catch all or a pattern.
+
+	*Example*
+	    iex> "/some/path"
+	       >  |> Match.new()
+	       >  |> Match.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
   """
-	def to_func(match_pattern, name, other_args \\ [], body)
-	
+  def to_func(match_pattern, name, other_args \\ [], body)
+
   def to_func(match_pattern, name, other_args, body) when is_tuple(match_pattern) do
+    other_args =
+      Enum.map(other_args, fn
+        {arg, value} ->
+          quote do
+            unquote(Macro.var(arg, __ENV__.module)) = unquote(value)
+          end
 
-		other_args =
+        arg when is_atom(arg) ->
+          quote do
+            unquote(Macro.var(arg, __ENV__.module))
+          end
+      end)
 
-			Enum.map(other_args, fn
-				{arg, value} ->
-			quote do
-				unquote(Macro.var(arg, __ENV__.module )) = (unquote(value))
-			end
+    args = [match_pattern] ++ other_args
 
-				arg when is_atom(arg) -> quote do
-																	unquote(Macro.var(arg, __ENV__.module )) 
-																	end
-			end)
-		
-		args = [match_pattern] ++ other_args
     quote do
       def unquote(name)(unquote_splicing(args)) do
         unquote(body)
@@ -142,18 +143,21 @@ defmodule Routex.Match do
   defp unify_segments(segments),
     do: Enum.reject(segments, &(&1 == ""))
 
-	@doc """
-  A non conflicting function mimicking `to_string/1`
-	"""
+  @doc """
+   A non conflicting function mimicking `to_string/1`
+  """
 
-	def to_binary(record) do
-		match( segments: segments, query: query, fragment: fragment) = record
-		
-		struct(URI, %{path: Enum.join(["" |  segments], @path_seperator), query: query, fragment: fragment}) |> to_string()	
-	end
+  def to_binary(record) do
+    match(segments: segments, query: query, fragment: fragment) = record
+
+    struct(URI, %{
+      path: Enum.join(["" | segments], @path_seperator),
+      query: query,
+      fragment: fragment
+    })
+    |> to_string()
+  end
 end
-
-
 
 # defmodule Example do
 #   require Match
@@ -230,4 +234,4 @@ end
 
 #     Module.create(Foo, ast, __ENV__)
 #   end
-#end
+# end

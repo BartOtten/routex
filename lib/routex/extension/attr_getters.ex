@@ -56,33 +56,22 @@ defmodule Routex.Extension.AttrGetters do
         """
         def attrs(url) when is_binary(url) do
           url
-          |> Routex.URI.to_matchable()
+          |> Routex.Match.new()
           |> attrs()
         end
       end
 
-    case_clauses =
+    functions =
       for route <- routes do
-        pattern = Routex.Route.to_matchable(route)
-				
-        quote do
-          unquote(pattern) ->
-            unquote(route |> Attrs.get() |> Macro.escape())
-        end
+				route
+				|> Routex.Match.new()
+				|> Routex.Match.to_func(
+					:attrs,
+					route |> Attrs.get() |> Macro.escape()
+				)
       end
       |> List.flatten()
 
-    ast =
-      quote do
-        def attrs(match) do
-          case match do
-            unquote(case_clauses)
-          end
-        end
-      end
-
-		#Routex.Dev.esc_inspect(ast)
-		
-    [prelude, ast]
+    [prelude, functions]
   end
 end

@@ -96,6 +96,11 @@ defmodule MatchTest do
 
     assert result == "var_is_var-value"
   end
+
+	test "Correct defaults" do
+		route = %Phoenix.Router.Route{path: "/some"}
+		assert Match.new(route) == {:match, [], ["some"], nil, nil, false}
+		end
 end
 
 # ~"/some/path" must become a runtime call to sigil_p("/some/path", branch_from_socket_or_conn)

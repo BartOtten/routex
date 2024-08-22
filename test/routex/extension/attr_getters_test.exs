@@ -1,14 +1,24 @@
-defmodule Routex.Extension.AttrGettersTestInit do
-  # alias Routex.Extension.AttrGetters
+defmodule Routex.Extension.AttrGettersTest.HelpersModule do
+   alias Routex.Extension.AttrGetters
 
-  # route =
-  #   %Phoenix.Router.Route{private: %{}, path: "/foo/bar"}
-  #   |> Routex.Attrs.put(:rtx_1, "r1")
-  #   |> Routex.Attrs.put(:rtx_2, "r2")
+  route =
+    %Phoenix.Router.Route{private: %{}, path: "/foo/bar", trailing_slash?: false}
+    |> Routex.Attrs.put(:rtx_1, "r1")
+    |> Routex.Attrs.put(:rtx_2, "r2")
 
-  # ast = AttrGetters.create_helpers([route], Conf1, nil)
+  ast = AttrGetters.create_helpers([route], Conf1, nil)
+	
 
-  # Module.create(:AttrGettersTestMod, ast, __ENV__)
+	# pattern = route |> Routex.Match.new() |> Routex.Match.to_pattern()
+	# IO.inspect(pattern)
+	# ast =
+	# 	quote do
+	# 		def attrs(unquote(pattern)) do
+	# 			:foo
+	# 		end
+	# 	end
+
+  Module.create(AttrGettersTestMod, ast, __ENV__)
 
   # mod_ast =
   #   quote do
@@ -22,13 +32,13 @@ end
 
 defmodule Routex.Extension.AttrGettersTest do
   use ExUnit.Case, async: true
-  require Routex.Extension.AttrGettersTestInit
+  require Routex.Extension.AttrGettersTest.HelpersModule
+	alias Routex.Extension.AttrGettersTest.HelpersModule
 
-  # TODO: How?
-  #
-  # test "by default includes all attrs" do
-  #   alias Routex.Extension.AttrGetters
-
-  #   assert(:foo = Foo.attrs("/foo/bar"))
-  # end
+  
+  test "by default includes all attrs" do
+    assert  %{rtx_1: "r1", rtx_2: "r2"} =
+						 "/foo/bar"
+						 |>  AttrGettersTestMod.attrs()
+  end
 end

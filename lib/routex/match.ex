@@ -35,9 +35,9 @@ defmodule Routex.Match do
 
   def new(%Phoenix.Router.Route{} = route) do
     match(
-      hosts: route.hosts,
+      hosts: route.hosts || [],
       segments: split_path(route.path) |> unify_segments(),
-      trailing_slash?: route.trailing_slash?
+      trailing_slash?: route.trailing_slash? || false
     )
   end
 
@@ -77,7 +77,8 @@ defmodule Routex.Match do
   """
   def to_func(match_pattern, name, other_args \\ [], body)
 
-  def to_func(match_pattern, name, other_args, body) when is_tuple(match_pattern) do
+  def to_func(record, name, other_args, body) when is_tuple(record) do
+		match_pattern = to_pattern(record)
     other_args =
       Enum.map(other_args, fn
         {arg, value} ->
@@ -101,7 +102,7 @@ defmodule Routex.Match do
   end
 
   def to_func(%Phoenix.Router.Route{} = route, name, other_args, body) do
-    to_func(to_pattern(route), name, other_args, body)
+    to_func(new(route), name, other_args, body)
   end
 
   @doc """

@@ -8,7 +8,7 @@ defmodule Routex.Utils do
   the terminal during compile time.
   """
   @spec print(input :: iodata) :: binary
-  def print(input), do: IO.puts(">> #{input}")
+  def print(input), do: IO.puts([">> " | input])
 
     @doc """
   Returns the ast to get the last value in the order list

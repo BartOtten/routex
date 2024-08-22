@@ -155,6 +155,7 @@ defmodule Routex.Extension.VerifiedRoutesTest do
 
 IO.inspect("CREATE")
   ast = create_helpers(@routes, RtxBackend, __ENV__)
+	Routex.Dev.inspect_ast(ast)
   # Module.create(Router.RoutexHelpers, ast, __ENV__)
 
   # test "should create matchable patterns" do

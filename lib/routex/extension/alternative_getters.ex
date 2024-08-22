@@ -22,7 +22,6 @@ defmodule Routex.Extension.AlternativeGetters do
 
   ## Helpers
   - alternatives(url :: String.t()) :: struct()
-  - alternatives(segments :: list, query:: String.t()) :: structs()
 
   **Example**
   ```elixir
@@ -59,61 +58,61 @@ defmodule Routex.Extension.AlternativeGetters do
     prelude =
       quote do
         def alternatives(url) when is_binary(url) do
-					uri = Routex.URI.to_matchable(url)
+          uri = Routex.Match.new(url)
           alternatives(uri)
         end
       end
 
+    functions = functions_ast(routes)
+
+    [prelude, functions]
+  end
+
+  def functions_ast(routes) do
     sibling_groups = Route.group_by_nesting(routes)
 
     route_groups =
       routes
       |> Enum.group_by(& &1, &Map.get(sibling_groups, Route.get_nesting(&1)))
 
-    funs =
+    functions =
       for {route, sibling_routes} <- route_groups do
-        helper_ast(route, sibling_routes, :ignored)
-      end |> Enum.reverse()
-
-    [prelude | funs]
+        function_ast(route, sibling_routes)
+      end
+      |> Enum.reverse()
   end
 
-  defp helper_ast(route, sibling_routes, _env) do
-    pattern = route |> Routex.Route.to_matchable()
-		
+  defp function_ast(route, sibling_routes) do
+    match_pattern =
+      route
+      |> Routex.Match.new()
+      |> Routex.Match.to_pattern()
 
-    dynamic_paths =
+    alternatives =
       sibling_routes
       |> List.flatten()
       |> Enum.map(fn route ->
-        pattern =
-          Routex.Path.to_match_pattern(route.path)
+        pattern = route |> Routex.Match.new() |> Routex.Match.to_pattern()
 
-        # unset the :alternatives key as it is redundant
+        # unset the :alternatives key when present as it is redundant
         attrs =
           route
           |> Attrs.get()
           |> Map.new()
           |> Map.drop([:alternatives])
 
-        {pattern, Macro.escape(attrs)}
+        quote do
+          %Routex.Extension.AlternativeGetters{
+            slug: unquote(pattern) |> Routex.Match.to_binary(),
+            attrs: unquote(attrs |> Macro.escape())
+          }
+        end
       end)
 
-    result =
-      quote do
-        def alternatives(unquote(pattern)) do
-          unquote(dynamic_paths)
-          |> Enum.map(
-            &%Routex.Extension.AlternativeGetters{
-						slug: elem(&1, 0)
-						|> Routex.Path.absname()
-						|> Path.join() |> then(fn x -> x <> Enum.join(unquote(Macro.var(:tl, Routex.Path))) end),
-              attrs: elem(&1, 1)
-            }
-          )
-        end
+    quote do
+      def alternatives(unquote(match_pattern)) do
+        unquote(alternatives)
       end
-
-    result
+    end
   end
 end

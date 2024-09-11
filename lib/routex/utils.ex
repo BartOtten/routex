@@ -15,8 +15,9 @@ defmodule Routex.Utils do
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
   def get_helper_ast(caller) do
-		IO.inspect(caller.module, label: :MODULE)
-		IO.inspect(caller.versioned_vars, label: :VVARS)
+    IO.inspect(caller.module, label: :MODULE)
+    IO.inspect(caller.versioned_vars, label: :VVARS)
+
     vars =
       caller.versioned_vars
       |> Enum.filter(fn
@@ -26,7 +27,8 @@ defmodule Routex.Utils do
         _other ->
           false
       end)
-      |> Enum.map(fn {{var, _}, _} -> var end) |> IO.inspect(label: :VARS)
+      |> Enum.map(fn {{var, _}, _} -> var end)
+      |> IO.inspect(label: :VARS)
 
     cond do
       :assigns in vars ->
@@ -73,12 +75,12 @@ defmodule Routex.Utils do
       #   quote do
       #     require Logger
       #     Logger.warning("No match for helper AST, set manual __order__")
-			# 		try do
-			# 			var!(__order__)
-			# 		rescue
-			# 			e -> IO.inspect(e)
-			# 				0
-			# 		end
+      # 		try do
+      # 			var!(__order__)
+      # 		rescue
+      # 			e -> IO.inspect(e)
+      # 				0
+      # 		end
       #   end
 
       true ->

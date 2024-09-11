@@ -41,11 +41,11 @@ defmodule Routex.Match do
     )
   end
 
-	def new({_func, _meta1, [ast, []]}), do: new(ast)
-		
+  def new({_func, _meta1, [ast, []]}), do: new(ast)
+
   def new({:<<>>, _meta, args} = input) do
     segments =
-      Enum.find_value(args, fn
+      Enum.map(args, fn
         segment when is_binary(segment) ->
           uri = URI.parse(segment)
           [uri.path]
@@ -194,9 +194,9 @@ defmodule Routex.Match do
     |> to_string()
   end
 
-	def match?(r1, r2) do
-match(r1, :segments) == match(r2, :segments)
-	end
+  def match?(r1, r2) do
+    match(r1, :segments) == match(r2, :segments)
+  end
 end
 
 # defmodule Example do

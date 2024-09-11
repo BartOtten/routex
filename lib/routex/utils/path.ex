@@ -39,7 +39,7 @@ defmodule Routex.Path do
     |> to_match_pattern()
   end
 
-  def to_match_pattern({:<<>>, [], segments}) do
+  def to_match_pattern({:<<>>, _, segments}) do
     to_match_pattern(segments)
   end
 

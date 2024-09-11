@@ -1,65 +1,73 @@
 defmodule Routex.Branching do
   alias Routex.Utils
-	
-	require Logger
+
+  require Logger
 
   @doc """
   Takes a list of match patterns and creates the AST for branching variants
   for all arities of `function` in `module`.
 
 
-	** Args
+  ** Args
   - match_binding: the argument for the case clause
-	- patterns: the match patterns of the case clause
-	- transformer: transforms the original arguments value
+  - patterns: the match patterns of the case clause
+  - transformer: transforms the original arguments value
 
   ** Example
 
-	We want to create a branching variant of the `url` macro in `Phoenix,.VerifiedRoutes` module. The original
-	macro generates code that simply prints the given path argument, but we want to it to write multiple clauses and
-	prefix the given argument based on the clause.
+  We want to create a branching variant of the `url` macro in `Phoenix,.VerifiedRoutes` module. The original
+  macro generates code that simply prints the given path argument, but we want to it to write multiple clauses and
+  prefix the given argument based on the clause.
 
     defmacro url(path, opts \\ []) do -> quote do IO.puts(path) end
 
-	Given this code:
+  Given this code:
 
-	  patterns = ["en", "nl"]
-		match_binding = var!(external_var)
-		arg_transformer = fn pattern, arg -> "europe/" <> pattern <> "/" <> arg end
+   patterns = ["en", "nl"]
+  match_binding = var!(external_var)
+  arg_transformer = fn pattern, arg -> "europe/" <> pattern <> "/" <> arg end
 
     branch_macro(patterns, match_binding, arg_transformer, Phoenix.VerifiedRoutes, :url,
-			as: :url,
-			orig: :url_original,
-			arg_pos: fn arity -> arity - 1 end
-		)
+  	as: :url,
+  	orig: :url_original,
+  	arg_pos: fn arity -> arity - 1 end
+  )
 
-	A new macro is build which outputs the AST of the original macro, wrapped in a case clause given transformed arguments.
+  A new macro is build which outputs the AST of the original macro, wrapped in a case clause given transformed arguments.
 
   defmacro url(path, opts \\ []) do
      quote do
-	    case match_binding do
+     case match_binding do
         "en" -> Original.Module.url("europe/en/" <> url, opts)
         "nl" -> Original.Module.url("europe/nl/" <> url, opts)
       end
-	  end
+   end
   end
   """
 
-  def branch_macro(patterns, match_binding, pattern_transformer, transformer, module, fun, opts \\ [])
-      when is_list(patterns)
-					 and is_atom(module)
-					 and is_atom(fun)
-			and is_list(opts) do
+  def branch_macro(
+        patterns,
+        match_binding,
+        pattern_transformer,
+        transformer,
+        module,
+        fun,
+        opts \\ []
+      )
+      when is_list(patterns) and
+             is_atom(module) and
+             is_atom(fun) and
+             is_list(opts) do
     as_fun = Keyword.get(opts, :as, fun)
     orig_fun = Keyword.get(opts, :orig, fun)
     arities = :macros |> module.__info__() |> Keyword.get_values(fun)
-		patterns = Enum.map(patterns, &Macro.escape/1)
+    patterns = Enum.map(patterns, &Macro.escape/1)
 
     ## Print a message to make developers aware of branched macro's.
     arities_str =
       if length(arities) == 1,
-				 do: "#{hd(arities)}",
-				 else: "{#{Enum.join(arities, ",")}}"
+        do: "#{hd(arities)}",
+        else: "{#{Enum.join(arities, ",")}}"
 
     mod_name = module |> Module.split() |> Enum.join(".")
     Utils.print("Generate branching variant of: #{mod_name}.#{fun}/#{arities_str}")
@@ -85,33 +93,43 @@ defmodule Routex.Branching do
         end
 
         defmacro unquote(as_fun)(unquote_splicing(args)) do
-					#IO.inspect("Called from }")
-					#IO.inspect(unquote(args) |> List.first())
+          template_path_segments = case unquote(args) |> List.first() do
+						{:<<>>, _, segments} -> segments |> Routex.Path.split()
+						{_other, _, [{:<<>>, _, segments}, []]} -> segments |> Routex.Path.split()
+						other -> raise other
+					end
 
-					segments = unquote(args) |> List.first() 
-				#	IO.inspect(segments, label: :segments)
 
-					template_link_match = Routex.Match.new(segments) #|> IO.inspect(label: :MATCH)
+          {template_path_match_record, _} = template_path_segments |>  Routex.Path.to_match_pattern() |> Enum.split_while(fn
+						"?" <> _ -> false
+						"?" -> false
+						x -> true
+					end)
 
-					matching_route = Enum.find(unquote(patterns), fn route -> Routex.Match.new(route) |> Routex.Match.match?(template_link_match) end) 
-					IO.puts("#{inspect(__CALLER__.module)} includes #{inspect(segments)}\n Match: #{inspect(template_link_match)} => #{inspect(matching_route, pretty: true)}")
+          matching_route =
+            Enum.find(unquote(patterns), fn route ->
+              route.path |> Routex.Path.to_match_pattern() == template_path_match_record
+            end)
 
-					alternatives = matching_route && Routex.Attrs.get!(matching_route, :alternatives) || []
-				
-					
-					 match_binding = Routex.Utils.get_helper_ast(__CALLER__)
+           IO.puts("Template #{inspect(__CALLER__.module)} includes #{inspect(template_path_segments)}\n Match: #{inspect(template_path_match_record)} => #{inspect(matching_route, pretty: true)}")
+
+          alternatives =
+            (matching_route && Routex.Attrs.get!(matching_route, :alternatives)) || []
+
+          match_binding = Routex.Utils.get_helper_ast(__CALLER__)
 
           Routex.Branching.build_case(
             alternatives,
-						Routex.Utils.get_helper_ast(__CALLER__),
-						unquote(Macro.escape(pattern_transformer)),
+            match_binding,
+            unquote(Macro.escape(pattern_transformer)),
             unquote(Macro.escape(transformer)),
             unquote(module),
             unquote(fun),
             unquote(args),
             unquote(opts)
-          ) |> Routex.Dev.inspect_ast()
- end  
+          )
+          |> Routex.Dev.inspect_ast()
+        end
       end
     end
   end
@@ -122,46 +140,42 @@ defmodule Routex.Branching do
     end
   end
 
-  def build_case(patterns, match_binding, {cm, cf, ca} = _pattern_transformer, {m, f, a} = _transformer, module, fun, args, opts) do
-
+  def build_case(
+        patterns,
+        match_binding,
+        {cm, cf, ca} = _pattern_transformer,
+        {m, f, a} = _transformer,
+        module,
+        fun,
+        args,
+        opts
+      ) do
     branched_arg_pos = Keyword.get(opts, :arg_pos, 0)
     branched_arg = Enum.at(args, branched_arg_pos)
 
-
     clauses =
       for pattern <- patterns do
-				recomposed_pattern = apply(cm, cf, [pattern | ca])
+        recomposed_pattern = apply(cm, cf, [pattern | ca])
         recomposed_arg = apply(m, f, [pattern, branched_arg | a])
         recomposed_args = List.replace_at(args, branched_arg_pos, recomposed_arg)
 
         quote do
           unquote(recomposed_pattern) ->
-					#unquote(body_ast)
-						# Or A WHOLE AST?!
             unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
         end
-
       end
       |> List.flatten()
-		|> Enum.uniq()
+      |> Enum.uniq()
 
     if clauses == [] do
       Logger.critical("Failed to create branches for #{inspect(args)}")
       []
     else
-
-			catchall = quote do
-				other -> IO.inspect(other, label: :NO_MATCH)
-			end
-
-			clauses = clauses ++ catchall
-
       quote do
         case unquote(match_binding) do
           unquote(clauses)
-
         end
       end
     end
-  end 
+  end
 end

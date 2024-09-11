@@ -156,11 +156,10 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   macros_ast = create_helpers(@routes, RtxBackend, __ENV__)
   Routex.Dev.inspect_ast(macros_ast)
   Module.create(Router.RoutexHelpers, macros_ast, __ENV__)
-	
 
   test "~p produxct with static string" do
-		__order__ = 1
-     assert ~p"/products/1" == "/products/1"
+    __order__ = 1
+    assert ~p"/products/1" == "/products/1"
     assert ~p"/products/1?foo=bar" == "/products/1?foo=bar"
   end
 
@@ -173,10 +172,10 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   # end
 
   # test "~p with dynamic string uses Phoenix.Param" do
-    # struct = %__MODULE__{id: 123, slug: "post-123"}
-    # assert ~p"/posts/#{struct}" == "/posts/post-123"
-    # assert ~p"/posts/#{123}" == "/posts/123"
-    # assert ~p|/posts/#{"a b"}| == "/posts/a%20b"
+  # struct = %__MODULE__{id: 123, slug: "post-123"}
+  # assert ~p"/posts/#{struct}" == "/posts/post-123"
+  # assert ~p"/posts/#{123}" == "/posts/123"
+  # assert ~p|/posts/#{"a b"}| == "/posts/a%20b"
   # end
 
   #   test "~p with static and dynamic string and query params" do

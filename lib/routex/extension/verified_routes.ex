@@ -83,7 +83,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   require Logger
   require Routex.Branching
   import Routex.Branching
-	import Routex.Match
+  import Routex.Match
 
   @behaviour Routex.Extension
   @phoenix_sigil "~p"
@@ -144,7 +144,8 @@ defmodule Routex.Extension.VerifiedRoutes do
     # empty space
     IO.puts("")
 
-    match_ast = :fixMe # Routex.Utils.get_helper_ast(env)
+    # Routex.Utils.get_helper_ast(env)
+    match_ast = :fixMe
 
     [
       branch_macro(
@@ -181,67 +182,85 @@ defmodule Routex.Extension.VerifiedRoutes do
         arg_pos: fn arity -> arity - 1 end
       )
     ]
-		end
-	end
-
+  end
+end
 
 defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
- 
   def clause_transformer(route) do
     # pattern =
-     #  route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new() |> Routex.Match.to_pattern()
+    #  route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new() |> Routex.Match.to_pattern()
 
     order = route |> Routex.Attrs.get!(:__order__) |> List.last()
 
-    order #, pattern}
+    # , pattern}
+    order
   end
 
   def transformer(pattern, branched_arg) do
+		
+    #IO.inspect([pattern, branched_arg], label: :PAT_BA)
 
-		IO.inspect(branched_arg, label: :BA)
-		import Routex.Match
-		orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
-		new_pattern = pattern |>  Routex.Match.new()
-		segments_pattern = branched_arg |> Routex.Match.new()
+    import Routex.Match
 
-		dyn_map =
-			orig_pattern |> elem(2) |> Enum.with_index() |> Enum.reduce([], fn
-	{":" <> _ = segment, idx}, acc -> [{segment, elem(segments_pattern, 2) |> Enum.at(idx)} | acc]
-	_, acc -> acc
-end) |> Map.new() 
+		
+    orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
+    new_pattern = pattern |> Routex.Match.new()
+    segments_pattern = branched_arg |> Routex.Match.new()
 
-		new_segments = new_pattern |> elem(2) |> Enum.map( fn
-			":" <> _ = segment -> dyn_map[segment]
-			segment when is_binary(segment) -> "/" <> segment
-			segment -> segment
-		end)
+    dyn_map =
+      orig_pattern
+      |> elem(2)
+      |> Enum.with_index()
+      |> Enum.reduce([], fn
+        {":" <> _ = segment, idx}, acc ->
+          [{segment, elem(segments_pattern, 2) |> Enum.at(idx)} | acc]
 
-		new_segments = ["/" | new_segments] |> Enum.reject(&is_nil/1) |> Path.join() 
+        _, acc ->
+          acc
+      end)
+      |> Map.new()
+		#|> dbg
 
-		q = match(segments_pattern, :query)
-		f = match(segments_pattern, :fragment)
+		#IO.inspect(dyn_map, label: :DYN)
 
-		new_segments =q && new_segments <> "?" <> q || new_segments
-		new_segments =f && new_segments <> "#" <> f || new_segments
-
-		new_segments = List.wrap(new_segments)
-
-
-		case branched_arg do
-			{:sigil_p,_meta, _args} -> 
-	{:sigil_p, [delimiter: "\"", line: 34, column: 14],
- [
-   {:<<>>, [line: 34, column: 14],
-    new_segments},
-   []
- ]}
-				_ ->
+    new_segments =
+      new_pattern
+      |> elem(2)
+      |> Enum.reduce([], fn
+				segment, [] = acc  -> ["/" <> segment | []]
+        ":" <> _ = segment, [h|t] -> [ dyn_map[segment] , h <> "/" | t ]
 				
-    {:<<>>, [], new_segments} |> IO.inspect(label: :NEW_SEGS)
-		#branched_arg |> IO.inspect(label: :BRANCHED_ARG)
-end
-	
+        segment, [h|t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
+				segment, acc when is_binary(segment) -> [ "/" <> segment | acc]
+        segment, acc -> [segment | acc]
+      end) |> List.flatten()
 
-		#branched_arg
+    new_segments =  case new_segments do
+			[] -> ["/" ]
+			other -> other |> Enum.reject(&is_nil/1) |> Enum.reverse()
+			end
+
+    q = match(segments_pattern, :query)
+    f = match(segments_pattern, :fragment)
+
+    new_segments = (q && new_segments ++ [ "?" <> q]) || new_segments
+    new_segments = (f && new_segments ++ [ "#" <> f]) || new_segments
+
+    new_segments = List.wrap(new_segments)
+
+    case branched_arg do
+      {:sigil_p, _meta, _args} ->
+        {:sigil_p, [delimiter: "\"", line: 34, column: 14],
+         [
+           {:<<>>, [line: 34, column: 14], new_segments},
+           []
+         ]}  |> IO.inspect(label: :NEW_SEGS)
+
+      _ ->
+        {:<<>>, [], new_segments} |> IO.inspect(label: :NEW_SEGS)
+        # branched_arg |> IO.inspect(label: :BRANCHED_ARG)
+    end
+
+     
   end
 end

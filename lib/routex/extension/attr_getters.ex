@@ -45,7 +45,7 @@ defmodule Routex.Extension.AttrGetters do
 
   alias Routex.Attrs
   alias Routex.Path
-  #alias Routex.MatchMap
+  # alias Routex.MatchMap
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
@@ -63,12 +63,12 @@ defmodule Routex.Extension.AttrGetters do
 
     functions =
       for route <- routes do
-				route
-				|> Routex.Match.new()
-				|> Routex.Match.to_func(
-					:attrs,
-					route |> Attrs.get() |> Macro.escape()
-				)
+        route
+        |> Routex.Match.new()
+        |> Routex.Match.to_func(
+          :attrs,
+          route |> Attrs.get() |> Macro.escape()
+        )
       end
       |> List.flatten()
 

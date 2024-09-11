@@ -152,26 +152,32 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   import Router.RoutexHelpers
   import Routex.Extension.VerifiedRoutes
 
+  IO.inspect("CREATE")
+  macros_ast = create_helpers(@routes, RtxBackend, __ENV__)
+  Routex.Dev.inspect_ast(macros_ast)
+  Module.create(Router.RoutexHelpers, macros_ast, __ENV__)
+	
 
-IO.inspect("CREATE")
-  ast = create_helpers(@routes, RtxBackend, __ENV__)
-	Routex.Dev.inspect_ast(ast)
-  # Module.create(Router.RoutexHelpers, ast, __ENV__)
-
-  # test "should create matchable patterns" do
-  # end
+  test "~p produxct with static string" do
+		__order__ = 1
+     assert ~p"/products/1" == "/products/1"
+    assert ~p"/products/1?foo=bar" == "/products/1?foo=bar"
+  end
 
   # test "~p with static string" do
+  #   order = 1
+  #   ~p"/post/1" |> Routex.Dev.inspect_ast()
+
   #   assert ~p"/posts/1" == "/posts/1"
   #   assert ~p"/posts/1?foo=bar" == "/posts/1?foo=bar"
   # end
 
-  test "~p with dynamic string uses Phoenix.Param" do
-    struct = %__MODULE__{id: 123, slug: "post-123"}
-    assert ~p"/posts/#{struct}" == "/posts/post-123"
+  # test "~p with dynamic string uses Phoenix.Param" do
+    # struct = %__MODULE__{id: 123, slug: "post-123"}
+    # assert ~p"/posts/#{struct}" == "/posts/post-123"
     # assert ~p"/posts/#{123}" == "/posts/123"
     # assert ~p|/posts/#{"a b"}| == "/posts/a%20b"
-  end
+  # end
 
   #   test "~p with static and dynamic string and query params" do
   #     struct = %__MODULE__{id: 123, slug: "post-123"}

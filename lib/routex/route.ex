@@ -67,8 +67,7 @@ defmodule Routex.Route do
     end
   end
 
-	def to_matchable(route) do
-		route.path |> Routex.Path.to_match_pattern() |> Routex.Path.with_tail()
-		
-	end
+  def to_matchable(route) do
+    route.path |> Routex.Path.to_match_pattern() |> Routex.Path.with_tail()
+  end
 end

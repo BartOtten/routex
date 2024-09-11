@@ -1,19 +1,21 @@
 defmodule Routex.MatchMap do
-	alias Routex.Path
-  @moduledoc """
-	A MatchMap is an easy inspectable struct which can be used during compile time to match Paths' of different types.
+  alias Routex.Path
 
-  For efficient matching and mapping during runtime, see `Routex.URI.to_match_pattern`
-	"""
+  @moduledoc """
+  A MatchMap is an easy inspectable struct which can be used during compile time to match Paths' of different types.
+
+   For efficient matching and mapping during runtime, see `Routex.URI.to_match_pattern`
+  """
 
   @protocol_separator "://"
   @fragment_separator "#"
   @query_separator "?"
   @path_separator "/"
 
-	# TODO: Match_MAP_ is an implementation detail what need to be abstracted
+  # TODO: Match_MAP_ is an implementation detail what need to be abstracted
 
-	defstruct length: 0, static: [] #, dynamic: []
+  # , dynamic: []
+  defstruct length: 0, static: []
 
   @doc ~S"""
   Takes a path or a list of segments and creates a unique pattern which can be used to compare paths in different formats.
@@ -45,22 +47,21 @@ defmodule Routex.MatchMap do
     }
   """
 
-	def parse(input), do: new(input)
+  def parse(input), do: new(input)
 
-	def new(%Phoenix.Router.Route{path: path}) do
+  def new(%Phoenix.Router.Route{path: path}) do
     new(path)
-	end
-	
+  end
+
   def new(input) when is_binary(input) do
     URI.parse(input)
     |> Map.get(:path, "")
-			# being strict causes problems in pattern matching function heads
-			# as runtime URI's are all static  an empty dynamic map does not match the MatchMap map.
+    # being strict causes problems in pattern matching function heads
+    # as runtime URI's are all static  an empty dynamic map does not match the MatchMap map.
     |> Path.split(strict: false)
-   # no can't do |> Path.join_statics()
+    # no can't do |> Path.join_statics()
     |> new()
   end
-
 
   def new(segments) when is_list(segments) do
     grouped =
@@ -72,11 +73,11 @@ defmodule Routex.MatchMap do
         {_idx, _v} -> :static
       end)
 
-		# including dynamic causes pattern match isssues in function heads
+    # including dynamic causes pattern match isssues in function heads
     %__MODULE__{
       length: length(segments),
-      static: Map.new(grouped[:static] || []),
-     # dynamic: Map.new(grouped[:dynamic] || [])
+      static: Map.new(grouped[:static] || [])
+      # dynamic: Map.new(grouped[:dynamic] || [])
     }
   end
 
@@ -102,7 +103,7 @@ defmodule Routex.MatchMap do
     Enum.all?(pattern.static, fn {k, v} -> actual.static[k] == v end)
   end
 
-	#can we make a match for functions using the above? Two inputs where entries of 1 equa entries of 2.
+  # can we make a match for functions using the above? Two inputs where entries of 1 equa entries of 2.
 
   def match?(pattern, actual), do: false
 end

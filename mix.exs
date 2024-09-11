@@ -49,7 +49,7 @@ defmodule Routex.MixProject do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:dev), do: ["lib"]
- # defp elixirc_paths(:test), do: ["lib", "test/support"]
+  # defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp compilers(:test), do: Mix.compilers()
@@ -60,9 +60,9 @@ defmodule Routex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phoenix, ">= 1.6.0"},
+      {:phoenix, ">= 1.7.0"},
       {:phoenix_view, ">= 2.0.0", optional: true},
-      {:phoenix_live_view, ">= 0.16.0", optional: true},
+      {:phoenix_live_view, ">= 0.20.0", optional: true},
       {:gettext, ">= 0.0.0", optional: true}
     ]
   end
@@ -78,7 +78,8 @@ defmodule Routex.MixProject do
       {:makeup_diff, "~> 0.1.0", only: [:dev]},
       {:git_ops, "~> 2.5.6", only: [:dev]},
       {:mix_test_interactive, "~> 2.0", only: :dev, runtime: false},
-      {:benchee, "~> 1.0", only: :dev}
+      {:benchee, "~> 1.0", only: :dev},
+      {:ssl_verify_fun, "~> 1.1.7", manager: :rebar3, override: true}
     ]
   end
 

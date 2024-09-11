@@ -35,9 +35,8 @@ defmodule Routex.Path do
   def to_match_pattern(path) when is_binary(path) do
     path
     |> split()
-    #|> join_statics()
+    # |> join_statics()
     |> to_match_pattern()
-	
   end
 
   def to_match_pattern({:<<>>, [], segments}) do
@@ -47,26 +46,23 @@ defmodule Routex.Path do
   def to_match_pattern(segments) when is_list(segments) do
     {segments, _binding} =
       segments
-     # |> Routex.URI.parse()
-     # |> Map.get(:path_segments)
-      #|> join_statics()
+      # |> Routex.URI.parse()
+      # |> Map.get(:path_segments)
+      # |> join_statics()
       |> rewrite_segments()
-	
 
-    segments 
-
-
-	
+    segments
   end
 
-	def with_tail([]), do: quote do: [tl]
-	def with_tail(segments) do 
-		#accept trailers
-		quote do
-			[unquote_splicing(segments) | tl]
-		end
-		
-	end
+  def with_tail([]), do: quote(do: [tl])
+
+  def with_tail(segments) do
+    # accept trailers
+    quote do
+      [unquote_splicing(segments) | tl]
+    end
+  end
+
   # Using universal binding names as the binding names
   # might not be available
   defp rewrite_segments(segments) do
@@ -325,12 +321,10 @@ defmodule Routex.Path do
     strict? = Keyword.get(opts, :strict, false)
 
     uri = Routex.URI.parse(segments)
-    
+
     path_segments = segs_to_binaries(uri.path_segments)
     query_segments = segs_to_binaries(uri.query)
     fragment_segments = segs_to_binaries(uri.fragment)
-
-
 
     path_binary =
       if strict? do
@@ -349,7 +343,7 @@ defmodule Routex.Path do
       |> Enum.reject(&is_nil/1)
       |> Enum.map(&seg_to_binary/1)
 
-	defp segs_to_binaries(segment) when is_binary(segment), do: segment
+  defp segs_to_binaries(segment) when is_binary(segment), do: segment
   defp segs_to_binaries(nil), do: ""
 
   defp seg_to_binary(segment) when is_integer(segment), do: to_string(segment)

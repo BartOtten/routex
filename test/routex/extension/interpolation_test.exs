@@ -31,11 +31,11 @@ defmodule Routex.Extension.InterpolationTest do
              transform(@routes, nil, nil)
   end
 
-  test "should fail when attrs missing" do
+  test "should fail when attr is missing" do
     [r1 | _] = @routes
-    r1 = %{r1 | path: "/path/[rtx.missing]"}
+    r1 = %{r1 | path: "/path/[rtx.my_missing_attr]"}
     exception = assert_raise RuntimeError, fn -> transform([r1], nil, nil) end
-    assert exception.message =~ "key :missing"
+    assert exception.message =~ "key :my_missing_attr"
   end
 
   test "should raise on duplicate routes after interpolation" do

@@ -10,11 +10,13 @@ defmodule Routex.Utils do
   @spec print(input :: iodata) :: binary
   def print(input), do: IO.puts([">> " | input])
 
-    @doc """
+  @doc """
   Returns the ast to get the last value in the order list
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
   def get_helper_ast(caller) do
+		IO.inspect(caller.module, label: :MODULE)
+		IO.inspect(caller.versioned_vars, label: :VVARS)
     vars =
       caller.versioned_vars
       |> Enum.filter(fn
@@ -24,7 +26,7 @@ defmodule Routex.Utils do
         _other ->
           false
       end)
-      |> Enum.map(fn {{var, _}, _} -> var end)
+      |> Enum.map(fn {{var, _}, _} -> var end) |> IO.inspect(label: :VARS)
 
     cond do
       :assigns in vars ->
@@ -67,12 +69,17 @@ defmodule Routex.Utils do
           end
         end
 
-      ExUnit.Callbacks in caller.requires ->
-        quote do
-          require Logger
-          Logger.warning("No match for helper AST, set manual __order__")
-          0
-        end
+      # ExUnit.Callbacks in caller.requires ->
+      #   quote do
+      #     require Logger
+      #     Logger.warning("No match for helper AST, set manual __order__")
+			# 		try do
+			# 			var!(__order__)
+			# 		rescue
+			# 			e -> IO.inspect(e)
+			# 				0
+			# 		end
+      #   end
 
       true ->
         quote do
@@ -82,7 +89,4 @@ defmodule Routex.Utils do
         end
     end
   end
-
- 
-
 end

@@ -40,10 +40,9 @@ defmodule Routex.URI do
       {other, _pos} ->
         other
     end)
-			|> Enum.join("/")
+    |> Enum.join("/")
     |> to_string()
   end
-
 
   @doc """
   Parse a binary URI or segment list and returns a `Routex.URI` struct.
@@ -54,11 +53,12 @@ defmodule Routex.URI do
       segments
       |> to_binary()
 
-		parse(uri, segments)
-	end
+    parse(uri, segments)
+  end
 
-	def parse(url, segments \\ []) do
-		uri = url
+  def parse(url, segments \\ []) do
+    uri =
+      url
       |> URI.parse()
 
     path_segments =
@@ -89,9 +89,9 @@ defmodule Routex.URI do
     |> Map.put(:path_segments, path_segments)
   end
 
-	def to_matchable(uri) do
-		uri = parse(uri)
-		path = uri.path |> Routex.Path.to_match_pattern()
-		path ++ ["?", uri.query] ++ ["#", uri.fragment]
-		end
+  def to_matchable(uri) do
+    uri = parse(uri)
+    path = uri.path |> Routex.Path.to_match_pattern()
+    path ++ ["?", uri.query] ++ ["#", uri.fragment]
+  end
 end

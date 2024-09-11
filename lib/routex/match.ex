@@ -19,7 +19,7 @@ defmodule Routex.Match do
   )
 
   @doc """
-  Converts a binary URL, `Phoenix.Router.Route` or sigil into a Match record. 
+  Converts a binary URL, `Phoenix.Router.Route` or sigil into a Match record.
   """
   def new(input) when is_binary(input), do: input |> URI.parse() |> new()
 
@@ -41,9 +41,42 @@ defmodule Routex.Match do
     )
   end
 
+	def new({_func, _meta1, [ast, []]}), do: new(ast)
+		
   def new({:<<>>, _meta, args} = input) do
     segments =
-      Enum.flat_map(args, fn
+      Enum.find_value(args, fn
+        segment when is_binary(segment) ->
+          uri = URI.parse(segment)
+          [uri.path]
+
+        segment ->
+          [segment]
+      end)
+      |> List.flatten()
+
+    query =
+      Enum.find_value(args, fn
+        segment when is_binary(segment) ->
+          uri = URI.parse(segment)
+          uri.query
+
+        _segment ->
+          false
+      end)
+
+    fragment =
+      Enum.find_value(args, fn
+        segment when is_binary(segment) ->
+          uri = URI.parse(segment)
+          uri.fragment
+
+        segment ->
+          false
+      end)
+
+    segments =
+      Enum.flat_map(segments, fn
         path when is_binary(path) -> split_path(path)
         arg -> [arg]
       end)
@@ -62,23 +95,25 @@ defmodule Routex.Match do
       |> Enum.reverse()
 
     trailing_slash? = List.last(segments) |> trailing?()
-    match(segments: segments, trailing_slash?: trailing_slash?)
+
+    match(segments: segments, query: query, fragment: fragment, trailing_slash?: trailing_slash?)
   end
 
   @doc """
   Creates a function named `name` which the first argument matching
   a Match record pattern. Other arguments can be given with either a
-	catch all or a pattern.
+  catch all or a pattern.
 
-	*Example*
-	    iex> "/some/path"
-	       >  |> Match.new()
-	       >  |> Match.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
+  *Example*
+     iex> "/some/path"
+        >  |> Match.new()
+        >  |> Match.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
   """
   def to_func(match_pattern, name, other_args \\ [], body)
 
   def to_func(record, name, other_args, body) when is_tuple(record) do
-		match_pattern = to_pattern(record)
+    match_pattern = to_pattern(record)
+
     other_args =
       Enum.map(other_args, fn
         {arg, value} ->
@@ -158,6 +193,10 @@ defmodule Routex.Match do
     })
     |> to_string()
   end
+
+	def match?(r1, r2) do
+match(r1, :segments) == match(r2, :segments)
+	end
 end
 
 # defmodule Example do

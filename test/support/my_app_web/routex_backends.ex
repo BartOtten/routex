@@ -73,7 +73,7 @@ defmodule MyAppWeb.MultiLangRoutes do
     translations_backend: MyAppWeb.Gettext,
     assigns: %{namespace: :rtx, attrs: [:scope_helper, :language, :contact, :name]},
     extensions: [
-      #Routex.Extension.Alternatives,
+      # Routex.Extension.Alternatives,
       # Routex.Extension.Translations,
       # Routex.Extension.AlternativeGetters,
       # Routex.Extension.RouteHelpers,

@@ -74,15 +74,16 @@ defmodule Routex.Extension.VerifiedRoutes do
   - none
   """
 
-  alias Routex.Attrs
-  alias Routex.Utils
-  alias Routex.Path
-  alias Routex.Route
+  # alias Routex.Attrs
+  # alias Routex.Utils
+  # alias Routex.Path
+  # alias Routex.Route
 
   require Phoenix.VerifiedRoutes
   require Logger
-	require Routex.Branching
-	import Routex.Branching
+  require Routex.Branching
+  import Routex.Branching
+	import Routex.Match
 
   @behaviour Routex.Extension
   @phoenix_sigil "~p"
@@ -113,119 +114,134 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   require Phoenix.VerifiedRoutes
 
-  defp uniform_path_matchspec(input) do
-    Path.path_map(input)
+  # defp uniform_path_matchspec(input) do
+  #   Path.path_map(input)
+  # end
+
+  def routes() do
+    [
+      %Phoenix.Router.Route{
+        path: "/products/:id",
+        kind: :match,
+        private: %{routex: %{__order__: [2, 0], __origin__: "/products/:id"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/alt1/:id/productsa/",
+        kind: :match,
+        private: %{routex: %{__order__: [2, 1], __origin__: "/products/:id"}}
+      },
+      %Phoenix.Router.Route{
+        path: "/alt2/:id/productsb/",
+        kind: :match,
+        private: %{routex: %{__order__: [2, 2], __origin__: "/products/:id"}}
+      }
+    ]
   end
 
   @impl true
-  def create_helpers(routes, _cm, _env) do
-    # config = cm.config()
-
-    # %{
-    #   verified_sigil_routex: verified_sigil_routex,
-    #   verified_sigil_original: verified_sigil_original
-    # } = config
-
-    # to_sigil_funname = fn "~" <> sigil_letter -> String.to_atom("sigil_" <> sigil_letter) end
-    # org_sigil_fun_name = to_sigil_funname.(verified_sigil_original)
-    # routex_sigil_fun_name = to_sigil_funname.(verified_sigil_routex)
-
-    # pattern_routes =
-    #   routes
-    #   |> Route.group_by_method_and_origin()
-    #   |> Enum.map(fn {{_method, path}, routes} ->
-    #     pattern = uniform_path_matchspec(path)
-
-    #     {pattern, routes}
-    #   end)
-    #   |> Map.new()
-
+  def create_helpers(routes, _cm, env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
     IO.puts("")
 
-		## WHHHOOOPPSSS. Caller is not there yet!
-		#match_ast = quote do: Utils.get_helper_ast(__CALLER__)
-				match_ast = quote do: "fixME!"
-		
+    match_ast = :fixMe # Routex.Utils.get_helper_ast(env)
+
     [
-      branch_macro(routes, match_ast, {__MODULE__.PreCompiled, :transformer, []}, Phoenix.VerifiedRoutes, :sigil_p,
+      branch_macro(
+        routes,
+        match_ast,
+        {__MODULE__.PreCompiled, :clause_transformer, []},
+        {__MODULE__.PreCompiled, :transformer, []},
+        Phoenix.VerifiedRoutes,
+        :sigil_p,
         as: :sigil_p,
         orig: :sigil_o,
         arg_pos: fn arity -> arity - 1 end
       ),
-      branch_macro(routes, match_ast,  {__MODULE__.PreCompiled, :transformer, []}, Phoenix.VerifiedRoutes, :url,
+      branch_macro(
+        routes,
+        match_ast,
+        {__MODULE__.PreCompiled, :clause_transformer, []},
+        {__MODULE__.PreCompiled, :transformer, []},
+        Phoenix.VerifiedRoutes,
+        :url,
         as: :url,
         orig: :url_o,
         arg_pos: fn arity -> arity - 1 end
       ),
-      branch_macro(routes, match_ast,  {__MODULE__.PreCompiled, :transformer, []},Phoenix.VerifiedRoutes, :path,
+      branch_macro(
+        routes,
+        match_ast,
+        {__MODULE__.PreCompiled, :clause_transformer, []},
+        {__MODULE__.PreCompiled, :transformer, []},
+        Phoenix.VerifiedRoutes,
+        :path,
         as: :path,
         orig: :path_o,
         arg_pos: fn arity -> arity - 1 end
       )
     ]
-  end
-end
+		end
+	end
+
 
 defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
+ 
+  def clause_transformer(route) do
+    # pattern =
+     #  route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new() |> Routex.Match.to_pattern()
 
-	def transformer(pattern, branched_arg) do
-		# IO.inspect(pattern |> Routex.Match.new() |> Routex.Match.to_pattern())
-		# IO.inspect(branched_arg |> Routex.Match.new() |> Routex.Match.to_pattern())
-		branched_arg
+    order = route |> Routex.Attrs.get!(:__order__) |> List.last()
+
+    order #, pattern}
+  end
+
+  def transformer(pattern, branched_arg) do
+
+		IO.inspect(branched_arg, label: :BA)
+		import Routex.Match
+		orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
+		new_pattern = pattern |>  Routex.Match.new()
+		segments_pattern = branched_arg |> Routex.Match.new()
+
+		dyn_map =
+			orig_pattern |> elem(2) |> Enum.with_index() |> Enum.reduce([], fn
+	{":" <> _ = segment, idx}, acc -> [{segment, elem(segments_pattern, 2) |> Enum.at(idx)} | acc]
+	_, acc -> acc
+end) |> Map.new() 
+
+		new_segments = new_pattern |> elem(2) |> Enum.map( fn
+			":" <> _ = segment -> dyn_map[segment]
+			segment when is_binary(segment) -> "/" <> segment
+			segment -> segment
+		end)
+
+		new_segments = ["/" | new_segments] |> Enum.reject(&is_nil/1) |> Path.join() 
+
+		q = match(segments_pattern, :query)
+		f = match(segments_pattern, :fragment)
+
+		new_segments =q && new_segments <> "?" <> q || new_segments
+		new_segments =f && new_segments <> "#" <> f || new_segments
+
+		new_segments = List.wrap(new_segments)
+
+
+		case branched_arg do
+			{:sigil_p,_meta, _args} -> 
+	{:sigil_p, [delimiter: "\"", line: 34, column: 14],
+ [
+   {:<<>>, [line: 34, column: 14],
+    new_segments},
+   []
+ ]}
+				_ ->
+				
+    {:<<>>, [], new_segments} |> IO.inspect(label: :NEW_SEGS)
+		#branched_arg |> IO.inspect(label: :BRANCHED_ARG)
+end
+	
+
+		#branched_arg
   end
 end
-  #   # we save the type of the argument and if necessary convert it to a list of segments
-  #   # this way we can continue with a consistent format and restore the original format afterwards.
-  #   {type, route_arg_segments} = fetch_segments(route_arg)
-
-  #   matchable_arg_segments = Routex.Utils.matchable(route_arg_segments)
-
-  #   # we could create a map upstream to be a bit more efficient but it makes
-  #   # testing harder and not worth the microseconds.
-  #   routes_matching_pattern =
-  #     Enum.filter(routes, fn route ->
-  #       matchable_path = route |> Attrs.get!(:__origin__) |> Routex.Utils.matchable()
-  #       Routex.Utils.match?(matchable_path, matchable_arg_segments)
-  #     end)
-
-  #   clauses =
-  #     for route <- routes_matching_pattern do
-  #       orig_path = Attrs.get!(route, :__origin__)
-  #       helper = Attrs.get!(route, :__order__) |> List.last()
-
-  #       recomposed_route =
-  #         route_arg_segments
-  #         |> PathQueryFragment.recompose(orig_path, route.path)
-  #         |> PathQueryFragment.join_statics()
-  #         |> then(&{:<<>>, [], &1})
-
-  #       recomposed_route_arg =
-  #         case type do
-  #           :sigil -> {:sigil_p, [], [recomposed_route, []]}
-  #           :list -> recomposed_route
-  #         end
-
-  #       recomposed_args = List.replace_at(args, route_arg_pos, recomposed_route_arg)
-
-  #       quote do
-  #         unquote(helper) -> unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
-  #       end
-  #     end
-  #     |> List.flatten()
-  #     |> Enum.uniq_by(& &1)
-
-  #   if clauses == [] do
-  #     Logger.critical("Failed to create branches for #{inspect(args)}")
-  #     []
-  #   else
-  #     quote do
-  #       case unquote(helper_ast) do
-  #         unquote(clauses)
-  #       end
-  #     end
-  #     |> Routex.Dev.inspect_ast()
-  #   end
-  # end
-#end

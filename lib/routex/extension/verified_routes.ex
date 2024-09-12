@@ -197,12 +197,10 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
   end
 
   def transformer(pattern, branched_arg) do
-		
-    #IO.inspect([pattern, branched_arg], label: :PAT_BA)
 
     import Routex.Match
-
-		
+ #IO.inspect(branched_arg, label: :ORIG_SEGS)
+ 		#IO.inspect(pattern, label: :PATTERN)
     orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
     new_pattern = pattern |> Routex.Match.new()
     segments_pattern = branched_arg |> Routex.Match.new()
@@ -219,9 +217,7 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
           acc
       end)
       |> Map.new()
-		#|> dbg
-
-		#IO.inspect(dyn_map, label: :DYN)
+	#	|> IO.inspect(label: :DYNMAP)
 
     new_segments =
       new_pattern
@@ -229,7 +225,6 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
       |> Enum.reduce([], fn
 				segment, [] = acc  -> ["/" <> segment | []]
         ":" <> _ = segment, [h|t] -> [ dyn_map[segment] , h <> "/" | t ]
-				
         segment, [h|t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
 				segment, acc when is_binary(segment) -> [ "/" <> segment | acc]
         segment, acc -> [segment | acc]
@@ -261,6 +256,6 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
         # branched_arg |> IO.inspect(label: :BRANCHED_ARG)
     end
 
-     
+		#branched_arg
   end
 end

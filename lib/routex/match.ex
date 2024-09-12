@@ -1,7 +1,48 @@
 defmodule Routex.Match do
   @moduledoc """
+	Match records are an essential part of Routex. They are used to match
+	compile time routes with runtime routes, while also binding values with
+	the possibility to bind values.
+
+	** Examples
+
+	iex > path = "/posts/1?foo=bar#top"
+	    > route = %Phoenix.Router.Route{path: "/posts/:id"}
+	    > sigil = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
+
+	iex> Routex.Match.new(path)
+	{:match, [nil], ["posts", "1"], "foo=bar", "top", false}
+
+	iex> Routex.Match.new(route)
+  {:match, [], ["posts", ":id"], nil, nil, false}
+
+	iex> Routex.Match.new(sigil)
+	{:match, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
+
+
+	The unified Match records can be converted to patterns, to be used in pattern matching. As the patterns also bind values,the can be used for input and output.
+
+
+	iex > "/original/:arg1/:arg2" |> Routex.Match.new() |> Routex.Match.to_pattern()
+  {:{}, [], [:match, {:hosts, [], Routex.Match}, ["original", {:arg1, [], Routex.Match}, {:arg2, [], Routex.Match}], {:query, [], Routex.Match}, {:fragment, [], Routex.Match}, false]}
+
+	"iex> /recomposed/:arg2/:arg1" |> Routex.Match.new() |> Routex.Match.to_pattern()
+ {:{}, [], [:match, {:hosts, [], Routex.Match}, ["recomposed", {:arg2, [], Routex.Match}, {:arg1, [], Routex.Match}], {:query, [], Routex.Match}, {:fragment, [], Routex.Match}, false]}
+
+
+iex> "/original/segment_1/segment_2" |> Routex.Match.new() |> Routex.Match.to_pattern()
+{:{}, [], [:match, {:hosts, [], Routex.Match}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Match}, {:fragment, [], Routex.Match}, false]}
+
+
+
+
+
+	
   hosts: the list of request hosts or host prefixes
   """
+
+
+	# TODO: Make `match?` also match AST with placeholders like `:id`
 
   @path_seperator "/"
   @query_separator "?"
@@ -22,6 +63,7 @@ defmodule Routex.Match do
   Converts a binary URL, `Phoenix.Router.Route` or sigil into a Match record.
   """
   def new(input) when is_binary(input), do: input |> URI.parse() |> new()
+	def new(input) when is_list(input), do: match(segments: unify_segments(input))
 
   def new(%URI{} = uri) do
     match(
@@ -195,7 +237,75 @@ defmodule Routex.Match do
   end
 
   def match?(r1, r2) do
-    match(r1, :segments) == match(r2, :segments)
+
+
+		#route_list & AST
+    #route_list & static
+
+		## NEEDS TO LOSELY MATCH TOO
+	# 	{:match, [nil], ["products", ":id", "edit"], nil, nil, false}
+		
+ # 		{:match, [],
+ # [
+ #   "products",
+ #   {:"::", [line: 21],
+ #    [
+ #      {{:., [line: 21], [Kernel, :to_string]},
+ #       [from_interpolation: true, line: 21], [{:product, [line: 21], nil}]},
+ #      {:binary, [line: 21], nil}
+ #    ]},
+ #   "edit",
+ #   "?",
+ #   {:"::", [line: 21],
+ #    [
+ #      {{:., [line: 21], [Kernel, :to_string]},
+ #       [from_interpolation: true, line: 21],
+ #       [{:%{}, [line: 21], [foo: "bar"]}]},
+ #      {:binary, [line: 21], nil}
+ #    ]}
+ # ], nil, nil, false}
+
+
+
+
+		# IO.puts("#{inspect(r1)} vs #{inspect(r2)}")
+		s1 = match(r1, :segments) 
+    s2 = match(r2, :segments)
+
+		{s1, _} = Enum.split_while(s1, fn x -> x != "?" || !String.starts_with?(x,"?") end)
+		{s2, _} = Enum.split_while(s2, fn x -> x != "?" || !String.starts_with?(x,"?") end)
+
+	reduc =  fn
+		x when is_binary(x) -> Path.split(x)
+		x -> x
+	end
+
+		s1=Enum.map(s1, &reduc.(&1)) |> List.flatten() #|> dbg
+			s2=Enum.map(s2, &reduc.(&1)) |> List.flatten() #|> dbg
+		
+
+		si1 = s1 |> Enum.with_index(fn x,y -> {y,x} end)
+		si2 = s2 |> Enum.with_index(fn x,y -> {y,x} end)  |> Map.new()
+
+		
+		# IO.inspect(si1, label: :Si1)
+		# IO.inspect(si2, label: :Si2)
+		
+is_match = length(s1) == length(s2) &&
+		
+	Enum.all?(si1, fn
+	{_idx, ":" <> seg} -> true
+	{_idx, "*"} -> true
+	{idx, other} -> si2[idx] == other	
+	end)
+
+		is_match && IO.puts("MATCH: #{inspect(s2)} MATCHES PATTERN OF #{inspect(s1)}")
+
+		is_match
+		# |> dbg
+		
+		
+    #(match(r1, :segments) == match(r2, :segments)) |> dbg
   end
 end
 

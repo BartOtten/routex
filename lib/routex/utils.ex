@@ -15,9 +15,6 @@ defmodule Routex.Utils do
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
   def get_helper_ast(caller) do
-    IO.inspect(caller.module, label: :MODULE)
-    IO.inspect(caller.versioned_vars, label: :VVARS)
-
     vars =
       caller.versioned_vars
       |> Enum.filter(fn
@@ -28,7 +25,7 @@ defmodule Routex.Utils do
           false
       end)
       |> Enum.map(fn {{var, _}, _} -> var end)
-      |> IO.inspect(label: :VARS)
+
 
     cond do
       :assigns in vars ->

@@ -75,7 +75,6 @@ defmodule Routex.Extension.AlternativeGetters do
       routes
       |> Enum.group_by(& &1, &Map.get(sibling_groups, Route.get_nesting(&1)))
 
-    functions =
       for {route, sibling_routes} <- route_groups do
         function_ast(route, sibling_routes)
       end
@@ -83,11 +82,6 @@ defmodule Routex.Extension.AlternativeGetters do
   end
 
   defp function_ast(route, sibling_routes) do
-    match_pattern =
-      route
-      |> Routex.Match.new()
-      |> Routex.Match.to_pattern()
-
     alternatives =
       sibling_routes
       |> List.flatten()
@@ -109,10 +103,9 @@ defmodule Routex.Extension.AlternativeGetters do
         end
       end)
 
-    quote do
-      def alternatives(unquote(match_pattern)) do
-        unquote(alternatives)
-      end
-    end
+		route
+    |> Routex.Match.new()
+		|> Routex.Match.to_func(:alternatives, alternatives)
+
   end
 end

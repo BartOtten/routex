@@ -26,7 +26,6 @@ defmodule Routex.Utils do
       end)
       |> Enum.map(fn {{var, _}, _} -> var end)
 
-
     cond do
       :assigns in vars ->
         quote do

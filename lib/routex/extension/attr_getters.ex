@@ -61,7 +61,7 @@ defmodule Routex.Extension.AttrGetters do
 
     functions =
       for route <- routes do
-				attributes = route |> Attrs.get() |> Macro.escape()
+        attributes = route |> Attrs.get() |> Macro.escape()
 
         route
         |> Routex.Match.new()

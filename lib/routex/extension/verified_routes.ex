@@ -197,13 +197,13 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
   end
 
   def transformer(pattern, branched_arg) do
-
     import Routex.Match
- #IO.inspect(branched_arg, label: :ORIG_SEGS)
- 		#IO.inspect(pattern, label: :PATTERN)
+    IO.inspect(branched_arg, label: :ORIG_SEGS)
+
+    # IO.inspect(pattern, label: :PATTERN)
     orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
     new_pattern = pattern |> Routex.Match.new()
-    segments_pattern = branched_arg |> Routex.Match.new()
+    segments_pattern = branched_arg |> Routex.Match.new() |> IO.inspect(label: :SEGMENTS_MATCH)
 
     dyn_map =
       orig_pattern
@@ -217,29 +217,32 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
           acc
       end)
       |> Map.new()
-	#	|> IO.inspect(label: :DYNMAP)
+
+    # 	|> IO.inspect(label: :DYNMAP)
 
     new_segments =
       new_pattern
       |> elem(2)
       |> Enum.reduce([], fn
-				segment, [] = acc  -> ["/" <> segment | []]
-        ":" <> _ = segment, [h|t] -> [ dyn_map[segment] , h <> "/" | t ]
-        segment, [h|t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
-				segment, acc when is_binary(segment) -> [ "/" <> segment | acc]
+        segment, [] = acc -> ["/" <> segment | []]
+        ":" <> _ = segment, [h | t] -> [dyn_map[segment], h <> "/" | t]
+        segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
+        segment, acc when is_binary(segment) -> ["/" <> segment | acc]
         segment, acc -> [segment | acc]
-      end) |> List.flatten()
+      end)
+      |> List.flatten()
 
-    new_segments =  case new_segments do
-			[] -> ["/" ]
-			other -> other |> Enum.reject(&is_nil/1) |> Enum.reverse()
-			end
+    new_segments =
+      case new_segments do
+        [] -> ["/"]
+        other -> other |> Enum.reject(&is_nil/1) |> Enum.reverse()
+      end
 
     q = match(segments_pattern, :query)
     f = match(segments_pattern, :fragment)
 
-    new_segments = (q && new_segments ++ [ "?" <> q]) || new_segments
-    new_segments = (f && new_segments ++ [ "#" <> f]) || new_segments
+    new_segments = (q && new_segments ++ ["?", q] |> List.flatten() )|| new_segments
+    new_segments = (f && new_segments ++ ["#", f] |> List.flatten() )|| new_segments
 
     new_segments = List.wrap(new_segments)
 
@@ -249,13 +252,14 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
          [
            {:<<>>, [line: 34, column: 14], new_segments},
            []
-         ]}  |> IO.inspect(label: :NEW_SEGS)
+         ]}
+        |> IO.inspect(label: :NEW_SEGS)
 
       _ ->
         {:<<>>, [], new_segments} |> IO.inspect(label: :NEW_SEGS)
         # branched_arg |> IO.inspect(label: :BRANCHED_ARG)
     end
 
-		#branched_arg
+    # branched_arg
   end
 end

@@ -30,7 +30,7 @@ defmodule MatchTest do
 
   @sigil_matches (for p1 <- ["/nl/products/"],
                       p2 <- [%{id: 12}],
-                      p3 <- ["/edit", "/edit?k=v", "/edit#top"] do
+                      p3 <- ["/edit", "/edit?k=v", quote(do: "/edit?#{%{k: "v"}}"), "/edit#top"] do
                     [p1, p2, p3]
                   end)
 
@@ -109,7 +109,34 @@ defmodule MatchTest do
 
   test "Correctly splits query part in AST node" do
     route = {:<<>>, [], ["/products/1?foo=bar"]}
-    assert Match.new(route) == {:match, [], ["products", "1"], "foo=bar", nil, false}
+    assert Match.new(route) == {:match, [], ["products", "1"], ["foo=bar"], nil, false}
+
+    route =
+      {:<<>>, [],
+       [
+         "/products/1?",
+         {:"::", [],
+          [
+            {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+             [{:%{}, [], [foo: "bar"]}]},
+            {:binary, [], Elixir}
+          ]}
+       ]}
+
+    assert Match.new(route) ==
+						{
+              :match,
+              [],
+              [
+                "products",
+                "1"
+              ],
+              [
+                {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:%{}, [], [foo: "bar"]}]}, {:binary, [], Elixir}]}
+              ],
+              nil,
+              false
+            }
   end
 end
 

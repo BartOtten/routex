@@ -93,33 +93,34 @@ defmodule Routex.Branching do
         end
 
         defmacro unquote(as_fun)(unquote_splicing(args)) do
-          template_path_segments = case unquote(args) |> List.first() do
-						{:<<>>, _, segments} -> segments |> Routex.Path.split()
-						{_other, _, [{:<<>>, _, segments}, []]} -> segments |> Routex.Path.split()
-						other -> raise other
-					end
-
+          template_path_segments =
+            case unquote(args) |> List.first() do
+              {:<<>>, _, segments} -> segments |> Routex.Path.split()
+              {_other, _, [{:<<>>, _, segments}, []]} -> segments |> Routex.Path.split()
+              other -> raise other
+            end
 
           template_path_match_record = template_path_segments |> Routex.Match.new()
-					# Routex.Path.to_match_pattern() |> Enum.split_while(fn
-					# 	"?" <> _ -> false
-					# 	"?" -> false
-					# 	x -> true
-					# end) |> dbg()
+          # Routex.Path.to_match_pattern() |> Enum.split_while(fn
+          # 	"?" <> _ -> false
+          # 	"?" -> false
+          # 	x -> true
+          # end) |> dbg()
 
           matching_route =
             Enum.find(unquote(patterns), fn route ->
               Routex.Match.match?(route.path |> Routex.Match.new(), template_path_match_record)
             end)
 
-           #IO.puts("Template #{inspect(__CALLER__.module)} includes #{inspect(template_path_segments)}\n Match: #{inspect(template_path_match_record)} => #{inspect(matching_route, pretty: true)}")
+          # IO.puts("Template #{inspect(__CALLER__.module)} includes #{inspect(template_path_segments)}\n Match: #{inspect(template_path_match_record)} => #{inspect(matching_route, pretty: true)}")
 
           alternatives =
-						cond do
-							matching_route == nil -> []
-						  matching_route |> Routex.Attrs.get!(:__order__) |> List.last() != 0 -> [] # non-root routes are not branched
-						  alternatives = Routex.Attrs.get!(matching_route, :alternatives) -> alternatives
-						end
+            cond do
+              matching_route == nil -> []
+              # non-root routes are not branched
+              matching_route |> Routex.Attrs.get!(:__order__) |> List.last() != 0 -> []
+              alternatives = Routex.Attrs.get!(matching_route, :alternatives) -> alternatives
+            end
 
           match_binding = Routex.Utils.get_helper_ast(__CALLER__)
 
@@ -133,7 +134,8 @@ defmodule Routex.Branching do
             unquote(args),
             unquote(opts)
           )
-         # |> Routex.Dev.inspect_ast()
+
+          # |> Routex.Dev.inspect_ast()
         end
       end
     end
@@ -174,9 +176,10 @@ defmodule Routex.Branching do
 
     if clauses == [] do
       Logger.critical("Failed to create branches for #{inspect(args)}")
+
       quote do
-      unquote(module).unquote(fun)(unquote_splicing(args))
-    end
+        unquote(module).unquote(fun)(unquote_splicing(args))
+      end
     else
       quote do
         case unquote(match_binding) do

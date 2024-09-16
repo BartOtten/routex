@@ -123,6 +123,7 @@ defmodule Routex.Path do
   Joins consecutive static segments using the path separator. Splits at
   interpolation placeholders when provided with a path.
   """
+
   # def join_statics(segments, opts \\ [strict: true])
 
   # def join_statics(segments, opts) when is_binary(segments) do
@@ -290,7 +291,7 @@ defmodule Routex.Path do
     path
   end
 
-	  @doc """
+  @doc """
   Returns a binary URL when given a list with URL components. Any AST element is replaced by a
   numbered placeholder in format `:rtx_bind_{element_index}`
   """
@@ -366,7 +367,6 @@ defmodule Routex.Path do
   defp seg_to_binary(segment) when is_atom(segment), do: ":" <> to_string(segment)
   defp seg_to_binary(segment) when is_ast(segment), do: get_interpol_binding(segment)
   defp seg_to_binary(segment) when is_binary(segment), do: segment
-
 
   def to_binary(%__MODULE__{} = map) do
     to_string(map.path) <> to_string(map.query) <> to_string(map.fragment)

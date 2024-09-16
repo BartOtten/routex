@@ -33,7 +33,7 @@ defmodule Routex.Extension.Cloak do
   """
   @behaviour Routex.Extension
 
-  #alias Routex.Path
+  # alias Routex.Path
 
   @interpolate ":"
   @catch_all "*"

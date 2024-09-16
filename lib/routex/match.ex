@@ -47,7 +47,7 @@ defmodule Routex.Match do
   @query_separator "?"
   @fragment_separator "#"
   @interpolated [?:, ?*]
-	@ast_placeholder "_RTX_"
+  @ast_placeholder "_RTX_"
 
   require Record
 
@@ -70,10 +70,10 @@ defmodule Routex.Match do
 
   def new(%URI{} = uri) do
     match(
-      hosts: [uri.host],
+      hosts: uri.host && [uri.host] || [],
       segments: split_path(uri.path) |> unify_segments(),
-      query: uri.query,
-      fragment: uri.fragment,
+      query: uri.query && [uri.query],
+      fragment: uri.fragment && [uri.fragment],
       trailing_slash?: trailing?(uri.path)
     )
   end
@@ -144,8 +144,7 @@ defmodule Routex.Match do
   #   )
   # end
 
-	defguard is_ast(input) when is_tuple(input) and tuple_size(input) == 3
-  
+  defguard is_ast(input) when is_tuple(input) and tuple_size(input) == 3
 
   def new({:<<>>, _meta, segments} = input) do
     {segs, dyns} =
@@ -154,35 +153,37 @@ defmodule Routex.Match do
 
     uri = segs |> Enum.join() |> URI.parse() |> Map.from_struct()
 
-		codepoint_to_integer = fn codepoint -> 	<<codepoint>>  |> to_string |> String.to_integer() end
-		
-    map = for type <- [:path, :query, :fragment], into: %{} do
-      v =
-				case value = uri[type] do
-				nil -> nil
-					_ ->
-						value
-					|> String.trim_leading("/")
-						|> String.split("/")
-						
-						|> Enum.map(fn
-							<<@ast_placeholder ,codepoint::utf8>> ->
-								idx = codepoint_to_integer.(codepoint)
-							  Enum.at(dyns, idx)
-							
-          <<@ast_placeholder ,codepoint::utf8, rest::binary>> ->
-	idx = codepoint_to_integer.(codepoint)
-							  [Enum.at(dyns, idx), rest]
+    codepoint_to_integer = fn codepoint -> <<codepoint>> |> to_string |> String.to_integer() end
 
-          o -> o
-        end)
-end
-					{type, v}
-				
-    end
-match(segments: map.path, query: map.query, fragment: map.fragment) 
+    map =
+      for type <- [:path, :query, :fragment], into: %{} do
+        v =
+          case value = uri[type] do
+            nil ->
+              nil
 
-		
+            _ ->
+              value
+              |> String.trim_leading("/")
+              |> String.split("/")
+              |> Enum.map(fn
+                <<@ast_placeholder, codepoint::utf8>> ->
+                  idx = codepoint_to_integer.(codepoint)
+                  [Enum.at(dyns, idx)]
+
+                <<@ast_placeholder, codepoint::utf8, rest::binary>> ->
+                  idx = codepoint_to_integer.(codepoint)
+                  [Enum.at(dyns, idx), rest]
+
+                o ->
+                  o
+              end)
+          end
+
+        {type, v}
+      end
+
+    match(segments: map.path, query: map.query, fragment: map.fragment)
   end
 
   defp segs_to_binaries(segments) do
@@ -198,19 +199,18 @@ match(segments: map.path, query: map.query, fragment: map.fragment)
 
           {[str | acc], dyns}
 
-        seg, {acc, dyns}->
+        seg, {acc, dyns} ->
           {[seg_to_binary(seg) | acc], dyns}
       end)
 
     {segs |> Enum.reverse(), dyns |> Enum.reverse()}
   end
 
-	defp seg_to_binary(nil), do: nil
+  defp seg_to_binary(nil), do: nil
   defp seg_to_binary(segment) when is_integer(segment), do: to_string(segment)
   defp seg_to_binary(segment) when is_atom(segment), do: ":" <> to_string(segment)
   defp seg_to_binary(segment) when is_ast(segment), do: @ast_placeholder
   defp seg_to_binary(segment) when is_binary(segment), do: segment
-
 
   @doc """
   Creates a function named `name` which the first argument matching

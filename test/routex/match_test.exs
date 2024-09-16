@@ -124,19 +124,24 @@ defmodule MatchTest do
        ]}
 
     assert Match.new(route) ==
-						{
-              :match,
-              [],
-              [
-                "products",
-                "1"
-              ],
-              [
-                {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:%{}, [], [foo: "bar"]}]}, {:binary, [], Elixir}]}
-              ],
-              nil,
-              false
-            }
+             {
+               :match,
+               [],
+               [
+                 "products",
+                 "1"
+               ],
+               [
+                 {:"::", [],
+                  [
+                    {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+                     [{:%{}, [], [foo: "bar"]}]},
+                    {:binary, [], Elixir}
+                  ]}
+               ],
+               nil,
+               false
+             }
   end
 end
 

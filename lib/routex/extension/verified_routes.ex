@@ -198,12 +198,10 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
 
   def transformer(pattern, branched_arg) do
     import Routex.Match
-    IO.inspect(branched_arg, label: :ORIG_SEGS)
 
-    # IO.inspect(pattern, label: :PATTERN)
     orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
     new_pattern = pattern |> Routex.Match.new()
-    segments_pattern = branched_arg |> Routex.Match.new() |> IO.inspect(label: :SEGMENTS_MATCH)
+    segments_pattern = branched_arg |> Routex.Match.new()
 
     dyn_map =
       orig_pattern
@@ -217,8 +215,6 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
           acc
       end)
       |> Map.new()
-
-    # 	|> IO.inspect(label: :DYNMAP)
 
     new_segments =
       new_pattern
@@ -241,25 +237,17 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
     q = match(segments_pattern, :query)
     f = match(segments_pattern, :fragment)
 
-    new_segments = (q && new_segments ++ ["?", q] |> List.flatten() )|| new_segments
-    new_segments = (f && new_segments ++ ["#", f] |> List.flatten() )|| new_segments
+    new_segments = (q && (new_segments ++ ["?", q]) |> List.flatten()) || new_segments
+    new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
 
     new_segments = List.wrap(new_segments)
 
     case branched_arg do
       {:sigil_p, _meta, _args} ->
-        {:sigil_p, [delimiter: "\"", line: 34, column: 14],
-         [
-           {:<<>>, [line: 34, column: 14], new_segments},
-           []
-         ]}
-        |> IO.inspect(label: :NEW_SEGS)
+        {:sigil_p, [], [{:<<>>, [], new_segments}, []]}
 
       _ ->
-        {:<<>>, [], new_segments} |> IO.inspect(label: :NEW_SEGS)
-        # branched_arg |> IO.inspect(label: :BRANCHED_ARG)
-    end
-
-    # branched_arg
-  end
+        {:<<>>, [], new_segments}
+           end
+      end
 end

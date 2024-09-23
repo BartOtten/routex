@@ -139,7 +139,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
 
   @impl true
-  def create_helpers(routes, _cm, env) do
+  def create_helpers(routes, _cm, _env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
     IO.puts("")
@@ -147,7 +147,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     # Routex.Utils.get_helper_ast(env)
     match_ast = :fixMe
 
-    [
+	    [
       branch_macro(
         routes,
         match_ast,
@@ -220,7 +220,7 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
       new_pattern
       |> elem(2)
       |> Enum.reduce([], fn
-        segment, [] = acc -> ["/" <> segment | []]
+        segment, [] = _acc -> ["/" <> segment | []]
         ":" <> _ = segment, [h | t] -> [dyn_map[segment], h <> "/" | t]
         segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
         segment, acc when is_binary(segment) -> ["/" <> segment | acc]
@@ -248,6 +248,6 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
 
       _ ->
         {:<<>>, [], new_segments}
-           end
-      end
+    end
+  end
 end

@@ -1,46 +1,67 @@
-defmodule MatchTest do
-  use ExUnit.Case
+defmodule MatchTest.Constants do
+  @moduledoc """
+  A module to be use'd to import shared attributes
+  """
+  defmacro __using__(_) do
+    quote do
+      @route %Phoenix.Router.Route{
+        hosts: [],
+        path: "/:category/products/:id/edit",
+        trailing_slash?: false
+      }
+
+      @product_route_spanish %Phoenix.Router.Route{
+        hosts: [],
+        path: "/:id/:category/producta/edito",
+        trailing_slash?: false
+      }
+
+      @product_route_dutch %Phoenix.Router.Route{
+        hosts: [],
+        path: "/:category/producten/wijzigen/:id",
+        trailing_slash?: false
+      }
+
+      @uri_matches (for scheme <- ["http", "https", "ftp"],
+                        host <- ["localhost"],
+                        path <- ["/games/products/12/edit"],
+                        query <- [nil, "k=v"],
+                        fragment <- [nil, "top"] do
+                      %URI{
+                        scheme: scheme,
+                        host: host,
+                        path: path,
+                        query: query,
+                        fragment: fragment
+                      }
+                    end)
+
+      @sigil_matches (for p1 <- ["/games/products/"],
+                          p2 <- [quote do: "#{%{id: 12}}"],
+                          p3 <- [
+                            "/edit",
+                            "/edit?k=v",
+                            ["edit?", quote(do: "#{%{k: "v"}}")],
+                            "/edit#top"
+                          ] do
+                        {:<<>>, [], [p1, p2, p3]}
+                      end)
+    end
+  end
+end
+
+defmodule MatchTest.Setup do
+  @moduledoc """
+   Creates a module used for testing compiled functions and patterns.
+  """
+  use MatchTest.Constants
   alias Routex.Match
 
-  @route %Phoenix.Router.Route{
-    hosts: [],
-    path: "/:category/products/:id/edit",
-    trailing_slash?: false
-  }
-
-  @alt_route_sp %Phoenix.Router.Route{
-    hosts: [],
-    path: "/:id/:category/producta/edito",
-    trailing_slash?: false
-  }
-
-  @alt_route_nl %Phoenix.Router.Route{
-    hosts: [],
-    path: "/:category/producten/wijzigen/:id",
-    trailing_slash?: false
-  }
-
-  @uri_matches (for scheme <- ["http", "https", "ftp"],
-                    host <- ["localhost"],
-                    path <- ["/games/products/12/edit"],
-                    query <- [nil, "k=v"],
-                    fragment <- [nil, "top"] do
-                  %URI{scheme: scheme, host: host, path: path, query: query, fragment: fragment}
-                end)
-
-  @sigil_matches (for p1 <- ["/nl/products/"],
-                      p2 <- [%{id: 12}],
-                      p3 <- ["/edit", "/edit?k=v", quote(do: "/edit?#{%{k: "v"}}"), "/edit#top"] do
-                    [p1, p2, p3]
-                  end)
-
-  # create a compiled module which we can use for matching
-  recompose_ast_sp = quote do: unquote(Match.to_pattern(@alt_route_sp))
-  recompose_ast_nl = quote do: unquote(Match.to_pattern(@alt_route_nl))
-
-  testvar_ast = quote do: "var_is_" <> unquote(Macro.var(:var, Match))
-
+  # create a compiled module which we can use for matching. The module has tre functions: recompose/2, route/1 and testvar/2.
   route_definition_ast = quote do: unquote(@route |> Macro.escape())
+  recompose_ast_sp = quote do: unquote(Match.to_pattern(@product_route_spanish))
+  recompose_ast_nl = quote do: unquote(Match.to_pattern(@product_route_dutch))
+  binding_ast = quote do: "binding_is_" <> unquote(Macro.var(:var, Match))
 
   ast = [
     Match.to_func(@route, :recompose, [var: "nl"], recompose_ast_nl),
@@ -50,19 +71,128 @@ defmodule MatchTest do
       def recompose(input), do: {:error, :invalid_input_format}
     end,
     Match.to_func(@route, :route, route_definition_ast),
-    quote do
-      def route(input) when is_tuple(input), do: {:not_found, input}
-      def route(input), do: {:error, :invalid_input_format}
-    end,
-    Match.to_func(@route, :testvar, [:var], testvar_ast)
+     quote do
+       def route(input) when is_tuple(input), do: {:not_found, input}
+       def route(input), do: {:error, :invalid_input_format}
+     end,
+    Match.to_func(@route, :testvar, [:var], binding_ast)
   ]
 
-  Module.create(__MODULE__.Compiled, ast, __ENV__)
+  Module.create(MatchTest.Setup.Compiled, ast, __ENV__)
+end
 
-  alias __MODULE__.Compiled
+defmodule MatchTest do
+  use ExUnit.Case
+  use MatchTest.Constants
+
+  alias __MODULE__.Setup.Compiled
   alias Routex.Match
 
-  test "URL matches Route" do
+  def route(input), do: Map.merge(%Phoenix.Router.Route{}, Map.new(input))
+	def ast(input), do: {:<<>>, [], input}
+
+  describe "new/1" do
+    test "uses same defaults for all types" do
+      routes = [route(path: "/some"), "/some", {:<<>>, [], ["/some"]}]
+
+      for route <- routes do
+        assert Match.new(route) == {:match, [], ["some"], nil, nil, false}
+      end
+    end
+
+    test "returns correct match on root path" do
+      routes = [
+				route(path: "/", trailing_slash?: true),
+				"/",
+				ast(["/"])
+					]
+
+      for route <- routes do
+        assert Match.new(route) == {:match, [], [], nil, nil, true}
+      end
+    end
+
+    test "correctly splits query and fragment parts" do
+      route = "/products/1?foo=bar#top"
+      assert Match.new(route) == {:match, [], ["products", "1"], ["foo=bar"], ["top"], false}
+    end
+
+    test "correctly splits query part in AST node" do
+      static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
+
+      assert Match.new(static_route) ==
+               {:match, [], ["products", "1"], ["foo=bar"], ["top"], false}
+
+      dynamic_route = ast(
+         [
+           "/products/1/edit?",
+           {:"::", [],
+            [
+              {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+               [{:%{}, [], [foo: "bar"]}]},
+              {:binary, [], Elixir}
+            ]},
+           "#top"
+         ])
+
+      assert Match.new(dynamic_route) ==
+               {
+                 :match,
+                 [],
+                 [
+                   "products",
+                   "1",
+									 "edit"
+                 ],
+                 [
+                   {:"::", [],
+                    [
+                      {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+                       [{:%{}, [], [foo: "bar"]}]},
+                      {:binary, [], Elixir}
+                    ]}
+                 ],
+                 ["top"],
+                 false
+               }
+
+    end
+  end
+
+  describe "to_binary/1" do
+    test "returns a binary matching the path, query and fragment of the original url" do
+      for uri <- @uri_matches do
+        expected = URI.parse(uri)
+
+        result =
+          uri
+          |> Match.new()
+          |> Match.to_binary()
+          |> URI.parse()
+
+        assert result.query == expected.query
+        assert result.fragment == expected.fragment
+        assert result.path == expected.path
+      end
+    end
+  end
+
+	describe "match?" do
+		test "returns 'true' for matching records" do
+			matching = @uri_matches ++ @sigil_matches
+
+			for uri <- matching  do
+				m1 = Routex.Match.new(@route)
+				m2 = Routex.Match.new(uri)
+
+				assert Routex.Match.match?(m1, m2) == true, "#{inspect(uri, pretty: true)} does not match #{inspect(@route, pretty: true)} \n\n m1: #{inspect(m1, pretty: true)}\n m2: #{inspect(m2, pretty: true)}"
+			end
+		end
+		end
+
+	describe "to_pattern/1 and to_function/2" do
+  test "compiled body patterns are in line with compiled head patterns" do
+    # This tests the compiled functions which were created with to_function/1 (which creates a pattern matching function head) and a body created with to_pattern/2 (which creates a pattern including head matching bindings).
     for uri <- @uri_matches do
       result =
         uri
@@ -88,61 +218,27 @@ defmodule MatchTest do
     end
   end
 
-  test "Catchall var can be added to the arguments" do
-    result =
+  test "accept catchall var in the arguments" do
+    # This tests a compile function which is created with to_function/1 (which creates a route pattern matching function head with a catchall argument) and a custom body which matches the
+    # given variable name.
+    route_match =
       @route
       |> Match.new()
-      |> Compiled.testvar("var-value")
 
-    assert result == "var_is_var-value"
+		 result = Compiled.testvar(route_match, "var-value")
+     assert result == "binding_is_var-value"
   end
 
-  test "Correct defaults" do
-    route = %Phoenix.Router.Route{path: "/some"}
-    assert Match.new(route) == {:match, [], ["some"], nil, nil, false}
-  end
+		test "non-matching route returns the value from the defined catch-all function" do
+		route_mismatch = route(path: "/non-matching") |> Match.new()
+		result = Compiled.route(route_mismatch)
+		assert {:not_found, {:match, [], ["non-matching"], nil, nil, false}} == result
 
-  test "Correctly splits query part" do
-    route = "/products/1?foo=bar"
-    assert Match.new(route) == {:match, [nil], ["products", "1"], "foo=bar", nil, false}
-  end
-
-  test "Correctly splits query part in AST node" do
-    route = {:<<>>, [], ["/products/1?foo=bar"]}
-    assert Match.new(route) == {:match, [], ["products", "1"], ["foo=bar"], nil, false}
-
-    route =
-      {:<<>>, [],
-       [
-         "/products/1?",
-         {:"::", [],
-          [
-            {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
-             [{:%{}, [], [foo: "bar"]}]},
-            {:binary, [], Elixir}
-          ]}
-       ]}
-
-    assert Match.new(route) ==
-             {
-               :match,
-               [],
-               [
-                 "products",
-                 "1"
-               ],
-               [
-                 {:"::", [],
-                  [
-                    {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
-                     [{:%{}, [], [foo: "bar"]}]},
-                    {:binary, [], Elixir}
-                  ]}
-               ],
-               nil,
-               false
-             }
-  end
+			route_misformed = "/misformed"
+			result = Compiled.route(route_misformed)
+			assert {:error, :invalid_input_format} == result
+		end
+	end
 end
 
 # ~"/some/path" must become a runtime call to sigil_p("/some/path", branch_from_socket_or_conn)
@@ -162,7 +258,7 @@ end
 # 			#binds vars
 # 		case {unquote(Match.to_pattern(route), branch} do
 # 		{match_ast, "en"} -> Compiled.recompose(@en_route)
-# 		{match_ast, "nl"} -> Compiled.recompose(@enl_route)
+# 		{match_ast, "nl"} -> Compiled.recompose(@nl_route)
 # 		end
 # 	end
 # end

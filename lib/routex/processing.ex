@@ -29,7 +29,6 @@ defmodule Routex.Processing do
   the picture and route code generation is performed by Phoenix Router.
   """
 
-  alias Routex.ExtensionUtils
   alias Routex.Attrs
 
   @type backend :: module

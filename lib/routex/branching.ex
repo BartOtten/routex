@@ -47,7 +47,7 @@ defmodule Routex.Branching do
 
   def branch_macro(
         patterns,
-        match_binding,
+        _match_binding,
         pattern_transformer,
         transformer,
         module,
@@ -93,6 +93,10 @@ defmodule Routex.Branching do
         end
 
         defmacro unquote(as_fun)(unquote_splicing(args)) do
+
+
+
+					###### FROM HERE
           template_path_segments =
             case unquote(args) |> List.first() do
               {:<<>>, _, segments} -> segments |> Routex.Path.split()
@@ -101,11 +105,6 @@ defmodule Routex.Branching do
             end
 
           template_path_match_record = template_path_segments |> Routex.Match.new()
-          # Routex.Path.to_match_pattern() |> Enum.split_while(fn
-          # 	"?" <> _ -> false
-          # 	"?" -> false
-          # 	x -> true
-          # end) |> dbg()
 
           matching_route =
             Enum.find(unquote(patterns), fn route ->
@@ -123,6 +122,10 @@ defmodule Routex.Branching do
             end
 
           match_binding = Routex.Utils.get_helper_ast(__CALLER__)
+
+
+
+					### TILL HERE
 
           Routex.Branching.build_case(
             alternatives,

@@ -83,7 +83,6 @@ defmodule Routex.Extension.VerifiedRoutes do
   require Logger
   require Routex.Branching
   import Routex.Branching
-  import Routex.Match
 
   @behaviour Routex.Extension
   @phoenix_sigil "~p"
@@ -119,27 +118,6 @@ defmodule Routex.Extension.VerifiedRoutes do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
     IO.puts("")
-
-    recompose_functions_ast =
-      for route <- routes do
-        for alt <- Routex.Attrs.get!(route, :alternatives) do
-          alt_pattern = Routex.Match.to_pattern(alt)
-          alt_order = Routex.Attrs.get!(alt, :__order__) |> List.last()
-
-					# creates a function that matches on a route's Match record and an order
-					# it rebinds the values from the function head into the body pattern.
-          Routex.Match.to_func(
-            route,
-            :recompose,
-            [var: alt_order],
-            quote do
-              unquote(alt_pattern)
-
-            end
-          )
-        end
-        |> Routex.Dev.inspect_ast()
-      end
 
     match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
 
@@ -179,37 +157,37 @@ defmodule Routex.Extension.VerifiedRoutes do
       )
     ]
 
-    recompose_functions_ast ++ macros_ast
+   macros_ast
   end
 end
 
 defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
-  require Routex.Match
-  import Routex.Match
-
   def clause_transformer(route, branched_arg) do
+		orig_record = route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
+		arg_record = branched_arg |> Routex.Match.new()
 
-
-		# for the clauses, we need to know the routes matching the branched_arg
-		template_record = Routex.Match.new(branched_arg)
-		matching_root_route? = route.path == Routex.Attrs.get!(route, :__origin__) && Routex.Match.new(route) |> Routex.Match.match?(template_record)
-
-		#if matching_root_route? do
+		if Routex.Match.match?(orig_record, arg_record) do
 			Routex.Attrs.get!(route, :__order__) |> List.last()
-	#	else
-	#		:skip
-	#		end
-
+		else
+			:skip
 		end
+	end
 
   def argument_transformer(pattern, branched_arg) do
-    orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
-    new_pattern = pattern |> Routex.Match.new()
-    segments_pattern = branched_arg |> Routex.Match.new()
+    orig_record = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
+		orig_pattern = orig_record |> Routex.Match.to_pattern()
+    new_pattern = pattern |> Routex.Match.new() |> Routex.Match.to_pattern()
 
-    order = pattern |> Routex.Attrs.get!(:__order__) |> List.last()
+   arg_record = branched_arg |> Routex.Match.new()
 
-    new_segments = ExampleWeb.Router.RoutexHelpers.recompose(segments_pattern, order)               |> Routex.Match.to_sigil_segments()
+		if Routex.Match.match?(orig_record, arg_record) do
+						ast = quote do
+						unquote(orig_pattern) = unquote(Macro.escape(arg_record))
+						unquote(new_pattern)
+						end
+
+					{new_segments, _bindings} = Code.eval_quoted(ast)
+					new_segments =  Routex.Match.to_sigil_segments(new_segments)
 
     case branched_arg do
       {:sigil_p, _meta, _args} ->
@@ -218,5 +196,9 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
       _ ->
         {:<<>>, [], new_segments}
     end
+
+															else
+																:skip
+																end
   end
 end

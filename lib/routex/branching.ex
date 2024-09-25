@@ -103,7 +103,7 @@ defmodule Routex.Branching do
             unquote(opts)
           )
 
-           |> Routex.Dev.inspect_ast()
+      
         end
       end
     end
@@ -129,43 +129,39 @@ defmodule Routex.Branching do
     branched_arg_pos = Keyword.get(opts, :arg_pos, 0)
     branched_arg = Enum.at(args, branched_arg_pos)
 
-		# # for the clauses, we need to know the routes matching the branched_arg
-		# template_record = Routex.Match.new(branched_arg)
-		# matching_root_route = Enum.find(patterns, fn route -> route.path == Routex.Attrs.get!(route, :__origin__) && Routex.Match.new(route) |> Routex.Match.match?(template_record) end)
-
-
-
-# # alternative routes in templates are not auto branched
-# if !matching_root_route do
-#       quote do
-#         unquote(module).unquote(fun)(unquote_splicing(args))
-#       end
-
-# else
-	#	clauses = Routex.Attrs.get!(matching_root_route, :alternatives)
-
-
-
-		
-		
-
     clauses =
       for pattern <- patterns do
+
 				recomposed_clause = apply(cm,cf,[pattern, branched_arg | ca])
-        recomposed_arg = apply(m, f, [pattern, branched_arg | a])
+
+				if recomposed_clause == :skip do
+					[]
+				else
+
+				recomposed_arg = apply(m, f, [pattern, branched_arg | a])
         recomposed_args = List.replace_at(args, branched_arg_pos, recomposed_arg)
+
+				if recomposed_arg == :skip do
+					[]
+					else
 
         quote do
           unquote(recomposed_clause) ->
             unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
         end
+				end
+					end
       end
       |> List.flatten()
-      |> Enum.uniq()
+      |> Enum.uniq_by(fn {:->, [],
+   [
+     [clause],
+     _
+   ]} -> clause
+					end)
+
 
     if clauses == [] do
-      Logger.critical("Failed to create branches for #{inspect(args)}")
-
       quote do
         unquote(module).unquote(fun)(unquote_splicing(args))
       end
@@ -177,5 +173,4 @@ defmodule Routex.Branching do
       end
     end
 end
-  # end
 end

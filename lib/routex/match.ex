@@ -280,7 +280,7 @@ defmodule Routex.Match do
 
     new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
 
-    new_segments = List.wrap(new_segments)
+    List.wrap(new_segments)
   end
 
   @doc """

@@ -23,33 +23,32 @@ defmodule Routex.Branching do
 
   Given this code:
 
-   patterns = ["en", "nl"]
-  match_binding = var!(external_var)
-  arg_transformer = fn pattern, arg -> "europe/" <> pattern <> "/" <> arg end
+    patterns = ["en", "nl"]
+    match_binding = var!(external_var)
+    arg_transformer = fn pattern, arg -> "europe/" <> pattern <> "/" <> arg end
 
-    branch_macro(patterns, match_binding, arg_transformer, Phoenix.VerifiedRoutes, :url,
+    branch_macro(patterns, match_binding, arg_transformer, OriginalModule, :url,
   	as: :url,
   	orig: :url_original,
-  	arg_pos: fn arity -> arity - 1 end
-  )
+  	arg_pos: fn arity -> arity - 1 end)
 
   A new macro is build which outputs the AST of the original macro, wrapped in a case clause given transformed arguments.
 
-  defmacro url(path, opts \\ []) do
-     quote do
-     case match_binding do
-        "en" -> Original.Module.url("europe/en/" <> url, opts)
-        "nl" -> Original.Module.url("europe/nl/" <> url, opts)
-      end
-   end
+    defmacro url(path, opts \\ []) do
+			 quote do
+			   case match_binding do
+					 "en" -> Original.Module.url("europe/en/" <> url, opts)
+					 "nl" -> Original.Module.url("europe/nl/" <> url, opts)
+				 end
+		 end
   end
   """
 
   def branch_macro(
         patterns,
-        _match_binding,
-        pattern_transformer,
-        transformer,
+        match_binding,
+				clause_transformer,
+        argument_transformer,
         module,
         fun,
         opts \\ []
@@ -93,52 +92,19 @@ defmodule Routex.Branching do
         end
 
         defmacro unquote(as_fun)(unquote_splicing(args)) do
-
-
-
-					###### FROM HERE
-          template_path_segments =
-            case unquote(args) |> List.first() do
-              {:<<>>, _, segments} -> segments |> Routex.Path.split()
-              {_other, _, [{:<<>>, _, segments}, []]} -> segments |> Routex.Path.split()
-              other -> raise other
-            end
-
-          template_path_match_record = template_path_segments |> Routex.Match.new()
-
-          matching_route =
-            Enum.find(unquote(patterns), fn route ->
-              Routex.Match.match?(route.path |> Routex.Match.new(), template_path_match_record)
-            end)
-
-          # IO.puts("Template #{inspect(__CALLER__.module)} includes #{inspect(template_path_segments)}\n Match: #{inspect(template_path_match_record)} => #{inspect(matching_route, pretty: true)}")
-
-          alternatives =
-            cond do
-              matching_route == nil -> []
-              # non-root routes are not branched
-              matching_route |> Routex.Attrs.get!(:__order__) |> List.last() != 0 -> []
-              alternatives = Routex.Attrs.get!(matching_route, :alternatives) -> alternatives
-            end
-
-          match_binding = Routex.Utils.get_helper_ast(__CALLER__)
-
-
-
-					### TILL HERE
-
+				
           Routex.Branching.build_case(
-            alternatives,
-            match_binding,
-            unquote(Macro.escape(pattern_transformer)),
-            unquote(Macro.escape(transformer)),
+            unquote(patterns),
+            unquote(match_binding),
+						unquote(Macro.escape(clause_transformer)),
+            unquote(Macro.escape(argument_transformer)),
             unquote(module),
             unquote(fun),
             unquote(args),
             unquote(opts)
           )
 
-          # |> Routex.Dev.inspect_ast()
+           |> Routex.Dev.inspect_ast()
         end
       end
     end
@@ -153,24 +119,45 @@ defmodule Routex.Branching do
   def build_case(
         patterns,
         match_binding,
-        {cm, cf, ca} = _pattern_transformer,
-        {m, f, a} = _transformer,
+				{cm, cf, ca} = _clause_transformer,
+        {m, f, a} = _argument_transformer,
         module,
         fun,
         args,
         opts
       ) do
+
     branched_arg_pos = Keyword.get(opts, :arg_pos, 0)
     branched_arg = Enum.at(args, branched_arg_pos)
 
+		# for the clauses, we need to know the routes matching the branched_arg
+		template_record = Routex.Match.new(branched_arg)
+		matching_root_route = Enum.find(patterns, fn route -> route.path == Routex.Attrs.get!(route, :__origin__) && Routex.Match.new(route) |> Routex.Match.match?(template_record) end)
+
+
+
+# alternative routes in templates are not auto branched
+if !matching_root_route do
+      quote do
+        unquote(module).unquote(fun)(unquote_splicing(args))
+      end
+
+else
+		clauses = Routex.Attrs.get!(matching_root_route, :alternatives)
+
+
+
+		
+		
+
     clauses =
-      for pattern <- patterns do
-        recomposed_pattern = apply(cm, cf, [pattern | ca])
+      for pattern <- clauses do
+				recomposed_clause = apply(cm,cf,[pattern, branched_arg | ca])
         recomposed_arg = apply(m, f, [pattern, branched_arg | a])
         recomposed_args = List.replace_at(args, branched_arg_pos, recomposed_arg)
 
         quote do
-          unquote(recomposed_pattern) ->
+          unquote(recomposed_clause) ->
             unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
         end
       end
@@ -190,5 +177,6 @@ defmodule Routex.Branching do
         end
       end
     end
+end
   end
 end

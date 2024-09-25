@@ -157,6 +157,41 @@ defmodule MatchTest do
                }
 
     end
+
+		test "correctly returns trailing slash when last segment is AST" do
+  dynamic_route = ast(
+         [
+           "/products/1/edit/",
+           {:"::", [],
+            [
+              {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+               [{:%{}, [], [foo: "bar"]}]},
+              {:binary, [], Elixir}
+            ]}
+         ])
+
+      assert Match.new(dynamic_route) ==
+               {
+                 :match,
+                 [],
+                 [
+                   "products",
+                   "1",
+									 "edit"    ,           
+                   {:"::", [],
+                    [
+                      {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
+                       [{:%{}, [], [foo: "bar"]}]},
+                      {:binary, [], Elixir}
+                    ]}
+                 ],
+                 nil,
+								 nil,
+                 false
+               }
+
+		end
+		
   end
 
   describe "to_binary/1" do

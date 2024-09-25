@@ -4,7 +4,7 @@ defmodule Routex.Path do
   """
 
   @interpolate ":"
-  # @catch_all "*"
+  @catch_all "*"
   @query_separator "?"
   @fragment_separator "#"
   @path_separator "/"
@@ -282,4 +282,37 @@ defmodule Routex.Path do
     do: String.replace_prefix(input, prefix, "")
 
   def remove_prefix(input, _prefix), do: input
+
+	@doc """
+  Joins consecutive static segments using the path separator. Splits at
+  interpolation placeholders when provided with a path.
+  """
+  def join_statics(segments, opts \\ [strict: true])
+
+  def join_statics(segments, opts) when is_binary(segments) do
+    segments |> split(opts) |> join_statics(opts)
+  end
+
+  def join_statics([], _), do: ["/"]
+
+  def join_statics(segments, opts),
+    do: segments |> List.flatten() |> do_join_statics([], opts) |> Enum.reverse()
+
+  defp do_join_statics(segments, acc, opts) do
+    {l1, l2} =
+      Enum.split_while(segments, fn
+        @interpolate <> _ -> false
+        @catch_all <> _ -> false
+        segment when is_integer(segment) -> to_string(segment)
+        segment when is_binary(segment) -> true
+        _ -> false
+      end)
+
+    cond do
+      l1 == [] and l2 == [] -> acc
+      l1 == [] -> do_join_statics(tl(l2), [hd(l2) | acc], opts)
+      true -> do_join_statics(l2, [join(l1, opts) | acc], opts)
+    end
+  end
+
 end

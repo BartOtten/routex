@@ -61,7 +61,7 @@ defmodule Routex.Match do
     match(
       hosts: route.hosts || [],
       segments: split_path(route.path) |> unify_segments(),
-      trailing_slash?: route.trailing_slash? || false
+      trailing_slash?: route.trailing_slash? || route.path == "/" || false
     )
   end
 
@@ -71,7 +71,7 @@ defmodule Routex.Match do
     {segs, dyns} =
       segments
       |> segs_to_binaries()
-
+IO.inspect(segs)
     uri = segs |> Enum.join() |> URI.parse() |> Map.from_struct()
     trailing_slash? = trailing?(uri.path)
 
@@ -124,7 +124,7 @@ defmodule Routex.Match do
         seg, {acc, dyns} when is_ast(seg) ->
           count = length(dyns)
           dyns = [seg | dyns]
-          str = seg_to_binary(seg) <> to_string(count) <> "/"
+          str = seg_to_binary(seg) <> to_string(count)
 
           {[str | acc], dyns}
 
@@ -248,6 +248,22 @@ defmodule Routex.Match do
     })
     |> to_string()
   end
+
+	def to_segments(record) do
+IO.inspect(record, label: :record)
+		s = match(record, :segments)
+    q = match(record, :query)
+     f = match(record, :fragment)
+
+		new_segments = s
+     new_segments = (q && (new_segments ++ ["?", q]) |> List.flatten()) || new_segments
+     new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
+
+		   new_segments = List.wrap(new_segments)
+	end
+
+
+	
 
   @doc """
   Returns whether two Match records match on their route defining properties. The first argument

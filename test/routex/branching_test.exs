@@ -15,16 +15,21 @@ defmodule Routex.BranchingTest.Routex do
   A module which can be required in another module to trigger the creation of module with branched macro's.
   """
 
+	 #current level
   match_binding =
+		# into branching ast level
     quote do
-      var!(variant)
+			#into caller level
+			quote do
+				var!(variant)
+				end
     end
 
   ast =
     Routex.Branching.branch_macro(
       ["en", "nl"],
       match_binding,
-      {Routex.BranchingTest.PreCompiled, :transform_pattern, []},
+			{Routex.BranchingTest.PreCompiled, :transform_clause, []},
       {Routex.BranchingTest.PreCompiled, :transform_arg, []},
       Routex.BranchingTest.OriginalMacros,
       :original_macro,
@@ -39,10 +44,8 @@ defmodule Routex.BranchingTest.PreCompiled do
   A module with a transform function; should be 'required' before the transformation takes place.
   """
 
-  def transform_pattern(pattern) do
-    pattern
-  end
-
+	 def transform_clause(clause), do: clause
+	
   def transform_arg(pattern, branched_arg) do
     ["/europe", "/" <> pattern | branched_arg]
   end

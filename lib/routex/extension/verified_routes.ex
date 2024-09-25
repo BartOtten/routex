@@ -114,45 +114,41 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   require Phoenix.VerifiedRoutes
 
-  # defp uniform_path_matchspec(input) do
-  #   Path.path_map(input)
-  # end
-
-  def routes() do
-    [
-      %Phoenix.Router.Route{
-        path: "/products/:id",
-        kind: :match,
-        private: %{routex: %{__order__: [2, 0], __origin__: "/products/:id"}}
-      },
-      %Phoenix.Router.Route{
-        path: "/alt1/:id/productsa/",
-        kind: :match,
-        private: %{routex: %{__order__: [2, 1], __origin__: "/products/:id"}}
-      },
-      %Phoenix.Router.Route{
-        path: "/alt2/:id/productsb/",
-        kind: :match,
-        private: %{routex: %{__order__: [2, 2], __origin__: "/products/:id"}}
-      }
-    ]
-  end
-
   @impl true
   def create_helpers(routes, _cm, _env) do
+
     # print a newline so the branch_macro's can safely print in their own
     # empty space
-    IO.puts("")
+   #  IO.puts("")
 
-    # Routex.Utils.get_helper_ast(env)
-    match_ast = :fixMe
+	recompose_ast = []
+	# recompose_ast = for route <- routes do
+	# 	for alt <- Routex.Attrs.get!(route, :alternatives) do
+  #    alt_pattern = Routex.Match.to_pattern(alt)
+  #    alt_order = Routex.Attrs.get!(alt, :__order__) |> List.last()
 
-	    [
+	# 		Routex.Match.to_func(route, :recompose, [var: alt_order], quote do
+
+
+
+																																	
+  #  pat = unquote(alt_pattern)
+	# {:<<>>, [], unquote(elem(pat,3)}
+	# 	end)
+			
+  #   end |> Routex.Dev.inspect_ast()
+	# end
+
+		
+     match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
+
+	
+	macros_ast  = [
       branch_macro(
         routes,
         match_ast,
         {__MODULE__.PreCompiled, :clause_transformer, []},
-        {__MODULE__.PreCompiled, :transformer, []},
+				 {__MODULE__.PreCompiled, :argument_transformer, []},
         Phoenix.VerifiedRoutes,
         :sigil_p,
         as: :sigil_p,
@@ -163,7 +159,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         routes,
         match_ast,
         {__MODULE__.PreCompiled, :clause_transformer, []},
-        {__MODULE__.PreCompiled, :transformer, []},
+				 {__MODULE__.PreCompiled, :argument_transformer, []},
         Phoenix.VerifiedRoutes,
         :url,
         as: :url,
@@ -174,7 +170,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         routes,
         match_ast,
         {__MODULE__.PreCompiled, :clause_transformer, []},
-        {__MODULE__.PreCompiled, :transformer, []},
+				 {__MODULE__.PreCompiled, :argument_transformer, []},
         Phoenix.VerifiedRoutes,
         :path,
         as: :path,
@@ -182,24 +178,25 @@ defmodule Routex.Extension.VerifiedRoutes do
         arg_pos: fn arity -> arity - 1 end
       )
     ]
-  end
-end
+
+		recompose_ast ++ macros_ast
+  
+	end
+	end
 
 defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
-  def clause_transformer(route) do
-    # pattern =
-    #  route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new() |> Routex.Match.to_pattern()
+	require Routex.Match
+	import Routex.Match
 
-    order = route |> Routex.Attrs.get!(:__order__) |> List.last()
+	def clause_transformer(route, branched_arg), do: Routex.Attrs.get!(route, :__order__) |> List.last()
+	
+  # def argument_transformer(route, branched_arg) do
 
-    # , pattern}
-    order
-  end
-
-  def transformer(pattern, branched_arg) do
-    import Routex.Match
-
-    orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
+	
+	def argument_transformer(pattern, branched_arg) do
+		IO.inspect(branched_arg, label: :BRANCHED_ARG)
+		
+orig_pattern = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
     new_pattern = pattern |> Routex.Match.new()
     segments_pattern = branched_arg |> Routex.Match.new()
 
@@ -237,7 +234,16 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
     q = match(segments_pattern, :query)
     f = match(segments_pattern, :fragment)
 
-    new_segments = (q && (new_segments ++ ["?", q]) |> List.flatten()) || new_segments
+
+# hack to support "/users/login?_action=updated
+		new_segments =
+			case q do
+				nil -> new_segments
+				[h|t] when is_binary(h) -> new_segments ++ ["?" <> h | t] |> List.flatten()
+				q -> new_segments ++ ["?" | q] |> List.flatten()
+			end
+
+
     new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
 
     new_segments = List.wrap(new_segments)
@@ -248,6 +254,7 @@ defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
 
       _ ->
         {:<<>>, [], new_segments}
-    end
+    end |> IO.inspect(label: :RECOMPOSED)
   end
-end
+	end
+

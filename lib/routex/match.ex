@@ -71,7 +71,7 @@ defmodule Routex.Match do
     {segs, dyns} =
       segments
       |> segs_to_binaries()
-IO.inspect(segs)
+
     uri = segs |> Enum.join() |> URI.parse() |> Map.from_struct()
     trailing_slash? = trailing?(uri.path)
 
@@ -249,21 +249,39 @@ IO.inspect(segs)
     |> to_string()
   end
 
-	def to_segments(record) do
-IO.inspect(record, label: :record)
-		s = match(record, :segments)
+  def to_sigil_segments(record) do
+    s = match(record, :segments)
     q = match(record, :query)
-     f = match(record, :fragment)
+    f = match(record, :fragment)
 
-		new_segments = s
-     new_segments = (q && (new_segments ++ ["?", q]) |> List.flatten()) || new_segments
-     new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
+    new_segments =
+      s
+      |> Enum.reduce([], fn
+        segment, [] = _acc -> ["/" <> segment | []]
+        segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
+        segment, acc when is_binary(segment) -> ["/" <> segment | acc]
+        segment, acc -> [segment, "/" | acc]
+      end)
+      |> List.flatten()
 
-		   new_segments = List.wrap(new_segments)
-	end
+    new_segments =
+      case new_segments do
+        [] -> ["/"]
+        other -> other |> Enum.reject(&is_nil/1) |> Enum.reverse()
+      end
 
+    # hack to support "/users/login?_action=updated
+    new_segments =
+      case q do
+        nil -> new_segments
+        [h | t] when is_binary(h) -> (new_segments ++ ["?" <> h | t]) |> List.flatten()
+        q -> (new_segments ++ ["?" | q]) |> List.flatten()
+      end
 
-	
+    new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
+
+    new_segments = List.wrap(new_segments)
+  end
 
   @doc """
   Returns whether two Match records match on their route defining properties. The first argument

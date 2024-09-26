@@ -98,10 +98,10 @@ defmodule Routex.Extension.VerifiedRoutes do
       if routex == @phoenix_sigil do
         "\nThe default sigil used by Phoenix Verified Routes is overridden by Routex due to the configuration in `#{inspect(cm)}`.
 
-      #{routex}: localizes and verifies routes. (override)
-      #{original}: only verifies routes. (original)"
+      #{routex}: verifies routes while supporting route transfomations and alternatives. (override)
+      #{original}: verifies and preserves original routes. (original)"
       else
-        "\nRoutes can be localized using the #{routex} sigil"
+        "\nTransformed and/or branched routes can be used with the #{routex} sigil"
       end
 
     p2 = "\n\nDocumentation: https://hexdocs.pm/routex/extensions/verified_routes.html\n"
@@ -142,7 +142,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         :url,
         as: :url,
         orig: :url_o,
-        arg_pos: fn arity -> arity - 1 end
+        arg_pos: fn arity -> arity end
       ),
       branch_macro(
         routes,
@@ -153,7 +153,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         :path,
         as: :path,
         orig: :path_o,
-        arg_pos: fn arity -> arity - 1 end
+        arg_pos: fn arity -> arity end
       )
     ]
 

@@ -43,16 +43,57 @@ defmodule Routex.Match do
   {:match, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
 
   """
-  def new(input) when is_binary(input), do: input |> URI.parse() |> new()
+  def new(input) when is_binary(input) do
 
-  def new(%URI{} = uri) do
-    match(
-      hosts: (uri.host && [uri.host]) || [],
-      path: split_path(uri.path),
-      query: uri.query && [uri.query],
-      fragment: uri.fragment && [uri.fragment]
+		# mimmicks the regex from URI.parse/1 but does not consider a `#` start of a
+		# fragment when directly followed by a `{` as is used for string
+		# interpolation.
+
+		regex = ~r{^(([a-z][a-z0-9\+\-\.]*):)?(//([^/?#]*))?((?:(?:[^#?]*):?\#{)*(?:[^?#]*))(\?([^#]*:?\#{[^#]*))?(#(.*))?}i
+
+    parts = Regex.run(regex, input)
+
+    destructure [
+                  _full,
+                  # 1
+                  _scheme_with_colon,
+                  # 2
+                  _scheme,
+                  # 3
+                  _authority_with_slashes,
+                  # 4
+                  authority,
+                  # 5
+                  path,
+                  # 6
+                  query_with_question_mark,
+                  # 7
+                  _query,
+                  # 8
+                  fragment_with_hash,
+                  # 9
+                  _fragment
+                ],
+                parts
+
+
+		authority = nillify(authority)
+		path = nillify(path)
+		query_with_question_mark = nillify( query_with_question_mark)
+		fragment_with_hash = nillify(fragment_with_hash)
+		
+		 match(
+      hosts: authority && [authority],
+      path: path && split_path(path),
+      query: query_with_question_mark && [query_with_question_mark],
+      fragment: fragment_with_hash && [fragment_with_hash]
     )
-  end
+
+		
+	end
+
+  defp nillify(""), do: nil
+  defp nillify(other), do: other
 
   def new(%Phoenix.Router.Route{} = route) do
     match(

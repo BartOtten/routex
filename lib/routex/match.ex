@@ -1,15 +1,15 @@
 defmodule Routex.Match do
   @moduledoc """
-   Match records are an essential part of Routex. They are used to match
-   compile time routes with runtime routes. This module procides functions
-  to create Match records, convert them to match pattern AST as well as
-  function heads AST and to check if the routing values of two Match records
+  Match records are an essential part of Routex. They are used to match run time
+  routes with compile time routes.
+
+  This module provides functions to create Match records, convert them to match
+  pattern AST as well as function heads AST and to check if the routing values
+  of two Match records.
   match.
   """
 
-  # TODO: Make `match?` also match AST with placeholders like `:id`
-
-  @path_seperator "/"
+  @path_separator "/"
   @query_separator "?"
   @ast_placeholder "_RTX_"
 
@@ -17,10 +17,9 @@ defmodule Routex.Match do
 
   Record.defrecord(:match,
     hosts: [],
-    segments: [],
+    path: [],
     query: nil,
-    fragment: nil,
-    trailing_slash?: false
+    fragment: nil
   )
 
   defguardp is_ast(input) when is_tuple(input) and tuple_size(input) == 3
@@ -45,35 +44,29 @@ defmodule Routex.Match do
 
   """
   def new(input) when is_binary(input), do: input |> URI.parse() |> new()
-  def new(input) when is_list(input), do: match(segments: unify_segments(input))
 
   def new(%URI{} = uri) do
     match(
       hosts: (uri.host && [uri.host]) || [],
-      segments: split_path(uri.path) |> unify_segments(),
+      path: split_path(uri.path),
       query: uri.query && [uri.query],
-      fragment: uri.fragment && [uri.fragment],
-      trailing_slash?: trailing?(uri.path)
+      fragment: uri.fragment && [uri.fragment]
     )
   end
 
   def new(%Phoenix.Router.Route{} = route) do
     match(
       hosts: route.hosts || [],
-      segments: split_path(route.path) |> unify_segments(),
-      trailing_slash?: route.trailing_slash? || route.path == "/" || false
+      path: split_path(route.path)
     )
   end
 
   def new({_func, _meta1, [ast, []]}), do: new(ast)
 
-  def new({:<<>>, _meta, segments}) do
-    {segs, dyns} =
-      segments
-      |> segs_to_binaries()
+  def new({:<<>>, _meta, path}) do
+    {path, dyns} = path_to_binaries(path)
 
-    uri = segs |> Enum.join() |> URI.parse() |> Map.from_struct()
-    trailing_slash? = trailing?(uri.path)
+    uri = path |> Enum.join() |> URI.parse() |> Map.from_struct()
 
     map =
       for type <- [:path, :query, :fragment], into: %{} do
@@ -84,7 +77,7 @@ defmodule Routex.Match do
 
             _ ->
               value
-              |> String.split("/")
+              |> split_path()
               |> placeholders_to_ast(dyns)
           end
 
@@ -92,17 +85,16 @@ defmodule Routex.Match do
       end
 
     match(
-      segments: map.path,
+      path: map.path,
       query: map.query,
-      fragment: map.fragment,
-      trailing_slash?: trailing_slash?
+      fragment: map.fragment
     )
   end
 
-  def placeholders_to_ast(segments, dyns) do
+  def placeholders_to_ast(path, dyns) do
     codepoint_to_integer = fn codepoint -> <<codepoint>> |> to_string |> String.to_integer() end
 
-    Enum.flat_map(segments, fn
+    Enum.flat_map(path, fn
       <<@ast_placeholder, codepoint::utf8>> ->
         idx = codepoint_to_integer.(codepoint)
         [Enum.at(dyns, idx)]
@@ -115,19 +107,19 @@ defmodule Routex.Match do
         []
 
       o when is_binary(o) ->
-        segments = String.split(o, ~r"_RTX_\d", include_captures: true)
+        path = String.split(o, ~r"_RTX_\d", include_captures: true)
 
-        if length(segments) == 1 do
-          segments
+        if length(path) == 1 do
+          path
         else
-          placeholders_to_ast(segments, dyns)
+          placeholders_to_ast(path, dyns)
         end
     end)
   end
 
-  defp segs_to_binaries(segments) do
-    {segs, dyns} =
-      segments
+  defp path_to_binaries(path) do
+    {path, dyns} =
+      path
       |> List.flatten()
       |> Enum.reject(&is_nil/1)
       |> Enum.reduce({[], []}, fn
@@ -142,7 +134,7 @@ defmodule Routex.Match do
           {[seg_to_binary(seg) | acc], dyns}
       end)
 
-    {segs |> Enum.reverse(), dyns |> Enum.reverse()}
+    {path |> Enum.reverse(), dyns |> Enum.reverse()}
   end
 
   defp seg_to_binary(nil), do: nil
@@ -213,8 +205,8 @@ defmodule Routex.Match do
     do: route |> new() |> to_pattern()
 
   def to_pattern(record) when is_tuple(record) do
-    segments_ast =
-      Enum.map(match(record, :segments), fn
+    path_ast =
+      Enum.map(match(record, :path), fn
         ":" <> name -> quote do: unquote(name |> String.to_atom() |> Macro.var(__MODULE__))
         other -> other
       end)
@@ -223,39 +215,27 @@ defmodule Routex.Match do
     query_ast = Macro.var(:query, __MODULE__)
     fragment_ast = Macro.var(:fragment, __MODULE__)
 
-    # the trailing slash is not used for matching purposes in Phoenix.
-    # match(record, :trailing_slash?)
-    trailing_ast = Macro.var(:trailing_slash?, __MODULE__)
-
     quote do
-      {:match, unquote(hosts_ast), unquote(segments_ast), unquote(query_ast),
-       unquote(fragment_ast), unquote(trailing_ast)}
+      {:match, unquote(hosts_ast), unquote(path_ast), unquote(query_ast), unquote(fragment_ast)}
     end
   end
 
   defp split_path(input) when is_nil(input), do: []
 
-  defp split_path(input) when is_binary(input),
-    do: String.split(input, @path_seperator)
-
-  defp trailing?(input) when is_binary(input),
-    do: String.ends_with?(input, @path_seperator)
-
-  defp trailing?(_),
-    do: false
-
-  defp unify_segments(segments),
-    do: Enum.reject(segments, &(&1 == ""))
+  defp split_path(input) when is_binary(input) do
+    String.split(input, ~r"#{@path_separator}", include_captures: true)
+    |> Enum.reject(&(&1 == ""))
+  end
 
   @doc """
    A non conflicting function mimicking `to_string/1`
   """
 
   def to_binary(record) do
-    match(segments: segments, query: query, fragment: fragment) = record
+    match(path: path, query: query, fragment: fragment) = record
 
     struct(URI, %{
-      path: Enum.join(["" | segments], @path_seperator),
+      path: Enum.join(["" | path]),
       query: query,
       fragment: fragment
     })
@@ -263,41 +243,30 @@ defmodule Routex.Match do
   end
 
   def to_sigil_segments(record) do
-    s = match(record, :segments)
+    s = match(record, :path)
     q = match(record, :query)
     f = match(record, :fragment)
-    t = match(record, :trailing_slash?)
 
-    new_segments =
+    new_path =
       s
       |> Enum.reduce([], fn
-        segment, [] = _acc -> ["/" <> segment | []]
-        segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> "/" <> segment | t]
-        segment, acc when is_binary(segment) -> ["/" <> segment | acc]
-        segment, acc -> [segment, "/" | acc]
+        segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> segment | t]
+        segment, acc -> [segment | acc]
       end)
       |> List.flatten()
-
-    # support trailing slashes
-    new_segments = (t && ["/" | new_segments]) || new_segments
-
-    new_segments =
-      case new_segments do
-        [] -> ["/"]
-        other -> other |> Enum.reject(&is_nil/1) |> Enum.reverse()
-      end
+      |> Enum.reverse()
 
     # hack to support "/users/login?_action=updated
-    new_segments =
+    new_path =
       case q do
-        nil -> new_segments
-        [h | t] when is_binary(h) -> (new_segments ++ ["?" <> h | t]) |> List.flatten()
-        q -> (new_segments ++ ["?" | q]) |> List.flatten()
+        nil -> new_path
+        [h | t] when is_binary(h) -> (new_path ++ ["?" <> h | t]) |> List.flatten()
+        q -> (new_path ++ ["?" | q]) |> List.flatten()
       end
 
-    new_segments = (f && (new_segments ++ ["#", f]) |> List.flatten()) || new_segments
+    new_path = (f && (new_path ++ ["#", f]) |> List.flatten()) || new_path
 
-    List.wrap(new_segments)
+    List.wrap(new_path)
   end
 
   @doc """
@@ -316,8 +285,8 @@ defmodule Routex.Match do
   false
   """
   def match?(r1, r2) do
-    s1 = match(r1, :segments)
-    s2 = match(r2, :segments)
+    s1 = match(r1, :path)
+    s2 = match(r2, :path)
 
     {s1, _} =
       Enum.split_while(s1, fn x ->

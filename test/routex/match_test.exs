@@ -41,7 +41,7 @@ defmodule MatchTest.Constants do
                           p3 <- [
                             "/edit",
                             "/edit?k=v",
-                            ["edit?", quote(do: "#{%{k: "v"}}")],
+                            ["/edit?", quote(do: "#{%{k: "v"}}")],
                             "/edit#top"
                           ] do
                         {:<<>>, [], [p1, p2, p3]}
@@ -96,7 +96,7 @@ defmodule MatchTest do
       routes = [route(path: "/some"), "/some", {:<<>>, [], ["/some"]}]
 
       for route <- routes do
-        assert Match.new(route) == {:match, [], ["some"], nil, nil, false}
+        assert Match.new(route) == {:match, [], ["/", "some"], nil, nil}
       end
     end
 
@@ -108,20 +108,20 @@ defmodule MatchTest do
       ]
 
       for route <- routes do
-        assert Match.new(route) == {:match, [], [], nil, nil, true}
+        assert Match.new(route) == {:match, [], ["/"], nil, nil}
       end
     end
 
     test "correctly splits query and fragment parts" do
       route = "/products/1?foo=bar#top"
-      assert Match.new(route) == {:match, [], ["products", "1"], ["foo=bar"], ["top"], false}
+      assert Match.new(route) == {:match, [], ["/", "products", "/", "1"], ["foo=bar"], ["top"]}
     end
 
     test "correctly splits query part in AST node" do
       static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
 
       assert Match.new(static_route) ==
-               {:match, [], ["products", "1"], ["foo=bar"], ["top"], false}
+               {:match, [], ["/", "products", "/", "1"], ["foo=bar"], ["top"]}
 
       dynamic_route =
         ast([
@@ -139,11 +139,7 @@ defmodule MatchTest do
                {
                  :match,
                  [],
-                 [
-                   "products",
-                   "1",
-                   "edit"
-                 ],
+                 ["/", "products", "/", "1", "/", "edit"],
                  [
                    {:"::", [],
                     [
@@ -152,8 +148,7 @@ defmodule MatchTest do
                       {:binary, [], Elixir}
                     ]}
                  ],
-                 ["top"],
-                 false
+                 ["top"]
                }
     end
 
@@ -174,9 +169,13 @@ defmodule MatchTest do
                  :match,
                  [],
                  [
+                   "/",
                    "products",
+                   "/",
                    "1",
+                   "/",
                    "edit",
+                   "/",
                    {:"::", [],
                     [
                       {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
@@ -185,8 +184,7 @@ defmodule MatchTest do
                     ]}
                  ],
                  nil,
-                 nil,
-                 false
+                 nil
                }
     end
   end
@@ -265,7 +263,7 @@ defmodule MatchTest do
     test "non-matching route returns the value from the defined catch-all function" do
       route_mismatch = route(path: "/non-matching") |> Match.new()
       result = Compiled.route(route_mismatch)
-      assert {:not_found, {:match, [], ["non-matching"], nil, nil, false}} == result
+      assert {:not_found, {:match, [], ["/", "non-matching"], nil, nil}} == result
 
       route_misformed = "/misformed"
       result = Compiled.route(route_misformed)
@@ -273,26 +271,3 @@ defmodule MatchTest do
     end
   end
 end
-
-# ~"/some/path" must become a runtime call to sigil_p("/some/path", branch_from_socket_or_conn)
-
-# def sigil_p([{:<<>>, _, segments, []]}) do
-# 	alias Compiled
-# 	quote do
-# 		record = segments |> Match.new()
-# 		# call branched variant
-# 		Compiled.sigil_p(record, branch)
-# 	end
-# end
-
-# def branched(record, branch) do
-
-# 	for route <- @routes do
-# 			#binds vars
-# 		case {unquote(Match.to_pattern(route), branch} do
-# 		{match_ast, "en"} -> Compiled.recompose(@en_route)
-# 		{match_ast, "nl"} -> Compiled.recompose(@nl_route)
-# 		end
-# 	end
-# end
-# end

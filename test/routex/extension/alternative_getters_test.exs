@@ -51,11 +51,11 @@ defmodule Routex.Extension.AlternativeGettersTest do
       attrs: %{}
     },
     %AlternativeGetters{
-      slug: "/alt1/12/productsa?foo=baz#top",
+      slug: "/alt1/12/productsa/?foo=baz#top",
       attrs: %{}
     },
     %AlternativeGetters{
-      slug: "/alt2/12/productsb?foo=baz#top",
+      slug: "/alt2/12/productsb/?foo=baz#top",
       attrs: %{}
     }
   ]

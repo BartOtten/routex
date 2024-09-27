@@ -48,8 +48,8 @@ defmodule Routex.MixProject do
   def aliases, do: [docs: ["docs", &copy_assets/1]]
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:dev), do: ["lib"]
-  # defp elixirc_paths(:test), do: ["lib", "test/support"]
+  # defp elixirc_paths(:dev), do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   defp compilers(:test), do: Mix.compilers()
@@ -63,7 +63,8 @@ defmodule Routex.MixProject do
       {:phoenix, ">= 1.7.0"},
       {:phoenix_view, ">= 2.0.0", optional: true},
       {:phoenix_live_view, ">= 0.20.0", optional: true},
-      {:gettext, ">= 0.0.0", optional: true}
+      {:gettext, ">= 0.0.0", optional: true},
+      {:phoenix_html_helpers, "~> 1.0"}
     ]
   end
 

@@ -1,5 +1,5 @@
 # config Logger to only display >= warning as capture_log doesn't seem to work
-#Logger.configure(level: :warning)
+# Logger.configure(level: :warning)
 ExUnit.start(capture_log: true)
 
 defmodule RouterTestHelpers do

@@ -35,19 +35,19 @@ defmodule Routex.Branching do
   A new macro is build which outputs the AST of the original macro, wrapped in a case clause given transformed arguments.
 
     defmacro url(path, opts \\ []) do
-			 quote do
-			   case match_binding do
-					 "en" -> Original.Module.url("europe/en/" <> url, opts)
-					 "nl" -> Original.Module.url("europe/nl/" <> url, opts)
-				 end
-		 end
+  	 quote do
+  	   case match_binding do
+  			 "en" -> Original.Module.url("europe/en/" <> url, opts)
+  			 "nl" -> Original.Module.url("europe/nl/" <> url, opts)
+  		 end
+   end
   end
   """
 
   def branch_macro(
         patterns,
         match_binding,
-				clause_transformer,
+        clause_transformer,
         argument_transformer,
         module,
         fun,
@@ -95,15 +95,13 @@ defmodule Routex.Branching do
           Routex.Branching.build_case(
             unquote(patterns),
             unquote(match_binding),
-						unquote(Macro.escape(clause_transformer)),
+            unquote(Macro.escape(clause_transformer)),
             unquote(Macro.escape(argument_transformer)),
             unquote(module),
             unquote(fun),
             unquote(args),
             unquote(opts)
           )
-
-      
         end
       end
     end
@@ -118,48 +116,44 @@ defmodule Routex.Branching do
   def build_case(
         patterns,
         match_binding,
-				{cm, cf, ca} = _clause_transformer,
+        {cm, cf, ca} = _clause_transformer,
         {m, f, a} = _argument_transformer,
         module,
         fun,
         args,
         opts
       ) do
-
     branched_arg_pos = Keyword.get(opts, :arg_pos, 0)
     branched_arg = Enum.at(args, branched_arg_pos)
 
     clauses =
       for pattern <- patterns do
+        recomposed_clause = apply(cm, cf, [pattern, branched_arg | ca])
 
-				recomposed_clause = apply(cm,cf,[pattern, branched_arg | ca])
+        if recomposed_clause == :skip do
+          []
+        else
+          recomposed_arg = apply(m, f, [pattern, branched_arg | a])
+          recomposed_args = List.replace_at(args, branched_arg_pos, recomposed_arg)
 
-				if recomposed_clause == :skip do
-					[]
-				else
-
-				recomposed_arg = apply(m, f, [pattern, branched_arg | a])
-        recomposed_args = List.replace_at(args, branched_arg_pos, recomposed_arg)
-
-				if recomposed_arg == :skip do
-					[]
-					else
-
-        quote do
-          unquote(recomposed_clause) ->
-            unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
+          if recomposed_arg == :skip do
+            []
+          else
+            quote do
+              unquote(recomposed_clause) ->
+                unquote(module).unquote(fun)(unquote_splicing(recomposed_args))
+            end
+          end
         end
-				end
-					end
       end
       |> List.flatten()
       |> Enum.uniq_by(fn {:->, [],
-   [
-     [clause],
-     _
-   ]} -> clause
-					end)
-
+                          [
+                            [clause],
+                            _
+                          ]} ->
+        clause
+      end)
 
     if clauses == [] do
       quote do
@@ -172,5 +166,5 @@ defmodule Routex.Branching do
         end
       end
     end
-end
+  end
 end

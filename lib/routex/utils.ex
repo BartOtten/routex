@@ -10,20 +10,25 @@ defmodule Routex.Utils do
   @spec print(input :: iodata) :: binary
   def print(input), do: IO.puts([">> " | input])
 
-	@spec get_scope_from_process_ast(log_level :: atom) :: Macro.output()
-		def get_scope_from_process_ast(log_level) do
-			quote do
-			    require Logger
-      		case scope = Process.get(:rtx_scope, :not_found) do
-						:not_found ->
-							Logger.unquote(log_level)("No helper AST and no proces key `:rtx_scope` found. Fallback to `0`")
-						0
-		_-> scope
-					end
-			end
-				end
+  @spec get_scope_from_process_ast(log_level :: atom) :: Macro.output()
+  def get_scope_from_process_ast(log_level) do
+    quote do
+      require Logger
 
-	
+      case scope = Process.get(:rtx_scope, :not_found) do
+        :not_found ->
+          Logger.unquote(log_level)(
+            "No helper AST and no proces key `:rtx_scope` found. Fallback to `0`"
+          )
+
+          0
+
+        _ ->
+          scope
+      end
+    end
+  end
+
   @doc """
   Returns the ast to get the last value in the order list
   """
@@ -81,8 +86,11 @@ defmodule Routex.Utils do
           end
         end
 
-      ExUnit.Callbacks in caller.requires -> get_scope_from_process_ast(:info)
-      true -> get_scope_from_process_ast(:warning)
+      ExUnit.Callbacks in caller.requires ->
+        get_scope_from_process_ast(:info)
+
+      true ->
+        get_scope_from_process_ast(:warning)
     end
   end
 end

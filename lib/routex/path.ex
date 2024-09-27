@@ -283,7 +283,7 @@ defmodule Routex.Path do
 
   def remove_prefix(input, _prefix), do: input
 
-	@doc """
+  @doc """
   Joins consecutive static segments using the path separator. Splits at
   interpolation placeholders when provided with a path.
   """
@@ -314,5 +314,4 @@ defmodule Routex.Path do
       true -> do_join_statics(l2, [join(l1, opts) | acc], opts)
     end
   end
-
 end

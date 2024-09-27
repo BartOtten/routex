@@ -99,30 +99,31 @@ defmodule Routex.Match do
     )
   end
 
-	def placeholders_to_ast(segments, dyns) do
-		 codepoint_to_integer = fn codepoint -> <<codepoint>> |> to_string |> String.to_integer() end
-	Enum.flat_map(segments, fn
-                <<@ast_placeholder, codepoint::utf8>> ->
-                  idx = codepoint_to_integer.(codepoint)
-                  [Enum.at(dyns, idx)]
+  def placeholders_to_ast(segments, dyns) do
+    codepoint_to_integer = fn codepoint -> <<codepoint>> |> to_string |> String.to_integer() end
 
-                <<@ast_placeholder, codepoint::utf8, rest::binary>> ->
-                  idx = codepoint_to_integer.(codepoint)
-                  [Enum.at(dyns, idx), placeholders_to_ast([rest], dyns)]
+    Enum.flat_map(segments, fn
+      <<@ast_placeholder, codepoint::utf8>> ->
+        idx = codepoint_to_integer.(codepoint)
+        [Enum.at(dyns, idx)]
 
-                "" ->
-                  []
+      <<@ast_placeholder, codepoint::utf8, rest::binary>> ->
+        idx = codepoint_to_integer.(codepoint)
+        [Enum.at(dyns, idx), placeholders_to_ast([rest], dyns)]
 
-                o when is_binary(o) ->
-									segments = String.split(o, ~r"_RTX_\d", include_captures: true)
+      "" ->
+        []
 
-									if length(segments) == 1 do
-										segments
-											else
-												placeholders_to_ast(segments, dyns)
-												end               
-  end)
-		end
+      o when is_binary(o) ->
+        segments = String.split(o, ~r"_RTX_\d", include_captures: true)
+
+        if length(segments) == 1 do
+          segments
+        else
+          placeholders_to_ast(segments, dyns)
+        end
+    end)
+  end
 
   defp segs_to_binaries(segments) do
     {segs, dyns} =
@@ -223,8 +224,8 @@ defmodule Routex.Match do
     fragment_ast = Macro.var(:fragment, __MODULE__)
 
     # the trailing slash is not used for matching purposes in Phoenix.
-		# match(record, :trailing_slash?)
-		trailing_ast = Macro.var(:trailing_slash?, __MODULE__)
+    # match(record, :trailing_slash?)
+    trailing_ast = Macro.var(:trailing_slash?, __MODULE__)
 
     quote do
       {:match, unquote(hosts_ast), unquote(segments_ast), unquote(query_ast),
@@ -265,7 +266,7 @@ defmodule Routex.Match do
     s = match(record, :segments)
     q = match(record, :query)
     f = match(record, :fragment)
-		t = match(record, :trailing_slash?)
+    t = match(record, :trailing_slash?)
 
     new_segments =
       s
@@ -277,10 +278,10 @@ defmodule Routex.Match do
       end)
       |> List.flatten()
 
-		# support trailing slashes
-		new_segments = t && ["/" | new_segments] || new_segments
+    # support trailing slashes
+    new_segments = (t && ["/" | new_segments]) || new_segments
 
-		new_segments =
+    new_segments =
       case new_segments do
         [] -> ["/"]
         other -> other |> Enum.reject(&is_nil/1) |> Enum.reverse()

@@ -157,48 +157,48 @@ defmodule Routex.Extension.VerifiedRoutes do
       )
     ]
 
-   macros_ast
+    macros_ast
   end
 end
 
 defmodule Routex.Extension.VerifiedRoutes.PreCompiled do
   def clause_transformer(route, branched_arg) do
-		orig_record = route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
-		arg_record = branched_arg |> Routex.Match.new()
+    orig_record = route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
+    arg_record = branched_arg |> Routex.Match.new()
 
-		if Routex.Match.match?(orig_record, arg_record) do
-			Routex.Attrs.get!(route, :__order__) |> List.last()
-		else
-			:skip
-		end
-	end
+    if Routex.Match.match?(orig_record, arg_record) do
+      Routex.Attrs.get!(route, :__order__) |> List.last()
+    else
+      :skip
+    end
+  end
 
   def argument_transformer(pattern, branched_arg) do
     orig_record = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
-		orig_pattern = orig_record |> Routex.Match.to_pattern()
+    orig_pattern = orig_record |> Routex.Match.to_pattern()
     new_pattern = pattern |> Routex.Match.new() |> Routex.Match.to_pattern()
 
-   arg_record = branched_arg |> Routex.Match.new()
+    arg_record = branched_arg |> Routex.Match.new()
 
-		if Routex.Match.match?(orig_record, arg_record) do
-						ast = quote do
-						unquote(orig_pattern) = unquote(Macro.escape(arg_record))
-						unquote(new_pattern)
-						end
+    if Routex.Match.match?(orig_record, arg_record) do
+      ast =
+        quote do
+          unquote(orig_pattern) = unquote(Macro.escape(arg_record))
+          unquote(new_pattern)
+        end
 
-					{new_segments, _bindings} = Code.eval_quoted(ast)
-					new_segments =  Routex.Match.to_sigil_segments(new_segments)
+      {new_segments, _bindings} = Code.eval_quoted(ast)
+      new_segments = Routex.Match.to_sigil_segments(new_segments)
 
-    case branched_arg do
-      {:sigil_p, _meta, _args} ->
-        {:sigil_p, [], [{:<<>>, [], new_segments}, []]}
+      case branched_arg do
+        {:sigil_p, _meta, _args} ->
+          {:sigil_p, [], [{:<<>>, [], new_segments}, []]}
 
-      _ ->
-        {:<<>>, [], new_segments}
+        _ ->
+          {:<<>>, [], new_segments}
+      end
+    else
+      :skip
     end
-
-															else
-																:skip
-																end
   end
 end

@@ -65,10 +65,10 @@ defmodule Routex.Extension.Cloak do
               if idx == 0 do
                 nil
               else
-                idx
+                idx |> to_string()
               end
 
-            path = Path.join(["c", dynamics, static]) |> Path.absname()
+            path = Path.join(["/", "c", dynamics || [], static || []]) |> Path.absname()
             cmap = Map.put_new(cmap, route.path, path)
             route = %{route | path: path}
 

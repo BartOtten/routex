@@ -5,8 +5,7 @@ defmodule Routex.Match do
 
   This module provides functions to create Match records, convert them to match
   pattern AST as well as function heads AST and to check if the routing values
-  of two Match records.
-  match.
+  of two Match records match.
   """
 
   @path_separator "/"
@@ -18,20 +17,20 @@ defmodule Routex.Match do
   Record.defrecord(:match,
     hosts: [],
     path: [],
-    query: nil,
-    fragment: nil
+    query: [],
+    fragment: []
   )
 
   defguardp is_ast(input) when is_tuple(input) and tuple_size(input) == 3
 
   @doc """
-  Converts a binary URL, `Phoenix.Router.Route` or sigil into a Match record.
+  Converts a binary URL, `Phoenix.Router.Route` or (sigil) AST argument into a Match record.
 
   ** Examples
 
   iex> path = "/posts/1?foo=bar#top"
      > route = %Phoenix.Router.Route{path: "/posts/:id"}
-     > sigil = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
+     > ast = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
 
   iex> path_match = Routex.Match.new(path)
   {:match, [nil], ["posts", "1"], "foo=bar", "top", false}
@@ -39,17 +38,26 @@ defmodule Routex.Match do
   iex> route_match = Routex.Match.new(route)
   {:match, [], ["posts", ":id"], nil, nil, false}
 
-  iex> ast_match = Routex.Match.new(sigil)
+  iex> ast_match = Routex.Match.new(ast)
   {:match, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
 
   """
   def new(input) when is_binary(input) do
 
-		# mimmicks the regex from URI.parse/1 but does not consider a `#` start of a
-		# fragment when directly followed by a `{` as is used for string
-		# interpolation.
+		# Mimmicks the regex from URI.parse/1 but does not consider a hash (`#`) start of a
+		# fragment when directly followed by a curly bracket (`{`) as the combination `#{` is used
+		# for string interpolation. Note that the characters `{` and `}` are not valid in URIs
+		# (see RFC 3986) so we can assume any `#{` is meant as interpolation start.
 
-		regex = ~r{^(([a-z][a-z0-9\+\-\.]*):)?(//([^/?#]*))?((?:(?:[^#?]*):?\#{)*(?:[^?#]*))(\?([^#]*:?\#{[^#]*))?(#(.*))?}i
+		# A comparison to the regex in `URI.parse/1` using a binary URL -without interpolation syntax
+		# as it would cause URI/parse to 'early exit'): "https://user@foo.com:80/bar/product?q=baz#top"
+
+		# uri   564.60 K | 640 B
+		# match 485.64 K | 472 B
+
+    # 1.16x slower (+0.29 μs) | 0.74x memory usage (-168 B)
+
+		regex = ~r{^(([a-z][a-z0-9\+\-\.]*):)?(//([^/?#]*))?((?:(?:[^#?]*):?\#{)*(?:[^?#]*))(\?([^#](*:?\#{)[^#]*))?(#(.*))?}i
 
     parts = Regex.run(regex, input)
 
@@ -83,17 +91,14 @@ defmodule Routex.Match do
 		fragment_with_hash = nillify(fragment_with_hash)
 		
 		 match(
-      hosts: authority && [authority],
+      hosts: authority && List.wrap(authority),
       path: path && split_path(path),
-      query: query_with_question_mark && [query_with_question_mark],
-      fragment: fragment_with_hash && [fragment_with_hash]
+      query: query_with_question_mark && List.wrap(query_with_question_mark),
+      fragment: fragment_with_hash && List.wrap(fragment_with_hash)
     )
 
 		
 	end
-
-  defp nillify(""), do: nil
-  defp nillify(other), do: other
 
   def new(%Phoenix.Router.Route{} = route) do
     match(
@@ -114,7 +119,7 @@ defmodule Routex.Match do
         v =
           case value = uri[type] do
             nil ->
-              nil
+              []
 
             _ ->
               value
@@ -127,10 +132,15 @@ defmodule Routex.Match do
 
     match(
       path: map.path,
-      query: map.query,
-      fragment: map.fragment
+      query: map.query != [] && ["?" | map.query] || [],
+      fragment: map.fragment != [] && ["#" | map.fragment] || []
     )
   end
+
+	
+  defp nillify(""), do: []
+	defp nillify(nil), do: []
+  defp nillify(other), do: other
 
   def placeholders_to_ast(path, dyns) do
     codepoint_to_integer = fn codepoint -> <<codepoint>> |> to_string |> String.to_integer() end
@@ -142,7 +152,7 @@ defmodule Routex.Match do
 
       <<@ast_placeholder, codepoint::utf8, rest::binary>> ->
         idx = codepoint_to_integer.(codepoint)
-        [Enum.at(dyns, idx), placeholders_to_ast([rest], dyns)]
+        [Enum.at(dyns, idx) | placeholders_to_ast([rest], dyns)]
 
       "" ->
         []
@@ -274,40 +284,20 @@ defmodule Routex.Match do
 
   def to_binary(record) do
     match(path: path, query: query, fragment: fragment) = record
-
-    struct(URI, %{
-      path: Enum.join(["" | path]),
-      query: query,
-      fragment: fragment
-    })
-    |> to_string()
+    Enum.join([path, query, fragment])
   end
 
   def to_sigil_segments(record) do
-    s = match(record, :path)
-    q = match(record, :query)
-    f = match(record, :fragment)
+    s = match(record, :path) || []
+    q = match(record, :query) || []
+    f = match(record, :fragment) || []
 
-    new_path =
-      s
+      s ++ q ++ f
       |> Enum.reduce([], fn
         segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> segment | t]
         segment, acc -> [segment | acc]
       end)
-      |> List.flatten()
       |> Enum.reverse()
-
-    # hack to support "/users/login?_action=updated
-    new_path =
-      case q do
-        nil -> new_path
-        [h | t] when is_binary(h) -> (new_path ++ ["?" <> h | t]) |> List.flatten()
-        q -> (new_path ++ ["?" | q]) |> List.flatten()
-      end
-
-    new_path = (f && (new_path ++ ["#", f]) |> List.flatten()) || new_path
-
-    List.wrap(new_path)
   end
 
   @doc """

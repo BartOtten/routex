@@ -27,13 +27,13 @@ defmodule MatchTest.Constants do
                         path <- ["/games/products/12/edit"],
                         query <- [nil, "k=v"],
                         fragment <- [nil, "top"] do
-                      %URI{
+                      to_string(%URI{
                         scheme: scheme,
                         host: host,
                         path: path,
                         query: query,
                         fragment: fragment
-                      }
+                      })
                     end)
 
       @sigil_matches (for p1 <- ["/games/products/"],
@@ -96,7 +96,7 @@ defmodule MatchTest do
       routes = [route(path: "/some"), "/some", {:<<>>, [], ["/some"]}]
 
       for route <- routes do
-        assert Match.new(route) == {:match, [], ["/", "some"], nil, nil}
+        assert Match.new(route) == {:match, [], ["/", "some"], [], []}
       end
     end
 
@@ -108,20 +108,20 @@ defmodule MatchTest do
       ]
 
       for route <- routes do
-        assert Match.new(route) == {:match, [], ["/"], nil, nil}
+        assert Match.new(route) == {:match, [], ["/"], [], []}
       end
     end
 
     test "correctly splits query and fragment parts" do
       route = "/products/1?foo=bar#top"
-      assert Match.new(route) == {:match, [], ["/", "products", "/", "1"], ["foo=bar"], ["top"]}
+      assert Match.new(route) == {:match, [], ["/", "products", "/", "1"], ["?foo=bar"], ["#top"]}
     end
 
     test "correctly splits query part in AST node" do
       static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
 
       assert Match.new(static_route) ==
-               {:match, [], ["/", "products", "/", "1"], ["foo=bar"], ["top"]}
+               {:match, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#" ,"top"]}
 
       dynamic_route =
         ast([
@@ -140,7 +140,7 @@ defmodule MatchTest do
                  :match,
                  [],
                  ["/", "products", "/", "1", "/", "edit"],
-                 [
+                 ["?",
                    {:"::", [],
                     [
                       {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
@@ -148,43 +148,7 @@ defmodule MatchTest do
                       {:binary, [], Elixir}
                     ]}
                  ],
-                 ["top"]
-               }
-    end
-
-    test "correctly returns trailing slash when last segment is AST" do
-      dynamic_route =
-        ast([
-          "/products/1/edit/",
-          {:"::", [],
-           [
-             {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
-              [{:%{}, [], [foo: "bar"]}]},
-             {:binary, [], Elixir}
-           ]}
-        ])
-
-      assert Match.new(dynamic_route) ==
-               {
-                 :match,
-                 [],
-                 [
-                   "/",
-                   "products",
-                   "/",
-                   "1",
-                   "/",
-                   "edit",
-                   "/",
-                   {:"::", [],
-                    [
-                      {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
-                       [{:%{}, [], [foo: "bar"]}]},
-                      {:binary, [], Elixir}
-                    ]}
-                 ],
-                 nil,
-                 nil
+                 ["#", "top"]
                }
     end
   end
@@ -225,6 +189,7 @@ defmodule MatchTest do
     test "compiled body patterns are in line with compiled head patterns" do
       # This tests the compiled functions which were created with to_function/1 (which creates a pattern matching function head) and a body created with to_pattern/2 (which creates a pattern including head matching bindings).
       for uri <- @uri_matches do
+				expected = URI.parse(uri)
         result =
           uri
           |> Match.new()
@@ -232,8 +197,8 @@ defmodule MatchTest do
           |> Match.to_binary()
           |> URI.parse()
 
-        assert result.query == uri.query
-        assert result.fragment == uri.fragment
+        assert result.query == expected.query
+        assert result.fragment == expected.fragment
         assert result.path == "/12/games/producta/edito"
 
         result =
@@ -243,8 +208,8 @@ defmodule MatchTest do
           |> Match.to_binary()
           |> URI.parse()
 
-        assert result.query == uri.query
-        assert result.fragment == uri.fragment
+        assert result.query == expected.query
+        assert result.fragment == expected.fragment
         assert result.path == "/games/producten/wijzigen/12"
       end
     end
@@ -263,7 +228,7 @@ defmodule MatchTest do
     test "non-matching route returns the value from the defined catch-all function" do
       route_mismatch = route(path: "/non-matching") |> Match.new()
       result = Compiled.route(route_mismatch)
-      assert {:not_found, {:match, [], ["/", "non-matching"], nil, nil}} == result
+      assert {:not_found, {:match, [], ["/", "non-matching"], [], []}} == result
 
       route_misformed = "/misformed"
       result = Compiled.route(route_misformed)

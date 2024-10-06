@@ -28,12 +28,11 @@ defmodule Routex.Route do
     |> Enum.group_by(root)
   end
 
-  @doc """
-  Returns routes grouped by the combination of method and path of an (ancestor)
-  route. By default groups by parent. This can be adjusted by providing a
-  negative depth offset.
-  """
-
+  # @doc """
+  # Returns routes grouped by the combination of method and path of an (ancestor)
+  # route. By default groups by parent. This can be adjusted by providing a
+  # negative depth offset.
+  # """
   def group_by_method_and_path(routes, offset \\ @default_nesting_offset) when offset <= 0 do
     routes
     |> group_by_nesting(offset)
@@ -44,7 +43,7 @@ defmodule Routex.Route do
     |> Map.new()
   end
 
-  @doc "Returns routes grouped by a combination method and origin path"
+  @doc "Returns routes grouped by the combination of method and origin path"
   def group_by_method_and_origin(routes) do
     routes |> Enum.group_by(&{&1.verb, &1.private.routex.__origin__})
   end

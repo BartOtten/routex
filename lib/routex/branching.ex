@@ -11,7 +11,7 @@ defmodule Routex.Branching do
   ** Args
   - match_binding: the argument for the case clause
   - patterns: the match patterns of the case clause
-  - transformer: transforms the original arguments value
+  - transformer: transforms a original arguments value
 
   ** Example
 
@@ -59,7 +59,7 @@ defmodule Routex.Branching do
              is_list(opts) do
     as_fun = Keyword.get(opts, :as, fun)
     orig_fun = Keyword.get(opts, :orig, fun)
-    arities = :macros |> module.__info__() |> Keyword.get_values(fun)
+    arities = Keyword.get(opts, :arities) || get_arities!(module, fun)
     patterns = Enum.map(patterns, &Macro.escape/1)
 
     ## Print a message to make developers aware of branched macro's.
@@ -107,6 +107,13 @@ defmodule Routex.Branching do
     end
   end
 
+  defp get_arities!(module, fun) do
+    module.__info__(:macros) |> Keyword.get_values(fun)
+  rescue
+    ArgumentError ->
+      Module.definitions_in(module, :defmacro) |> Keyword.get_values(fun)
+  end
+
   def build_default(module, fun, args) do
     quote do
       unquote(module).unquote(fun)(unquote_splicing(args))
@@ -117,7 +124,7 @@ defmodule Routex.Branching do
         patterns,
         match_binding,
         {cm, cf, ca} = _clause_transformer,
-        {m, f, a} = _argument_transformer,
+        {am, af, aa} = _argument_transformer,
         module,
         fun,
         args,
@@ -133,7 +140,7 @@ defmodule Routex.Branching do
         if recomposed_clause == :skip do
           []
         else
-          recomposed_arg = apply(m, f, [pattern, branched_arg | a])
+          recomposed_arg = apply(am, af, [pattern, branched_arg | aa])
           recomposed_args = List.replace_at(args, branched_arg_pos, recomposed_arg)
 
           if recomposed_arg == :skip do

@@ -121,7 +121,7 @@ defmodule MatchTest do
       static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
 
       assert Match.new(static_route) ==
-               {:match, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#" ,"top"]}
+               {:match, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#", "top"]}
 
       dynamic_route =
         ast([
@@ -140,7 +140,8 @@ defmodule MatchTest do
                  :match,
                  [],
                  ["/", "products", "/", "1", "/", "edit"],
-                 ["?",
+                 [
+                   "?",
                    {:"::", [],
                     [
                       {{:., [], [Kernel, :to_string]}, [from_interpolation: true],
@@ -189,7 +190,8 @@ defmodule MatchTest do
     test "compiled body patterns are in line with compiled head patterns" do
       # This tests the compiled functions which were created with to_function/1 (which creates a pattern matching function head) and a body created with to_pattern/2 (which creates a pattern including head matching bindings).
       for uri <- @uri_matches do
-				expected = URI.parse(uri)
+        expected = URI.parse(uri)
+
         result =
           uri
           |> Match.new()

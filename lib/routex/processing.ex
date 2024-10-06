@@ -101,7 +101,7 @@ defmodule Routex.Processing do
 
     create_helper_module(extensions_ast, env)
 
-    IO.puts(["End: ", inspect(__MODULE__), " completed route processing.."])
+    IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
     :ok
   end
 

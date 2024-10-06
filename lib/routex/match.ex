@@ -43,21 +43,21 @@ defmodule Routex.Match do
 
   """
   def new(input) when is_binary(input) do
+    # Mimmicks the regex from URI.parse/1 but does not consider a hash (`#`) start of a
+    # fragment when directly followed by a curly bracket (`{`) as the combination `#{` is used
+    # for string interpolation. Note that the characters `{` and `}` are not valid in URIs
+    # (see RFC 3986) so we can assume any `#{` is meant as interpolation start.
 
-		# Mimmicks the regex from URI.parse/1 but does not consider a hash (`#`) start of a
-		# fragment when directly followed by a curly bracket (`{`) as the combination `#{` is used
-		# for string interpolation. Note that the characters `{` and `}` are not valid in URIs
-		# (see RFC 3986) so we can assume any `#{` is meant as interpolation start.
+    # A comparison to the regex in `URI.parse/1` using a binary URL -without interpolation syntax
+    # as it would cause URI/parse to 'early exit'): "https://user@foo.com:80/bar/product?q=baz#top"
 
-		# A comparison to the regex in `URI.parse/1` using a binary URL -without interpolation syntax
-		# as it would cause URI/parse to 'early exit'): "https://user@foo.com:80/bar/product?q=baz#top"
-
-		# uri   564.60 K | 640 B
-		# match 485.64 K | 472 B
+    # uri   564.60 K | 640 B
+    # match 485.64 K | 472 B
 
     # 1.16x slower (+0.29 μs) | 0.74x memory usage (-168 B)
 
-		regex = ~r{^(([a-z][a-z0-9\+\-\.]*):)?(//([^/?#]*))?((?:(?:[^#?]*):?\#{)*(?:[^?#]*))(\?([^#](*:?\#{)[^#]*))?(#(.*))?}i
+    regex =
+      ~r{^(([a-z][a-z0-9\+\-\.]*):)?(//([^/?#]*))?((?:(?:[^#?]*):?\#{)*(?:[^?#]*))(\?([^#](*:?\#{)[^#]*))?(#(.*))?}i
 
     parts = Regex.run(regex, input)
 
@@ -84,21 +84,18 @@ defmodule Routex.Match do
                 ],
                 parts
 
+    authority = nillify(authority)
+    path = nillify(path)
+    query_with_question_mark = nillify(query_with_question_mark)
+    fragment_with_hash = nillify(fragment_with_hash)
 
-		authority = nillify(authority)
-		path = nillify(path)
-		query_with_question_mark = nillify( query_with_question_mark)
-		fragment_with_hash = nillify(fragment_with_hash)
-		
-		 match(
+    match(
       hosts: authority && List.wrap(authority),
       path: path && split_path(path),
       query: query_with_question_mark && List.wrap(query_with_question_mark),
       fragment: fragment_with_hash && List.wrap(fragment_with_hash)
     )
-
-		
-	end
+  end
 
   def new(%Phoenix.Router.Route{} = route) do
     match(
@@ -107,12 +104,12 @@ defmodule Routex.Match do
     )
   end
 
-  def new({_func, _meta1, [ast, []]}), do: new(ast)
+  def new({:<<>>, _meta, path_segments}), do: new(path_segments)
 
-  def new({:<<>>, _meta, path}) do
-    {path, dyns} = path_to_binaries(path)
+  def new(path_segments) when is_list(path_segments) do
+    {binary_path_segments, dyns} = path_segments_to_binaries(path_segments)
 
-    uri = path |> Enum.join() |> URI.parse() |> Map.from_struct()
+    uri = binary_path_segments |> Enum.join() |> URI.parse() |> Map.from_struct()
 
     map =
       for type <- [:path, :query, :fragment], into: %{} do
@@ -132,14 +129,13 @@ defmodule Routex.Match do
 
     match(
       path: map.path,
-      query: map.query != [] && ["?" | map.query] || [],
-      fragment: map.fragment != [] && ["#" | map.fragment] || []
+      query: (map.query != [] && ["?" | map.query]) || [],
+      fragment: (map.fragment != [] && ["#" | map.fragment]) || []
     )
   end
 
-	
   defp nillify(""), do: []
-	defp nillify(nil), do: []
+  defp nillify(nil), do: []
   defp nillify(other), do: other
 
   def placeholders_to_ast(path, dyns) do
@@ -168,7 +164,7 @@ defmodule Routex.Match do
     end)
   end
 
-  defp path_to_binaries(path) do
+  defp path_segments_to_binaries(path) do
     {path, dyns} =
       path
       |> List.flatten()
@@ -287,17 +283,17 @@ defmodule Routex.Match do
     Enum.join([path, query, fragment])
   end
 
-  def to_sigil_segments(record) do
+  def to_ast_segments(record) do
     s = match(record, :path) || []
     q = match(record, :query) || []
     f = match(record, :fragment) || []
 
-      s ++ q ++ f
-      |> Enum.reduce([], fn
-        segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> segment | t]
-        segment, acc -> [segment | acc]
-      end)
-      |> Enum.reverse()
+    (s ++ q ++ f)
+    |> Enum.reduce([], fn
+      segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> segment | t]
+      segment, acc -> [segment | acc]
+    end)
+    |> Enum.reverse()
   end
 
   @doc """

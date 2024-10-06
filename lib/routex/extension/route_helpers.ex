@@ -69,8 +69,6 @@ defmodule Routex.Extension.RouteHelpers do
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, env) do
-    Logger.warning("The use of Routex extension `RouteHelpers` causes long compilation times.")
-
     routes_per_origin = Route.group_by_nesting(routes)
 
     prelude =
@@ -83,7 +81,10 @@ defmodule Routex.Extension.RouteHelpers do
         esc_routes = Macro.escape(routes)
         router = env.module
 
-        for nr <- [2, 3], suffix <- ["_path", "_url"], route <- routes, route.helper != nil do
+        for nr <- [2, 3],
+            suffix <- ["_path", "_url"],
+            route <- routes,
+            route.helper != nil do
           nr_bindings =
             route.path |> Path.split() |> Enum.count(&String.starts_with?(&1, @interpolate))
 

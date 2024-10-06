@@ -1,8 +1,10 @@
 defmodule Routex.Extension.AttrGettersTest.HelpersModule do
   alias Routex.Extension.AttrGetters
 
+	@path "/foo/bar"
+
   route =
-    %Phoenix.Router.Route{private: %{}, path: "/foo/bar", trailing_slash?: false}
+    %Phoenix.Router.Route{private: %{}, path: @path, trailing_slash?: false}
     |> Routex.Attrs.put(:rtx_1, "r1")
     |> Routex.Attrs.put(:rtx_2, "r2")
 
@@ -16,8 +18,6 @@ defmodule Routex.Extension.AttrGettersTest do
   require Routex.Extension.AttrGettersTest.HelpersModule
 
   test "by default includes all attrs" do
-    assert %{rtx_1: "r1", rtx_2: "r2"} =
-             "/foo/bar"
-             |> AttrGettersTestMod.attrs()
+    assert %{rtx_1: "r1", rtx_2: "r2"} = AttrGettersTestMod.attrs(@path)
   end
 end

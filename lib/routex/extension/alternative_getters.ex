@@ -1,7 +1,7 @@
 defmodule Routex.Extension.AlternativeGetters do
   @moduledoc """
-  Creates helper functions to get a list of alternative slugs and their routes
-  attributes given a binary url or a list of path segments and a binary url.
+  Creates helper functions to get a list of alternative slugs and their Routex
+  attributes by providing the function a binary url.
 
   ## Configuration
   ```diff
@@ -63,48 +63,31 @@ defmodule Routex.Extension.AlternativeGetters do
         end
       end
 
-    functions = functions_ast(routes)
+    functions =
+      for {_nesting, siblings} <- Route.group_by_nesting(routes) do
+        body_ast =
+          for route <- siblings do
+            map_ast(route)
+          end
+
+        _function_ast =
+          for route <- siblings do
+            Routex.Match.new(route) |> Routex.Match.to_func(:alternatives, body_ast)
+          end
+      end
 
     [prelude, functions]
   end
 
-  def functions_ast(routes) do
-    sibling_groups = Route.group_by_nesting(routes)
+  defp map_ast(route) do
+    pattern = route |> Routex.Match.new() |> Routex.Match.to_pattern()
+    attrs = Attrs.get(route)
 
-    route_groups =
-      routes
-      |> Enum.group_by(& &1, &Map.get(sibling_groups, Route.get_nesting(&1)))
-
-    for {route, sibling_routes} <- route_groups do
-      function_ast(route, sibling_routes)
+    quote do
+      %Routex.Extension.AlternativeGetters{
+        slug: unquote(pattern) |> Routex.Match.to_binary(),
+        attrs: unquote(Macro.escape(attrs))
+      }
     end
-    |> Enum.reverse()
-  end
-
-  defp function_ast(route, sibling_routes) do
-    alternatives =
-      sibling_routes
-      |> List.flatten()
-      |> Enum.map(fn route ->
-        pattern = route |> Routex.Match.new() |> Routex.Match.to_pattern()
-
-        # unset the :alternatives key when present as it is redundant
-        attrs =
-          route
-          |> Attrs.get()
-          |> Map.new()
-          |> Map.drop([:alternatives])
-
-        quote do
-          %Routex.Extension.AlternativeGetters{
-            slug: unquote(pattern) |> Routex.Match.to_binary(),
-            attrs: unquote(attrs |> Macro.escape())
-          }
-        end
-      end)
-
-    route
-    |> Routex.Match.new()
-    |> Routex.Match.to_func(:alternatives, alternatives)
   end
 end

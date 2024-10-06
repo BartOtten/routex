@@ -92,12 +92,7 @@ defmodule Routex.Extension.Alternatives do
 
     routes =
       for route <- routes do
-        if route.verb in @expandable_route_methods do
-          route
-          |> expand_route(config)
-        else
-          route
-        end
+        if route.verb in @expandable_route_methods, do: expand_route(route, config), else: route
       end
 
     List.flatten(routes)

@@ -172,10 +172,8 @@ defmodule Routex.Extension.VerifiedRoutes do
       if Enum.any?(config, fn {_, mapping} -> mapping.phoenix == mapping.routex end),
         do: [
           """
-          -- Notice --
-          Due to the configuration in module `#{inspect(config_module)}` this project includes
-          Verified Route macro's that replace the official Phoenix variants.
-          -----------\n
+          \nDue to the configuration in module `#{inspect(config_module)}` one or multiple Routex variants
+          use the name of their official counterpart.
           """
         ]
 
@@ -184,12 +182,13 @@ defmodule Routex.Extension.VerifiedRoutes do
     IO.puts("")
 
     Routex.Utils.print([
-      warning_msg,
       """
-      While the Native Verified Routes macro's directly delegate to
-      the official Phoenix macro's, the Routex variants apply route
-      transfomations and/or automated branching before delegation.
+      \n-- Notice --
+      This project uses Routex generated variants of the official Phoenix Verifies Routes.
+      While the Native variants directly delegate to the official Phoenix macro's, the
+      Routex variants apply route transfomations and/or automated branching before delegation.
       """,
+      warning_msg,
       macro_names_table,
       """
       Documentation: https://hexdocs.pm/routex/extensions/verified_routes.html
@@ -224,12 +223,12 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
 
   defp table(config) do
-    heading = row(["Routex", "Native"])
+    heading = row(["Native", "Routex"])
     divider = row([String.duplicate("-", @cell_width * 2 + 1)])
 
     body =
       for {_config_key, %{phoenix: _phoenix, routex: routex, native: native}} <- config do
-        [routex, native] |> row()
+        [native, routex] |> row()
       end
 
     ["\n", heading, divider, body, "\n"]
@@ -249,7 +248,7 @@ defmodule Routex.Extension.VerifiedRoutes do
       do: clause_transformer(route, ast)
 
     def clause_transformer(route, {:<<>>, _, segments}),
-				do: clause_segments_transformer(route, segments)
+      do: clause_segments_transformer(route, segments)
 
     def clause_segments_transformer(route, segments) do
       orig_record = route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()

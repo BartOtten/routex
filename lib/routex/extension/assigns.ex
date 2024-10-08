@@ -15,12 +15,12 @@ defmodule Routex.Extension.Assigns do
     extensions: [
   +   Routex.Extension.Assigns,
   ],
-  + assigns: %{namespace: :rtx, attrs: [:scope_helper, :locale, :contact, :name]}
+  + assigns: %{namespace: :rtx, attrs: [:branch_helper, :locale, :contact, :name]}
   ```
 
   ## Pseudo result
       # in (h)eex template
-      @rtx.scope_helper   ⇒  "eu_nl"
+      @rtx.branch_helper   ⇒  "eu_nl"
       @rtx.locale         ⇒  "nl"
       @rtx.contact        ⇒  "verkoop@example.nl"
       @rtx.name           ⇒  "The Netherlands"
@@ -33,7 +33,7 @@ defmodule Routex.Extension.Assigns do
   - assigns
 
   ## Example use case
-  Combine with `Routext.Extension.Alternatives` to make compile time, scope
+  Combine with `Routext.Extension.Alternatives` to make compile time, branch
   bound assigns available to components and controllers.
   """
 

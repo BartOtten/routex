@@ -37,7 +37,7 @@ defmodule Routex.Extension.RouteHelpers do
   ```
 
   ## Pseudo result
-      # When alternatives are created it uses auto-selection to keep the user 'in scope'.
+      # When alternatives are created it uses auto-selection to keep the user 'in branch'.
 
       # in (h)eex template
       <a href={Routes.product_index_path(@socket, :show, product)}>Product #1</a>

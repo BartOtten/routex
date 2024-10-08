@@ -37,7 +37,7 @@ Verified Routes.
   _website.com/[locale]/page_)
 - Translation: URLs [match the language of content](#multilingual-routes);
   enhancing user engagement and content relevance.
-- Assigns: the value of `locale` is specified per scope by the configuration of
+- Assigns: the value of `locale` is specified per branch by the configuration of
   the Alternatives extension.  The value is made available in components and
   controllers in namespace `loc` as `@loc.locale`
 - Branching Verified Routes allows you to use use
@@ -66,8 +66,8 @@ The documentation of each extension lists any provided or required
 
 ### Alternatives
 
-Create alternative routes based on `scopes` configured in a Routex backend
-module. Scopes can be nested and each scope can provide it's own attributes to
+Create alternative routes based on `branches` configured in a Routex backend
+module. Branches can be nested and each branch can provide it's own attributes to
 be shared with other extensions.
 
 [Alternatives Documentation](`Routex.Extension.Alternatives`)
@@ -97,7 +97,7 @@ attribute used by the Translations extension.
 ### Verified Routes
 
 This extension creates a sigil (default: `~l`) with the ability to branch based
-on the current alternative scope of a user. It is able to verify routes even
+on the current alternative branch of a user. It is able to verify routes even
 when thy have been transformed by Routex extensions. Optionally this sigil can
 be set to `~p` (Phoenix' default) as it is a drop-in replacement.
 
@@ -108,7 +108,7 @@ It also provides branching variants of `url/{2,3,4}` and `path/{2,3}`.
 ### Route Helpers
 
 Creates Phoenix Helpers that have the ability to branch based on the current
-alternative scope of a user. Optionally these helpers can replace the original
+alternative branch of a user. Optionally these helpers can replace the original
 Phoenix Route Helpers as they are drop-ins.
 
 [Route Helpers Documentation](`Routex.Extension.RouteHelpers`)
@@ -162,10 +162,10 @@ Localized Routes has stagnated in its development, developers are strongly
 advised to transition to Routex for a more robust solution.
 
 When considering `Routex` against `CLDR Routes`, it's akin to comparing Apple to
-Linux. CLDR Routes maintains a fixed scope and enjoys a shared configuration
-with other CLDR packages. Routex on the other hand boasts a dynamic scope
+Linux. CLDR Routes maintains a fixed branch and enjoys a shared configuration
+with other CLDR packages. Routex on the other hand boasts a dynamic branch
 providing maximum freedom. Its primary advantages over CLDR Routes include its
-expansive scope facilitated by its extension mechanism and the minimized
+expansive branch facilitated by its extension mechanism and the minimized
 necessity for code modifications throughout a codebase.
 
 ### History
@@ -202,7 +202,7 @@ solutions.
 
 | Feature             | Routex     | PLR        | CLDR Routes |
 |---------------------|------------|------------|-------------|
-| Scope detection     | URL   [^1] | Session    | Session     |
+| Branch detection     | URL   [^1] | Session    | Session     |
 | Route encapsulation | Free  [^2] | Restricted | Restricted  |
 | Route manipulation  | Full  [^3] | Limited    | Limited     |
 | Route interpolation | Free       | -          | Limited     |
@@ -215,9 +215,9 @@ solutions.
 | Modular             | X          |            | -           |
 | Extendable          | X          |            | -           |
 
-[^1]: Routex uses pattern matching to match the current URL to a scope
+[^1]: Routex uses pattern matching to match the current URL to a branch
 [^2]: Routex' `preprocesss_using` can encapsulate any code / is not bound within
-    (session) scopes
+    (session) branches
 [^3]: [Crazy example](https://github.com/BartOtten/routex/blob/main/lib/routex/extension/cloak.ex)
 [^4]: Routex *can* be configured to shim original Phoenix functionality (for
     example: `~p` and `url/2`) while CLDR Routes mandates code modifications

@@ -63,7 +63,7 @@ defmodule Routex.Router do
     Macro.postwalk(ast, fn
       node = {method, _opts, _args} when method in @supported_methods ->
         backend = Macro.expand_once(backend, __CALLER__)
-        wrap_in_scope(node, backend, opts)
+        wrap_in_branch(node, backend, opts)
 
       {{:., _, [Kernel, :to_string]}, _, [{binding, _, _}]} ->
         quote do: "[rtx.#{unquote(binding)}]"
@@ -81,7 +81,7 @@ defmodule Routex.Router do
   # :resources lack the :private option and their line numbers after expansion
   # do not match the line number of their 'parent' definition.
 
-  defp wrap_in_scope(node, backend, opts) do
+  defp wrap_in_branch(node, backend, opts) do
     quote do
       scope path: "/",
             private: %{

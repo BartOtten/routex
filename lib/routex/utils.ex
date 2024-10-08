@@ -10,21 +10,21 @@ defmodule Routex.Utils do
   @spec print(input :: iodata) :: binary
   def print(input), do: IO.puts([">> " | input])
 
-  @spec get_scope_from_process_ast(log_level :: atom) :: Macro.output()
-  def get_scope_from_process_ast(log_level) do
+  @spec get_branch_from_process_ast(log_level :: atom) :: Macro.output()
+  def get_branch_from_process_ast(log_level) do
     quote do
       require Logger
 
-      case scope = Process.get(:rtx_scope, :not_found) do
+      case branch = Process.get(:rtx_branch, :not_found) do
         :not_found ->
           Logger.unquote(log_level)(
-            "No helper AST and no proces key `:rtx_scope` found. Fallback to `0`"
+            "No helper AST and no proces key `:rtx_branch` found. Fallback to `0`"
           )
 
           0
 
         _ ->
-          scope
+          branch
       end
     end
   end
@@ -87,10 +87,10 @@ defmodule Routex.Utils do
         end
 
       ExUnit.Callbacks in caller.requires ->
-        get_scope_from_process_ast(:info)
+        get_branch_from_process_ast(:info)
 
       true ->
-        get_scope_from_process_ast(:warning)
+        get_branch_from_process_ast(:warning)
     end
   end
 end

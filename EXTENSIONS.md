@@ -57,14 +57,14 @@ structure.
 
 **Example**
 The Alternatives extension uses nested options and allows inheritance
-of properties from parent scopes.
+of properties from parent branches.
 
 ```
 alternatives: %{
   "/" =>
     helper: nil,
     locale: "en",
-    scopes: %{
+    branches: %{
       "nl" => %{
           helper: "nl",
           locale: "nl"
@@ -77,7 +77,7 @@ alternatives: %{
 ```
 The Alternatives module is therefor responsible for flattening those for
 (itself and) other extensions to use. To take the route responsible for the
-"gb" scope as an example, the extension should add flattened attributes in the
+"gb" branch as an example, the extension should add flattened attributes in the
 Route struct. It can do so using the helper function `Routex.Attrs.put/2`.
 
 ```

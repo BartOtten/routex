@@ -18,7 +18,7 @@ defmodule Routex.Extension.Interpolation do
 
   ## Pseudo result
       # in combination with Routex.Extension.Alternatives with auto prefix
-      # disabled and 3 scopes. It splits the routes and sets the :locale
+      # disabled and 3 branches. It splits the routes and sets the :locale
       # attribute which is used for interpolation.
 
                                ⇒ /products/en/:id

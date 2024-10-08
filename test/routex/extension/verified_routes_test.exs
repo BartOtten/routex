@@ -69,7 +69,7 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   import Plug.Test
 
   setup do
-    set_scope(1)
+    set_branch(1)
     :ok
   end
 
@@ -121,11 +121,11 @@ defmodule Routex.Extension.VerifiedRoutesTest do
     %URI{scheme: "https", host: "example.com", port: 123, path: "/api"}
   end
 
-  defp set_scope(nr), do: Process.put(:rtx_scope, nr)
+  defp set_branch(nr), do: Process.put(:rtx_branch, nr)
 
   # Overwrite the Phoenix generated route structs to mimick other extenstions'
   # transformations. See how the original route `posts` is made a alternative
-  # for `postsa` and gets the scope `1`. This aligns with the process key in the
+  # for `postsa` and gets the branch `1`. This aligns with the process key in the
   # setup function. This way we can use the original test cases from Phoenix
   # VerifiedRoutes.
   @routes [
@@ -189,13 +189,13 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   import Router.RoutexHelpers
 
   test "~p preserves path separators from the new route definition" do
-    set_scope(2)
+    set_branch(2)
     assert ~p"/posts/1" == "/alt2/1/postsb/"
     assert ~p"/posts/1?foo=bar" == "/alt2/1/postsb/?foo=bar"
   end
 
-  test "~p with static string, using fallback scope 0" do
-    Process.delete(:rtx_scope)
+  test "~p with static string, using fallback branch 0" do
+    Process.delete(:rtx_branch)
     assert ~p"/posts/1" == "/alt1/1/postsa/"
     assert ~p"/posts/1?foo=bar" == "/alt1/1/postsa/?foo=bar"
   end
@@ -253,7 +253,7 @@ defmodule Routex.Extension.VerifiedRoutesTest do
     assert ~p"/posts/#{struct}?foo=bar" == "/posts/post-123?foo=bar"
   end
 
-  test "~p with scoped host" do
+  test "~p with branchd host" do
     assert ~p"/host_users/1/info" == "/host_users/1/info"
   end
 

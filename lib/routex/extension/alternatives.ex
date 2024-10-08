@@ -1,14 +1,14 @@
 defmodule Routex.Extension.Alternatives do
   @moduledoc """
-  Creates alternative routes based on `scopes` configured in a Routex backend
-  module. Scopes can be nested and each scope can provide `Routex.Attrs` to be shared
+  Creates alternative routes based on `branches` configured in a Routex backend
+  module. Branches can be nested and each branch can provide `Routex.Attrs` to be shared
   with other extensions.
 
   ## Configuration
   ```diff
   # file /lib/example_web/routex_backend.ex
   # This example uses a `Struct` for custom attributes, so there is no attribute inheritance;
-  # only struct defaults. When using maps, nested scopes will inherit attributes from their parent.
+  # only struct defaults. When using maps, nested branches will inherit attributes from their parent.
 
   + defmodule ExampleWeb.RoutexBackend.AltAttrs do
   +  @moduledoc false
@@ -25,10 +25,10 @@ defmodule Routex.Extension.Alternatives do
   + alternatives: %{
   +    "/" => %{
   +      attrs: %AltAttrs{contact: "root@example.com"},
-  +      scopes: %{
+  +      branches: %{
   +        "/europe" => %{
   +          attrs: %AltAttrs{contact: "europe@example.com"},
-  +          scopes: %{
+  +          branches: %{
   +            "/nl" => %{attrs: %AltAttrs{locale: "nl", contact: "verkoop@example.nl"}},
   +            "/be" => %{attrs: %AltAttrs{locale: "nl", contact: "handel@example.be"}}
   +          }
@@ -51,17 +51,17 @@ defmodule Routex.Extension.Alternatives do
 
   **Sets**
   - **any key/value in `:attrs`**
-  - scope_helper
-  - scope_alias
-  - scope_prefix
-  - scope_opts
+  - branch_helper
+  - branch_alias
+  - branch_prefix
+  - branch_opts
   - alternatives (list of `Phoenix.Route.Route`)
   """
   @behaviour Routex.Extension
 
   alias Routex.Attrs
   alias Routex.Extension.Alternatives.Config
-  alias Routex.Extension.Alternatives.Scopes
+  alias Routex.Extension.Alternatives.Branches
   alias Routex.Path
   alias Routex.Route
 
@@ -80,10 +80,10 @@ defmodule Routex.Extension.Alternatives do
 
   @impl Routex.Extension
   def configure(config, _backend) do
-    scopes_nested = Scopes.add_precomputed_values!(config[:alternatives])
-    expansion_config = Config.new!(scopes_nested: scopes_nested)
+    branches_nested = Branches.add_precomputed_values!(config[:alternatives])
+    expansion_config = Config.new!(branches_nested: branches_nested)
 
-    [{:scopes, expansion_config.scopes} | config]
+    [{:branches, expansion_config.branches} | config]
   end
 
   @impl Routex.Extension
@@ -113,25 +113,25 @@ defmodule Routex.Extension.Alternatives do
   defp expand_route(route, config) do
     global_prefix? = Map.get(config, :alternatives_prefix, true)
 
-    for {{_scope, scope_opts}, suborder} <- Enum.with_index(config.scopes) do
+    for {{_branch, branch_opts}, suborder} <- Enum.with_index(config.branches) do
       path_prefix? = Map.get(route.private.routex, :alternatives_prefix, global_prefix?)
 
       path =
         if path_prefix? do
           route.path
-          |> Path.add_prefix(scope_opts.scope_prefix)
+          |> Path.add_prefix(branch_opts.branch_prefix)
           |> String.replace_prefix("//", "/")
         else
           route.path
         end
 
-      helper = helper_name(route.helper, scope_opts.scope_alias)
+      helper = helper_name(route.helper, branch_opts.branch_alias)
 
       %{route | path: path, helper: helper}
-      |> Attrs.merge(scope_opts.attrs)
-      |> Attrs.merge(scope_opts |> Map.from_struct() |> Map.delete(:attrs))
+      |> Attrs.merge(branch_opts.attrs)
+      |> Attrs.merge(branch_opts |> Map.from_struct() |> Map.delete(:attrs))
       |> Attrs.update(:__order__, &List.insert_at(&1, -1, suborder))
-      |> Attrs.put(:scope_helper, scope_opts.attrs.scope_helper)
+      |> Attrs.put(:branch_helper, branch_opts.attrs.branch_helper)
     end
   end
 

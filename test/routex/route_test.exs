@@ -14,7 +14,7 @@ defmodule Routex.RouteTest do
     assert [] == Route.get_nesting(route, -1)
   end
 
-  test "group_by_nesting within a scope" do
+  test "group_by_nesting within a branch" do
     routes = [
       %Phoenix.Router.Route{
         path: "/",
@@ -78,7 +78,7 @@ defmodule Routex.RouteTest do
     assert expected == Route.group_by_nesting(routes)
   end
 
-  test "group_by_nesting without a scope" do
+  test "group_by_nesting without a branch" do
     routes = [
       %Phoenix.Router.Route{
         path: "/page",
@@ -129,7 +129,7 @@ defmodule Routex.RouteTest do
     assert expected == Route.group_by_nesting(routes)
   end
 
-  test "group_by_method_and_path in a scope" do
+  test "group_by_method_and_path in a branch" do
     routes = [
       %Phoenix.Router.Route{
         path: "/",
@@ -217,7 +217,7 @@ defmodule Routex.RouteTest do
     assert expected == Route.group_by_method_and_path(routes)
   end
 
-  test "group_by_method_and_path outside a scope" do
+  test "group_by_method_and_path outside a branch" do
     routes = [
       %Phoenix.Router.Route{
         path: "/page",
@@ -293,7 +293,7 @@ defmodule Routex.RouteTest do
     assert expected == Route.group_by_method_and_path(routes)
   end
 
-  test "group_by_method_and_origin outside a scope" do
+  test "group_by_method_and_origin outside a branch" do
     routes = [
       %Phoenix.Router.Route{
         path: "/page",

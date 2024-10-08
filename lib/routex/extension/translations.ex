@@ -40,7 +40,7 @@ defmodule Routex.Extension.Translations do
   This extension can be combined with `Routext.Extension.Alternatives` to create
   multilingual routes.
 
-  Use Alternatives to create new scopes and provide a `:language` or `:locale` per scope and
+  Use Alternatives to create new branches and provide a `:language` or `:locale` per branch and
   Translations to translate the alternative routes.
 
                           ⇒ /products/:id/edit                  language: "en"

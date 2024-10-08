@@ -35,8 +35,8 @@ defmodule Routex.Extension.AttrGetters do
     backend: ExampleWeb.LocalizedRoutes,
     contact: "verkoop@example.nl",
     locale: "nl",
-    scope_name: "The Netherlands",
-    scope_helper: "europe_nl",
+    branch_name: "The Netherlands",
+    branch_helper: "europe_nl",
   }
   ```
   """

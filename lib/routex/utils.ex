@@ -10,6 +10,9 @@ defmodule Routex.Utils do
   @spec print(input :: iodata) :: binary
   def print(input), do: IO.puts([">> " | input])
 
+	@doc """
+	Returns the AST to get the current branch from the process dictionary
+	"""
   @spec get_branch_from_process_ast(log_level :: atom) :: Macro.output()
   def get_branch_from_process_ast(log_level) do
     quote do
@@ -30,7 +33,8 @@ defmodule Routex.Utils do
   end
 
   @doc """
-  Returns the ast to get the last value in the order list
+  Returns the AST to get the current branch from assigns, conn or socket based on the available
+	variables in the __CALLER__ module.
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
   def get_helper_ast(caller) do

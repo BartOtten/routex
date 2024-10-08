@@ -44,6 +44,7 @@ defmodule Routex.Extension.AttrGetters do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
+  alias Routex.Matchable
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
@@ -54,7 +55,7 @@ defmodule Routex.Extension.AttrGetters do
         """
         def attrs(url) when is_binary(url) do
           url
-          |> Routex.Match.new()
+          |> Matchable.new()
           |> attrs()
         end
       end
@@ -64,8 +65,8 @@ defmodule Routex.Extension.AttrGetters do
         attributes = route |> Attrs.get() |> Macro.escape()
 
         route
-        |> Routex.Match.new()
-        |> Routex.Match.to_func(:attrs, attributes)
+        |> Matchable.new()
+        |> Matchable.to_func(:attrs, attributes)
       end
       |> List.flatten()
 

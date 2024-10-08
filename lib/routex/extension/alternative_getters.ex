@@ -50,6 +50,7 @@ defmodule Routex.Extension.AlternativeGetters do
 
   alias Routex.Attrs
   alias Routex.Route
+  alias Routex.Matchable
 
   defstruct [:slug, :attrs]
 
@@ -58,7 +59,7 @@ defmodule Routex.Extension.AlternativeGetters do
     prelude =
       quote do
         def alternatives(url) when is_binary(url) do
-          uri = Routex.Match.new(url)
+          uri = Matchable.new(url)
           alternatives(uri)
         end
       end
@@ -72,7 +73,7 @@ defmodule Routex.Extension.AlternativeGetters do
 
         _function_ast =
           for route <- siblings do
-            Routex.Match.new(route) |> Routex.Match.to_func(:alternatives, body_ast)
+            Matchable.new(route) |> Matchable.to_func(:alternatives, body_ast)
           end
       end
 
@@ -80,12 +81,12 @@ defmodule Routex.Extension.AlternativeGetters do
   end
 
   defp map_ast(route) do
-    pattern = route |> Routex.Match.new() |> Routex.Match.to_pattern()
+    pattern = route |> Matchable.new() |> Matchable.to_pattern()
     attrs = Attrs.get(route)
 
     quote do
       %Routex.Extension.AlternativeGetters{
-        slug: unquote(pattern) |> Routex.Match.to_binary(),
+        slug: unquote(pattern) |> Matchable.to_binary(),
         attrs: unquote(Macro.escape(attrs))
       }
     end

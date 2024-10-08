@@ -86,6 +86,8 @@ defmodule Routex.Extension.VerifiedRoutes do
   - none
   """
 
+  alias Routex.Matchable
+
   require Logger
   require Phoenix.VerifiedRoutes
   require Routex.Branching
@@ -251,10 +253,10 @@ defmodule Routex.Extension.VerifiedRoutes do
       do: clause_segments_transformer(route, segments)
 
     def clause_segments_transformer(route, segments) do
-      orig_record = route |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
-      arg_record = segments |> Routex.Match.new()
+      orig_record = route |> Routex.Attrs.get!(:__origin__) |> Matchable.new()
+      arg_record = segments |> Matchable.new()
 
-      if Routex.Match.match?(orig_record, arg_record) do
+      if Matchable.match?(orig_record, arg_record) do
         Routex.Attrs.get!(route, :__order__) |> List.last()
       else
         :skip
@@ -275,12 +277,12 @@ defmodule Routex.Extension.VerifiedRoutes do
     end
 
     def argument_segments_transformer(pattern, segments) do
-      orig_record = pattern |> Routex.Attrs.get!(:__origin__) |> Routex.Match.new()
-      orig_pattern = orig_record |> Routex.Match.to_pattern()
-      new_pattern = pattern |> Routex.Match.new() |> Routex.Match.to_pattern()
-      arg_record = segments |> Routex.Match.new()
+      orig_record = pattern |> Routex.Attrs.get!(:__origin__) |> Matchable.new()
+      orig_pattern = orig_record |> Matchable.to_pattern()
+      new_pattern = pattern |> Matchable.new() |> Matchable.to_pattern()
+      arg_record = segments |> Matchable.new()
 
-      if Routex.Match.match?(orig_record, arg_record) do
+      if Matchable.match?(orig_record, arg_record) do
         ast =
           quote do
             unquote(orig_pattern) = unquote(Macro.escape(arg_record))
@@ -288,7 +290,7 @@ defmodule Routex.Extension.VerifiedRoutes do
           end
 
         {new_segments, _bindings} = Code.eval_quoted(ast)
-        Routex.Match.to_ast_segments(new_segments)
+        Matchable.to_ast_segments(new_segments)
       else
         :skip
       end

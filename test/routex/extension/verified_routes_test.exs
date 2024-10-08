@@ -637,7 +637,7 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   # test "~p does not warn if route without warn_on_verify: true matches first" do
   #   warnings =
   #     ExUnit.CaptureIO.capture_io(:stderr, fn ->
-  #       defmodule VerifyFalseTrueMatchesFirst do
+  #       defmodule VerifyFalseTrueMatchableesFirst do
   #         use Phoenix.VerifiedRoutes,
   #           endpoint: unquote(@endpoint),
   #           router: CatchAllWarningRouter

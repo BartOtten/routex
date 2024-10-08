@@ -1,4 +1,4 @@
-defmodule MatchTest.Constants do
+defmodule MatchableTest.Constants do
   @moduledoc """
   A module to be use'd to import shared attributes
   """
@@ -50,43 +50,43 @@ defmodule MatchTest.Constants do
   end
 end
 
-defmodule MatchTest.Setup do
+defmodule MatchableTest.Setup do
   @moduledoc """
    Creates a module used for testing compiled functions and patterns.
   """
-  use MatchTest.Constants
-  alias Routex.Match
+  use MatchableTest.Constants
+  alias Routex.Matchable
 
   # create a compiled module which we can use for matching. The module has tre functions: recompose/2, route/1 and testvar/2.
   route_definition_ast = quote do: unquote(@route |> Macro.escape())
-  recompose_ast_sp = quote do: unquote(Match.to_pattern(@product_route_spanish))
-  recompose_ast_nl = quote do: unquote(Match.to_pattern(@product_route_dutch))
-  binding_ast = quote do: "binding_is_" <> unquote(Macro.var(:var, Match))
+  recompose_ast_sp = quote do: unquote(Matchable.to_pattern(@product_route_spanish))
+  recompose_ast_nl = quote do: unquote(Matchable.to_pattern(@product_route_dutch))
+  binding_ast = quote do: "binding_is_" <> unquote(Macro.var(:var, Matchable))
 
   ast = [
-    Match.to_func(@route, :recompose, [var: "nl"], recompose_ast_nl),
-    Match.to_func(@route, :recompose, [var: "sp"], recompose_ast_sp),
+    Matchable.to_func(@route, :recompose, [var: "nl"], recompose_ast_nl),
+    Matchable.to_func(@route, :recompose, [var: "sp"], recompose_ast_sp),
     quote do
       def recompose(input) when is_tuple(input), do: {:not_found, input}
       def recompose(input), do: {:error, :invalid_input_format}
     end,
-    Match.to_func(@route, :route, route_definition_ast),
+    Matchable.to_func(@route, :route, route_definition_ast),
     quote do
       def route(input) when is_tuple(input), do: {:not_found, input}
       def route(input), do: {:error, :invalid_input_format}
     end,
-    Match.to_func(@route, :testvar, [:var], binding_ast)
+    Matchable.to_func(@route, :testvar, [:var], binding_ast)
   ]
 
-  Module.create(MatchTest.Setup.Compiled, ast, __ENV__)
+  Module.create(MatchableTest.Setup.Compiled, ast, __ENV__)
 end
 
-defmodule MatchTest do
+defmodule MatchableTest do
   use ExUnit.Case
-  use MatchTest.Constants
+  use MatchableTest.Constants
 
   alias __MODULE__.Setup.Compiled
-  alias Routex.Match
+  alias Routex.Matchable
 
   def route(input), do: Map.merge(%Phoenix.Router.Route{}, Map.new(input))
   def ast(input), do: {:<<>>, [], input}
@@ -96,7 +96,7 @@ defmodule MatchTest do
       routes = [route(path: "/some"), "/some", {:<<>>, [], ["/some"]}]
 
       for route <- routes do
-        assert Match.new(route) == {:match, [], ["/", "some"], [], []}
+        assert Matchable.new(route) == {:match, [], ["/", "some"], [], []}
       end
     end
 
@@ -108,19 +108,21 @@ defmodule MatchTest do
       ]
 
       for route <- routes do
-        assert Match.new(route) == {:match, [], ["/"], [], []}
+        assert Matchable.new(route) == {:match, [], ["/"], [], []}
       end
     end
 
     test "correctly splits query and fragment parts" do
       route = "/products/1?foo=bar#top"
-      assert Match.new(route) == {:match, [], ["/", "products", "/", "1"], ["?foo=bar"], ["#top"]}
+
+      assert Matchable.new(route) ==
+               {:match, [], ["/", "products", "/", "1"], ["?foo=bar"], ["#top"]}
     end
 
     test "correctly splits query part in AST node" do
       static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
 
-      assert Match.new(static_route) ==
+      assert Matchable.new(static_route) ==
                {:match, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#", "top"]}
 
       dynamic_route =
@@ -135,7 +137,7 @@ defmodule MatchTest do
           "#top"
         ])
 
-      assert Match.new(dynamic_route) ==
+      assert Matchable.new(dynamic_route) ==
                {
                  :match,
                  [],
@@ -161,8 +163,8 @@ defmodule MatchTest do
 
         result =
           uri
-          |> Match.new()
-          |> Match.to_binary()
+          |> Matchable.new()
+          |> Matchable.to_binary()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -177,10 +179,10 @@ defmodule MatchTest do
       matching = @uri_matches ++ @sigil_matches
 
       for uri <- matching do
-        m1 = Routex.Match.new(@route)
-        m2 = Routex.Match.new(uri)
+        m1 = Matchable.new(@route)
+        m2 = Matchable.new(uri)
 
-        assert Routex.Match.match?(m1, m2) == true,
+        assert Matchable.match?(m1, m2) == true,
                "#{inspect(uri, pretty: true)} does not match #{inspect(@route, pretty: true)} \n\n m1: #{inspect(m1, pretty: true)}\n m2: #{inspect(m2, pretty: true)}"
       end
     end
@@ -194,9 +196,9 @@ defmodule MatchTest do
 
         result =
           uri
-          |> Match.new()
+          |> Matchable.new()
           |> Compiled.recompose("sp")
-          |> Match.to_binary()
+          |> Matchable.to_binary()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -205,9 +207,9 @@ defmodule MatchTest do
 
         result =
           uri
-          |> Match.new()
+          |> Matchable.new()
           |> Compiled.recompose("nl")
-          |> Match.to_binary()
+          |> Matchable.to_binary()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -221,14 +223,14 @@ defmodule MatchTest do
       # given variable name.
       route_match =
         @route
-        |> Match.new()
+        |> Matchable.new()
 
       result = Compiled.testvar(route_match, "var-value")
       assert result == "binding_is_var-value"
     end
 
     test "non-matching route returns the value from the defined catch-all function" do
-      route_mismatch = route(path: "/non-matching") |> Match.new()
+      route_mismatch = route(path: "/non-matching") |> Matchable.new()
       result = Compiled.route(route_mismatch)
       assert {:not_found, {:match, [], ["/", "non-matching"], [], []}} == result
 

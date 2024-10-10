@@ -58,7 +58,7 @@ defmodule Routex.Extension.Alternatives.Branches do
 
   @spec attr_values(branches, list(atom | binary)) :: list({atom | binary, any})
   def attr_values(branches, keys) when is_list(keys) do
-    branches |> aggregate_attrss(keys) |> Enum.uniq()
+    branches |> aggregate_attrs(keys) |> Enum.uniq()
   end
 
   # takes a nested map of maps and returns a flat map with concatenated keys, aliases and prefixes.
@@ -174,8 +174,8 @@ defmodule Routex.Extension.Alternatives.Branches do
   def maybe_compute_nested_branches(%Branch.Nested{} = branch_struct, %{} = _branch_map),
     do: branch_struct
 
-  @spec aggregate_attrss(branches, list(binary | atom), list) :: list
-  def aggregate_attrss(branches, keys, acc \\ []) do
+  @spec aggregate_attrs(branches, list(binary | atom), list) :: list
+  def aggregate_attrs(branches, keys, acc \\ []) do
     branches
     |> Enum.reduce(acc, fn
       {_slug, %{attrs: attrs}}, acc ->

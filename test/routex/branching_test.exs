@@ -9,7 +9,7 @@ defmodule Routex.BranchingTest.OriginalMacros do
     end
   end
 
-	defmacro original_macro(path_segments, other_path_segments) do
+  defmacro original_macro(path_segments, other_path_segments) do
     quote do
       unquote(Path.join([path_segments, other_path_segments]))
     end
@@ -22,8 +22,8 @@ defmodule Routex.BranchingTest.Routex do
   """
 
   # current level
+  # into branching ast level
   match_binding =
-		# into branching ast level
     quote do
       # into caller level
       quote do
@@ -72,7 +72,7 @@ defmodule Routex.BranchingTest.MyModule do
     original_macro(["/my/macro", "/path"])
   end
 
-	 def original(variant, _v2) do
+  def original(variant, _v2) do
     _ = variant
     original_macro(["/my/macro", "/path"], ["foo"])
   end
@@ -82,7 +82,7 @@ defmodule Routex.BranchingTest.MyModule do
     branched_macro(["/my/macro", "/path"])
   end
 
-	def branched(variant, _v2) do
+  def branched(variant, _v2) do
     _ = variant
     branched_macro(["/my/macro", "/path"], ["foo"])
   end
@@ -94,16 +94,16 @@ defmodule Routex.BranchingTest do
 
   test "original" do
     assert Routex.BranchingTest.MyModule.original("en") == "/my/macro/path"
-		assert Routex.BranchingTest.MyModule.original("en", "other") == "/my/macro/path/foo"
+    assert Routex.BranchingTest.MyModule.original("en", "other") == "/my/macro/path/foo"
   end
 
   test "branching nl" do
     assert Routex.BranchingTest.MyModule.branched("nl") == "/europe/nl/my/macro/path"
-		assert Routex.BranchingTest.MyModule.branched("nl", "other") == "/europe/nl/my/macro/path/foo"
+    assert Routex.BranchingTest.MyModule.branched("nl", "other") == "/europe/nl/my/macro/path/foo"
   end
 
   test "branching en" do
     assert Routex.BranchingTest.MyModule.branched("en") == "/europe/en/my/macro/path"
-		assert Routex.BranchingTest.MyModule.branched("en", "other") == "/europe/en/my/macro/path/foo"
+    assert Routex.BranchingTest.MyModule.branched("en", "other") == "/europe/en/my/macro/path/foo"
   end
 end

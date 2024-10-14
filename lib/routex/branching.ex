@@ -69,7 +69,10 @@ defmodule Routex.Branching do
         else: "{#{Enum.join(arities, ",")}}"
 
     mod_name = module |> Module.split() |> Enum.join(".")
-    Utils.print("Generate branching variant of: #{mod_name}.#{fun}/#{arities_str}")
+
+    Utils.print(
+      "Generate branching variant of: #{mod_name}.#{fun}/#{arities_str} => #{as_fun}/#{arities_str}"
+    )
 
     for arity <- arities do
       # The value of option :arg_pos is at this point a function which defines

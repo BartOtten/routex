@@ -2,6 +2,7 @@ defmodule Routex.Extension.InterpolationTest do
   use ExUnit.Case
 
   alias Phoenix.Router.Route
+  alias Routex.Attrs
 
   import Routex.Extension.Interpolation
 
@@ -58,5 +59,10 @@ defmodule Routex.Extension.InterpolationTest do
              {{:get, "/path/en"},
               [%{verb: :get, path: "/path/en"}, %{verb: :get, path: "/path/en"}]}
            ] = exception.duplicated
+  end
+
+  test "sets origin without interpolation syntax" do
+    routes = transform(@routes, nil, nil)
+    assert routes |> Enum.at(0) |> Attrs.get(:__origin__) == "/path"
   end
 end

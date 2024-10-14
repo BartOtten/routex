@@ -123,7 +123,7 @@ defmodule Routex.Extension.Translations do
         @catch_all -> nil
         @interpolate <> _rest -> nil
         segment when not is_binary(segment) -> nil
-        segment -> quote do: unquote(backend).dgettext(unquote(domain), unquote(segment))
+        segment -> quote do: Gettext.dgettext(unquote(backend), unquote(domain), unquote(segment))
       end)
 
     [prelude | triggers_ast]

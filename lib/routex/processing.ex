@@ -5,8 +5,8 @@ defmodule Routex.Processing do
   the `transform` callbacks from extensions to transform `Phoenix.Router.Route`
   structs and `create_helpers` callbacks to create one unified Helper module.
 
-  **Powerful but thin** Although
-  Routext is able to influence the routes in Phoenix applications in profound
+  **Powerful but thin**
+  Although Routext is able to influence the routes in Phoenix applications in profound
   ways, the framework and it's extensions are a suprisingly lightweight piece
   of compile-time middleware. This is made possible by the way router modules
   are pre-processed by `Phoenix.Router` itself.

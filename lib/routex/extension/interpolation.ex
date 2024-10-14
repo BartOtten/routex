@@ -1,7 +1,7 @@
 defmodule Routex.Extension.Interpolation do
   @moduledoc ~S"""
   A route may be defined with a routes `Routex.Attrs` interpolated
-  into it. These interpolations are specified using the normal #{}
+  into it. These interpolations are specified using the usual `#{variable}`
   interpolation syntax.
 
   > #### In combination with... {: .info}
@@ -9,6 +9,12 @@ defmodule Routex.Extension.Interpolation do
   > want to disable auto prefixing for the whole Routex backend (see
   > `Routex.Extension.Alternatives`) or per route (see `Routex`for
   > instructions).
+
+  > #### Naked base route {: .warn}
+  > The route as specified in the Router will be stripped from any
+  > interpolation syntax. Variants with interpolation branch of this route.
+  > This allows you to still use uninterpolated routes in your templates, have them
+  > verified with Verified Routes while using interpolated routes at run time.
 
   ## Usage
   ```diff
@@ -21,9 +27,9 @@ defmodule Routex.Extension.Interpolation do
       # disabled and 3 branches. It splits the routes and sets the :locale
       # attribute which is used for interpolation.
 
-                               ⇒ /products/en/:id
-      /products/#{locale}/:id/ ⇒ /products/fr/:id
-                               ⇒ /products/fr/:id
+                     ⇒ /products/en/:id
+      /products/:id/ ⇒ /products/fr/:id
+                     ⇒ /products/fr/:id
 
   ## `Routex.Attrs`
   **Requires**
@@ -85,7 +91,7 @@ defmodule Routex.Extension.Interpolation do
   require Logger
 
   @behaviour Routex.Extension
-  @interpolate ~r/\[rtx\.(\w+)\]/
+  @interpolate ~r/(\[rtx\.(\w+)\])/
 
   @impl Routex.Extension
   def transform(routes, _backend, _env) do
@@ -95,9 +101,16 @@ defmodule Routex.Extension.Interpolation do
   end
 
   defp interpolate(route) do
-    path =
-      Regex.replace(@interpolate, route.path, fn _full, c1 ->
-        key = c1 |> String.to_atom()
+    origin =
+      "/" <>
+        (Regex.replace(@interpolate, route.path, "")
+         |> String.trim_leading("/")
+         |> String.trim_trailing("/")
+         |> String.replace("//", "/"))
+
+    interpolated_path =
+      Regex.replace(@interpolate, route.path, fn _full, _interpolation, attr ->
+        key = attr |> String.to_atom()
 
         Attrs.get!(
           route,
@@ -107,7 +120,22 @@ defmodule Routex.Extension.Interpolation do
         |> to_string()
       end)
 
-    %{route | path: path}
+    # when the path requires interpolated we also generate one without as this is the one used in templates.
+    # for example: /#{region/products => "/products"
+    # the interpolated route is made a child of this route
+
+    interpolated_path =
+      if Attrs.get(route, :__order__) |> List.last() == 0 do
+        origin
+      else
+        interpolated_path
+      end
+
+    if interpolated_path != route.path do
+      %{route | path: interpolated_path} |> Attrs.put(:__origin__, origin)
+    else
+      route
+    end
   end
 
   defp check_uniqness!(routes) do

@@ -52,15 +52,15 @@ defmodule Routex.Extension.VerifiedRoutes do
   +   Routex.Extension.VerifiedRoutes,
   ],
   + verified_sigil_routex: "~p",
-  + verified_sigil_native: "~o",
+  + verified_sigil_phoenix: "~o",
   + verified_url_routex: :url,
-  + verified_url_native: :url_native,
+  + verified_url_phoenix: :url_native,
   + verified_path_routex: :path,
-  + verified_path_nativel: :path_native,
+  + verified_path_phoenix: :path_native,
   ```
 
   ## Pseudo result (simplified)
-      # given Routex is configured to use ~r
+      # given Routex is configured to use ~l
       # given Phoenix is assigned ~o (for example clarity)
 
       # given other extensions have caused a route transformation
@@ -69,7 +69,6 @@ defmodule Routex.Extension.VerifiedRoutes do
 
       # given another extension has generated branches / alternative routes
       ~o"/products/#{product}"  ⇒  ~p"/products/#{products}"
-
       ~l"/products/#{product}"  ⇒
               case branch do
                 nil ⇒  ~p"/products/#{product}"

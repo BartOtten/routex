@@ -19,7 +19,8 @@ defmodule Routex.ConfigTest do
           }
         })
 
-      assert %Config{branches: %{nil => _, "foo" => _}} = Config.new!(branches_nested: branches_nested)
+      assert %Config{branches: %{nil => _, "foo" => _}} =
+               Config.new!(branches_nested: branches_nested)
     end
   end
 

@@ -162,47 +162,17 @@ Localized Routes has stagnated in its development, developers are strongly
 advised to transition to Routex for a more robust solution.
 
 When considering `Routex` against `CLDR Routes`, it's akin to comparing Apple to
-Linux. CLDR Routes maintains a fixed branch and enjoys a shared configuration
-with other CLDR packages. Routex on the other hand boasts a dynamic branch
+Linux. CLDR Routes maintains a fixed scope and enjoys a shared configuration
+with other CLDR packages. Routex on the other hand boasts a dynamic scope
 providing maximum freedom. Its primary advantages over CLDR Routes include its
 expansive branch facilitated by its extension mechanism and the minimized
 necessity for code modifications throughout a codebase.
-
-### History
-
-Embarking into 2022, the introduction of `Phoenix Localized Routes` brought an
-innovative approach to route generation within the Phoenix ecosystem. This
-library reimagined website route generation and introduced features such as
-alternative route creation, the ability to translate URL segments using Gettext,
-and easy route based template assignments.
-
-The unveiling of Phoenix Localized Routes (PLR) captured the attention of the
-main author behind CLDR. Recognizing its potential, he discerned that the lack
-of modularity in PLR did not align with the requirements of CLDR. Consequently,
-CLDR forked PLR, birthing `CLDR-routes`, tailored precisely to meet their unique
-objectives. Initially, there was a spirit of collaboration between the two
-endeavors, with shared code fostering mutual progress. However, over time, the
-natural evolution of each project led to increasing disparities, hindering
-further cooperation.
-
-The debut of Phoenix 1.7, featuring verified routes, underscored the challenges
-confronted by maintainers of PLR and CLDR-routes alike. The heavy reliance on
-complex macros posed significant hurdles in adapting to this new
-paradigm. Moreover, the growing divide between their codebases made the exchange
-of solutions impractical.
-
-In response to these obstacles, the creator of PLR took the initiative to
-develop `Routex`. Inspired by the simplicity and versatility of Plug, Routex
-embraces extensions, offering ease of maintenance and seamless integration into
-diverse projects. Its modular design empowers developers to extend functionality
-effortlessly, paving the way for the streamlined development of tailored
-solutions.
 
 ### Comparison table
 
 | Feature             | Routex     | PLR        | CLDR Routes |
 |---------------------|------------|------------|-------------|
-| Branch detection     | URL   [^1] | Session    | Session     |
+| Branch detection    | URL   [^1] | Session    | Session     |
 | Route encapsulation | Free  [^2] | Restricted | Restricted  |
 | Route manipulation  | Full  [^3] | Limited    | Limited     |
 | Route interpolation | Free       | -          | Limited     |

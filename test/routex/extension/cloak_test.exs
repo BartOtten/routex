@@ -22,12 +22,12 @@ defmodule Routex.Extension.CloakTest do
 
     ListAssertions.assert_unordered(
       [
-        %{path: "/c"},
-        %{path: "/c/:id/1"},
-        %{path: "/c/2"},
-        %{path: "/c/:id/3"},
-        %{path: "/c/:id/4"},
-        %{path: "/c/:id/5"}
+        %{path: "/"},
+        %{path: "/:id/1"},
+        %{path: "/2"},
+        %{path: "/:id/3"},
+        %{path: "/:id/4"},
+        %{path: "/:id/5"}
       ],
       transformed_routes
     )

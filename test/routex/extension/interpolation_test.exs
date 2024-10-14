@@ -11,24 +11,24 @@ defmodule Routex.Extension.InterpolationTest do
       line: 1,
       path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/path", language: :nl}}
+      private: %{routex: %{__origin__: "/path/[rtx.language]", language: :nl, __order__: [1, 1]}}
     },
     %Route{
       line: 8,
       path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/path", language: :en}}
+      private: %{routex: %{__origin__: "/path/[rtx.language]", language: :en, __order__: [1, 0]}}
     },
     %Route{
       line: 30,
       path: "/path/new",
       verb: :get,
-      private: %{routex: %{__origin__: "/no/interpolation"}}
+      private: %{routex: %{__origin__: "/no/interpolation", __order__: [2, 0]}}
     }
   ]
 
-  test "should interpolate when attrs provided" do
-    assert [%{path: "/path/nl"}, %{path: "/path/en"}, %{path: "/path/new"}] =
+  test "should interpolate only descendants when attrs provided" do
+    assert [%{path: "/path/nl"}, %{path: "/path"}, %{path: "/path/new"}] =
              transform(@routes, nil, nil)
   end
 
@@ -45,7 +45,7 @@ defmodule Routex.Extension.InterpolationTest do
         line: 20,
         path: "/path/[rtx.language]",
         verb: :get,
-        private: %{routex: %{__origin__: "/foo", language: :en}}
+        private: %{routex: %{__origin__: "/foo", language: :nl, __order__: [3]}}
       }
       | @routes
     ]
@@ -56,8 +56,8 @@ defmodule Routex.Extension.InterpolationTest do
       end
 
     assert [
-             {{:get, "/path/en"},
-              [%{verb: :get, path: "/path/en"}, %{verb: :get, path: "/path/en"}]}
+             {{:get, "/path/nl"},
+              [%{verb: :get, path: "/path/nl"}, %{verb: :get, path: "/path/nl"}]}
            ] = exception.duplicated
   end
 

@@ -120,12 +120,12 @@ defmodule Routex.Extension.Interpolation do
         |> to_string()
       end)
 
-    # when the path requires interpolated we also generate one without as this is the one used in templates.
-    # for example: /#{region/products => "/products"
-    # the interpolated route is made a child of this route
+    # when the path requires interpolation we also generate one without as
+    # this is the one used in templates. For example: /#{region/products => "/products".
+    # The interpolated routes are made descendants of this route
 
     interpolated_path =
-      if Attrs.get(route, :__order__) |> List.last() == 0 do
+      if Attrs.get!(route, :__order__) |> List.last() == 0 do
         origin
       else
         interpolated_path

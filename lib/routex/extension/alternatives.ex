@@ -18,7 +18,7 @@ defmodule Routex.Extension.Alternatives do
   defmodule ExampleWeb.RoutexBackend do
   + alias ExampleWeb.RoutexBackend.AltAttrs
 
-  use Routex,
+  use Routex.Backend,
   extensions: [
   + Routex.Extension.Alternatives
   ],
@@ -62,7 +62,6 @@ defmodule Routex.Extension.Alternatives do
   alias Routex.Attrs
   alias Routex.Extension.Alternatives.Config
   alias Routex.Extension.Alternatives.Branches
-  alias Routex.Path
   alias Routex.Route
 
   @expandable_route_methods [
@@ -118,9 +117,7 @@ defmodule Routex.Extension.Alternatives do
 
       path =
         if path_prefix? do
-          route.path
-          |> Path.add_prefix(branch_opts.branch_prefix)
-          |> String.replace_prefix("//", "/")
+          String.replace_prefix(  branch_opts.branch_prefix <> route.path, "//", "/")
         else
           route.path
         end

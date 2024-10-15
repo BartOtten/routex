@@ -156,7 +156,7 @@ defmodule Routex.Processing do
     end
   end
 
-	defp create_helper_functions(routes, backend, env) do
+  defp create_helper_functions(routes, backend, env) do
     for extension <- backend.extensions(), extension != [] do
       exec_when_defined(backend, extension, :create_helpers, nil, [
         routes,
@@ -203,7 +203,8 @@ defmodule Routex.Processing do
           socket =
             %{
               socket
-              | private: Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
+              | private:
+                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
             }
 
           {:cont,
@@ -220,7 +221,8 @@ defmodule Routex.Processing do
           socket =
             %{
               socket
-              | private: Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
+              | private:
+                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
             }
 
           {:cont,

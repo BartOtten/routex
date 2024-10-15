@@ -7,7 +7,7 @@ defmodule MyAppWeb.RoutexBackend do
   @moduledoc false
   alias Router.Attrs
 
-  use Routex,
+  use Routex.Backend,
     alternatives: %{
       "/" => %{
         attrs: %Attrs{contact: "root@example.com"},
@@ -50,7 +50,7 @@ defmodule MyAppWeb.MultiLangRoutes do
   alias Router.Attrs
 
   use(
-    Routex,
+    Routex.Backend,
     alternatives: %{
       "/" => %{
         attrs: %Attrs{contact: "root@example.com"},

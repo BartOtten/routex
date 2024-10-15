@@ -11,7 +11,7 @@ for module <- modules do
 end
 
 defmodule RtxBackend do
-  use Routex,
+  use Routex.Backend,
     extensions: [Routex.Extension.VerifiedRoutes],
     verified_sigil_routex: "~p",
     verified_sigil_original: "~o"

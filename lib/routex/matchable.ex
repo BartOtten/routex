@@ -13,8 +13,9 @@ defmodule Routex.Matchable do
   @ast_placeholder "_RTX_"
 
   require Record
+  import Record
 
-  Record.defrecord(:match,
+  defrecord(:matchable,
     hosts: [],
     path: [],
     query: [],
@@ -33,13 +34,13 @@ defmodule Routex.Matchable do
      > ast = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
 
   iex> path_match = Routex.Matchable.new(path)
-  {:match, [nil], ["posts", "1"], "foo=bar", "top", false}
+  {:matchable, [nil], ["posts", "1"], "foo=bar", "top", false}
 
   iex> route_match = Routex.Matchable.new(route)
-  {:match, [], ["posts", ":id"], nil, nil, false}
+  {:matchable, [], ["posts", ":id"], nil, nil, false}
 
   iex> ast_match = Routex.Matchable.new(ast)
-  {:match, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
+  {:matchable, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
 
   """
   def new(input) when is_binary(input) do
@@ -89,7 +90,7 @@ defmodule Routex.Matchable do
     query_with_question_mark = nillify(query_with_question_mark)
     fragment_with_hash = nillify(fragment_with_hash)
 
-    match(
+    matchable(
       hosts: authority && List.wrap(authority),
       path: path && split_path(path),
       query: query_with_question_mark && List.wrap(query_with_question_mark),
@@ -98,7 +99,7 @@ defmodule Routex.Matchable do
   end
 
   def new(%Phoenix.Router.Route{} = route) do
-    match(
+    matchable(
       hosts: route.hosts || [],
       path: split_path(route.path)
     )
@@ -127,7 +128,7 @@ defmodule Routex.Matchable do
         {type, v}
       end
 
-    match(
+    matchable(
       path: map.path,
       query: (map.query != [] && ["?" | map.query]) || [],
       fragment: (map.fragment != [] && ["#" | map.fragment]) || []
@@ -238,14 +239,14 @@ defmodule Routex.Matchable do
 
 
   iex> "/original/:arg1/:arg2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
-  {:{}, [], [:match, {:hosts, [], Routex.Matchable}, ["original", {:arg1, [], Routex.Matchable}, {:arg2, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
+  {:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", {:arg1, [], Routex.Matchable}, {:arg2, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
 
   "iex> /recomposed/:arg2/:arg1" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
-  {:{}, [], [:match, {:hosts, [], Routex.Matchable}, ["recomposed", {:arg2, [], Routex.Matchable}, {:arg1, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
+  {:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["recomposed", {:arg2, [], Routex.Matchable}, {:arg1, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
 
 
   iex> "/original/segment_1/segment_2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
-  {:{}, [], [:match, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
+  {:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
   """
 
   def to_pattern(%Phoenix.Router.Route{} = route),
@@ -253,7 +254,7 @@ defmodule Routex.Matchable do
 
   def to_pattern(record) when is_tuple(record) do
     path_ast =
-      Enum.map(match(record, :path), fn
+      Enum.map(matchable(record, :path), fn
         ":" <> name -> quote do: unquote(name |> String.to_atom() |> Macro.var(__MODULE__))
         other -> other
       end)
@@ -263,7 +264,8 @@ defmodule Routex.Matchable do
     fragment_ast = Macro.var(:fragment, __MODULE__)
 
     quote do
-      {:match, unquote(hosts_ast), unquote(path_ast), unquote(query_ast), unquote(fragment_ast)}
+      {:matchable, unquote(hosts_ast), unquote(path_ast), unquote(query_ast),
+       unquote(fragment_ast)}
     end
   end
 
@@ -279,14 +281,14 @@ defmodule Routex.Matchable do
   """
 
   def to_binary(record) do
-    match(path: path, query: query, fragment: fragment) = record
+    matchable(path: path, query: query, fragment: fragment) = record
     Enum.join([path, query, fragment])
   end
 
   def to_ast_segments(record) do
-    s = match(record, :path) || []
-    q = match(record, :query) || []
-    f = match(record, :fragment) || []
+    s = matchable(record, :path) || []
+    q = matchable(record, :query) || []
+    f = matchable(record, :fragment) || []
 
     (s ++ q ++ f)
     |> Enum.reduce([], fn
@@ -311,9 +313,10 @@ defmodule Routex.Matchable do
   iex match?(route_record, failing_record)
   false
   """
-  def match?(r1, r2) do
-    s1 = match(r1, :path)
-    s2 = match(r2, :path)
+
+  def match?(r1, r2) when is_record(r1, :matchable) and is_record(r2, :matchable) do
+    s1 = matchable(r1, :path)
+    s2 = matchable(r2, :path)
 
     {s1, _} =
       Enum.split_while(s1, fn x ->
@@ -345,4 +348,7 @@ defmodule Routex.Matchable do
 
     is_match
   end
+
+  def match?(r1, r2) when not is_record(r1, :matchable), do: __MODULE__.match?(new(r1), r2)
+  def match?(r1, r2) when not is_record(r2, :matchable), do: __MODULE__.match?(r1, new(r2))
 end

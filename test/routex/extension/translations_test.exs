@@ -1,6 +1,6 @@
 defmodule Routex.Extension.TranslationsTest do
   defmodule RtxBackend do
-    use Routex,
+    use Routex.Backend,
       extensions: [Routex.Extension.Translations],
       translations_backend: Routex.Test.Support.Gettext
   end
@@ -17,7 +17,7 @@ defmodule Routex.Extension.TranslationsTest do
     exception =
       assert_raise RuntimeError, fn ->
         defmodule RtxErrorBackend do
-          use(Routex, extensions: [Routex.Extension.Translations])
+          use(Routex.Backend, extensions: [Routex.Extension.Translations])
         end
       end
 

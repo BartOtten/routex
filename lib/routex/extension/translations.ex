@@ -14,7 +14,7 @@ defmodule Routex.Extension.Translations do
   ## Configuration
   ```diff
   defmodule ExampleWeb.RoutexBackend do
-  use Routex,
+  use Routex.Backend,
   extensions: [
   + Routex.Extension.Translations
   ]
@@ -51,9 +51,9 @@ defmodule Routex.Extension.Translations do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Path
   require Logger
 
+	@separator "/"
   @interpolate ":"
   @catch_all "*"
   @default_domain "routes"
@@ -134,11 +134,9 @@ defmodule Routex.Extension.Translations do
   defp translate(path, locale, backend, domain) when is_binary(path) do
     Gettext.put_locale(backend, locale)
 
-    path
-    |> Path.split()
+		Regex.split(~r{(/)}, path, include_captures: true, trim: true)
     |> translate_segments(locale, backend, domain)
-    |> Path.join()
-    |> Path.absname()
+    |> Enum.join()
   end
 
   defp translate_segments(segments, locale, backend, domain) do
@@ -146,10 +144,8 @@ defmodule Routex.Extension.Translations do
     Enum.map(segments, &translate_segment(&1, locale, backend, domain))
   end
 
-  defp translate_segment("/" <> _rest = segment, locale, backend, domain) do
-    translate(segment, locale, backend, domain)
-  end
 
+	defp translate_segment(@separator, _loc, _back, _domain), do: @separator
   defp translate_segment(@catch_all, _loc, _back, _domain), do: @catch_all
   defp translate_segment(@interpolate <> _rest = segment, _loc, _back, _domain), do: segment
   defp translate_segment(segment, _loc, _back, _domain) when not is_binary(segment), do: segment

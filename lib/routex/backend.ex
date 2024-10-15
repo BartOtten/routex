@@ -1,6 +1,6 @@
-defmodule Routex do
+defmodule Routex.Backend do
   @moduledoc """
-  > #### `use Routex` {: .info}
+  > #### `use Routex.Backend` {: .info}
   > When use'd this module generates a Routext backend module and
   > a configuration struct using the `configure/2` callbacks of
   > the extensions provided in `opts`.
@@ -10,7 +10,7 @@ defmodule Routex do
   **Example**
 
        iex> defmodule MyApp.RtxBackend do
-       ...>  use Routex,
+       ...>  use Routex.Backend,
        ...>   extensions: [
        ...>    Routex.Extension.VerifiedRoutes,
        ...>    Routex.Extension.AttrGetters,

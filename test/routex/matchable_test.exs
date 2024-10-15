@@ -96,7 +96,7 @@ defmodule MatchableTest do
       routes = [route(path: "/some"), "/some", {:<<>>, [], ["/some"]}]
 
       for route <- routes do
-        assert Matchable.new(route) == {:match, [], ["/", "some"], [], []}
+        assert Matchable.new(route) == {:matchable, [], ["/", "some"], [], []}
       end
     end
 
@@ -108,7 +108,7 @@ defmodule MatchableTest do
       ]
 
       for route <- routes do
-        assert Matchable.new(route) == {:match, [], ["/"], [], []}
+        assert Matchable.new(route) == {:matchable, [], ["/"], [], []}
       end
     end
 
@@ -116,14 +116,14 @@ defmodule MatchableTest do
       route = "/products/1?foo=bar#top"
 
       assert Matchable.new(route) ==
-               {:match, [], ["/", "products", "/", "1"], ["?foo=bar"], ["#top"]}
+               {:matchable, [], ["/", "products", "/", "1"], ["?foo=bar"], ["#top"]}
     end
 
     test "correctly splits query part in AST node" do
       static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
 
       assert Matchable.new(static_route) ==
-               {:match, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#", "top"]}
+               {:matchable, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#", "top"]}
 
       dynamic_route =
         ast([
@@ -139,7 +139,7 @@ defmodule MatchableTest do
 
       assert Matchable.new(dynamic_route) ==
                {
-                 :match,
+                 :matchable,
                  [],
                  ["/", "products", "/", "1", "/", "edit"],
                  [
@@ -232,7 +232,7 @@ defmodule MatchableTest do
     test "non-matching route returns the value from the defined catch-all function" do
       route_mismatch = route(path: "/non-matching") |> Matchable.new()
       result = Compiled.route(route_mismatch)
-      assert {:not_found, {:match, [], ["/", "non-matching"], [], []}} == result
+      assert {:not_found, {:matchable, [], ["/", "non-matching"], [], []}} == result
 
       route_misformed = "/misformed"
       result = Compiled.route(route_misformed)

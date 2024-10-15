@@ -53,26 +53,26 @@ defmodule Routex.Utils do
       :assigns in vars ->
         quote do
           case var!(assigns) do
-            %{conn: %{private: %{routex: %{__order__: order}}}} ->
+            %{conn: %{private: %{routex: %{__branch__: order}}}} ->
               List.last(order)
 
-            %{__order__: order} ->
+            %{__branch__: order} ->
               List.last(order)
           end
         end
 
       :conn in vars ->
         quote do
-          var!(conn).private.routex.__order__ |> List.last()
+          var!(conn).private.routex.__branch__ |> List.last()
         end
 
       :socket in vars ->
         quote do
           case var!(socket) do
-            %{private: %{routex: %{__order__: order}}} ->
+            %{private: %{routex: %{__branch__: order}}} ->
               List.last(order)
 
-            %{private: %{connect_info: %{private: %{routex: %{__order__: order}}}}} ->
+            %{private: %{connect_info: %{private: %{routex: %{__branch__: order}}}}} ->
               List.last(order)
 
             _ ->

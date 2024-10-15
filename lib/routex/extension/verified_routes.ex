@@ -256,7 +256,7 @@ defmodule Routex.Extension.VerifiedRoutes do
       arg_record = segments |> Matchable.new()
 
       if Matchable.match?(orig_record, arg_record) do
-        Routex.Attrs.get!(route, :__order__) |> List.last()
+        Routex.Attrs.get!(route, :__branch__) |> List.last()
       else
         :skip
       end

@@ -10,7 +10,7 @@ defmodule Routex.Extension.TranslationsTest do
   alias Routex.Extension.Translations
   alias Phoenix.Router.Route
 
-  @default_attrs %{__order__: [0, 1], backend: RtxBackend, locale: "en-US"}
+  @default_attrs %{__branch__: [0, 1], backend: RtxBackend, locale: "en-US"}
   defp route(rtx \\ @default_attrs), do: %Route{path: "/products/:id", private: %{routex: rtx}}
 
   test "should raise when no gettext backend is set" do
@@ -86,11 +86,11 @@ defmodule Routex.Extension.TranslationsTest do
       [
         %Route{
           path: "/producten/:id",
-          private: %{routex: %{__order__: [0, 1], locale: "nl"}}
+          private: %{routex: %{__branch__: [0, 1], locale: "nl"}}
         },
         %Route{
           path: "/products/:id",
-          private: %{routex: %{__order__: [0, 0], locale: "en"}}
+          private: %{routex: %{__branch__: [0, 0], locale: "en"}}
         }
       ]
 

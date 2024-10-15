@@ -11,19 +11,19 @@ defmodule Routex.Extension.InterpolationTest do
       line: 1,
       path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/path/[rtx.language]", language: :nl, __order__: [1, 1]}}
+      private: %{routex: %{__origin__: "/path/[rtx.language]", language: :nl, __branch__: [1, 1]}}
     },
     %Route{
       line: 8,
       path: "/path/[rtx.language]",
       verb: :get,
-      private: %{routex: %{__origin__: "/path/[rtx.language]", language: :en, __order__: [1, 0]}}
+      private: %{routex: %{__origin__: "/path/[rtx.language]", language: :en, __branch__: [1, 0]}}
     },
     %Route{
       line: 30,
       path: "/path/new",
       verb: :get,
-      private: %{routex: %{__origin__: "/no/interpolation", __order__: [2, 0]}}
+      private: %{routex: %{__origin__: "/no/interpolation", __branch__: [2, 0]}}
     }
   ]
 
@@ -45,7 +45,7 @@ defmodule Routex.Extension.InterpolationTest do
         line: 20,
         path: "/path/[rtx.language]",
         verb: :get,
-        private: %{routex: %{__origin__: "/foo", language: :nl, __order__: [3]}}
+        private: %{routex: %{__origin__: "/foo", language: :nl, __branch__: [3]}}
       }
       | @routes
     ]

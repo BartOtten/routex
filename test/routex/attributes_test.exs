@@ -24,34 +24,34 @@ defmodule Routex.AttributesTest do
   end
 
   test "update/2 updates the list of attributes using a function" do
-    route = %Route{private: %{routex: %{__order__: [1, 2], other: "other"}}}
-    result = route |> update(&Enum.reject(&1, fn {k, _v} -> k == :__order__ end))
+    route = %Route{private: %{routex: %{__branch__: [1, 2], other: "other"}}}
+    result = route |> update(&Enum.reject(&1, fn {k, _v} -> k == :__branch__ end))
 
     assert %Route{private: %{routex: %{other: "other"}}} = result
-    refute match?(%Route{private: %{routex: %{__order__: _}}}, result)
+    refute match?(%Route{private: %{routex: %{__branch__: _}}}, result)
   end
 
   test "update/2 updates the attr  with `key` using a function" do
-    route = %Route{private: %{routex: %{__order__: [1, 2]}}}
-    result = route |> update(:__order__, &List.insert_at(&1, -1, 3))
+    route = %Route{private: %{routex: %{__branch__: [1, 2]}}}
+    result = route |> update(:__branch__, &List.insert_at(&1, -1, 3))
 
-    assert %Route{private: %{routex: %{__order__: [1, 2, 3]}}} = result
+    assert %Route{private: %{routex: %{__branch__: [1, 2, 3]}}} = result
   end
 
   describe "merge" do
     test "a list value" do
-      route = %Route{private: %{routex: %{__order__: [1, 2]}}}
-      result = merge(route, __order__: [5, 6], some: "some", other: "other")
+      route = %Route{private: %{routex: %{__branch__: [1, 2]}}}
+      result = merge(route, __branch__: [5, 6], some: "some", other: "other")
 
-      assert %Route{private: %{routex: %{__order__: [5, 6], some: "some", other: "other"}}} =
+      assert %Route{private: %{routex: %{__branch__: [5, 6], some: "some", other: "other"}}} =
                result
     end
 
     test "a map value" do
-      route = %Route{private: %{routex: %{__order__: [1, 2]}}}
-      result = merge(route, %{__order__: [5, 6], some: "some", other: "other"})
+      route = %Route{private: %{routex: %{__branch__: [1, 2]}}}
+      result = merge(route, %{__branch__: [5, 6], some: "some", other: "other"})
 
-      assert %Route{private: %{routex: %{__order__: [5, 6], some: "some", other: "other"}}} =
+      assert %Route{private: %{routex: %{__branch__: [5, 6], some: "some", other: "other"}}} =
                result
     end
   end

@@ -125,7 +125,7 @@ defmodule Routex.Extension.Interpolation do
     # The interpolated routes are made descendants of this route
 
     interpolated_path =
-      if Attrs.get!(route, :__order__) |> List.last() == 0 do
+      if Attrs.get!(route, :__branch__) |> List.last() == 0 do
         origin
       else
         interpolated_path

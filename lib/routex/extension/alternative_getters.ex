@@ -31,7 +31,7 @@ defmodule Routex.Extension.AlternativeGetters do
     slug: "/europe/products/12/?foo=baz",
     attrs: %{
       __line__: 32,
-      __order__: [0, 12, 1],
+      __branch__: [0, 12, 1],
       __origin__: "/products/:id",
       [...attributes set by other extensions...]
     }},
@@ -39,7 +39,7 @@ defmodule Routex.Extension.AlternativeGetters do
     slug: "/asia/products/12/?foo=baz",
     attrs: %{
       __line__: 32,
-      __order__: [0, 12, 1],
+      __branch__: [0, 12, 1],
       __origin__: "/products/:id",
       [...attributes set by other extensions...]
     }},

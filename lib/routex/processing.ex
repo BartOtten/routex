@@ -93,7 +93,7 @@ defmodule Routex.Processing do
       processed_routes_per_cm_p2
       |> Enum.map(&elem(&1, 1))
       |> List.flatten()
-      |> Enum.sort_by(&Attrs.get(&1, :__order__))
+      |> Enum.sort_by(&Attrs.get(&1, :__branch__))
 
     new_routes
     |> remove_build_info()
@@ -120,7 +120,7 @@ defmodule Routex.Processing do
       Map.new()
       |> Map.put(:__origin__, route.path)
       |> Map.put(:__line__, route.line)
-      |> Map.put(:__order__, [index])
+      |> Map.put(:__branch__, [index])
 
     overrides = Map.get(route.private, :rtx, %{})
     values = Map.merge(meta, overrides)
@@ -144,16 +144,6 @@ defmodule Routex.Processing do
     end
   end
 
-  defp create_helper_functions(routes, backend, env) do
-    for extension <- backend.extensions(), extension != [] do
-      exec_when_defined(backend, extension, :create_helpers, nil, [
-        routes,
-        backend,
-        env
-      ])
-    end
-  end
-
   @spec post_transform_routes(routes, backend, Macro.Env.t()) :: routes
   defp post_transform_routes(routes, nil, _env), do: routes
 
@@ -163,6 +153,16 @@ defmodule Routex.Processing do
     for extension <- backend.extensions(), extension != [], reduce: routes do
       acc ->
         exec_when_defined(backend, extension, :post_transform, acc, [acc, backend, env])
+    end
+  end
+
+	defp create_helper_functions(routes, backend, env) do
+    for extension <- backend.extensions(), extension != [] do
+      exec_when_defined(backend, extension, :create_helpers, nil, [
+        routes,
+        backend,
+        env
+      ])
     end
   end
 
@@ -203,13 +203,13 @@ defmodule Routex.Processing do
           socket =
             %{
               socket
-              | private: Map.put(socket.private, :routex, %{url: url, __order__: opts.__order__})
+              | private: Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
             }
 
           {:cont,
            Phoenix.LiveView.assign(
              socket,
-             [url: url, __order__: opts.__order__] ++
+             [url: url, __branch__: opts.__branch__] ++
                Map.to_list(opts.assigns)
            )}
         end
@@ -220,13 +220,13 @@ defmodule Routex.Processing do
           socket =
             %{
               socket
-              | private: Map.put(socket.private, :routex, %{url: url, __order__: opts.__order__})
+              | private: Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
             }
 
           {:cont,
            Phoenix.Component.assign(
              socket,
-             [url: url, __order__: opts.__order__] ++
+             [url: url, __branch__: opts.__branch__] ++
                Map.to_list(opts.assigns)
            )}
         end

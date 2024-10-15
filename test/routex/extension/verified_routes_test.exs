@@ -103,16 +103,16 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   defp conn_with_endpoint(endpoint \\ Endpoint) do
     conn(:get, "/")
     |> Plug.Conn.put_private(:phoenix_endpoint, endpoint)
-    |> Plug.Conn.put_private(:routex, %{__order__: [0, 1]})
+    |> Plug.Conn.put_private(:routex, %{__branch__: [0, 1]})
   end
 
   defp socket_with_endpoint(endpoint \\ Endpoint),
-    do: %Phoenix.Socket{endpoint: endpoint, private: %{routex: %{__order__: [0, 1]}}}
+    do: %Phoenix.Socket{endpoint: endpoint, private: %{routex: %{__branch__: [0, 1]}}}
 
   def conn_with_script_name(script_name \\ ~w(api)) do
     conn =
       Plug.Conn.put_private(conn(:get, "/"), :phoenix_endpoint, ScriptName)
-      |> Plug.Conn.put_private(:routex, %{__order__: [0, 1]})
+      |> Plug.Conn.put_private(:routex, %{__branch__: [0, 1]})
 
     put_in(conn.script_name, script_name)
   end
@@ -132,47 +132,47 @@ defmodule Routex.Extension.VerifiedRoutesTest do
     %Phoenix.Router.Route{
       path: "/",
       kind: :match,
-      private: %{routex: %{__order__: [0, 1], __origin__: "/"}}
+      private: %{routex: %{__branch__: [0, 1], __origin__: "/"}}
     },
     %Phoenix.Router.Route{
       path: "/alt1",
       kind: :match,
-      private: %{routex: %{__order__: [0, 0], __origin__: "/"}}
+      private: %{routex: %{__branch__: [0, 0], __origin__: "/"}}
     },
     %Phoenix.Router.Route{
       path: "/alt2",
       kind: :match,
-      private: %{routex: %{__order__: [0, 2], __origin__: "/"}}
+      private: %{routex: %{__branch__: [0, 2], __origin__: "/"}}
     },
     %Phoenix.Router.Route{
       path: "/posts",
       kind: :match,
-      private: %{routex: %{__order__: [1, 1], __origin__: "/posts"}}
+      private: %{routex: %{__branch__: [1, 1], __origin__: "/posts"}}
     },
     %Phoenix.Router.Route{
       path: "/alt1/postsa/",
       kind: :match,
-      private: %{routex: %{__order__: [1, 0], __origin__: "/posts"}}
+      private: %{routex: %{__branch__: [1, 0], __origin__: "/posts"}}
     },
     %Phoenix.Router.Route{
       path: "/alt2/postsb/",
       kind: :match,
-      private: %{routex: %{__order__: [1, 2], __origin__: "/posts"}}
+      private: %{routex: %{__branch__: [1, 2], __origin__: "/posts"}}
     },
     %Phoenix.Router.Route{
       path: "/posts/:id",
       kind: :match,
-      private: %{routex: %{__order__: [2, 1], __origin__: "/posts/:id"}}
+      private: %{routex: %{__branch__: [2, 1], __origin__: "/posts/:id"}}
     },
     %Phoenix.Router.Route{
       path: "/alt1/:id/postsa/",
       kind: :match,
-      private: %{routex: %{__order__: [2, 0], __origin__: "/posts/:id"}}
+      private: %{routex: %{__branch__: [2, 0], __origin__: "/posts/:id"}}
     },
     %Phoenix.Router.Route{
       path: "/alt2/:id/postsb/",
       kind: :match,
-      private: %{routex: %{__order__: [2, 2], __origin__: "/posts/:id"}}
+      private: %{routex: %{__branch__: [2, 2], __origin__: "/posts/:id"}}
     }
   ]
 

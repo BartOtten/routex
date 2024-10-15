@@ -33,7 +33,7 @@ Modify the entrypoint your web interface definition.
 
 # in live_view
       unquote(html_helpers())
-+     on_mount(ExampleWeb.Router.RoutexHelpers)
++     on_mount(unquote(__MODULE__).Router.RoutexHelpers)
 
 # in view_helpers or html_helpers
    unquote(verified_routes())
@@ -42,7 +42,8 @@ Modify the entrypoint your web interface definition.
 # insert new private function
 +  defp routex_helpers do
 +    quote do
-+      import ExampleWeb.Router.RoutexHelpers
++      import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
++      alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
 +    end
 +  end
 ```
@@ -57,9 +58,9 @@ def on_mount(_, params, session, socket) do
   socket =
     Phoenix.LiveView.attach_hook(socket, :set_rtx, :handle_params, fn _params, url, socket ->
       attrs = ExampleWeb.Route.RoutexHelpers.attrs(url)
-      rtx_assigns = [url: url, __order__: attrs.__order__] ++ Map.to_list(attrs.assigns)
+      rtx_assigns = [url: url, __branch__: attrs.__branch__] ++ Map.to_list(attrs.assigns)
 
-      {:cont,Phoenix.LiveView.assign( socket, rtx_assigns)}
+      {:cont, Phoenix.LiveView.assign(socket, rtx_assigns)}
     end)
 
   {:cont, socket}

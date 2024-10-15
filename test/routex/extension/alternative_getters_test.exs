@@ -8,37 +8,37 @@ defmodule Routex.Extension.AlternativeGettersTest do
     %Phoenix.Router.Route{
       path: "/",
       kind: :match,
-      private: %{routex: %{__order__: [0]}}
+      private: %{routex: %{__branch__: [0]}}
     },
     %Phoenix.Router.Route{
       path: "/products",
       kind: :match,
-      private: %{routex: %{__order__: [1, 0]}}
+      private: %{routex: %{__branch__: [1, 0]}}
     },
     %Phoenix.Router.Route{
       path: "/alt1/productsa",
       kind: :match,
-      private: %{routex: %{__order__: [1, 1]}}
+      private: %{routex: %{__branch__: [1, 1]}}
     },
     %Phoenix.Router.Route{
       path: "/alt2/productsb",
       kind: :match,
-      private: %{routex: %{__order__: [1, 2]}}
+      private: %{routex: %{__branch__: [1, 2]}}
     },
     %Phoenix.Router.Route{
       path: "/products/:id",
       kind: :match,
-      private: %{routex: %{__order__: [2, 0]}}
+      private: %{routex: %{__branch__: [2, 0]}}
     },
     %Phoenix.Router.Route{
       path: "/alt1/:id/productsa/",
       kind: :match,
-      private: %{routex: %{__order__: [2, 1]}}
+      private: %{routex: %{__branch__: [2, 1]}}
     },
     %Phoenix.Router.Route{
       path: "/alt2/:id/productsb/",
       kind: :match,
-      private: %{routex: %{__order__: [2, 2]}}
+      private: %{routex: %{__branch__: [2, 2]}}
     }
   ]
 

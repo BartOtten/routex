@@ -104,7 +104,7 @@ defmodule Routex.Extension.Translations do
     backend = config.translations_backend
     domain = config.translations_domain
 
-    is_original_fn = &(&1 |> Attrs.get(:__order__) |> List.last() == 0)
+    is_original_fn = &(&1 |> Attrs.get(:__branch__) |> List.last() == 0)
 
     uniq_segments =
       routes

@@ -26,9 +26,18 @@ defmodule Routex.Extension.AlternativeGetters do
   **Example**
   ```elixir
   iex> ExampleWeb.Router.RoutexHelpers.alternatives("/products/12?foo=baz")
-  [
+  [ %Routex.Extension.AlternativeGetters{
+    slug: "products/12/?foo=baz",
+   is_current?: true,
+    attrs: %{
+      __line__: 32,
+      __branch__: [0, 12, 0],
+      __origin__: "/products/:id",
+      [...attributes set by other extensions...]
+    }},
     %Routex.Extension.AlternativeGetters{
     slug: "/europe/products/12/?foo=baz",
+   is_current?: true,
     attrs: %{
       __line__: 32,
       __branch__: [0, 12, 1],
@@ -37,6 +46,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
    %Routex.Extension.AlternativeGetters{
     slug: "/asia/products/12/?foo=baz",
+   is_current?: true,
     attrs: %{
       __line__: 32,
       __branch__: [0, 12, 1],
@@ -52,7 +62,7 @@ defmodule Routex.Extension.AlternativeGetters do
   alias Routex.Route
   alias Routex.Matchable
 
-  defstruct [:slug, :attrs]
+  defstruct [:slug, :attrs, :is_current?]
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
@@ -67,8 +77,8 @@ defmodule Routex.Extension.AlternativeGetters do
     functions =
       for {_nesting, siblings} <- Route.group_by_nesting(routes) do
         body_ast =
-          for route <- siblings do
-            map_ast(route)
+          for sibling <- siblings do
+            map_ast(sibling)
           end
 
         _function_ast =
@@ -86,6 +96,7 @@ defmodule Routex.Extension.AlternativeGetters do
 
     quote do
       %Routex.Extension.AlternativeGetters{
+        is_current?: unquote(Macro.var(:pattern, Matchable)) == unquote(pattern),
         slug: unquote(pattern) |> Matchable.to_binary(),
         attrs: unquote(Macro.escape(attrs))
       }

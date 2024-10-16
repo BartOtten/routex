@@ -196,6 +196,8 @@ defmodule Routex.Matchable do
   a Matchable record pattern. Other arguments can be given with either a
   catch all or a pattern.
 
+  The Matchable pattern is bound to `pattern`
+
   *Example*
      iex> "/some/path"
         >  |> Matchable.new()
@@ -204,7 +206,10 @@ defmodule Routex.Matchable do
   def to_func(match_pattern, name, other_args \\ [], body)
 
   def to_func(record, name, other_args, body) when is_tuple(record) do
-    match_pattern = to_pattern(record)
+    match_pattern =
+      quote do
+        pattern = unquote(to_pattern(record))
+      end
 
     other_args =
       Enum.map(other_args, fn

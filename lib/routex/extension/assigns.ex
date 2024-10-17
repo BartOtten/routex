@@ -48,7 +48,7 @@ defmodule Routex.Extension.Assigns do
     for route <- routes do
       assigns =
         Enum.reduce(route.private.routex, [], fn el = {k, _v}, acc ->
-          if is_nil(attrs) or k in attrs ++ [:__branch__], do: [el | acc], else: acc
+          if is_nil(attrs) or k in attrs, do: [el | acc], else: acc
         end)
 
       assigns_map =

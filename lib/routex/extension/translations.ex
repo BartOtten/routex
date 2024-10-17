@@ -53,7 +53,7 @@ defmodule Routex.Extension.Translations do
   alias Routex.Attrs
   require Logger
 
-	@separator "/"
+  @separator "/"
   @interpolate ":"
   @catch_all "*"
   @default_domain "routes"
@@ -134,18 +134,20 @@ defmodule Routex.Extension.Translations do
   defp translate(path, locale, backend, domain) when is_binary(path) do
     Gettext.put_locale(backend, locale)
 
-		Regex.split(~r{(/)}, path, include_captures: true, trim: true)
+    path
+    |> into_segment_list()
     |> translate_segments(locale, backend, domain)
     |> Enum.join()
   end
+
+  defp into_segment_list(path), do: Regex.split(~r{(/)}, path, include_captures: true, trim: true)
 
   defp translate_segments(segments, locale, backend, domain) do
     Gettext.put_locale(backend, locale)
     Enum.map(segments, &translate_segment(&1, locale, backend, domain))
   end
 
-
-	defp translate_segment(@separator, _loc, _back, _domain), do: @separator
+  defp translate_segment(@separator, _loc, _back, _domain), do: @separator
   defp translate_segment(@catch_all, _loc, _back, _domain), do: @catch_all
   defp translate_segment(@interpolate <> _rest = segment, _loc, _back, _domain), do: segment
   defp translate_segment(segment, _loc, _back, _domain) when not is_binary(segment), do: segment

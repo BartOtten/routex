@@ -117,7 +117,7 @@ defmodule Routex.Extension.Alternatives do
 
       path =
         if path_prefix? do
-          String.replace_prefix(  branch_opts.branch_prefix <> route.path, "//", "/")
+          String.replace_prefix(branch_opts.branch_prefix <> route.path, "//", "/")
         else
           route.path
         end

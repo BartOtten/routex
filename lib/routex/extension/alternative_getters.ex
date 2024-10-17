@@ -62,7 +62,7 @@ defmodule Routex.Extension.AlternativeGetters do
   alias Routex.Route
   alias Routex.Matchable
 
-  defstruct [:slug, :attrs, :is_current?]
+  defstruct [:slug, :attrs, is_current?: false]
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do

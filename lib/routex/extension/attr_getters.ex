@@ -8,7 +8,7 @@ defmodule Routex.Extension.AttrGetters do
   ```diff
   # file /lib/example_web/routex_backend.ex
   defmodule ExampleWeb.RoutexBackend do
-    use Routex,
+    use Routex.Backend,
     extensions: [
   +   Routex.Extension.AttrGetters,
   ],
@@ -29,14 +29,13 @@ defmodule Routex.Extension.AttrGetters do
   ```elixir
   iex> ExampleWeb.Router.RoutexHelpers.attrs("/europe/nl/producten/?foo=baz")
   %{
-    __line__: 28,
-    __order__: [0, 9, 3],
+    __branch__: [0, 9, 3],
     __origin__: "/products",
     backend: ExampleWeb.LocalizedRoutes,
     contact: "verkoop@example.nl",
     locale: "nl",
-    scope_name: "The Netherlands",
-    scope_helper: "europe_nl",
+    branch_name: "The Netherlands",
+    branch_helper: "europe_nl",
   }
   ```
   """
@@ -44,30 +43,32 @@ defmodule Routex.Extension.AttrGetters do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Path
+  alias Routex.Matchable
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
     prelude =
       quote do
+        @doc """
+        Returns Routex attributes of given URL
+        """
         def attrs(url) when is_binary(url) do
-          path = URI.parse(url).path
-          segments = Path.split(path)
-          attrs(segments)
+          url
+          |> Matchable.new()
+          |> attrs()
         end
       end
 
-    ast =
+    functions =
       for route <- routes do
-        pattern = Path.to_match_pattern(route.path)
+        attributes = route |> Attrs.get() |> Macro.escape()
 
-        quote do
-          def attrs(unquote(pattern)) do
-            unquote(route |> Attrs.get() |> Macro.escape())
-          end
-        end
+        route
+        |> Matchable.new()
+        |> Matchable.to_func(:attrs, attributes)
       end
+      |> List.flatten()
 
-    [prelude | ast]
+    [prelude, functions]
   end
 end

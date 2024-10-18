@@ -3,23 +3,24 @@ defmodule Routex.ConfigTest do
 
   alias Routex.Extension.Alternatives
   alias Alternatives.Config
-  alias Alternatives.Scopes
+  alias Alternatives.Branches
   alias Alternatives.Exceptions.AttrsMismatchError
   alias Alternatives.Exceptions.MissingRootSlugError
 
   describe "config new" do
     test "returns a Config struct" do
-      scopes_nested =
-        Scopes.add_precomputed_values!(%{
+      branches_nested =
+        Branches.add_precomputed_values!(%{
           "/" => %{
             attrs: %{key1: 1, key2: 2},
-            scopes: %{
+            branches: %{
               "/foo" => %{attrs: %{key1: 1, key2: 2}}
             }
           }
         })
 
-      assert %Config{scopes: %{nil => _, "foo" => _}} = Config.new!(scopes_nested: scopes_nested)
+      assert %Config{branches: %{nil => _, "foo" => _}} =
+               Config.new!(branches_nested: branches_nested)
     end
   end
 
@@ -27,16 +28,16 @@ defmodule Routex.ConfigTest do
     test "raises when no root slug is set" do
       assert_raise MissingRootSlugError, fn ->
         Config.validate!(%Config{
-          scopes: %{nil => %{scope_prefix: "foo", attrs: %{key1: 1}}}
+          branches: %{nil => %{branch_prefix: "foo", attrs: %{key1: 1}}}
         })
       end
     end
 
     test "does not raise when no attributes" do
       config = %Config{
-        scopes: %{
+        branches: %{
           nil => %{
-            scope_prefix: "/"
+            branch_prefix: "/"
           },
           "foo" => %{}
         }
@@ -49,9 +50,9 @@ defmodule Routex.ConfigTest do
       matching_assign = %{key1: 1, key2: 2}
 
       config = %Config{
-        scopes: %{
+        branches: %{
           nil => %{
-            scope_prefix: "/",
+            branch_prefix: "/",
             attrs: matching_assign
           },
           "foo" => %{attrs: matching_assign}
@@ -64,9 +65,9 @@ defmodule Routex.ConfigTest do
     test "raises on assign keys mismatch" do
       assert_raise AttrsMismatchError, fn ->
         Config.validate!(%Config{
-          scopes: %{
+          branches: %{
             nil => %{
-              scope_prefix: "/",
+              branch_prefix: "/",
               attrs: %{key1: 1, key2: 2}
             },
             "foo" => %{attrs: %{key1: 1}}

@@ -2,7 +2,7 @@
 
 <%= if @live_action in [:edit] do %>
   <.modal
-    scope_helper={@loc.scope_helper}
+    branch_helper={@loc.branch_helper}
     return_to={Routes.product_show_path(@socket, :show, @product)}
   >
     <.live_component

@@ -1,6 +1,6 @@
 defmodule Routex.Route do
   @moduledoc """
-  Function for working with Phoenix Routes
+  Function for working with Routex augmented Phoenix Routes
   """
   alias Phoenix.Router.Route
   alias Routex.Attrs
@@ -13,7 +13,7 @@ defmodule Routex.Route do
   """
   def get_nesting(route, offset \\ @default_nesting_offset) when offset <= 0 do
     slice_end = -2 + offset
-    route |> Attrs.get(:__order__) |> Enum.slice(0..slice_end)
+    route |> Attrs.get(:__branch__) |> Enum.slice(0..slice_end//1)
   end
 
   @doc """
@@ -22,22 +22,30 @@ defmodule Routex.Route do
   """
   def group_by_nesting(routes, offset \\ @default_nesting_offset) when offset <= 0 do
     slice_end = -2 + offset
-    root = &(&1 |> Attrs.get(:__order__) |> Enum.slice(0..slice_end))
+    root = &(&1 |> Attrs.get(:__branch__) |> Enum.slice(0..slice_end//1))
 
     routes
     |> Enum.group_by(root)
   end
 
-  @doc """
-  Returns routes grouped by the combination of method and path of an (ancestor)
-  route. By default groups by parent. This can be adjusted by providing a
-  negative depth offset.
-  """
+  # @doc """
+  # Returns routes grouped by the combination of method and path of an (ancestor)
+  # route. By default groups by parent. This can be adjusted by providing a
+  # negative depth offset.
+  # """
   def group_by_method_and_path(routes, offset \\ @default_nesting_offset) when offset <= 0 do
     routes
     |> group_by_nesting(offset)
-    |> Enum.map(fn {_nesting, groutes} -> {{hd(groutes).verb, hd(groutes).path}, groutes} end)
+    |> Enum.map(fn
+      {_nesting, groutes} -> {{hd(groutes).verb, hd(groutes).path}, groutes}
+    end)
+    |> List.flatten()
     |> Map.new()
+  end
+
+  @doc "Returns routes grouped by the combination of method and origin path"
+  def group_by_method_and_origin(routes) do
+    routes |> Enum.group_by(&{&1.verb, &1.private.routex.__origin__})
   end
 
   @doc """

@@ -1,26 +1,26 @@
 defmodule Routex.Test.Fixtures.Assigns do
-  defstruct [:key, locale: "en", opt_attr: "default"]
+  defstruct [:key, language: "en", opt_attr: "default"]
 end
 
 defmodule Routex.Test.Fixtures do
-  alias Routex.Extension.Alternatives.Scope
+  alias Routex.Extension.Alternatives.Branch
   alias __MODULE__.Assigns
 
-  def scopes_with_map_attrs,
+  def branches_with_map_attrs,
     do: %{
       "/" => %{
-        attrs: %{key: :root, locale: "en", opt_attr: "default"},
-        scopes: %{
+        attrs: %{key: :root, language: "en", opt_attr: "default"},
+        branches: %{
           "/foo" => %{
             attrs: %{
-              locale: "en",
+              language: "en",
               key: :root
             },
-            scopes: %{
+            branches: %{
               "/nested" => %{
-                attrs: %{key: :n1, locale: "en"},
-                scopes: %{
-                  "/nested2" => %{attrs: %{key: :n2, locale: "en"}}
+                attrs: %{key: :n1, language: "en"},
+                branches: %{
+                  "/nested2" => %{attrs: %{key: :n2, language: "en"}}
                 }
               }
             }
@@ -29,21 +29,21 @@ defmodule Routex.Test.Fixtures do
       }
     }
 
-  def scopes,
+  def branches,
     do: %{
       "/" => %{
-        attrs: %Assigns{key: :root, locale: "en"},
-        scopes: %{
+        attrs: %Assigns{key: :root, language: "en"},
+        branches: %{
           "/foo" => %{
             attrs: %Assigns{
-              locale: "en",
+              language: "en",
               key: :root
             },
-            scopes: %{
+            branches: %{
               "/nested" => %{
-                attrs: %Assigns{key: :n1, locale: "en"},
-                scopes: %{
-                  "/nested2" => %{attrs: %Assigns{key: :n2, locale: "en"}}
+                attrs: %Assigns{key: :n1, language: "en"},
+                branches: %{
+                  "/nested2" => %{attrs: %Assigns{key: :n2, language: "en"}}
                 }
               }
             }
@@ -52,81 +52,81 @@ defmodule Routex.Test.Fixtures do
       }
     }
 
-  def scopes_precomputed,
+  def branches_precomputed,
     do: %{
-      nil => %Scope.Nested{
-        attrs: %{scope_helper: nil, key: :root, locale: "en", opt_attr: "default"},
-        scope_path: [],
-        scope_alias: nil,
-        scope_prefix: "/",
-        scopes: %{
-          "foo" => %Scope.Nested{
-            attrs: %{opt_attr: "default", locale: "en", key: :root, scope_helper: "foo"},
-            scopes: %{
-              "nested" => %Scope.Nested{
+      nil => %Branch.Nested{
+        attrs: %{branch_helper: nil, key: :root, language: "en", opt_attr: "default"},
+        branch_path: [],
+        branch_alias: nil,
+        branch_prefix: "/",
+        branches: %{
+          "foo" => %Branch.Nested{
+            attrs: %{opt_attr: "default", language: "en", key: :root, branch_helper: "foo"},
+            branches: %{
+              "nested" => %Branch.Nested{
                 attrs: %{
                   opt_attr: "default",
-                  locale: "en",
+                  language: "en",
                   key: :n1,
-                  scope_helper: "foo_nested"
+                  branch_helper: "foo_nested"
                 },
-                scopes: %{
-                  "nested2" => %Scope.Nested{
+                branches: %{
+                  "nested2" => %Branch.Nested{
                     attrs: %{
                       opt_attr: "default",
-                      locale: "en",
+                      language: "en",
                       key: :n2,
-                      scope_helper: "foo_nested_nested2"
+                      branch_helper: "foo_nested_nested2"
                     },
-                    scope_path: ["foo", "nested", "nested2"],
-                    scope_alias: :nested2,
-                    scope_prefix: "/nested2",
-                    scopes: %{}
+                    branch_path: ["foo", "nested", "nested2"],
+                    branch_alias: :nested2,
+                    branch_prefix: "/nested2",
+                    branches: %{}
                   }
                 },
-                scope_path: ["foo", "nested"],
-                scope_alias: :nested,
-                scope_prefix: "/nested"
+                branch_path: ["foo", "nested"],
+                branch_alias: :nested,
+                branch_prefix: "/nested"
               }
             },
-            scope_path: ["foo"],
-            scope_alias: :foo,
-            scope_prefix: "/foo"
+            branch_path: ["foo"],
+            branch_alias: :foo,
+            branch_prefix: "/foo"
           }
         }
       }
     }
 
-  def scopes_flat,
+  def branches_flat,
     do: %{
-      nil => %Scope.Flat{
-        attrs: %{scope_helper: nil, key: :root, locale: "en", opt_attr: "default"},
-        scope_path: [],
-        scope_alias: nil,
-        scope_prefix: "/"
+      nil => %Branch.Flat{
+        attrs: %{branch_helper: nil, key: :root, language: "en", opt_attr: "default"},
+        branch_path: [],
+        branch_alias: nil,
+        branch_prefix: "/"
       },
-      "foo" => %Scope.Flat{
-        scope_path: ["foo"],
-        attrs: %{opt_attr: "default", locale: "en", key: :root, scope_helper: "foo"},
-        scope_alias: :foo,
-        scope_prefix: "/foo"
+      "foo" => %Branch.Flat{
+        branch_path: ["foo"],
+        attrs: %{opt_attr: "default", language: "en", key: :root, branch_helper: "foo"},
+        branch_alias: :foo,
+        branch_prefix: "/foo"
       },
-      "foo_nested" => %Scope.Flat{
-        scope_path: ["foo", "nested"],
-        attrs: %{opt_attr: "default", locale: "en", key: :n1, scope_helper: "foo_nested"},
-        scope_alias: :foo_nested,
-        scope_prefix: "/foo/nested"
+      "foo_nested" => %Branch.Flat{
+        branch_path: ["foo", "nested"],
+        attrs: %{opt_attr: "default", language: "en", key: :n1, branch_helper: "foo_nested"},
+        branch_alias: :foo_nested,
+        branch_prefix: "/foo/nested"
       },
-      "foo_nested_nested2" => %Scope.Flat{
+      "foo_nested_nested2" => %Branch.Flat{
         attrs: %{
           opt_attr: "default",
-          locale: "en",
+          language: "en",
           key: :n2,
-          scope_helper: "foo_nested_nested2"
+          branch_helper: "foo_nested_nested2"
         },
-        scope_path: ["foo", "nested", "nested2"],
-        scope_alias: :foo_nested_nested2,
-        scope_prefix: "/foo/nested/nested2"
+        branch_path: ["foo", "nested", "nested2"],
+        branch_alias: :foo_nested_nested2,
+        branch_prefix: "/foo/nested/nested2"
       }
     }
 end

@@ -6,6 +6,11 @@ defmodule Routex.Extension.Translations do
   Extracts segments of a routes' path to a translations domain file (default: `routes.po`)
   for translation. At compile-time it combines the translated segments to transform routes.
 
+  This extension expects either a `:language` attribute or a `:locale` attribute. When only
+  `:locale` is provided it will try to extract the language from the locale tag. This algorithm is
+  covers Alpha-2 and Alpha-3 codes (see:
+  [ISO](https://datatracker.ietf.org/doc/html/rfc5646#section-2.2.1))
+
   ## Configuration
   ```diff
   defmodule ExampleWeb.RoutexBackend do
@@ -14,7 +19,7 @@ defmodule Routex.Extension.Translations do
   + Routex.Extension.Translations
   ]
   + translations_backend: MyApp.Gettext,
-  + translations_domain: "routes.po",
+  + translations_domain: "routes",
   ```
 
   ## Pseudo result
@@ -26,7 +31,7 @@ defmodule Routex.Extension.Translations do
 
   ## `Routex.Attrs`
   **Requires**
-  - locale
+  - language || locale
 
   **Sets**
   - none
@@ -46,26 +51,31 @@ defmodule Routex.Extension.Translations do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Path
   require Logger
 
+  @separator "/"
   @interpolate ":"
   @catch_all "*"
   @default_domain "routes"
 
   @impl Routex.Extension
-  def configure(config, _backend) do
-    gt_in_compilers =
-      Mix.Project.get!().project() |> Access.get(:compilers, []) |> Enum.member?(:gettext)
+  def configure(config, backend) do
+    gettext_in_compilers? =
+      Mix.Project.get!().project()
+      |> Access.get(:compilers, [])
+      |> Enum.member?(:gettext)
 
-    unless Version.match?(System.version(), ">= 1.14.0") or gt_in_compilers do
-      Logger.warning(
-        "When route translations are updated, run `mix compile --force [MyWebApp].Route"
-      )
-    end
+    auto_compile? =
+      Version.match?(System.version(), ">= 1.14.0")
+
+    unless auto_compile? or gettext_in_compilers?,
+      do:
+        Logger.warning(
+          "When route translations are updated, run `mix compile --force [MyWebApp].Route"
+        )
 
     unless Keyword.get(config, :translations_backend),
-      do: raise("Expected :translations_backend to be set")
+      do: raise("Expected `:translations_backend` to be set in #{to_string(backend)}")
 
     [{:translations_domain, Keyword.get(config, :translations_domain, @default_domain)} | config]
   end
@@ -75,16 +85,13 @@ defmodule Routex.Extension.Translations do
     config = config_backend.config()
 
     for route <- routes do
-      locale =
-        Attrs.get!(
-          route,
-          :locale,
-          "#{route |> Attrs.get(:backend) |> to_string()} lists this extention but no
-          :locale was found in private.routex of route #{inspect(Macro.escape(route))}."
-        )
+      language = Attrs.get(route, :language)
+      locale = Attrs.get(route, :locale)
+
+      detected = language || detect_language!(locale, route)
 
       path =
-        translate(route.path, locale, config.translations_backend, config.translations_domain)
+        translate(route.path, detected, config.translations_backend, config.translations_domain)
 
       %{route | path: path}
     end
@@ -116,7 +123,7 @@ defmodule Routex.Extension.Translations do
         @catch_all -> nil
         @interpolate <> _rest -> nil
         segment when not is_binary(segment) -> nil
-        segment -> quote do: unquote(backend).dgettext(unquote(domain), unquote(segment))
+        segment -> quote do: Gettext.dgettext(unquote(backend), unquote(domain), unquote(segment))
       end)
 
     [prelude | triggers_ast]
@@ -128,24 +135,45 @@ defmodule Routex.Extension.Translations do
     Gettext.put_locale(backend, locale)
 
     path
-    |> Path.split()
+    |> into_segment_list()
     |> translate_segments(locale, backend, domain)
-    |> Path.join()
+    |> Enum.join()
   end
+
+  defp into_segment_list(path), do: Regex.split(~r{(/)}, path, include_captures: true, trim: true)
 
   defp translate_segments(segments, locale, backend, domain) do
     Gettext.put_locale(backend, locale)
     Enum.map(segments, &translate_segment(&1, locale, backend, domain))
   end
 
-  defp translate_segment("/" <> _rest = segment, locale, backend, domain) do
-    translate(segment, locale, backend, domain)
-  end
-
+  defp translate_segment(@separator, _loc, _back, _domain), do: @separator
   defp translate_segment(@catch_all, _loc, _back, _domain), do: @catch_all
   defp translate_segment(@interpolate <> _rest = segment, _loc, _back, _domain), do: segment
   defp translate_segment(segment, _loc, _back, _domain) when not is_binary(segment), do: segment
 
   defp translate_segment(segment, _loc, backend, domain),
     do: Gettext.dgettext(backend, domain, segment)
+
+  defp detect_language!(<<lang::binary-size(2)>>, _), do: lang
+  defp detect_language!(<<lang::binary-size(3)>>, _), do: lang
+  defp detect_language!(<<lang::binary-size(2), ?-, _rest::binary>>, _), do: lang
+  defp detect_language!(<<lang::binary-size(3), ?-, _rest::binary>>, _), do: lang
+  defp detect_language!(<<lang::binary-size(2), ?_, _rest::binary>>, _), do: lang
+  defp detect_language!(<<lang::binary-size(3), ?_, _rest::binary>>, _), do: lang
+
+  defp detect_language!(nil, route) do
+    backend = route |> Attrs.get(:backend) |> to_string()
+
+    raise(
+      "Routex backend `#{backend}` lists extension `#{__MODULE__}` but
+ neither :language nor :locale was found in private.routex of route #{inspect(route, pretty: true)}."
+    )
+  end
+
+  defp detect_language!(other, route) do
+    raise(
+      ":locale `#{other}` is a non supported format. Found in private.routex of route #{inspect(route, pretty: true)}."
+    )
+  end
 end

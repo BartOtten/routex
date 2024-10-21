@@ -35,12 +35,12 @@ defmodule Routex.Extension.Translations do
   This extension can be combined with `Routext.Extension.Alternatives` to create
   multilingual routes.
 
-  Use Alternatives to create new scopes and provide a `:locale` per scope and
+  Use Alternatives to create new branches and provide a `:language` or `:locale` per branch and
   Translations to translate the alternative routes.
 
-                          ⇒ /products/:id/edit                  locale = "en"
-      /products/:id/edit  ⇒ /nederland/producten/:id/bewerken   locale = "nl"
-                          ⇒ /espana/producto/:id/editar         locale = "es"
+                          ⇒ /products/:id/edit                  language: "en"
+      /products/:id/edit  ⇒ /nederland/producten/:id/bewerken   language: "nl"
+                          ⇒ /espana/producto/:id/editar         language: "es"
   """
 
   @behaviour Routex.Extension
@@ -97,7 +97,7 @@ defmodule Routex.Extension.Translations do
     backend = config.translations_backend
     domain = config.translations_domain
 
-    is_original_fn = &(&1 |> Attrs.get(:__order__) |> List.last() == 0)
+    is_original_fn = &(&1 |> Attrs.get(:__branch__) |> List.last() == 0)
 
     uniq_segments =
       routes

@@ -125,7 +125,7 @@ defmodule Routex.Extension.RouteHelpers do
 
   def build_case_clauses(routes, router, suffix, args) do
     for route <- routes do
-      ref = route |> Attrs.get(:__order__) |> List.last()
+      ref = route |> Attrs.get(:__branch__) |> List.last()
       helper = (route.helper <> suffix) |> String.to_atom()
       helper_module = Module.concat(router, :Helpers)
 

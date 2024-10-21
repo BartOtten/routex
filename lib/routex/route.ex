@@ -13,7 +13,7 @@ defmodule Routex.Route do
   """
   def get_nesting(route, offset \\ @default_nesting_offset) when offset <= 0 do
     slice_end = -2 + offset
-    route |> Attrs.get(:__order__) |> Enum.slice(0..slice_end)
+    route |> Attrs.get(:__branch__) |> Enum.slice(0..slice_end//1)
   end
 
   @doc """
@@ -22,7 +22,7 @@ defmodule Routex.Route do
   """
   def group_by_nesting(routes, offset \\ @default_nesting_offset) when offset <= 0 do
     slice_end = -2 + offset
-    root = &(&1 |> Attrs.get(:__order__) |> Enum.slice(0..slice_end))
+    root = &(&1 |> Attrs.get(:__branch__) |> Enum.slice(0..slice_end//1))
 
     routes
     |> Enum.group_by(root)

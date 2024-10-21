@@ -1,5 +1,8 @@
 # Routex Extensions
 
+> #### List of extensions {: .info}
+> A [list of included extensions](README.md#extensions) can be found in the README.
+
 Routex Extensions extend the functionality provided by Routex to transform routes or
 generate new route based helper functions. Each extension is a module which adopts the
 `Routex.Extension` specification. It has to implement one or multiple public functions:
@@ -54,14 +57,14 @@ structure.
 
 **Example**
 The Alternatives extension uses nested options and allows inheritance
-of properties from parent scopes.
+of properties from parent branches.
 
 ```
 alternatives: %{
   "/" =>
     helper: nil,
     locale: "en",
-    scopes: %{
+    branches: %{
       "nl" => %{
           helper: "nl",
           locale: "nl"
@@ -74,7 +77,7 @@ alternatives: %{
 ```
 The Alternatives module is therefor responsible for flattening those for
 (itself and) other extensions to use. To take the route responsible for the
-"gb" scope as an example, the extension should add flattened attributes in the
+"gb" branch as an example, the extension should add flattened attributes in the
 Route struct. It can do so using the helper function `Routex.Attrs.put/2`.
 
 ```

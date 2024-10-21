@@ -93,7 +93,7 @@ defmodule Routex.Processing do
       processed_routes_per_cm_p2
       |> Enum.map(&elem(&1, 1))
       |> List.flatten()
-      |> Enum.sort_by(&Attrs.get(&1, :__order__))
+      |> Enum.sort_by(&Attrs.get(&1, :__branch__))
 
     new_routes
     |> remove_build_info()
@@ -119,8 +119,7 @@ defmodule Routex.Processing do
     meta =
       Map.new()
       |> Map.put(:__origin__, route.path)
-      |> Map.put(:__line__, route.line)
-      |> Map.put(:__order__, [0, index])
+      |> Map.put(:__branch__, [index])
 
     Attrs.merge(route, meta)
   end
@@ -200,7 +199,7 @@ defmodule Routex.Processing do
           {:cont,
            Phoenix.LiveView.assign(
              socket,
-             [url: url, __order__: opts.__order__] ++
+             [url: url, __branch__: opts.__branch__] ++
                Map.to_list(opts.assigns)
            )}
         end
@@ -211,7 +210,7 @@ defmodule Routex.Processing do
           {:cont,
            Phoenix.Component.assign(
              socket,
-             [url: url, __order__: opts.__order__] ++
+             [url: url, __branch__: opts.__branch__] ++
                Map.to_list(opts.assigns)
            )}
         end

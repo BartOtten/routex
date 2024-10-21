@@ -11,21 +11,21 @@ defmodule MyAppWeb.RoutexBackend do
     alternatives: %{
       "/" => %{
         attrs: %Attrs{contact: "root@example.com"},
-        scopes: %{
+        branches: %{
           "/europe" => %{
             attrs: %Attrs{
               contact: "europe@example.com"
             },
-            scopes: %{
+            branches: %{
               "/nl" => %{
                 attrs: %Attrs{
-                  locale: "nl",
+                  language: "nl",
                   contact: "verkoop@example.nl"
                 }
               },
               "/be" => %{
                 attrs: %Attrs{
-                  locale: "nl",
+                  language: "nl",
                   contact: "handel@example.be"
                 }
               }
@@ -50,19 +50,19 @@ defmodule MyAppWeb.MultiLangRoutes do
   alias Router.Attrs
 
   use(
-    Routex,
+    Routex.Backend,
     alternatives: %{
       "/" => %{
         attrs: %Attrs{contact: "root@example.com"},
-        scopes: %{
+        branches: %{
           "/europe" => %{
             attrs: %Attrs{contact: "europe@example.com"},
-            scopes: %{
+            branches: %{
               "/nl" => %{
-                attrs: %Attrs{locale: "nl", contact: "verkoop@example.nl"}
+                attrs: %Attrs{language: "nl", contact: "verkoop@example.nl"}
               },
               "/be" => %{
-                attrs: %Attrs{locale: "nl", contact: "handel@example.be"}
+                attrs: %Attrs{language: "nl", contact: "handel@example.be"}
               }
             }
           },
@@ -71,7 +71,7 @@ defmodule MyAppWeb.MultiLangRoutes do
       }
     },
     translations_backend: MyAppWeb.Gettext,
-    assigns: %{namespace: :rtx, attrs: [:scope_helper, :locale, :contact, :name]},
+    assigns: %{namespace: :rtx, attrs: [:branch_helper, :language, :contact, :name]},
     extensions: [
       Routex.Extension.Alternatives,
       Routex.Extension.Translations,

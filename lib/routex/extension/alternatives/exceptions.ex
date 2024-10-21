@@ -1,11 +1,11 @@
 defmodule Routex.Extension.Alternatives.Exceptions do
   defmodule AttrsMismatchError do
     @moduledoc """
-    Raised when the custom attributes of scopes do not have the same keys.
+    Raised when the custom attributes of branches do not have the same keys.
 
     ```elixir
     %{
-      scopes: %{
+      branches: %{
         "/"      => %{attrs: %{key1: 1, key2: 2}},
         "/other" => %{attrs: %{key1: 1}} # missing :key2
       }
@@ -15,12 +15,12 @@ defmodule Routex.Extension.Alternatives.Exceptions do
     To fix this, make the attribute maps consistent or use an attributes struct.
     """
 
-    defexception [:scope, :expected_keys, :actual_keys]
+    defexception [:branch, :expected_keys, :actual_keys]
 
     @impl Exception
     def message(exception) do
       ~s"""
-      attribute keys mismatch in local scope #{exception.scope}.\n
+      attribute keys mismatch in local branch #{exception.branch}.\n
       Expected: #{inspect(exception.expected_keys)}
       Actual: #{inspect(exception.actual_keys)}
       """
@@ -29,24 +29,24 @@ defmodule Routex.Extension.Alternatives.Exceptions do
 
   defmodule MissingRootSlugError do
     @moduledoc """
-    Raised when the scope map does not start with the root scope "/".
+    Raised when the branch map does not start with the root branch "/".
 
     ```elixir
     %{
-      scopes: %{
+      branches: %{
         "/first"  =>    %{attrs: %{key1: 1}},
         "/other"  =>    %{attrs: %{key1: 1}}},
     }
     ```
 
-    To fix this, include a scope for the root "/".
+    To fix this, include a branch for the root "/".
 
     ```elixir
     `%{
-      scopes: %{
+      branches: %{
         "/" => %{
           attrs: %{level: 1}
-          scopes: %{
+          branches: %{
             "/first"  =>    %{attrs: %{level: 2}},
             "/other"  =>    %{attrs: %{level: 2}}
           }
@@ -58,6 +58,6 @@ defmodule Routex.Extension.Alternatives.Exceptions do
     """
 
     defexception message:
-                   "the configured scopes do not start with a root slug. Please wrap your scopes in a root scope with key '/'"
+                   "the configured branches do not start with a root slug. Please wrap your branches in a root branch with key '/'"
   end
 end

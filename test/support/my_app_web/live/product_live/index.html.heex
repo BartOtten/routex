@@ -12,8 +12,8 @@
 <% end %>
 
 <span>Connected: <%= @connected %></span>
-<span>Locale: <%= @loc.locale %></span>
-<span>Helper: <%= @loc.scope_helper %></span>
+<span>Language: <%= @loc.language %></span>
+<span>Helper: <%= @loc.branch_helper %></span>
 
 <span>
   <%= live_redirect("New Product", id: "redirect", to: Routes.product_index_path(@socket, :new)) %>
@@ -24,7 +24,7 @@
 <span>
   <%= link("New Product", id: "link", to: Routes.product_index_path(@socket, :new)) %>
 </span>
-<%= for {slug, opts} <- Routes.alternatives(@url), opts.assign.scope_helper !=@loc.scope_helper do %>
+<%= for {slug, opts} <- Routes.alternatives(@url), opts.assign.branch_helper !=@loc.branch_helper do %>
   <span>
     <%= link(" [#{slug}] ",
       id: " link-#{slug}",

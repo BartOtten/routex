@@ -28,20 +28,25 @@ defmodule Routex.Extension.AlternativeGetters do
   **Example**
   ```elixir
   iex> ExampleWeb.Router.RoutexHelpers.alternatives("/products/12?foo=baz")
-  [
+  [ %Routex.Extension.AlternativeGetters{
+    slug: "products/12/?foo=baz",
+   is_current?: true,
+    attrs: %{
+      __branch__: [0, 12, 0],
+      __origin__: "/products/:id",
+      [...attributes set by other extensions...]
+    }},
     %Routex.Extension.AlternativeGetters{
     slug: "/europe/products/12/?foo=baz",
     attrs: %{
-      __line__: 32,
-      __order__: [0, 12, 1],
+      __branch__: [0, 12, 1],
       __origin__: "/products/:id",
       [...attributes set by other extensions...]
     }},
    %Routex.Extension.AlternativeGetters{
     slug: "/asia/products/12/?foo=baz",
     attrs: %{
-      __line__: 32,
-      __order__: [0, 12, 1],
+      __branch__: [0, 12, 1],
       __origin__: "/products/:id",
       [...attributes set by other extensions...]
     }},

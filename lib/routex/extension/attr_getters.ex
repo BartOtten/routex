@@ -29,14 +29,13 @@ defmodule Routex.Extension.AttrGetters do
   ```elixir
   iex> ExampleWeb.Router.RoutexHelpers.attrs("/europe/nl/producten/?foo=baz")
   %{
-    __line__: 28,
-    __order__: [0, 9, 3],
+    __branch__: [0, 9, 3],
     __origin__: "/products",
     backend: ExampleWeb.LocalizedRoutes,
     contact: "verkoop@example.nl",
     locale: "nl",
-    scope_name: "The Netherlands",
-    scope_helper: "europe_nl",
+    branch_name: "The Netherlands",
+    branch_helper: "europe_nl",
   }
   ```
   """

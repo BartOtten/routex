@@ -5,8 +5,8 @@ defmodule Routex.Processing do
   the `transform` callbacks from extensions to transform `Phoenix.Router.Route`
   structs and `create_helpers` callbacks to create one unified Helper module.
 
-  **Powerful but thin** Although
-  Routext is able to influence the routes in Phoenix applications in profound
+  **Powerful but thin**
+  Although Routext is able to influence the routes in Phoenix applications in profound
   ways, the framework and it's extensions are a suprisingly lightweight piece
   of compile-time middleware. This is made possible by the way router modules
   are pre-processed by `Phoenix.Router` itself.
@@ -101,7 +101,7 @@ defmodule Routex.Processing do
 
     create_helper_module(extensions_ast, env)
 
-    IO.puts(["End: ", inspect(__MODULE__), " completed route processing.."])
+    IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
     :ok
   end
 
@@ -121,7 +121,10 @@ defmodule Routex.Processing do
       |> Map.put(:__origin__, route.path)
       |> Map.put(:__branch__, [index])
 
-    Attrs.merge(route, meta)
+    overrides = Map.get(route.private, :rtx, %{})
+    values = Map.merge(meta, overrides)
+
+    Attrs.merge(route, values)
   end
 
   @spec helper_mod_name(Macro.Env.t()) :: module
@@ -140,16 +143,6 @@ defmodule Routex.Processing do
     end
   end
 
-  defp create_helper_functions(routes, backend, env) do
-    for extension <- backend.extensions(), extension != [] do
-      exec_when_defined(backend, extension, :create_helpers, nil, [
-        routes,
-        backend,
-        env
-      ])
-    end
-  end
-
   @spec post_transform_routes(routes, backend, Macro.Env.t()) :: routes
   defp post_transform_routes(routes, nil, _env), do: routes
 
@@ -159,6 +152,16 @@ defmodule Routex.Processing do
     for extension <- backend.extensions(), extension != [], reduce: routes do
       acc ->
         exec_when_defined(backend, extension, :post_transform, acc, [acc, backend, env])
+    end
+  end
+
+  defp create_helper_functions(routes, backend, env) do
+    for extension <- backend.extensions(), extension != [] do
+      exec_when_defined(backend, extension, :create_helpers, nil, [
+        routes,
+        backend,
+        env
+      ])
     end
   end
 

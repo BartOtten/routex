@@ -53,13 +53,20 @@ defmodule Routex.Router do
   Wraps each enclosed route in a scope, marking it for processing by Routex
   using given `backend`. `opts` can be used to partially override the given
   configuration.
+
+  Replaces interpolation syntax with a string for macro free processing by
+  extensions. Format: `[rtx.{binding}]`.
   """
+
   @spec preprocess_using(module, opts :: list, do: ast :: Macro.t()) :: ast :: Macro.t()
   defmacro preprocess_using(backend, opts \\ [], do: ast) do
     Macro.postwalk(ast, fn
       node = {method, _opts, _args} when method in @supported_methods ->
         backend = Macro.expand_once(backend, __CALLER__)
         wrap_in_scope(node, backend, opts)
+
+      {{:., _, [Kernel, :to_string]}, _, [{binding, _, _}]} ->
+        quote do: "[rtx.#{unquote(binding)}]"
 
       node ->
         node
@@ -72,7 +79,7 @@ defmodule Routex.Router do
 
   # Example:
   # :resources lack the :private option and their line numbers after expansion
-  # does not match the line number of their 'parent' definition.
+  # do not match the line number of their 'parent' definition.
 
   defp wrap_in_scope(node, backend, opts) do
     quote do

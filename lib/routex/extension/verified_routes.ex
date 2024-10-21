@@ -1,25 +1,45 @@
 defmodule Routex.Extension.VerifiedRoutes do
+  require Phoenix.VerifiedRoutes
+
   @moduledoc ~S"""
-  Provides route generation with compile-time verification.
+  Supports the use of unmodified route paths in controllers and templates while using transformed
+  and/or branching paths with compile-time verification and dynamic runtime behavior.
 
-  Provides a sigil (default: ~l) with the ability to verify routes even when
-  the route has been transformed by Routex extensions. This allows the
-  use of the original route paths in controllers and templates.
+  > #### Implementation summary {:.info}
+  > Each sigil and function eventualy delegates to the official
+  > `Phoenix.VerifiedRoutes`.  If a non-branching route is provided it will
+  > simply delegate to the official Phoenix function. If a branching route is
+  > provided, it will use a branching mechanism before delegation.
 
-  The sigil to use can be set to ~p  to override Phoenix' default as it is
-  a drop-in replacement.
+  ## Alternative Verified Route sigil
+  Provides a sigil (default: `~l`) to verify transformed and/or branching routes.
+  The sigil to use can be set to `~p` to override the default of Phoenix as
+  it is a drop-in replacement. If you choose to override the default Phoenix sigil,
+  it is renamed (default: `~o`) and can be used when unaltered behavior is required.
+
+  ## Variants of url/{2,3,4} and path/{2,3}
+  Provides branching variants of (and delegates to) macro's provided by
+  `Phoenix.VerifiedRoutes`. Both new macro's detect whether branching should be
+  applied.
 
   ## Options
-  - `verified_sigil_routex`: Sigil to use for Routex verified routes (default: "~l")
-  - `verified_sigil_original`: Sigil for original routes when `verified_sigil_routex` is set to "~p". (default: "~o")
+  - `verified_sigil_routex`: Sigil to use for Routex verified routes (default `"~l"`)
+  - `verified_sigil_phoenix`: Replacement for the native (original) sigil when `verified_sigil_routex`
+    is set to "~p". (default: `"~o"`)
+   - `verified_url_routex`: Function name to use for Routex verified routes powered `url`. (default: `:rtx_url`)
+  - `verified_url_phoenix`: Replacement for the native `url` function when `verified_url_routex`
+    is set to `:url`. (default: `:phx_url`)
+   - `verified_path_routex`: Function name to use for Routex verified routes powered `path` (default `:rtx_path`)
+  - `verified_path_phoenix`: Replacement for the native `path` function  when `verified_path_routex`
+    is set to `:path`. (default: `:phx_path`)
 
-  When setting `verified_sigil_routex` option to "~p" an additional changes must be made.
+  When `verified_sigil_routex` is set to "~p" an additional change must be made.
 
   ```diff
   # file /lib/example_web.ex
   defp routex_helpers do
-  + import Phoenix.VerifiedRoutes, except: [sigil_p: 2]
-    import ExampleWeb.Router.RoutexHelpers
+  + import Phoenix.VerifiedRoutes, only: :functions
+    import ExampleWeb.Router.Routex
   end
   ```
 
@@ -32,22 +52,30 @@ defmodule Routex.Extension.VerifiedRoutes do
   +   Routex.Extension.VerifiedRoutes,
   ],
   + verified_sigil_routex: "~p",
-  + verified_sigil_original: "~o",
+  + verified_sigil_phoenix: "~o",
+  + verified_url_routex: :url,
+  + verified_url_phoenix: :url_native,
+  + verified_path_routex: :path,
+  + verified_path_phoenix: :path_native,
   ```
 
   ## Pseudo result (simplified)
-      # in (h)eex template
+      # given Routex is configured to use ~l
+      # given Phoenix is assigned ~o (for example clarity)
 
-      # for a 1-on-1 mapping
+      # given other extensions have caused a route transformation
+      ~o"/products/#{product}"   ⇒  ~p"/products/#{products}"
       ~l"/products/#{product}"   ⇒  ~p"/transformed/products/#{product}"
 
-      # or when alternative routes are created
-      ~l"/products/#{product}"  ⇒ case alternative do
-                                     nil ⇒  ~p"/products/#{product}"
-                                    "en" ⇒  ~p"/products/#{product}"
-                                    "eu_nl" ⇒  ~p"/europe/nl/products/#{product}"
-                                    "eu_be" ⇒  ~p"/europe/be/products/#{product}"
-                                  end
+      # given another extension has generated branches / alternative routes
+      ~o"/products/#{product}"  ⇒  ~p"/products/#{products}"
+      ~l"/products/#{product}"  ⇒
+              case branch do
+                nil ⇒  ~p"/products/#{product}"
+                "en" ⇒  ~p"/products/en/#{product}"
+                "eu_nl" ⇒  ~p"/europe/nl/products/#{product}"
+                "eu_be" ⇒  ~p"/europe/be/products/#{product}"
+              end
 
   ## `Routex.Attrs`
   **Requires**
@@ -57,126 +85,215 @@ defmodule Routex.Extension.VerifiedRoutes do
   - none
   """
 
+  alias Routex.Matchable
+
+  require Logger
+  require Phoenix.VerifiedRoutes
+  require Routex.Branching
+
+  import Routex.Branching
+
   @behaviour Routex.Extension
 
-  alias Routex.Attrs
-  alias Routex.ExtensionUtils
-  alias Routex.Path
-  alias Routex.Route
-  require Logger
+  @cell_width 20
 
-  @phoenix_sigil "~p"
-  @default_verified_sigil_routex "~l"
-  @default_verified_sigil_original "~o"
+  @defaults %{
+    verified_sigil: %{phoenix: "~p", routex: "~l", default_replacement: "~o"},
+    verified_url: %{phoenix: :url, routex: :url_rtx, default_replacement: :url_phx},
+    verified_path: %{phoenix: :path, routex: :path_rtx, default_replacement: :path_phx}
+  }
 
   @impl Routex.Extension
   def configure(config, cm) do
-    routex = Keyword.get(config, :verified_sigil_routex, @default_verified_sigil_routex)
-    original = Keyword.get(config, :verified_sigil_original, @default_verified_sigil_original)
+    final_config_map = merge_defaults_and_config(@defaults, config)
+    print_message(final_config_map, cm)
 
-    p1 =
-      if routex == @phoenix_sigil do
-        "\nThe default sigil used by Phoenix Verified Routes is overridden by Routex due to the configuration in `#{inspect(cm)}`.
-
-      #{routex}: localizes and verifies routes. (override)
-      #{original}: only verifies routes. (original)"
-      else
-        "\nRoutes can be localized using the #{routex} sigil"
-      end
-
-    p2 = "\n\nDocumentation: https://hexdocs.pm/routex/extensions/verified_routes.html\n"
-
-    Logger.info([p1, p2])
-
-    Keyword.merge(config, verified_sigil_routex: routex, verified_sigil_original: original)
-  end
-
-  @impl Routex.Extension
-  def create_helpers(routes, cm, _env) do
-    config = cm.config()
-
-    %{
-      verified_sigil_routex: verified_sigil_routex,
-      verified_sigil_original: verified_sigil_original
-    } = config
-
-    pattern_routes =
-      routes
-      |> Route.group_by_method_and_path()
-      |> Enum.map(fn {{_method, path}, routes} ->
-        {Path.to_match_pattern(path), routes}
+    opts_list =
+      Enum.flat_map(final_config_map, fn {config_prefix, %{routex: routex, native: native}} ->
+        [
+          {concat_atoms(config_prefix, :routex), routex},
+          {concat_atoms(config_prefix, :phoenix), native}
+        ]
       end)
-      |> Map.new()
 
-    original_sigil =
-      if verified_sigil_routex == @phoenix_sigil do
-        "~" <> sigil_letter = verified_sigil_original
-        sigil_fun_name = String.to_atom("sigil_" <> sigil_letter)
+    config ++ opts_list
+  end
 
-        quote location: :keep do
-          defmacro unquote(sigil_fun_name)({:<<>>, meta, segments} = route, extra) do
-            quote location: :keep do
-              Phoenix.VerifiedRoutes.sigil_p(unquote(route), unquote(extra))
-            end
+  @impl true
+  def create_helpers(routes, cm, _env) do
+    # print a newline so the branch_macro's can safely print in their own
+    # empty space
+    IO.puts("")
+
+    config = cm.config()
+    match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
+    to_macro_name = fn "~" <> letter -> String.to_atom("sigil_" <> letter) end
+
+    macros_ast = [
+      branch_macro(
+        routes,
+        match_ast,
+        {__MODULE__.Transformers, :clause_transformer, []},
+        {__MODULE__.Transformers, :argument_transformer, []},
+        Phoenix.VerifiedRoutes,
+        :sigil_p,
+        as: get_value(config, :verified_sigil, :routex) |> then(&to_macro_name.(&1)),
+        orig: get_value(config, :verified_sigil, :phoenix) |> then(&to_macro_name.(&1)),
+        arg_pos: fn arity -> arity - 1 end
+      ),
+      branch_macro(
+        routes,
+        match_ast,
+        {__MODULE__.Transformers, :clause_transformer, []},
+        {__MODULE__.Transformers, :argument_transformer, []},
+        Phoenix.VerifiedRoutes,
+        :url,
+        as: get_value(config, :verified_url, :routex),
+        orig: get_value(config, :verified_url, :phoenix),
+        arg_pos: fn arity -> arity end
+      ),
+      branch_macro(
+        routes,
+        match_ast,
+        {__MODULE__.Transformers, :clause_transformer, []},
+        {__MODULE__.Transformers, :argument_transformer, []},
+        Phoenix.VerifiedRoutes,
+        :path,
+        as: get_value(config, :verified_path, :routex),
+        orig: get_value(config, :verified_path, :phoenix),
+        arg_pos: fn arity -> arity end
+      )
+    ]
+
+    macros_ast
+  end
+
+  defp print_message(config, config_module) do
+    warning_msg =
+      if Enum.any?(config, fn {_, mapping} -> mapping.phoenix == mapping.routex end),
+        do: [
+          """
+          \nDue to the configuration in module `#{inspect(config_module)}` one or multiple
+          Routex variants use the default name of their native Phoenix equivalents. The native
+          macro's, sigils or functions have been renamed.
+          """
+        ]
+
+    macro_names_table = table(config)
+
+    IO.puts("")
+
+    Routex.Utils.print([
+      """
+      \n-- Notice --
+      This project uses Routex generated variants of the official Phoenix Verifies Routes.
+      While the Native variants directly delegate to the official Phoenix macro's, the
+      Routex variants apply route transfomations and/or automated branching before delegation.
+      """,
+      warning_msg,
+      macro_names_table,
+      """
+      Documentation: https://hexdocs.pm/routex/extensions/verified_routes.html
+      """
+    ])
+  end
+
+  defp merge_defaults_and_config(defaults, config) do
+    for {config_prefix, _defaults} <- defaults do
+      phoenix = get_value(config, config_prefix, :phoenix)
+      routex = get_value(config, config_prefix, :routex)
+      replacement = get_value(config, config_prefix, :default_replacement)
+
+      if routex == phoenix do
+        {config_prefix, %{phoenix: phoenix, routex: routex, native: replacement}}
+      else
+        {config_prefix, %{phoenix: phoenix, routex: routex, native: phoenix}}
+      end
+    end
+  end
+
+  defp get_value(config, prefix, key) when is_list(config) do
+    Keyword.get(config, concat_atoms(prefix, key), @defaults[prefix][key])
+  end
+
+  defp get_value(config, prefix, key) when is_map(config) do
+    Map.get(config, concat_atoms(prefix, key), @defaults[prefix][key])
+  end
+
+  defp concat_atoms(a1, a2) do
+    :"#{a1}_#{a2}"
+  end
+
+  defp table(config) do
+    heading = row(["Native", "Routex"])
+    divider = row([String.duplicate("-", @cell_width * 2 + 1)])
+
+    body =
+      for {_config_key, %{phoenix: _phoenix, routex: routex, native: native}} <- config do
+        [native, routex] |> row()
+      end
+
+    ["\n", heading, divider, body, "\n"]
+  end
+
+  defp row(items) do
+    items |> Enum.map(&cell/1) |> Enum.intersperse("|") |> then(&(&1 ++ ["\n"]))
+  end
+
+  defp cell(content, width \\ @cell_width) do
+    [" ", String.pad_trailing(to_string(content), width)]
+  end
+
+  defmodule Transformers do
+    @moduledoc false
+    def clause_transformer(route, {:sigil_p, _, [{:<<>>, _, _segments} = ast, []]}),
+      do: clause_transformer(route, ast)
+
+    def clause_transformer(route, {:<<>>, _, segments}),
+      do: clause_segments_transformer(route, segments)
+
+    def clause_segments_transformer(route, segments) do
+      orig_record = route |> Routex.Attrs.get!(:__origin__) |> Matchable.new()
+      arg_record = segments |> Matchable.new()
+
+      if Matchable.match?(orig_record, arg_record) do
+        Routex.Attrs.get!(route, :__branch__) |> List.last()
+      else
+        :skip
+      end
+    end
+
+    def argument_transformer(
+          pattern,
+          {:sigil_p, meta, [{:<<>>, _meta, _segments} = path_ast, opts]}
+        ) do
+      new_path_ast = {:<<>>, _, _} = argument_transformer(pattern, path_ast)
+      {:sigil_p, meta, [new_path_ast, opts]}
+    end
+
+    def argument_transformer(pattern, {:<<>>, meta, segments}) do
+      new_segments = argument_segments_transformer(pattern, segments)
+      {:<<>>, meta, new_segments}
+    end
+
+    def argument_segments_transformer(pattern, segments) do
+      orig_record = pattern |> Routex.Attrs.get!(:__origin__) |> Matchable.new()
+      orig_pattern = orig_record |> Matchable.to_pattern()
+      new_pattern = pattern |> Matchable.new() |> Matchable.to_pattern()
+      arg_record = segments |> Matchable.new()
+
+      if Matchable.match?(orig_record, arg_record) do
+        ast =
+          quote do
+            unquote(orig_pattern) = unquote(Macro.escape(arg_record))
+            unquote(new_pattern)
           end
-        end
-      end
 
-    localized_sigil =
-      quote location: :keep do
-        defmacro sigil_p(route, extra) do
-          Routex.Extension.VerifiedRoutes.sigil_callback(
-            route,
-            extra,
-            unquote(Macro.escape(pattern_routes)),
-            __CALLER__
-          )
-        end
-      end
-
-    [original_sigil, localized_sigil]
-  end
-
-  @doc false
-  def sigil_callback(route, extra, pattern_routes, caller) do
-    {:<<>>, _meta, segments} = route
-    pattern = Path.to_match_pattern(segments)
-    routes_matching_pattern = Map.get(pattern_routes, pattern, [])
-
-    # Routex does not handle all routes. Return the original route if we find
-    # none handled by Routex.
-    if routes_matching_pattern === [] do
-      quote do
-        Phoenix.VerifiedRoutes.sigil_p(unquote(route), unquote(extra))
-      end
-    else
-      build_case(segments, routes_matching_pattern, caller)
-    end
-  end
-
-  defp build_case(segments, routes_matching_pattern, caller) do
-    cases = build_case_clauses(segments, routes_matching_pattern)
-    helper_ast = ExtensionUtils.get_helper_ast(caller)
-
-    quote do
-      case {unquote(Macro.escape(segments)), unquote(helper_ast)} do
-        unquote(cases)
+        {new_segments, _bindings} = Code.eval_quoted(ast)
+        Matchable.to_ast_segments(new_segments)
+      else
+        :skip
       end
     end
-  end
-
-  defp build_case_clauses(segments, routes_matching_pattern) do
-    for route <- routes_matching_pattern do
-      new_segments = route |> Attrs.get(:__origin__) |> Path.recompose(route.path, segments)
-
-      helper = route |> Attrs.get(:__order__) |> List.last()
-
-      quote do
-        {unquote(Macro.escape(segments)), unquote(helper)} ->
-          Phoenix.VerifiedRoutes.sigil_p(<<unquote_splicing(new_segments)>>, [])
-      end
-    end
-    |> List.flatten()
-    |> Enum.uniq()
   end
 end

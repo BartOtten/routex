@@ -1,8 +1,7 @@
-#
 defmodule Routex.Extension.AlternativeGetters do
   @moduledoc """
-  Creates helper functions to get a list of alternative slugs and their routes
-  attributes given a binary url or a list of path segments and a binary url.
+  Creates helper functions to get a list of alternative slugs and their Routex
+  attributes by providing the function a binary url.
 
   ## Configuration
   ```diff
@@ -23,7 +22,6 @@ defmodule Routex.Extension.AlternativeGetters do
 
   ## Helpers
   - alternatives(url :: String.t()) :: struct()
-  - alternatives(segments :: list, query:: String.t()) :: structs()
 
   **Example**
   ```elixir
@@ -38,6 +36,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
     %Routex.Extension.AlternativeGetters{
     slug: "/europe/products/12/?foo=baz",
+   is_current?: true,
     attrs: %{
       __branch__: [0, 12, 1],
       __origin__: "/products/:id",
@@ -45,6 +44,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
    %Routex.Extension.AlternativeGetters{
     slug: "/asia/products/12/?foo=baz",
+   is_current?: true,
     attrs: %{
       __branch__: [0, 12, 1],
       __origin__: "/products/:id",
@@ -56,68 +56,47 @@ defmodule Routex.Extension.AlternativeGetters do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Path
   alias Routex.Route
+  alias Routex.Matchable
 
-  defstruct [:slug, :attrs]
+  defstruct [:slug, :attrs, is_current?: false]
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
     prelude =
       quote do
         def alternatives(url) when is_binary(url) do
-          uri = URI.parse(url)
-          segments = Path.split(uri.path)
-          alternatives(segments, uri.query)
+          uri = Matchable.new(url)
+          alternatives(uri)
         end
       end
 
-    sibling_groups = Route.group_by_nesting(routes)
+    functions =
+      for {_nesting, siblings} <- Route.group_by_nesting(routes) do
+        body_ast =
+          for sibling <- siblings do
+            map_ast(sibling)
+          end
 
-    route_groups =
-      routes
-      |> Enum.group_by(& &1, &Map.get(sibling_groups, Route.get_nesting(&1)))
-
-    funs =
-      for {path, sibling_routes} <- route_groups do
-        helper_ast(path, sibling_routes, :ignored)
+        _function_ast =
+          for route <- siblings do
+            Matchable.new(route) |> Matchable.to_func(:alternatives, body_ast)
+          end
       end
 
-    [prelude | funs]
+    [prelude, functions]
   end
 
-  defp helper_ast(path, sibling_routes, _env) do
-    pattern = Path.to_match_pattern(path)
+  defp map_ast(route) do
+    pattern = route |> Matchable.new() |> Matchable.to_pattern()
+    attrs = Attrs.get(route)
 
-    dynamic_paths =
-      sibling_routes
-      |> List.flatten()
-      |> Enum.map(fn route ->
-        pattern = Path.to_match_pattern(route)
-
-        # unset the :alternatives key as it is redundant
-        attrs =
-          route
-          |> Attrs.get()
-          |> Map.new()
-          |> Map.drop([:alternatives])
-
-        {pattern, Macro.escape(attrs)}
-      end)
-
-    result =
-      quote do
-        def alternatives(unquote(pattern), query) do
-          unquote(dynamic_paths)
-          |> Enum.map(
-            &%Routex.Extension.AlternativeGetters{
-              slug: Path.join([elem(&1, 0), "?#{query}"]),
-              attrs: elem(&1, 1)
-            }
-          )
-        end
-      end
-
-    result
+    quote do
+      %Routex.Extension.AlternativeGetters{
+        is_current?: unquote(Macro.var(:pattern, Matchable)) == unquote(pattern),
+        slug: unquote(pattern) |> Matchable.to_binary(),
+        attrs: unquote(Macro.escape(attrs))
+      }
+    end
   end
 end

@@ -44,16 +44,21 @@ defmodule Routex.Extension.AlternativeGettersTest do
 
   ast = AlternativeGetters.create_helpers(routes, __MODULE__, :ignored)
   Module.create(__MODULE__.RoutexHelpers, ast, __ENV__)
+
+  @expected [
     %AlternativeGetters{
-      slug: "/europe/be/producten/12?foo=baz",
+      slug: "/products/12?foo=baz#top",
+      is_current?: true,
       attrs: %{}
     },
     %AlternativeGetters{
-      slug: "/europe/nl/producten/12?foo=baz",
+      slug: "/alt1/12/productsa/?foo=baz#top",
+      is_current?: false,
       attrs: %{}
     },
     %AlternativeGetters{
-      slug: "/gb/products/12?foo=baz",
+      slug: "/alt2/12/productsb/?foo=baz#top",
+      is_current?: false,
       attrs: %{}
     }
   ]

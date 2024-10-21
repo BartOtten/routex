@@ -5,6 +5,35 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.0-alpha.1](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.1...v0.3.0-alpha.1) (2024-10-21)
+### Breaking Changes:
+
+* core: remove Routex.Path module
+
+* core: split Extension Utils module
+
+* alternatives: rename scope to branch
+
+
+
+### Features:
+
+* core: merge private Routex attrs into socket
+
+* verified: branching macro's of all arities of ~p, url and path
+
+* core: enable AST-free manipulation of interpolated routes
+
+* alternatives: indicate if an alternative route `is_current?`
+
+* interpol: add extension for interpolation of routes
+
+* translations: distinct locale and language
+
+* core: introduce Branching module
+
+* core: introduce Matchable module
+
 ## [v0.2.0-alpha.8](https://github.com/BartOtten/routex/compare/v0.2.0-alpha.7...v0.2.0-alpha.8) (2023-10-18)
 
 

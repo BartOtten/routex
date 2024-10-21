@@ -1,8 +1,8 @@
-defmodule Routex do
+defmodule Routex.Backend do
   @moduledoc """
-  > #### `use Routex` {: .info}
+  > #### `use Routex.Backend` {: .info}
   > When use'd this module generates a Routext backend module and
-  > a configuration struct using  the `configure/2` callbacks of
+  > a configuration struct using the `configure/2` callbacks of
   > the extensions provided in `opts`.
   >
   > See also: [Routex Extensions](EXTENSIONS.md).
@@ -10,21 +10,26 @@ defmodule Routex do
   **Example**
 
        iex> defmodule MyApp.RtxBackend do
-       ...>  use Routex,
+       ...>  use Routex.Backend,
        ...>   extensions: [
        ...>    Routex.Extension.VerifiedRoutes,
        ...>    Routex.Extension.AttrGetters,
        ...>   ],
-       ...>   bar: [some_opts: "value"]
+       ...>   extension_x_config: [key: "value"]
        ...> end
        iex> IO.inspect(%MyApp.RtxBackend{})
        %MyApp.RtxBackend{
-         bar: [some_opts: "value"],
+         extension_x_config: [key: "value"],
          extensions: [Routex.Extension.VerifiedRoutes, Routex.Extension.AttrGetters],
          verified_sigil_routex: "~l",
          verified_sigil_original: "~o"
        }
 
+  Values in the configuration can be overridden by providing an override map to the `:private` option of a scope or route.
+
+  **Example**
+
+      live /products, MyApp.Web.ProductIndexLive, :index, private: %{rtx: %{overridden_key: value}}
   """
 
   alias Routex.Processing
@@ -39,8 +44,8 @@ defmodule Routex do
     opts = process_opts(opts, __CALLER__)
     extensions = Keyword.get(opts, :extensions, [])
 
-    # Cheat by adding the struct fields to the map as the actual struct is
-    # not yet defined
+    # Workaround: Manually create an unchecked struct as the actual struct is
+    # not yet defined.
     config = opts |> Map.new() |> Map.put(:__struct__, __CALLER__.module)
 
     quote do
@@ -60,7 +65,7 @@ defmodule Routex do
   end
 
   defp process_opts(opts, env) do
-    {opts, _} = Code.eval_quoted(opts, [], env)
+    {opts, _binding} = Code.eval_quoted(opts, [], env)
 
     for extension <- opts[:extensions], extension != [], reduce: opts do
       acc ->

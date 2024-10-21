@@ -68,13 +68,13 @@ end
 
 ## Configuration
 
-To use `Routex`, a module that calls `use Routex` (referred to below as a
+To use `Routex`, a module that calls `use Routex.Backend` (referred to below as a
 "backend") has to be defined. It includes a list with extensions and
 configuration of extensions.
 
 ```elixir
 defmodule ExampleWeb.RoutexBackend do
-use Routex,
+use Routex.Backend,
   extensions: [
   # ...list of extensions...
   ],

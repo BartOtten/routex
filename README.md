@@ -6,51 +6,93 @@
 
 
 # Routex
-Routex is a framework to extend the functionality of Phoenix Frameworks'
-router. Using a pluggable extension system it can transform routes, create
-alternative routes and generate helper functions based on routes in your Phoenix
-Framework app. It acts as middleware between route definition and route
-compilation by Phoenix; in order to have minimal impact on run-time performance.
 
-It ships with a small set of extensions and provides helper functions for
-writing your own custom Phoenix router features.
+Routex serves as a framework designed to extend the capabilities of Phoenix'
+router. Leveraging a flexible extension system, it is able to transform routes,
+generate alternative routes and generate helper functions based on routes
+within you Phoenix Framework application. Positioned as middleware between route
+definition and compilation by Phoenix, Routex ensures (close to) zero impact on
+runtime performance.
 
 ## Top Features and Benefits
-- none to minimal run-time performance penalty (depending on extensions).
-- adding router features is plug-and-play.
-- include only features you need in your product; less code is less bugs.
-- write powerful extensions without the plumbing.
 
-## Example
-Localize your Phoenix website with multilingual URLs and custom template
-assigns; enhancing user engagement and content relevance. This example combines
-a few extensions: Alternatives, Translations, Assigns and Verified Routes.
+- **extension driven**: mix and match the features you need.
+- **performant**: (close to) zero run time impact.
+- **extensible**: write your own routing features with ease.
+- **plug-and-play**: enable site wide features with a single config change.
+- **easy setup**: Routex extensions provide drop-in alternatives with only a few lines of code.
 
-                        ⇒ /products/:id/edit                      @loc.locale = "en_US"
-    /products/:id/edit  ⇒ /eu/nederland/producten/:id/bewerken    @loc.locale = "nl_NL"
-                        ⇒ /eu/espana/producto/:id/editar          @loc.locale = "es_ES"
-                        ⇒ /gb/products/:id/edit                   @loc.locale = "en_GB"
-
-- Alternatives: the URL format is [customizable](#alternatives) (no mandatory
-  _website.com/[locale]/page_)
-- Translation: URLs [match the language of content](#multilingual-routes);
-  enhancing user engagement and content relevance.
-- Assigns: the value of `locale` is specified per scope by the configuration of
-  the Alternatives extension.  The value is made available in components and
-  controllers in namespace `loc` as `@loc.locale`
-- Verified Routes allows you to use use `~p"/products/#{product}/edit"` in your
-  code. At run-time the route is combined with the set `locale` to pick the
-  localized alternative route.
 
 ## Documentation
 
 [HexDocs](https://hexdocs.pm/routex) (stable) and [GitHub
 Pages](https://bartotten.github.io/routex) (development).
 
+[Summary of all official Routex extensions](#extensions)
+
+
 ## Requirements and Installation
 
 See the [Usage Guide](USAGE.md) for the requirements and installation
 instructions.
+
+
+## Example
+
+Localize your Phoenix website with multilingual URLs and custom template
+assigns; enhancing user engagement and content relevance. This example combines
+a few of the included extensions: `Alternatives`, `Translations`, `Assigns` and
+`Verified Routes`.
+
+                        ⇒ /products/:id/edit                      @loc.locale = "en_US"
+    /products/:id/edit  ⇒ /eu/nederland/producten/:id/bewerken    @loc.locale = "nl_NL"
+                        ⇒ /eu/espana/producto/:id/editar          @loc.locale = "es_ES"
+                        ⇒ /gb/products/:id/edit                   @loc.locale = "en_GB"
+
+- `Alternatives` to generate 4 route branches, with custom attributes per branch.
+- `Translation` to localize the urls enhanding user engagement and content relevance.
+- `Assigns` to access attributes of a route in LiveViews, components and
+  controllers using `loc` as namespace (`@loc.locale`)
+- `Verified Routes` to keep  `~p"/products/#{product}/edit"` in templates. At run-time the route is
+  combined with the set `locale` to pick the localized alternative route.
+
+
+## Routex vs CLDR Routes vs Phoenix Localized Routes
+
+The capabilities and advancements within `Routex` surpass those of `Phoenix
+Localized Routes`, offering a comprehensive array of features. As Phoenix
+Localized Routes has stagnated in its development, developers are strongly
+advised to transition to Routex for a more robust solution.
+
+When considering `Routex` against `CLDR Routes`, it's akin to comparing Apple to
+Linux. CLDR Routes maintains a fixed scope and enjoys a shared configuration
+with other CLDR packages. Routex on the other hand boasts a dynamic scope
+providing maximum freedom. Its primary advantages over CLDR Routes include its
+expansive branch facilitated by its extension mechanism and the minimized
+necessity for code modifications throughout a codebase.
+
+### Comparison table
+
+| Feature             | Routex     | CLDR Routes | PLR        |
+|---------------------|------------|-------------|------------|
+| Route encapsulation | Full  [^1] | Limited     | Limited    |
+| Route manipulation  | Full  [^2] | Limited     | Limited    |
+| Route interpolation | Full       | Limited     | No         |
+| Alternative Routes  | Full       | CLDR        | Full       |
+| Translation         | ☑          | ☑          |  ☑         |
+| Route Helpers       | ☑          | ☑          |  ☑         |
+| Verified Routes     | ☑          | ☑          |  ☐         |
+| Drop-in replacement | ☑     [^3] | ☐          |  ☑         |
+| Standalone          | ☑          | ☐          |  ☐         |
+| Modular             | ☑          | ☐          |  ☐         |
+| Extendable          | ☑          | ☐          |  ☐         |
+
+[^1]: Routex' `preprocesss_using` is not bound to Phoenix (session) scopes
+[^2]: [Crazy example](https://github.com/BartOtten/routex/blob/main/lib/routex/extension/cloak.ex)
+[^3]: Routex *can* be configured to shim original Phoenix functionality (for
+    example: `~p` and `url/2`) while CLDR Routes mandates code modifications
+    (for example: `~p` -> `~q` and `url/2` -> `url_q/2`)
+
 
 ## Extensions
 
@@ -62,13 +104,15 @@ allowing extensions to work together whithout being coupled.
 The documentation of each extension lists any provided or required
 `Routex.Attrs`.
 
+
 ### Alternatives
 
-Create alternative routes based on `scopes` configured in a Routex backend
-module. Scopes can be nested and each scope can provide it's values to be shared
-with other extensions.
+Create alternative routes based on `branches` configured in a Routex backend
+module. Branches can be nested and each branch can provide it's own attributes to
+be shared with other extensions.
 
 [Alternatives Documentation](`Routex.Extension.Alternatives`)
+
 
 ### Translations
 
@@ -79,38 +123,20 @@ enhance user engagement and content relevance.
 
 [Translations Documentation](`Routex.Extension.Translations`)
 
+
 ### Multilingual Routes
 
 The Alternatives extension can be combined with the Translations extension to
-create multilingual routes. The Alternatives extension provides the :locale
+create multilingual routes. The Alternatives extension can provide the :locale
 attribute used by the Translations extension.
 
-### Verified Routes
+    Original            Step 1: Alternatives                    Step 2: Translations
 
-This extension creates a sigil (default: `~l`) with the ability to branch based
-on the current alternative scope of a user. It is able to verify routes even
-when thy have been transformed by Routex extensions. Optionally this sigil can
-be set to `~p` (Phoenix' default) as it is a drop-in replacement.
+						⇒ /products/:id/edit                    ⇒ /products/:id/edit
+	/products/:id/edit  ⇒ /eu/nederland/products/:id/edit       ⇒ /eu/nederland/producten/:id/bewerken
+						⇒ /eu/espana/products/:id/edit		    ⇒ /eu/espana/producto/:id/editar
+						⇒ /gb/products/:id/edit				⇒ /gb/products/:id/edit
 
-[Verified Routes Documentation](`Routex.Extension.VerifiedRoutes`)
-
-### Route Helpers
-
-Creates Phoenix Helpers that have the ability to branch based on the current
-alternative scope of a user. Optionally these helpers can replace the original
-Phoenix Route Helpers as they are drop-ins.
-
-[Route Helpers Documentation](`Routex.Extension.RouteHelpers`)
-
-### Assigns
-
-With this extension you can add (a subset of) attributes set by other extensions
-to Phoenix' assigns making them available in components and controllers with the
-`@` assigns operator (optionally under a namespace)
-
-    @namespace.area   =>  :eu_nl
-
-[Assigns Documentation](`Routex.Extension.Assigns`)
 
 ### Alternative Getters
 
@@ -119,6 +145,53 @@ and their routes attributes. As `Routex` sets the `@url` assign you can simply
 get other routes to the current page with `alternatives(@url)`.
 
 [Alternative Getters Documentation](`Routex.Extension.AlternativeGetters`)
+
+
+### Verified Routes
+
+Routex is fully compatible with Verified Routes.
+
+This extension creates a sigil (default: `~l`) with the ability to branch based
+on the current alternative branch of a user. It is able to verify routes even
+when thy have been transformed by Routex extensions. Optionally this sigil can
+be set to `~p` (Phoenix' default) as it is a drop-in replacement.
+
+It also provides branching variants of `url/{2,3,4}` and `path/{2,3}`.
+
+[Verified Routes Documentation](`Routex.Extension.VerifiedRoutes`)
+
+
+### Route Helpers
+
+Creates Phoenix Helpers that have the ability to branch based on the current
+alternative branch of a user. Optionally these helpers can replace the original
+Phoenix Route Helpers as they are drop-ins.
+
+[Route Helpers Documentation](`Routex.Extension.RouteHelpers`)
+
+
+### Interpolation
+
+With this extension enabled, *any* attribute assigned to a route can be used
+for route interpolation. Most effective with an extension which enables
+alternative routes generation (such as extension `Alternatives`).
+
+    /product/#{territory}/:id/#{language}  => /product/europe/:id/nl
+
+[Interpolation Documentation](`Routex.Extension.Interpolation`)
+
+
+### Assigns
+
+With this extension you can add (a subset of) attributes set by other extensions
+to Phoenix' assigns making them available in components and controllers with the
+`@` assigns operator (optionally under a namespace)
+
+    @namespace.area      =>  :eu_nl
+	@namespace.contact   =>  "contact@example.com"
+
+[Assigns Documentation](`Routex.Extension.Assigns`)
+
 
 ### Attribute Getters
 
@@ -131,14 +204,16 @@ full list can be lazy loaded when needed.
 
 [Attribute Getters Documentation](`Routex.Extension.AttrGetters`)
 
+
 ### Cloak (only for experiments)
 
 Transforms routes to be unrecognizable. This extension is a show case and may
 change at any given moment to generate other routes without prior notice.
 
-      /products/  ⇒ /c/1
-      /products/:id/edit  ⇒ /c/:id/2      ⇒ in browser: /c/1/2, /c/2/2/ etc...
-      /products/:id/show/edit  ⇒ /:id/3   ⇒ in browser: /c/1/3, /c/2/3/ etc...
+      /products/  ⇒ /01
+      /products/:id/edit  ⇒ /:id/02      ⇒ in browser: /1/02, /2/02/ etc...
+      /products/:id/show/edit  ⇒ /:id/03   ⇒ in browser: /1/03, /2/03/ etc...
 
 
 [Attribute Getters Documentation](`Routex.Extension.Cloak`)
+

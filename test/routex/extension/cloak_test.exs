@@ -5,7 +5,7 @@ defmodule Routex.Extension.CloakTest do
   alias Routex.Extension.Cloak
 
   defmodule Conf1 do
-    use(Routex, extensions: [Routex.Extension.Cloak], cloak_character: ".")
+    use(Routex.Backend, extensions: [Routex.Extension.Cloak], cloak_character: ".")
   end
 
   test "simple test" do

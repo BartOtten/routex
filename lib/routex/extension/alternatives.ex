@@ -18,7 +18,7 @@ defmodule Routex.Extension.Alternatives do
   defmodule ExampleWeb.RoutexBackend do
   + alias ExampleWeb.RoutexBackend.AltAttrs
 
-  use Routex,
+  use Routex.Backend,
   extensions: [
   + Routex.Extension.Alternatives
   ],

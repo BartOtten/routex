@@ -8,7 +8,7 @@ defmodule Routex.Extension.AlternativeGetters do
   ```diff
   # file /lib/example_web/routex_backend.ex
   defmodule ExampleWeb.RoutexBackend do
-    use Routex,
+    use Routex.Backend,
     extensions: [
   +   Routex.Extension.AlternativeGetters,
   ],

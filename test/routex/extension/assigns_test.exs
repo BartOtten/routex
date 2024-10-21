@@ -4,12 +4,12 @@ defmodule Routex.Extension.AssignsTest do
   alias Routex.Extension.Assigns
 
   defmodule Conf1 do
-    use(Routex, extensions: [Routex.Extension.Assigns])
+    use(Routex.Backend, extensions: [Routex.Extension.Assigns])
   end
 
   defmodule Conf2 do
     use(
-      Routex,
+      Routex.Backend,
       assigns: %{namespace: :rtx},
       extensions: [
         Routex.Extension.Assigns
@@ -19,7 +19,7 @@ defmodule Routex.Extension.AssignsTest do
 
   defmodule Conf3 do
     use(
-      Routex,
+      Routex.Backend,
       assigns: %{namespace: :rtx, attrs: [:rtx_1]},
       extensions: [
         Routex.Extension.Assigns

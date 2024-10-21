@@ -9,7 +9,7 @@ defmodule Routex.Extension.Translations do
   ## Configuration
   ```diff
   defmodule ExampleWeb.RoutexBackend do
-  use Routex,
+  use Routex.Backend,
   extensions: [
   + Routex.Extension.Translations
   ]

@@ -20,9 +20,9 @@ defmodule Routex.Extension.Cloak do
   ```
 
    ## Pseudo result
-      /products/  ⇒ /c/1
-      /products/:id/edit  ⇒ /c/:id/2      ⇒ in browser: /c/1/2, /c/2/2/ etc...
-      /products/:id/show/edit  ⇒ /:id/3   ⇒ in browser: /c/1/3, /c/2/3/ etc...
+      /products/  ⇒ /1
+      /products/:id/edit  ⇒ rewrite: /:id/02      ⇒ in browser: /1/02, /2/02/ etc...
+      /products/:id/show/edit  ⇒ rewrite: /:id/03   ⇒ in browser: /1/03, /2/03/ etc...
 
   ## `Routex.Attrs`
   **Requires**
@@ -33,28 +33,17 @@ defmodule Routex.Extension.Cloak do
   """
   @behaviour Routex.Extension
 
-  alias Routex.Path
-
   @interpolate ":"
   @catch_all "*"
-
-  # original routes should be preserved until we figure out how to fix controllers
-  # relying directly on verified routes
-
-  #   warning: no route path for ExampleWeb.Router matches "/users/log_in"
-  #   lib/example_web/user_auth.ex:213: ExampleWeb.UserAuth.require_authenticated_user/2
-
-  # warning: no route path for ExampleWeb.Router matches "/users/log_in"
-  #   lib/example_web/user_auth.ex:159: ExampleWeb.UserAuth.on_mount/4
 
   @impl Routex.Extension
   def transform(routes, _cm, _env) do
     {routes, _} =
       for {route, idx} <- Enum.with_index(routes, 0), reduce: {[], %{}} do
-        {routes, cmap} ->
-          if path = cmap[route.path] do
+        {routes, cloak_map} ->
+          if path = cloak_map[route.path] do
             route = %{route | path: path}
-            {[route | routes], cmap}
+            {[route | routes], cloak_map}
           else
             dynamics =
               route.path
@@ -63,16 +52,16 @@ defmodule Routex.Extension.Cloak do
 
             static =
               if idx == 0 do
-                "/"
+                nil
               else
-                idx
+                idx |> to_string()
               end
 
-            path = Path.join(["c", dynamics, static])
-            cmap = Map.put_new(cmap, route.path, path)
+            path = Path.join(["/", dynamics || [], static || []]) |> Path.absname()
+            cloak_map = Map.put_new(cloak_map, route.path, path)
             route = %{route | path: path}
 
-            {[route | routes], cmap}
+            {[route | routes], cloak_map}
           end
       end
 

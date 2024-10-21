@@ -4,8 +4,7 @@ defmodule Routex.Attrs do
 
     Extensions can make use of `Routex.Attrs` values provided by Routex itself,
   Routex backends and other extensions. As those values are attributes to a
-  route extension B can use values attributed to to a route by (pre)processing
-  extension A.
+  route, extension B can use values attributed to a route by extension A.
 
     * To make the availability of the attributes as predictable as possible, Routex
     uses a flat structure.
@@ -19,7 +18,7 @@ defmodule Routex.Attrs do
   Returns true when the provided key or attribute is private.
   """
   @spec is_private({atom, any} | atom) :: boolean()
-  def is_private({key, _}), do: is_private(key)
+  def is_private({key, _v}), do: is_private(key)
   def is_private(key), do: key |> Atom.to_string() |> String.starts_with?("__")
 
   @doc """

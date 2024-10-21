@@ -9,13 +9,14 @@
 
 ## Installation
 
-You can install this library by adding it to your list of dependencies in `mix.exs`:
+You can install this library by adding it to your list of dependencies in `mix.exs`. Look at [https://hex.pm/packages/routex](Hex) to find the
+current version.
 
 ```diff
 def deps do
   [
      ...other deps
-+    {:routex, ">= 0.0.0"}
++    {:routex, "~= 0.3.0-alpha.1"}
   ]
 end
 ```
@@ -58,9 +59,9 @@ def on_mount(_, params, session, socket) do
   socket =
     Phoenix.LiveView.attach_hook(socket, :set_rtx, :handle_params, fn _params, url, socket ->
       attrs = ExampleWeb.Route.RoutexHelpers.attrs(url)
-      rtx_assigns = [url: url, __order__: attrs.__order__] ++ Map.to_list(attrs.assigns)
+      rtx_assigns = [url: url, __branch__: attrs.__branch__] ++ Map.to_list(attrs.assigns)
 
-      {:cont,Phoenix.LiveView.assign( socket, rtx_assigns)}
+      {:cont, Phoenix.LiveView.assign(socket, rtx_assigns)}
     end)
 
   {:cont, socket}

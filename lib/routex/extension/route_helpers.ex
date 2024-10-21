@@ -4,7 +4,7 @@ defmodule Routex.Extension.RouteHelpers do
   routes. The helpers can be used to override Phoenix' defaults as they are
   a drop-in replacements.
 
-  Only use this extension when you  make use of extensions generating alternative
+  Only use this extension when you make use of extensions generating alternative
   routes, as otherwise the result will be the same as the official helpers.
 
   ## Configuration
@@ -37,7 +37,7 @@ defmodule Routex.Extension.RouteHelpers do
   ```
 
   ## Pseudo result
-      # When alternatives are created it uses auto-selection to keep the user 'in scope'.
+      # When alternatives are created it uses auto-selection to keep the user 'in branch'.
 
       # in (h)eex template
       <a href={Routes.product_index_path(@socket, :show, product)}>Product #1</a>
@@ -61,7 +61,7 @@ defmodule Routex.Extension.RouteHelpers do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.ExtensionUtils
+  alias Routex.Utils
   alias Routex.Route
   require Logger
 
@@ -83,7 +83,10 @@ defmodule Routex.Extension.RouteHelpers do
         esc_routes = Macro.escape(routes)
         router = env.module
 
-        for nr <- [2, 3], suffix <- ["_path", "_url"], route <- routes, route.helper != nil do
+        for nr <- [2, 3],
+            suffix <- ["_path", "_url"],
+            route <- routes,
+            route.helper != nil do
           nr_bindings =
             route.path |> Path.split() |> Enum.count(&String.starts_with?(&1, @interpolate))
 
@@ -94,12 +97,12 @@ defmodule Routex.Extension.RouteHelpers do
           orig_helper_module = Module.concat(router, :Helpers)
 
           case {route.path == Attrs.get(route, :__origin__), route.plug == Phoenix.LiveView.Plug} do
-            {false, _} ->
+            {false, _lv?} ->
               quote do
                 unquote(dynamic_delegate_with_arity(orig_helper_module, orig_fun_name, fn_args))
               end
 
-            {true, _} ->
+            {true, _lv?} ->
               quote do
                 unquote(
                   dynamic_fn_with_arity(orig_fun_name, fn_args, [esc_routes, router, suffix])
@@ -114,7 +117,7 @@ defmodule Routex.Extension.RouteHelpers do
 
   def build_case([[caller, routes, router, suffix], args]) do
     cases = build_case_clauses(routes, router, suffix, args)
-    helper_ast = ExtensionUtils.get_helper_ast(caller)
+    helper_ast = Utils.get_helper_ast(caller)
 
     quote do
       case unquote(helper_ast) do

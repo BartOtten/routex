@@ -1,6 +1,6 @@
 defmodule Router.Attrs do
   @moduledoc false
-  defstruct [:contact, locale: "en"]
+  defstruct [:contact, language: "en"]
 end
 
 defmodule MyAppWeb.RoutexBackend do
@@ -40,7 +40,7 @@ defmodule MyAppWeb.RoutexBackend do
       }
     },
     extensions: [
-      Routex.Extension.Alternatives,
+      # Routex.Extension.Alternatives,
       Routex.Extension.AttrGetters
     ]
 end
@@ -73,10 +73,10 @@ defmodule MyAppWeb.MultiLangRoutes do
     translations_backend: MyAppWeb.Gettext,
     assigns: %{namespace: :rtx, attrs: [:branch_helper, :language, :contact, :name]},
     extensions: [
-      Routex.Extension.Alternatives,
-      Routex.Extension.Translations,
-      Routex.Extension.AlternativeGetters,
-      Routex.Extension.RouteHelpers,
+      # Routex.Extension.Alternatives,
+      # Routex.Extension.Translations,
+      # Routex.Extension.AlternativeGetters,
+      # Routex.Extension.RouteHelpers,
       Routex.Extension.AttrGetters,
       Routex.Extension.Assigns
     ]

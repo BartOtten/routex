@@ -2,7 +2,7 @@ defmodule Routex.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/BartOtten/routex"
-  @version "0.2.0-alpha.8"
+  @version "0.3.0-alpha.1"
   @name "Phoenix Routes Extension Framework"
 
   def project do
@@ -22,6 +22,7 @@ defmodule Routex.MixProject do
       docs: docs(),
       package: package(),
       test_coverage: [tool: ExCoveralls],
+      consolidate_protocols: Mix.env() != :test,
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -47,7 +48,7 @@ defmodule Routex.MixProject do
   def aliases, do: [docs: ["docs", &copy_assets/1]]
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:dev), do: ["lib"]
+  # defp elixirc_paths(:dev), do: ["lib"]
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -58,24 +59,26 @@ defmodule Routex.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [
-      {:phoenix, ">= 1.6.0"},
-      {:phoenix_view, ">= 2.0.0", optional: true},
-      {:phoenix_live_view, ">= 0.16.0", optional: true},
-      {:gettext, ">= 0.0.0", optional: true}
-    ]
+    [ {:phoenix, ">= 0.0.0"}]
   end
 
   defp dev_deps do
     [
+			{:phoenix, ">= 1.7.0"},
+      {:phoenix_view, ">= 2.0.0", optional: true},
+      {:phoenix_live_view, ">= 0.20.0", optional: true},
+      {:gettext, ">= 0.0.0", optional: true},
+      {:phoenix_html_helpers, "~> 1.0"}
       {:jason, "~> 1.0", only: [:dev, :test], optional: true},
       {:ex_doc, "~> 0.29", only: [:dev, :test]},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:makeup_diff, "~> 0.1.0", only: [:dev]},
-      {:git_ops, "~> 2.5.6", only: [:dev]}
+      {:git_ops, "~> 2.5.6", only: [:dev]},
+      {:benchee, "~> 1.0", only: :dev},
+      {:ssl_verify_fun, "~> 1.1.7", manager: :rebar3, override: true}
     ]
   end
 

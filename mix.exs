@@ -48,7 +48,7 @@ defmodule Routex.MixProject do
   def aliases, do: [docs: ["docs", &copy_assets/1]]
 
   # Specifies which paths to compile per environment.
-  # defp elixirc_paths(:dev), do: ["lib"]
+  defp elixirc_paths(:dev), do: ["lib"]
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -59,16 +59,17 @@ defmodule Routex.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [ {:phoenix, ">= 0.0.0"}]
+    [
+      {:phoenix, ">= 1.7.0"}
+    ]
   end
 
   defp dev_deps do
     [
-			{:phoenix, ">= 1.7.0"},
       {:phoenix_view, ">= 2.0.0", optional: true},
       {:phoenix_live_view, ">= 0.20.0", optional: true},
       {:gettext, ">= 0.0.0", optional: true},
-      {:phoenix_html_helpers, "~> 1.0"}
+      {:phoenix_html_helpers, "~> 1.0"},
       {:jason, "~> 1.0", only: [:dev, :test], optional: true},
       {:ex_doc, "~> 0.29", only: [:dev, :test]},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
@@ -76,7 +77,7 @@ defmodule Routex.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:makeup_diff, "~> 0.1.0", only: [:dev]},
-      {:git_ops, "~> 2.5.6", only: [:dev]},
+      {:git_ops, "~> 2.6.3", only: [:dev]},
       {:benchee, "~> 1.0", only: :dev},
       {:ssl_verify_fun, "~> 1.1.7", manager: :rebar3, override: true}
     ]

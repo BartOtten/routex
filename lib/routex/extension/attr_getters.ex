@@ -43,30 +43,32 @@ defmodule Routex.Extension.AttrGetters do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Path
+  alias Routex.Matchable
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
     prelude =
       quote do
+        @doc """
+        Returns Routex attributes of given URL
+        """
         def attrs(url) when is_binary(url) do
-          path = URI.parse(url).path
-          segments = Path.split(path)
-          attrs(segments)
+          url
+          |> Matchable.new()
+          |> attrs()
         end
       end
 
-    ast =
+    functions =
       for route <- routes do
-        pattern = Path.to_match_pattern(route.path)
+        attributes = route |> Attrs.get() |> Macro.escape()
 
-        quote do
-          def attrs(unquote(pattern)) do
-            unquote(route |> Attrs.get() |> Macro.escape())
-          end
-        end
+        route
+        |> Matchable.new()
+        |> Matchable.to_func(:attrs, attributes)
       end
+      |> List.flatten()
 
-    [prelude | ast]
+    [prelude, functions]
   end
 end

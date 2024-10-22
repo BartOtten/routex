@@ -68,7 +68,7 @@ defmodule Routex.MixProject do
     [
       {:phoenix_view, ">= 2.0.0", optional: true},
       {:phoenix_live_view, ">= 0.20.0", optional: true},
-      {:gettext, ">= 0.0.0", optional: true},
+      {:gettext, ">= 0.26.0", optional: true},
       {:phoenix_html_helpers, "~> 1.0"},
       {:jason, "~> 1.0", only: [:dev, :test], optional: true},
       {:ex_doc, "~> 0.29", only: [:dev, :test]},

@@ -9,10 +9,9 @@
 
 Routex serves as a framework designed to extend the capabilities of Phoenix'
 router. Leveraging a flexible extension system, it is able to transform routes,
-generate alternative routes and generate helper functions based on routes
-within you Phoenix Framework application. Positioned as middleware between route
-definition and compilation by Phoenix, Routex ensures (close to) zero impact on
-runtime performance.
+generate alternative routes and create helper functions for common use cases. As
+Routex is a middleware between route definition and compilation, it has minimal
+impact on run time performance.
 
 ## Top Features and Benefits
 
@@ -20,7 +19,7 @@ runtime performance.
 - **performant**: (close to) zero run time impact.
 - **extensible**: write your own routing features with ease.
 - **plug-and-play**: enable site wide features with a single config change.
-- **easy setup**: Routex extensions provide drop-in alternatives with only a few lines of code.
+- **easy setup**: test drive Routex with minimal changes to the codebase.
 
 
 ## Documentation
@@ -28,7 +27,7 @@ runtime performance.
 [HexDocs](https://hexdocs.pm/routex) (stable) and [GitHub
 Pages](https://bartotten.github.io/routex) (development).
 
-[Summary of all official Routex extensions](#extensions)
+Summaries of [official Routex extensions](#extensions)
 
 
 ## Requirements and Installation
@@ -49,8 +48,8 @@ a few of the included extensions: `Alternatives`, `Translations`, `Assigns` and
                         ⇒ /eu/espana/producto/:id/editar          @loc.locale = "es_ES"
                         ⇒ /gb/products/:id/edit                   @loc.locale = "en_GB"
 
-- `Alternatives` to generate 4 route branches, with custom attributes per branch.
-- `Translation` to localize the urls enhanding user engagement and content relevance.
+- `Alternatives` to generate 4 route branches with custom attributes per branch.
+- `Translation` to localize the urls enhancing user engagement and content relevance.
 - `Assigns` to access attributes of a route in LiveViews, components and
   controllers using `loc` as namespace (`@loc.locale`)
 - `Verified Routes` to keep  `~p"/products/#{product}/edit"` in templates. At run-time the route is

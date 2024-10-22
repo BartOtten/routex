@@ -115,7 +115,7 @@ defmodule Routex.Extension.Translations do
 
     prelude =
       quote do
-				use Gettext, backend: unquote(backend)
+        use Gettext, backend: unquote(backend)
       end
 
     triggers_ast =

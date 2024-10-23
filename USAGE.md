@@ -9,14 +9,13 @@
 
 ## Installation
 
-You can install this library by adding it to your list of dependencies in `mix.exs`. Look at [https://hex.pm/packages/routex](Hex) to find the
-current version.
+You can install this library by adding it to your list of dependencies in `mix.exs`. (use `mix hex.info routex` to find the latest version):
 
 ```diff
 def deps do
   [
      ...other deps
-+    {:routex, "~= 0.3.0-alpha.1"}
++    {:routex, ">= 0.0.0"}
   ]
 end
 ```

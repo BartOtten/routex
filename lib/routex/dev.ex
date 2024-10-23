@@ -8,10 +8,13 @@ defmodule Routex.Dev do
   `Macro.escape/1` and `IO.inspect/2` the given input. Options are
   passed through to `IO.inspect`. Returns the input.
   """
-  def esc_inspect(ast, opts \\ [limit: :infinity, structs: false]) do
+  @spec inspect_ast(ast :: Macro.t(), list()) :: Macro.t()
+  def inspect_ast(ast, opts \\ [limit: :infinity, structs: false]) do
     ast
     |> Macro.escape()
     |> IO.inspect(opts)
+
+    ast
   end
 
   @doc """
@@ -21,12 +24,12 @@ defmodule Routex.Dev do
   **Example**
 
       iex> ast = quote do: Map.put(my_map, :key, value)
-      iex> inspect_ast(ast)
+      iex> print_ast(ast)
       Map.put(my_map, :key, value)
       ...actual AST...
   """
-  @spec inspect_ast(ast :: Macro.t()) :: Macro.t()
-  def inspect_ast(ast, env \\ __ENV__) do
+  @spec print_ast(ast :: Macro.t()) :: Macro.t()
+  def print_ast(ast, env \\ __ENV__) do
     ast
     |> Macro.expand(env)
     |> Macro.to_string()

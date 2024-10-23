@@ -17,20 +17,19 @@ defmodule Routex.Attrs do
   @doc """
   Returns true when the provided key or attribute is private.
   """
-  @spec is_private({atom, any} | atom) :: boolean()
-  def is_private({key, _v}), do: is_private(key)
-  def is_private(key), do: key |> Atom.to_string() |> String.starts_with?("__")
+  @spec private?({atom, any} | atom) :: boolean()
+  def private?({key, _v}), do: private?(key)
+  def private?(key), do: key |> Atom.to_string() |> String.starts_with?("__")
 
   @doc """
   Removes non private fields from attrs. Input is either an opts map or a `Route`.
   """
   def cleanup(%Phoenix.Router.Route{} = route) do
-    route
-    |> update_in([Access.key!(:private), :routex], fn x -> Map.filter(x, &is_private/1) end)
+    update_in(route, [Access.key!(:private), :routex], fn x -> Map.filter(x, &private?/1) end)
   end
 
   def cleanup(meta) when is_map(meta) do
-    Map.filter(meta, &is_private/1)
+    Map.filter(meta, &private?/1)
   end
 
   @doc """

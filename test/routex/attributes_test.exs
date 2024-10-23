@@ -4,11 +4,11 @@ defmodule Routex.AttributesTest do
   alias Phoenix.Router.Route
   import Routex.Attrs
 
-  test "is_private" do
-    assert is_private(:__priv__)
-    refute is_private(:priv)
-    assert is_private({:__priv__, "value"})
-    refute is_private({:priv, "value"})
+  test "private?" do
+    assert private?(:__priv__)
+    refute private?(:priv)
+    assert private?({:__priv__, "value"})
+    refute private?({:priv, "value"})
   end
 
   describe "cleanup/1" do

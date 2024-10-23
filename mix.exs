@@ -71,7 +71,7 @@ defmodule Routex.MixProject do
       {:gettext, ">= 0.26.0", optional: true},
       {:phoenix_html_helpers, "~> 1.0"},
       {:jason, "~> 1.0", only: [:dev, :test], optional: true},
-      {:ex_doc, "~> 0.29", only: [:dev, :test]},
+      {:ex_doc, "~> 0.34", only: [:dev, :test]},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:floki, ">= 0.30.0", only: :test},
@@ -105,7 +105,7 @@ defmodule Routex.MixProject do
       main: "readme",
       source_ref: "v#{@version}",
       source_url: @source_url,
-      assets: "assets",
+      assets: %{"assets" => "assets"},
       before_closing_head_tag: &docs_before_closing_head_tag/1,
       extras: ["README.md", "USAGE.md", "CHANGELOG.md", "EXTENSIONS.md", "TROUBLESHOOTING.md"],
       filter_modules: ~r"Elixir.Routex.*$",
@@ -117,7 +117,9 @@ defmodule Routex.MixProject do
       nest_modules_by_prefix: [
         Routex.Extension.Alternatives,
         Routex.Extension
-      ]
+      ],
+      skip_undefined_reference_warnings_on: &String.match?(&1, ~r/Phoenix.Router.Route/),
+      skip_code_autolink_to: &String.match?(&1, ~r/Phoenix.Router.Route/)
     ]
   end
 

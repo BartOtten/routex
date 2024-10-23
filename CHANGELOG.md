@@ -5,6 +5,27 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.0-alpha.2](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.1...v0.3.0-alpha.2) (2024-10-23)
+### Breaking Changes:
+
+* dev: rename development aid functions
+
+* alternatives: rename :is_current? to :match?
+
+* translations: depend on Gettext greater than 0.26.0
+
+
+
+### Bug Fixes:
+
+* docs: warnings about referencing Phoenix.Router.Route
+
+* core: rename is_private/1 to private?/1
+
+* ci: update Github actions
+
+* core: warning during compilation about usage of :warn
+
 ## [v0.3.0-alpha.1](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.1...v0.3.0-alpha.1) (2024-10-21)
 ### Breaking Changes:
 

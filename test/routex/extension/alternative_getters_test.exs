@@ -48,17 +48,17 @@ defmodule Routex.Extension.AlternativeGettersTest do
   @expected [
     %AlternativeGetters{
       slug: "/products/12?foo=baz#top",
-      is_current?: true,
+      match?: true,
       attrs: %{}
     },
     %AlternativeGetters{
       slug: "/alt1/12/productsa/?foo=baz#top",
-      is_current?: false,
+      match?: false,
       attrs: %{}
     },
     %AlternativeGetters{
       slug: "/alt2/12/productsb/?foo=baz#top",
-      is_current?: false,
+      match?: false,
       attrs: %{}
     }
   ]

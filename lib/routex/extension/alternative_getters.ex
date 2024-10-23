@@ -28,7 +28,7 @@ defmodule Routex.Extension.AlternativeGetters do
   iex> ExampleWeb.Router.RoutexHelpers.alternatives("/products/12?foo=baz")
   [ %Routex.Extension.AlternativeGetters{
     slug: "products/12/?foo=baz",
-   is_current?: true,
+    match?: true,
     attrs: %{
       __branch__: [0, 12, 0],
       __origin__: "/products/:id",
@@ -36,7 +36,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
     %Routex.Extension.AlternativeGetters{
     slug: "/europe/products/12/?foo=baz",
-   is_current?: true,
+    match?: true,
     attrs: %{
       __branch__: [0, 12, 1],
       __origin__: "/products/:id",
@@ -44,7 +44,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
    %Routex.Extension.AlternativeGetters{
     slug: "/asia/products/12/?foo=baz",
-   is_current?: true,
+    match?: true,
     attrs: %{
       __branch__: [0, 12, 1],
       __origin__: "/products/:id",
@@ -59,7 +59,7 @@ defmodule Routex.Extension.AlternativeGetters do
   alias Routex.Matchable
   alias Routex.Route
 
-  defstruct [:slug, :attrs, is_current?: false]
+  defstruct [:slug, :attrs, match?: false]
 
   @impl Routex.Extension
   def create_helpers(routes, _cm, _env) do
@@ -93,7 +93,7 @@ defmodule Routex.Extension.AlternativeGetters do
 
     quote do
       %Routex.Extension.AlternativeGetters{
-        is_current?: unquote(Macro.var(:pattern, Matchable)) == unquote(pattern),
+        match?: unquote(Macro.var(:pattern, Matchable)) == unquote(pattern),
         slug: unquote(pattern) |> Matchable.to_binary(),
         attrs: unquote(Macro.escape(attrs))
       }

@@ -129,19 +129,20 @@ The Alternatives extension can be combined with the Translations extension to
 create multilingual routes. The Alternatives extension can provide the :locale
 attribute used by the Translations extension.
 
-    Original            Step 1: Alternatives                    Step 2: Translations
-
-						⇒ /products/:id/edit                    ⇒ /products/:id/edit
-	/products/:id/edit  ⇒ /eu/nederland/products/:id/edit       ⇒ /eu/nederland/producten/:id/bewerken
-						⇒ /eu/espana/products/:id/edit		    ⇒ /eu/espana/producto/:id/editar
-						⇒ /gb/products/:id/edit				⇒ /gb/products/:id/edit
+	Original            Step 1: Alternatives               Step 2: Translations
+						⇒ /products/:id/edit               ⇒ /products/:id/edit
+	/products/:id/edit  ⇒ /eu/nederland/products/:id/edit  ⇒ /eu/nederland/producten/:id/bewerken
+						⇒ /eu/espana/products/:id/edit	   ⇒ /eu/espana/producto/:id/editar
+						⇒ /gb/products/:id/edit            ⇒ /gb/products/:id/edit
 
 
 ### Alternative Getters
 
 Creates a helper function `alternatives/1` to get a list of alternative slugs
-and their routes attributes. As `Routex` sets the `@url` assign you can simply
-get other routes to the current page with `alternatives(@url)`.
+and their route attributes.  The current route is also included and has attribute
+`current?: true`. As `Routex` sets the `@url` assign you can simply
+get all routes to the current page with `alternatives(@url)`, use an attribute in the
+route as button text and highlight the current active route button.
 
 [Alternative Getters Documentation](`Routex.Extension.AlternativeGetters`)
 
@@ -204,15 +205,23 @@ full list can be lazy loaded when needed.
 [Attribute Getters Documentation](`Routex.Extension.AttrGetters`)
 
 
-### Cloak (only for experiments)
+### Cloak (show case)
 
 Transforms routes to be unrecognizable. This extension is a show case and may
 change at any given moment to generate other routes without prior notice.
 
-      /products/  ⇒ /01
-      /products/:id/edit  ⇒ /:id/02      ⇒ in browser: /1/02, /2/02/ etc...
-      /products/:id/show/edit  ⇒ /:id/03   ⇒ in browser: /1/03, /2/03/ etc...
+In this example it numbers all routes starting at 01 and increments the counter
+for each route. It also shifts the parameter to the left; causing a chaotic
+route structure. Do note: this still works with the Verified Routes extension
+while using the standard route (e.g. `<.link navigate={~p"/products">`) in
+templates.
 
 
-[Attribute Getters Documentation](`Routex.Extension.Cloak`)
+      Original                 Rewritten     Result (product_id: 88, 89, 90)
+      /products                ⇒ /01         ⇒   /01
+      /products/:id/edit       ⇒ /:id/02     ⇒ /88/02, /89/02, /90/02 etc...
+      /products/:id/show/edit  ⇒ /:id/03     ⇒ /88/03, /89/03, /90/03 etc...
+
+
+[Cloak Documentation](`Routex.Extension.Cloak`)
 

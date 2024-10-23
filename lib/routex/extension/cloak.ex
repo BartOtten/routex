@@ -57,7 +57,7 @@ defmodule Routex.Extension.Cloak do
                 idx |> to_string()
               end
 
-            path = Path.join(["/", dynamics || [], static || []]) |> Path.absname()
+            path = ["/", dynamics || [], static || []] |> Path.join() |> Path.absname()
             cloak_map = Map.put_new(cloak_map, route.path, path)
             route = %{route | path: path}
 

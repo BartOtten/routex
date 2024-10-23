@@ -65,7 +65,7 @@ defmodule Routex.Router do
         backend = Macro.expand_once(backend, __CALLER__)
         wrap_in_scope(node, backend, opts)
 
-      {{:., _, [Kernel, :to_string]}, _, [{binding, _, _}]} ->
+      {{:., _meta, [Kernel, :to_string]}, _meta2, [{binding, _meta3, _args3}]} ->
         quote do: "[rtx.#{unquote(binding)}]"
 
       node ->

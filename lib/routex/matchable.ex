@@ -8,12 +8,11 @@ defmodule Routex.Matchable do
   of two Matchable records match.
   """
 
-  @path_separator "/"
-  @query_separator "?"
-  @ast_placeholder "_RTX_"
-
-  require Record
   import Record
+  require Record
+
+  @path_separator "/"
+  @ast_placeholder "_RTX_"
 
   defrecord(:matchable,
     hosts: [],
@@ -27,20 +26,20 @@ defmodule Routex.Matchable do
   @doc """
   Converts a binary URL, `Phoenix.Router.Route` or (sigil) AST argument into a Matchable record.
 
-  ** Examples
+  ## Examples
 
-  iex> path = "/posts/1?foo=bar#top"
-     > route = %Phoenix.Router.Route{path: "/posts/:id"}
-     > ast = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
+  	iex> path = "/posts/1?foo=bar#top"
+  		 > route = %Phoenix.Router.Route{path: "/posts/:id"}
+  		 > ast = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
 
-  iex> path_match = Routex.Matchable.new(path)
-  {:matchable, [nil], ["posts", "1"], "foo=bar", "top", false}
+  	iex> path_match = Routex.Matchable.new(path)
+  	{:matchable, [nil], ["posts", "1"], "foo=bar", "top", false}
 
-  iex> route_match = Routex.Matchable.new(route)
-  {:matchable, [], ["posts", ":id"], nil, nil, false}
+  	iex> route_match = Routex.Matchable.new(route)
+  	{:matchable, [], ["posts", ":id"], nil, nil, false}
 
-  iex> ast_match = Routex.Matchable.new(ast)
-  {:matchable, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
+  	iex> ast_match = Routex.Matchable.new(ast)
+  	{:matchable, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
 
   """
   def new(input) when is_binary(input) do
@@ -115,11 +114,11 @@ defmodule Routex.Matchable do
     map =
       for type <- [:path, :query, :fragment], into: %{} do
         v =
-          case value = uri[type] do
+          case uri[type] do
             nil ->
               []
 
-            _ ->
+            value ->
               value
               |> split_path()
               |> placeholders_to_ast(dyns)
@@ -198,7 +197,7 @@ defmodule Routex.Matchable do
 
   The Matchable pattern is bound to `pattern`
 
-  *Example*
+  ## Example
      iex> "/some/path"
         >  |> Matchable.new()
         >  |> Matchable.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
@@ -243,15 +242,16 @@ defmodule Routex.Matchable do
   one pattern to another.
 
 
-  iex> "/original/:arg1/:arg2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
-  {:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", {:arg1, [], Routex.Matchable}, {:arg2, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
+  *Example*
+      iex> "/original/:arg1/:arg2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
+  	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", {:arg1, [], Routex.Matchable}, {:arg2, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
 
-  "iex> /recomposed/:arg2/:arg1" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
-  {:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["recomposed", {:arg2, [], Routex.Matchable}, {:arg1, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
+  	iex> "/recomposed/:arg2/:arg1" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
+  	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["recomposed", {:arg2, [], Routex.Matchable}, {:arg1, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
 
 
-  iex> "/original/segment_1/segment_2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
-  {:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
+  	iex> "/original/segment_1/segment_2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
+  	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
   """
 
   def to_pattern(%Phoenix.Router.Route{} = route),
@@ -259,7 +259,9 @@ defmodule Routex.Matchable do
 
   def to_pattern(record) when is_tuple(record) do
     path_ast =
-      Enum.map(matchable(record, :path), fn
+      record
+      |> matchable(:path)
+      |> Enum.map(fn
         ":" <> name -> quote do: unquote(name |> String.to_atom() |> Macro.var(__MODULE__))
         other -> other
       end)
@@ -277,7 +279,8 @@ defmodule Routex.Matchable do
   defp split_path(input) when is_nil(input), do: []
 
   defp split_path(input) when is_binary(input) do
-    String.split(input, ~r"#{@path_separator}", include_captures: true)
+    input
+    |> String.split(~r"#{@path_separator}", include_captures: true)
     |> Enum.reject(&(&1 == ""))
   end
 
@@ -307,7 +310,7 @@ defmodule Routex.Matchable do
   Returns whether two Matchable records match on their route defining properties. The first argument
   supports string interpolation syntax (e.g ":param" and "*") forming wildcards.
 
-  ** Example **
+  ## Example
 
   iex> route_record = %Phoenix.Router.Route{path: "/posts/:id"} |> Routex.Matchable.new()
      > matching_record = "/posts/1/foo=bar#top" |> Routex.Matchable.new()

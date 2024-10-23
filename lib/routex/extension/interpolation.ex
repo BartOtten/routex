@@ -39,6 +39,14 @@ defmodule Routex.Extension.Interpolation do
   - none
   """
 
+  @behaviour Routex.Extension
+
+  alias Routex.Attrs
+
+  require Logger
+
+  @interpolate ~r/(\[rtx\.(\w+)\])/
+
   defmodule NonUniqError do
     @moduledoc """
     Raised when a list of routes contains routes with the same path and verb.
@@ -87,12 +95,6 @@ defmodule Routex.Extension.Interpolation do
     end
   end
 
-  alias Routex.Attrs
-  require Logger
-
-  @behaviour Routex.Extension
-  @interpolate ~r/(\[rtx\.(\w+)\])/
-
   @impl Routex.Extension
   def transform(routes, _backend, _env) do
     routes
@@ -103,7 +105,8 @@ defmodule Routex.Extension.Interpolation do
   defp interpolate(route) do
     origin =
       "/" <>
-        (Regex.replace(@interpolate, route.path, "")
+        (@interpolate
+         |> Regex.replace(route.path, "")
          |> String.trim_leading("/")
          |> String.trim_trailing("/")
          |> String.replace("//", "/"))
@@ -112,11 +115,11 @@ defmodule Routex.Extension.Interpolation do
       Regex.replace(@interpolate, route.path, fn _full, _interpolation, attr ->
         key = attr |> String.to_atom()
 
-        Attrs.get!(
-          route,
-          key,
+        error_msg =
           "#{route |> Attrs.get(:backend) |> to_string()} lists this extention but key :#{key} was not found in private.routex of route #{inspect(Macro.escape(route), pretty: true)}."
-        )
+
+        route
+        |> Attrs.get!(key, error_msg)
         |> to_string()
       end)
 
@@ -124,15 +127,15 @@ defmodule Routex.Extension.Interpolation do
     # this is the one used in templates. For example: /#{region/products => "/products".
     # The interpolated routes are made descendants of this route
 
-    interpolated_path =
-      if Attrs.get!(route, :__branch__) |> List.last() == 0 do
+    path =
+      if route |> Attrs.get!(:__branch__) |> List.last() == 0 do
         origin
       else
         interpolated_path
       end
 
-    if interpolated_path != route.path do
-      %{route | path: interpolated_path} |> Attrs.put(:__origin__, origin)
+    if path != route.path do
+      %{route | path: path} |> Attrs.put(:__origin__, origin)
     else
       route
     end

@@ -60,8 +60,8 @@ defmodule Routex.Extension.Alternatives do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Extension.Alternatives.Config
   alias Routex.Extension.Alternatives.Branches
+  alias Routex.Extension.Alternatives.Config
 
   @expandable_route_methods [
     :get,

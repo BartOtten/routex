@@ -195,7 +195,7 @@ defmodule Routex.Processing do
     module = helper_mod_name(env)
 
     assign_code =
-      if Version.match?(to_string(phx_version), "< 1.7.0-dev") do
+      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
         quote do
           opts = unquote(module).attrs(url)
 

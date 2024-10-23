@@ -1,4 +1,8 @@
 defmodule Routex.Branching do
+  @moduledoc """
+   Provides a set of functions to build branched variants of macro's
+  """
+
   alias Routex.Utils
 
   require Logger
@@ -111,10 +115,10 @@ defmodule Routex.Branching do
   end
 
   defp get_arities!(module, fun) do
-    module.__info__(:macros) |> Keyword.get_values(fun)
+    :macros |> module.__info__() |> Keyword.get_values(fun)
   rescue
     ArgumentError ->
-      Module.definitions_in(module, :defmacro) |> Keyword.get_values(fun)
+      module |> Module.definitions_in(:defmacro) |> Keyword.get_values(fun)
   end
 
   def build_default(module, fun, args) do

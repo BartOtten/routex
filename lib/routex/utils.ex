@@ -7,6 +7,7 @@ defmodule Routex.Utils do
   Prints an indented text. Should be used when printing messages in
   the terminal during compile time.
   """
+  # credo:disable-for-lines:2
   @spec print(input :: iodata) :: binary
   def print(input), do: IO.puts([">> " | input])
 
@@ -37,12 +38,12 @@ defmodule Routex.Utils do
 
       :conn in vars ->
         quote do
-          var!(conn) |> Routex.Utils.get_branch()
+          conn |> var!() |> Routex.Utils.get_branch()
         end
 
       :socket in vars ->
         quote do
-          var!(socket) |> Routex.Utils.get_branch()
+          socket |> var!() |> Routex.Utils.get_branch()
         end
 
       ExUnit.Callbacks in caller.requires ->
@@ -63,7 +64,7 @@ defmodule Routex.Utils do
     List.last(branch)
   end
 
-  def get_branch(_) do
+  def get_branch(_assigns_conn_socket) do
     require Logger
 
     Logger.warning("""

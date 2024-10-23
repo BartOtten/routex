@@ -56,8 +56,8 @@ defmodule Routex.Extension.AlternativeGetters do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Route
   alias Routex.Matchable
+  alias Routex.Route
 
   defstruct [:slug, :attrs, is_current?: false]
 
@@ -80,7 +80,7 @@ defmodule Routex.Extension.AlternativeGetters do
 
         _function_ast =
           for route <- siblings do
-            Matchable.new(route) |> Matchable.to_func(:alternatives, body_ast)
+            route |> Matchable.new() |> Matchable.to_func(:alternatives, body_ast)
           end
       end
 

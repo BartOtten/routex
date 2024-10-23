@@ -61,8 +61,9 @@ defmodule Routex.Extension.RouteHelpers do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Utils
   alias Routex.Route
+  alias Routex.Utils
+
   require Logger
 
   @interpolate ":"

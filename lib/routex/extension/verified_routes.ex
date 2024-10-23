@@ -1,6 +1,5 @@
 defmodule Routex.Extension.VerifiedRoutes do
-  require Phoenix.VerifiedRoutes
-
+  # credo:disable-for-this-file Credo.Check.Refactor.IoPuts
   @moduledoc ~S"""
   Supports the use of unmodified route paths in controllers and templates while using transformed
   and/or branching paths with compile-time verification and dynamic runtime behavior.
@@ -84,6 +83,9 @@ defmodule Routex.Extension.VerifiedRoutes do
   **Sets**
   - none
   """
+  @behaviour Routex.Extension
+
+  import Routex.Branching
 
   alias Routex.Matchable
 
@@ -91,12 +93,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   require Phoenix.VerifiedRoutes
   require Routex.Branching
 
-  import Routex.Branching
-
-  @behaviour Routex.Extension
-
   @cell_width 20
-
   @defaults %{
     verified_sigil: %{phoenix: "~p", routex: "~l", default_replacement: "~o"},
     verified_url: %{phoenix: :url, routex: :url_rtx, default_replacement: :url_phx},
@@ -119,7 +116,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     config ++ opts_list
   end
 
-  @impl true
+  @impl Routex.Extension
   def create_helpers(routes, cm, _env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
@@ -137,8 +134,8 @@ defmodule Routex.Extension.VerifiedRoutes do
         {__MODULE__.Transformers, :argument_transformer, []},
         Phoenix.VerifiedRoutes,
         :sigil_p,
-        as: get_value(config, :verified_sigil, :routex) |> then(&to_macro_name.(&1)),
-        orig: get_value(config, :verified_sigil, :phoenix) |> then(&to_macro_name.(&1)),
+        as: config |> get_value(:verified_sigil, :routex) |> then(&to_macro_name.(&1)),
+        orig: config |> get_value(:verified_sigil, :phoenix) |> then(&to_macro_name.(&1)),
         arg_pos: fn arity -> arity - 1 end
       ),
       branch_macro(
@@ -148,8 +145,8 @@ defmodule Routex.Extension.VerifiedRoutes do
         {__MODULE__.Transformers, :argument_transformer, []},
         Phoenix.VerifiedRoutes,
         :url,
-        as: get_value(config, :verified_url, :routex),
-        orig: get_value(config, :verified_url, :phoenix),
+        as: config |> get_value(:verified_url, :routex),
+        orig: config |> get_value(:verified_url, :phoenix),
         arg_pos: fn arity -> arity end
       ),
       branch_macro(
@@ -159,8 +156,8 @@ defmodule Routex.Extension.VerifiedRoutes do
         {__MODULE__.Transformers, :argument_transformer, []},
         Phoenix.VerifiedRoutes,
         :path,
-        as: get_value(config, :verified_path, :routex),
-        orig: get_value(config, :verified_path, :phoenix),
+        as: config |> get_value(:verified_path, :routex),
+        orig: config |> get_value(:verified_path, :phoenix),
         arg_pos: fn arity -> arity end
       )
     ]
@@ -237,19 +234,20 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
 
   defp row(items) do
+    # credo:disable-for-next-line
     items |> Enum.map(&cell/1) |> Enum.intersperse("|") |> then(&(&1 ++ ["\n"]))
   end
 
   defp cell(content, width \\ @cell_width) do
-    [" ", String.pad_trailing(to_string(content), width)]
+    [" ", content |> to_string() |> String.pad_trailing(width)]
   end
 
   defmodule Transformers do
     @moduledoc false
-    def clause_transformer(route, {:sigil_p, _, [{:<<>>, _, _segments} = ast, []]}),
+    def clause_transformer(route, {:sigil_p, _meta, [{:<<>>, _meta2, _segments} = ast, []]}),
       do: clause_transformer(route, ast)
 
-    def clause_transformer(route, {:<<>>, _, segments}),
+    def clause_transformer(route, {:<<>>, _meta, segments}),
       do: clause_segments_transformer(route, segments)
 
     def clause_segments_transformer(route, segments) do
@@ -257,7 +255,7 @@ defmodule Routex.Extension.VerifiedRoutes do
       arg_record = segments |> Matchable.new()
 
       if Matchable.match?(orig_record, arg_record) do
-        Routex.Attrs.get!(route, :__branch__) |> List.last()
+        route |> Routex.Attrs.get!(:__branch__) |> List.last()
       else
         :skip
       end
@@ -267,7 +265,7 @@ defmodule Routex.Extension.VerifiedRoutes do
           pattern,
           {:sigil_p, meta, [{:<<>>, _meta, _segments} = path_ast, opts]}
         ) do
-      new_path_ast = {:<<>>, _, _} = argument_transformer(pattern, path_ast)
+      new_path_ast = {:<<>>, _meta, _segments} = argument_transformer(pattern, path_ast)
       {:sigil_p, meta, [new_path_ast, opts]}
     end
 

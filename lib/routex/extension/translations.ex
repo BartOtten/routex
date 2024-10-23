@@ -155,12 +155,12 @@ defmodule Routex.Extension.Translations do
   defp translate_segment(segment, _loc, backend, domain),
     do: Gettext.dgettext(backend, domain, segment)
 
-  defp detect_language!(<<lang::binary-size(2)>>, _), do: lang
-  defp detect_language!(<<lang::binary-size(3)>>, _), do: lang
-  defp detect_language!(<<lang::binary-size(2), ?-, _rest::binary>>, _), do: lang
-  defp detect_language!(<<lang::binary-size(3), ?-, _rest::binary>>, _), do: lang
-  defp detect_language!(<<lang::binary-size(2), ?_, _rest::binary>>, _), do: lang
-  defp detect_language!(<<lang::binary-size(3), ?_, _rest::binary>>, _), do: lang
+  defp detect_language!(<<lang::binary-size(2)>>, _route), do: lang
+  defp detect_language!(<<lang::binary-size(3)>>, _route), do: lang
+  defp detect_language!(<<lang::binary-size(2), ?-, _rest::binary>>, _route), do: lang
+  defp detect_language!(<<lang::binary-size(3), ?-, _rest::binary>>, _route), do: lang
+  defp detect_language!(<<lang::binary-size(2), ?_, _rest::binary>>, _route), do: lang
+  defp detect_language!(<<lang::binary-size(3), ?_, _rest::binary>>, _route), do: lang
 
   defp detect_language!(nil, route) do
     backend = route |> Attrs.get(:backend) |> to_string()

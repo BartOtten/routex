@@ -319,41 +319,26 @@ defmodule Routex.Matchable do
   false
   """
 
-  def match?(r1, r2) when is_record(r1, :matchable) and is_record(r2, :matchable) do
-    s1 = matchable(r1, :path)
-    s2 = matchable(r2, :path)
+  def match?(record_1, record_2)
+      when is_record(record_1, :matchable) and is_record(record_2, :matchable) do
+    segments_1 = matchable(record_1, :path)
+    segments_2 = matchable(record_2, :path)
 
-    {s1, _} =
-      Enum.split_while(s1, fn x ->
-        x != @query_separator || !String.starts_with?(x, @query_separator)
-      end)
-
-    {s2, _} =
-      Enum.split_while(s2, fn x ->
-        x != @query_separator || !String.starts_with?(x, @query_separator)
-      end)
-
-    maybe_split_fn = fn
-      x when is_binary(x) -> Path.split(x)
-      x -> x
-    end
-
-    s1 = Enum.map(s1, &maybe_split_fn.(&1)) |> List.flatten()
-    s2 = Enum.map(s2, &maybe_split_fn.(&1)) |> List.flatten()
-
-    is_match =
-      length(s1) == length(s2) &&
-        Enum.zip(s1, s2)
-        |> Enum.all?(fn
-          {":" <> _, _} -> true
-          {"*", _} -> true
-          {equal, equal} -> true
-          _not_equal -> false
-        end)
-
-    is_match
+    length(segments_1) == length(segments_2) && segments_match?(segments_1, segments_2)
   end
 
+  # credo:disable-for-lines:2
   def match?(r1, r2) when not is_record(r1, :matchable), do: __MODULE__.match?(new(r1), r2)
   def match?(r1, r2) when not is_record(r2, :matchable), do: __MODULE__.match?(r1, new(r2))
+
+  defp segments_match?(s1, s2) do
+    combined = Enum.zip(s1, s2)
+
+    Enum.all?(combined, fn
+      {":" <> _, _} -> true
+      {"*", _} -> true
+      {equal, equal} -> true
+      _not_equal -> false
+    end)
+  end
 end

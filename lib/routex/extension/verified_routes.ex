@@ -183,7 +183,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     Routex.Utils.print([
       """
       \n-- Notice --
-      This project uses Routex generated variants of the official Phoenix Verifies Routes.
+      This project uses Routex generated variants of the official Phoenix Verified Routes.
       While the Native variants directly delegate to the official Phoenix macro's, the
       Routex variants apply route transfomations and/or automated branching before delegation.
       """,

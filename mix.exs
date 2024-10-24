@@ -78,8 +78,7 @@ defmodule Routex.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:makeup_diff, "~> 0.1.0", only: [:dev]},
       {:git_ops, "~> 2.6.3", only: [:dev]},
-      {:benchee, "~> 1.0", only: :dev},
-      {:ssl_verify_fun, "~> 1.1.7", manager: :rebar3, override: true}
+      {:benchee, "~> 1.0", only: :dev}
     ]
   end
 

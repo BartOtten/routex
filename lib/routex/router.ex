@@ -38,7 +38,7 @@ defmodule Routex.Router do
   defmacro __using__(_options) do
     quote do
       @before_compile Routex.Processing
-      import unquote(__MODULE__), only: [preprocess_using: 2]
+      import unquote(__MODULE__), only: [preprocess_using: 2, preprocess_using: 3]
     end
   end
 

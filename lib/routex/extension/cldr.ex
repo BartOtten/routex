@@ -3,24 +3,62 @@ defmodule Routex.Extension.Cldr do
   Adapter for projects using :ex_cldr. It generates the configuration
   for `Routex.Extension.Alternatives`.
 
+
+  ## Interpolating Locale Data
+
+  Interpolation is provided by `Routex.Extension.`Interpolation`, which
+  is able to use any `Routex.Attr` for interpolation. See it's documentation
+  for additional options.
+
+  When using this Cldr extension, the following interpolations are supported as they
+  are set as `Routex.Attr`:
+
+  * `locale` will interpolate the Cldr locale name
+  * `locale_display` will interpolate the Cldr locale display name
+  * `language` will interpolate the Cldr language name
+  * `territory` will interpolate the Cldr territory code
+
+  Some examples are:
+  ```elixir
+  localize do
+  get "/#{locale}/locale/pages/:page", PageController, :show
+  get "/#{language}/language/pages/:page", PageController, :show
+  get "/#{territory}/territory/pages/:page", PageController, :show
+  end
+  ```
+
   ## Configuration
   ```diff
   defmodule ExampleWeb.RoutexBackend do
   use Routex.Backend,
   extensions: [
-  + Routex.Extension.Cldr
-  ]
-  + cldr_backend: MyApp.Cldr
+  + Routex.Extension.Cldr,
+  + Routex.Extension.Alternatives,
+  + Routex.Extension.Interpolation, #  when using routes with interpolation
+  + Routex.Extension.Translations,  # when using translated routes
+    [...]
+    Routex.Extension.AttrGetters
+  ],
+  + cldr_backend: MyApp.Cldr,
+  + translations_backend: MyApp.Gettext,  #  when using translated routes
+  + translations_domain: "routes",  #  when using translated routes
+  + alternatives_prefix: true,  #  when using routes with interpolation
   ```
 
   ```diff
   defmodule ExampleWeb.Router
+  # require your Cldr backend module before `use`ing the router.
   + require ExampleWeb.Cldr
+
+  use ExampleWeb, :router
+
+  import ExampleWeb.UserAuth
   ```
 
   ## Pseudo result
-   This extension injects configuration for `Routex.Extension.Alternatives`. See the documentation
-   of that extension to see the result.
+   This extension injects `:alternatives` into your configuration.
+   See the documentation of `Routex.Extension.Alternatives` to see
+   more options and the pseudo result.
 
   ```
    alternatives: %{
@@ -29,20 +67,20 @@ defmodule Routex.Extension.Cldr do
         language: "en",
         locale: "en",
         territory: "US",
-        locale_name: "English (United States)"
+        locale_display: "English (United States)"
       },
       branches: %{
         "/en" => %{
           language: "en",
           locale: "en",
           territory: "US",
-          locale_name: "English"
+          locale_dispay: "English"
         },
         "/fr" => %{
           language: "fr",
           locale: "fr",
           territory: "FR",
-          locale_name: "français"
+          locale_display: "français"
         }
      }
    }
@@ -56,7 +94,7 @@ defmodule Routex.Extension.Cldr do
   **Sets**
   - language
   - locale
-  - locale_name
+  - locale_display
   - territory
   """
 
@@ -82,7 +120,7 @@ defmodule Routex.Extension.Cldr do
       locale_str = to_string(locale)
       slug = "/" <> locale_str
 
-      {slug, get_attributes(locale, backend)}
+      {slug, %{attrs: get_attributes(locale, backend)}}
     end
   end
 

@@ -5,13 +5,12 @@
 ![Hex.pm](https://img.shields.io/hexpm/l/routex)
 
 
-# Routex
+# Supercharge Phoenix Router with Routex
 
-Routex serves as a framework designed to extend the capabilities of Phoenix'
-router. Leveraging a flexible extension system, it is able to transform routes,
-generate alternative routes and create helper functions for common use cases. As
-Routex is a middleware between route definition and compilation, it has minimal
-impact on run time performance.
+Routex is an feature rich routing framework build on top of Phoenix Router. It
+provides additional routing features for common use cases. Situated between
+route definition and compilation, Routex has zero to none impact on run time
+performance.
 
 ## Top Features and Benefits
 
@@ -56,28 +55,31 @@ a few of the included extensions: `Alternatives`, `Translations`, `Assigns` and
   combined with the set `locale` to pick the localized alternative route.
 
 
-## Routex vs CLDR Routes vs Phoenix Localized Routes
+## Routex vs Cldr Routes vs Phoenix Localized Routes
 
 The capabilities and advancements within `Routex` surpass those of `Phoenix
 Localized Routes`, offering a comprehensive array of features. As Phoenix
 Localized Routes has stagnated in its development, developers are strongly
 advised to transition to Routex for a more robust solution.
 
-When considering `Routex` against `CLDR Routes`, it's akin to comparing Apple to
-Linux. CLDR Routes maintains a fixed scope and enjoys a shared configuration
-with other CLDR packages. Routex on the other hand boasts a dynamic scope
-providing maximum freedom. Its primary advantages over CLDR Routes include its
-expansive branch facilitated by its extension mechanism and the minimized
+When considering `Routex` against `Cldr Routes`, it's akin to comparing Apple to
+Linux. Cldr Routes is a limited walled garden but is developed by the main Cldr
+developer ensuring maximum compatibility. Routex on the other hand boasts a
+wider and more dynamic feature scope providing maximum freedom. Its primary
+advantages over Cldr Routes are it's extension mechanism and the minimized
 necessity for code modifications throughout a codebase.
+
+But why choose when you can have Cldr through [the Cldr extension for
+Routex](`Routex.Extension.Cldr`)?
 
 ### Comparison table
 
-| Feature             | Routex     | CLDR Routes | PLR        |
+| Feature             | Routex     | Cldr Routes | PLR        |
 |---------------------|------------|-------------|------------|
 | Route encapsulation | Full  [^1] | Limited     | Limited    |
 | Route manipulation  | Full  [^2] | Limited     | Limited    |
 | Route interpolation | Full       | Limited     | No         |
-| Alternative Routes  | Full       | CLDR        | Full       |
+| Alternative Routes  | Full       | Cldr        | Full       |
 | Translation         | ☑          | ☑          |  ☑         |
 | Route Helpers       | ☑          | ☑          |  ☑         |
 | Verified Routes     | ☑          | ☑          |  ☐         |
@@ -89,7 +91,7 @@ necessity for code modifications throughout a codebase.
 [^1]: Routex' `preprocesss_using` is not bound to Phoenix (session) scopes
 [^2]: [Crazy example](https://github.com/BartOtten/routex/blob/main/lib/routex/extension/cloak.ex)
 [^3]: Routex *can* be configured to shim original Phoenix functionality (for
-    example: `~p` and `url/2`) while CLDR Routes mandates code modifications
+    example: `~p` and `url/2`) while Cldr Routes mandates code modifications
     (for example: `~p` -> `~q` and `url/2` -> `url_q/2`)
 
 
@@ -203,6 +205,12 @@ This way the `assigns` can be a subset of the full list of attributes but the
 full list can be lazy loaded when needed.
 
 [Attribute Getters Documentation](`Routex.Extension.AttrGetters`)
+
+
+### Cldr Adaptor
+Adapter for projects using :ex_cldr.
+
+[Cldr Adaptor Documentation](`Routex.Extension.Cldr`)
 
 
 ### Cloak (show case)

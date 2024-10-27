@@ -15,7 +15,8 @@ defmodule Routex.Extension.Cloak do
   defmodule ExampleWeb.RoutexBackend do
     use Routex.Backend,
     extensions: [
-  +   Routex.Extension.Cloak,
+  +  Routex.Extension.Cloak,
+     Routex.Extension.AttrGetters
   ],
   ```
 

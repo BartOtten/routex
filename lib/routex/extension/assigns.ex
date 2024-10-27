@@ -14,6 +14,7 @@ defmodule Routex.Extension.Assigns do
     use Routex.Backend,
     extensions: [
   +   Routex.Extension.Assigns,
+  Routex.Extension.AttrGetters
   ],
   + assigns: %{namespace: :rtx, attrs: [:branch_helper, :locale, :contact, :name]}
   ```

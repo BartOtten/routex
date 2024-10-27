@@ -9,7 +9,9 @@ defmodule Routex.Extension.AlternativeGetters do
   defmodule ExampleWeb.RoutexBackend do
     use Routex.Backend,
     extensions: [
+      Routex.Extension.Alternatives,
   +   Routex.Extension.AlternativeGetters,
+      Routex.Extension.AttrGetters
   ],
   ```
 

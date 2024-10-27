@@ -20,7 +20,8 @@ defmodule Routex.Extension.Alternatives do
 
   use Routex.Backend,
   extensions: [
-  + Routex.Extension.Alternatives
+  + Routex.Extension.Alternatives,
+  Routex.Extension.AttrGetters
   ],
   + alternatives: %{
   +    "/" => %{

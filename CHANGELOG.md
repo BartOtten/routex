@@ -43,7 +43,7 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 * verified: branching macro's of all arities of ~p, url and path
 
-* core: enable AST-free manipulation of interpolated routes
+* core: enable AST-free manipulation of routes with interpolation
 
 * alternatives: indicate if an alternative route `is_current?`
 

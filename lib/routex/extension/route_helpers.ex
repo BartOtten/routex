@@ -14,6 +14,7 @@ defmodule Routex.Extension.RouteHelpers do
     use Routex.Backend,
     extensions: [
   +   Routex.Extension.RouteHelpers,
+      Routex.Extension.AttrGetters
   ],
   ```
 

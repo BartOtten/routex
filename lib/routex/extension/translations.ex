@@ -16,7 +16,8 @@ defmodule Routex.Extension.Translations do
   defmodule ExampleWeb.RoutexBackend do
   use Routex.Backend,
   extensions: [
-  + Routex.Extension.Translations
+  + Routex.Extension.Translations,
+    Routex.Extension.AttrGetters
   ]
   + translations_backend: MyApp.Gettext,
   + translations_domain: "routes",

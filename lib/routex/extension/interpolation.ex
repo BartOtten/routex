@@ -12,9 +12,9 @@ defmodule Routex.Extension.Interpolation do
 
   > #### Bare base route {: .warn}
   > The route as specified in the Router will be stripped from any
-  > interpolation syntax. Variants with interpolation branch of this route.
-  > This allows you to still use uninterpolated routes in your templates, have them
-  > verified with Verified Routes while using interpolated routes at run time.
+  > interpolation syntax. This allows you to still use routes without interpolation
+  > syntax in your templates, have them verified by Verified Routes while generating
+  > routes with interpolated attributes at run time.
 
   ## Usage
   ```diff

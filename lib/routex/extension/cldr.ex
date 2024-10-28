@@ -37,6 +37,7 @@ defmodule Routex.Extension.Cldr do
   + Routex.Extension.Alternatives,
   + Routex.Extension.Interpolation, #  when using routes with interpolation
   + Routex.Extension.Translations,  # when using translated routes
+  + Routex.Extension.VerifiedRoutes,
     [...]
     Routex.Extension.AttrGetters
   ],
@@ -44,6 +45,7 @@ defmodule Routex.Extension.Cldr do
   + translations_backend: MyApp.Gettext,  #  when using translated routes
   + translations_domain: "routes",  #  when using translated routes
   + alternatives_prefix: false,  #  when using routes with interpolation
+  + verified_sigil_routex: "~q", #  consider using ~p, see `Routex.Extension.VerifiedRoutes`
   ```
 
   ```diff

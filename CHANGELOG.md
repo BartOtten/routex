@@ -5,6 +5,21 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.0-alpha.3](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.2...v0.3.0-alpha.3) (2024-10-28)
+
+
+
+
+### Features:
+
+* cldr: add adaptor for projects using Cldr
+
+### Bug Fixes:
+
+* core: preprocess_using does not accept options
+
+* mix: do not override dep :ssl_verify_fun
+
 ## [v0.3.0-alpha.2](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.1...v0.3.0-alpha.2) (2024-10-23)
 ### Breaking Changes:
 

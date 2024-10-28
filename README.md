@@ -5,7 +5,7 @@
 ![Hex.pm](https://img.shields.io/hexpm/l/routex)
 
 
-# Supercharge Phoenix Router with Routex
+# Routex: Supercharge your Phoenix Router
 
 Routex is an feature rich routing framework build on top of Phoenix Router. It
 provides additional routing features for common use cases. Situated between

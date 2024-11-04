@@ -65,7 +65,7 @@ defmodule Routex.Processing do
   """
   @spec execute_callbacks(Macro.Env.t()) :: :ok
   def execute_callbacks(env) do
-    routes = env.module |> Module.get_attribute(:phoenix_routes) |> Enum.reverse()
+    routes = env.module |> Module.get_attribute(:phoenix_routes)
 
     # grouping per config module allows extensions to use accumulated values.
     routes_per_backend = group_by_backend(routes)
@@ -83,7 +83,7 @@ defmodule Routex.Processing do
       end
 
     # phase 3: generate ast for helpers
-    extensions_ast =
+    helpers_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_helper_functions(routes, backend, env)
       end
@@ -99,7 +99,7 @@ defmodule Routex.Processing do
     |> remove_build_info()
     |> write_routes(env)
 
-    create_helper_module(extensions_ast, env)
+    create_helper_module(helpers_ast, env)
 
     IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
     :ok

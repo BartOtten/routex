@@ -6,7 +6,7 @@ defmodule Routex.Extension.Cldr do
 
   ## Interpolating Locale Data
 
-  Interpolation is provided by `Routex.Extension.`Interpolation`, which
+  Interpolation is provided by `Routex.Extension.Interpolation`, which
   is able to use any `Routex.Attr` for interpolation. See it's documentation
   for additional options.
 
@@ -57,6 +57,9 @@ defmodule Routex.Extension.Cldr do
 
   import ExampleWeb.UserAuth
   ```
+
+  When your application does not compile after adding this extension, force a
+  recompile using `mix compile --force`.
 
   ## Pseudo result
    This extension injects `:alternatives` into your configuration.

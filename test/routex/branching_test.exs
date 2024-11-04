@@ -35,11 +35,10 @@ defmodule Routex.BranchingTest.Routex do
     Routex.Branching.branch_macro(
       ["en", "nl"],
       match_binding,
-      {Routex.BranchingTest.PreCompiled, :transform_clause, []},
-      {Routex.BranchingTest.PreCompiled, :transform_arg, []},
       Routex.BranchingTest.OriginalMacros,
       :original_macro,
-      as: :branched_macro
+      as: :branched_macro,
+      argument_transformer: {Routex.BranchingTest.PreCompiled, :transform_arg, ["extra_arg"]}
     )
 
   Module.create(Routex.BranchingTest.Branched, ast, Macro.Env.location(__ENV__))
@@ -50,10 +49,8 @@ defmodule Routex.BranchingTest.PreCompiled do
   A module with a transform function; should be 'required' before the transformation takes place.
   """
 
-  def transform_clause(pattern, _branched_arg), do: pattern
-
-  def transform_arg(pattern, branched_arg) do
-    ["/europe", "/" <> pattern | branched_arg]
+  def transform_arg(pattern, branched_arg, extra_1) do
+    ["/" <> extra_1 <> "/europe", "/" <> pattern | branched_arg]
   end
 end
 
@@ -98,12 +95,16 @@ defmodule Routex.BranchingTest do
   end
 
   test "branching nl" do
-    assert Routex.BranchingTest.MyModule.branched("nl") == "/europe/nl/my/macro/path"
-    assert Routex.BranchingTest.MyModule.branched("nl", "other") == "/europe/nl/my/macro/path/foo"
+    assert Routex.BranchingTest.MyModule.branched("nl") == "/extra_arg/europe/nl/my/macro/path"
+
+    assert Routex.BranchingTest.MyModule.branched("nl", "other") ==
+             "/extra_arg/europe/nl/my/macro/path/foo"
   end
 
   test "branching en" do
-    assert Routex.BranchingTest.MyModule.branched("en") == "/europe/en/my/macro/path"
-    assert Routex.BranchingTest.MyModule.branched("en", "other") == "/europe/en/my/macro/path/foo"
+    assert Routex.BranchingTest.MyModule.branched("en") == "/extra_arg/europe/en/my/macro/path"
+
+    assert Routex.BranchingTest.MyModule.branched("en", "other") ==
+             "/extra_arg/europe/en/my/macro/path/foo"
   end
 end

@@ -46,7 +46,7 @@ defmodule Routex.Extension.AttrGetters do
   alias Routex.Matchable
 
   @impl Routex.Extension
-  def create_helpers(routes, _cm, _env) do
+  def create_helpers(routes, _backend, _env) do
     prelude =
       quote do
         @doc """
@@ -67,7 +67,6 @@ defmodule Routex.Extension.AttrGetters do
         |> Matchable.new()
         |> Matchable.to_func(:attrs, attributes)
       end
-      |> List.flatten()
 
     [prelude, functions]
   end

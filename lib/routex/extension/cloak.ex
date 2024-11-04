@@ -38,7 +38,7 @@ defmodule Routex.Extension.Cloak do
   @catch_all "*"
 
   @impl Routex.Extension
-  def transform(routes, _cm, _env) do
+  def transform(routes, _backend, _env) do
     {routes, _} =
       for {route, idx} <- Enum.with_index(routes, 0), reduce: {[], %{}} do
         {routes, cloak_map} ->

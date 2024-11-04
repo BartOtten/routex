@@ -41,8 +41,8 @@ defmodule Routex.Extension.Assigns do
   @behaviour Routex.Extension
 
   @impl Routex.Extension
-  def post_transform(routes, cm, _env) do
-    config = cm.config()
+  def post_transform(routes, backend, _env) do
+    config = backend.config()
     namespace = get_in(config, [Access.key(:assigns), :namespace])
     attrs = get_in(config, [Access.key(:assigns), :attrs])
 

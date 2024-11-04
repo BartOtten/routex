@@ -107,7 +107,7 @@ defmodule Routex.Extension.Cldr do
   @behaviour Routex.Extension
   require Logger
 
-  def configure(config, _cm) do
+  def configure(config, _backend) do
     backend = Keyword.get(config, :cldr_backend)
     root_attrs = backend.default_locale() |> get_attributes(backend)
 

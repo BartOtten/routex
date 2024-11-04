@@ -104,9 +104,9 @@ defmodule Routex.Extension.VerifiedRoutes do
   }
 
   @impl Routex.Extension
-  def configure(config, cm) do
+  def configure(config, backend) do
     final_config_map = merge_defaults_and_config(@defaults, config)
-    print_message(final_config_map, cm)
+    print_message(final_config_map, backend)
 
     opts_list =
       Enum.flat_map(final_config_map, fn {config_prefix, %{routex: routex, native: native}} ->
@@ -120,12 +120,12 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
 
   @impl Routex.Extension
-  def create_helpers(routes, cm, _env) do
+  def create_helpers(routes, backend, _env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
     IO.puts("")
 
-    config = cm.config()
+    config = backend.config()
     match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
     to_macro_name = fn "~" <> letter -> String.to_atom("sigil_" <> letter) end
 

@@ -64,7 +64,7 @@ defmodule Routex.Extension.AlternativeGetters do
   defstruct [:slug, :attrs, match?: false]
 
   @impl Routex.Extension
-  def create_helpers(routes, _cm, _env) do
+  def create_helpers(routes, _backend, _env) do
     prelude =
       quote do
         def alternatives(url) when is_binary(url) do

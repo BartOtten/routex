@@ -70,7 +70,7 @@ defmodule Routex.Extension.RouteHelpers do
   @interpolate ":"
 
   @impl Routex.Extension
-  def create_helpers(routes, _cm, env) do
+  def create_helpers(routes, _backend, env) do
     Logger.info("The use of Routext extension RouteHelpers causes long compilation times.")
 
     routes_per_origin = Route.group_by_nesting(routes)

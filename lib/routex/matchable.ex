@@ -139,7 +139,9 @@ defmodule Routex.Matchable do
   defp nillify(other), do: other
 
   def placeholders_to_ast(path, dyns) do
-    codepoint_to_integer = fn codepoint -> <<codepoint>> |> to_string |> String.to_integer() end
+    codepoint_to_integer = fn codepoint ->
+      <<codepoint>> |> Kernel.to_string() |> String.to_integer()
+    end
 
     Enum.flat_map(path, fn
       <<@ast_placeholder, codepoint::utf8>> ->
@@ -173,7 +175,7 @@ defmodule Routex.Matchable do
         seg, {acc, dyns} when is_ast(seg) ->
           count = length(dyns)
           dyns = [seg | dyns]
-          str = seg_to_binary(seg) <> to_string(count)
+          str = seg_to_binary(seg) <> Kernel.to_string(count)
 
           {[str | acc], dyns}
 
@@ -185,8 +187,8 @@ defmodule Routex.Matchable do
   end
 
   defp seg_to_binary(nil), do: nil
-  defp seg_to_binary(segment) when is_integer(segment), do: to_string(segment)
-  defp seg_to_binary(segment) when is_atom(segment), do: ":" <> to_string(segment)
+  defp seg_to_binary(segment) when is_integer(segment), do: Kernel.to_string(segment)
+  defp seg_to_binary(segment) when is_atom(segment), do: ":" <> Kernel.to_string(segment)
   defp seg_to_binary(segment) when is_ast(segment), do: @ast_placeholder
   defp seg_to_binary(segment) when is_binary(segment), do: segment
 
@@ -288,7 +290,7 @@ defmodule Routex.Matchable do
    A non conflicting function mimicking `to_string/1`
   """
 
-  def to_binary(record) do
+  def to_string(record) do
     matchable(path: path, query: query, fragment: fragment) = record
     Enum.join([path, query, fragment])
   end
@@ -312,14 +314,14 @@ defmodule Routex.Matchable do
 
   ## Example
 
-  iex> route_record = %Phoenix.Router.Route{path: "/posts/:id"} |> Routex.Matchable.new()
-     > matching_record = "/posts/1/foo=bar#top" |> Routex.Matchable.new()
-     > failing_record = "/products/1/foo=bar#op" |> Routex.Matchable.new()
+      iex> route_record = %Phoenix.Router.Route{path: "/posts/:id"} |> Routex.Matchable.new()
+         > matching_record = "/posts/1/foo=bar#top" |> Routex.Matchable.new()
+         > unmatched_record = "/unmatched/1/foo=bar#op" |> Routex.Matchable.new()
 
-  iex> match?(route_record, matching_record)
-  true
-  iex match?(route_record, failing_record)
-  false
+      iex> match?(route_record, matching_record)
+      true
+      iex match?(route_record, unmatched_record)
+      false
   """
 
   def match?(record_1, record_2)

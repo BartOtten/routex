@@ -96,7 +96,7 @@ defmodule Routex.Extension.AlternativeGetters do
     quote do
       %Routex.Extension.AlternativeGetters{
         match?: unquote(Macro.var(:pattern, Matchable)) == unquote(pattern),
-        slug: unquote(pattern) |> Matchable.to_binary(),
+        slug: unquote(pattern) |> Matchable.to_string(),
         attrs: unquote(Macro.escape(attrs))
       }
     end

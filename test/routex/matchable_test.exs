@@ -156,7 +156,7 @@ defmodule MatchableTest do
     end
   end
 
-  describe "to_binary/1" do
+  describe "to_string/1" do
     test "returns a binary matching the path, query and fragment of the original url" do
       for uri <- @uri_matches do
         expected = URI.parse(uri)
@@ -164,7 +164,7 @@ defmodule MatchableTest do
         result =
           uri
           |> Matchable.new()
-          |> Matchable.to_binary()
+          |> Matchable.to_string()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -198,7 +198,7 @@ defmodule MatchableTest do
           uri
           |> Matchable.new()
           |> Compiled.recompose("sp")
-          |> Matchable.to_binary()
+          |> Matchable.to_string()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -209,7 +209,7 @@ defmodule MatchableTest do
           uri
           |> Matchable.new()
           |> Compiled.recompose("nl")
-          |> Matchable.to_binary()
+          |> Matchable.to_string()
           |> URI.parse()
 
         assert result.query == expected.query

@@ -60,17 +60,17 @@ structure.
 
 **Example**
 The Alternatives extension uses nested options and allows inheritance
-of properties from parent branches.
+of attributes from parent branches.
 
 ```
 alternatives: %{
   "/" =>
     helper: nil,
-    locale: "en",
+    locale: "en_GB",
     branches: %{
       "nl" => %{
           helper: "nl",
-          locale: "nl"
+          locale: "nl_NL"
         },
       "gb" => %{
         helper: "gb",
@@ -88,7 +88,7 @@ Routex.Attrs.put(route, [locale: "en_GB", helper: "gb"])
 ```
 
 Now the `Translation` extension can search for the option `:locale` in the
-route's opts, unaware of how that locale was initially configured.
+route's attributes, unaware of how that locale was initially configured.
 
 ### Stage 3: Post Transform
 The `post_transform` stage is meant to set `Routex.Attrs` knowing all other

@@ -34,7 +34,7 @@ defmodule Routex.Extension.Assigns do
   - assigns
 
   ## Example use case
-  Combine with `Routext.Extension.Alternatives` to make compile time, branch
+  Combine with `Routex.Extension.Alternatives` to make compile time, branch
   bound assigns available to components and controllers.
   """
 

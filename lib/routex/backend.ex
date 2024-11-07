@@ -1,7 +1,7 @@
 defmodule Routex.Backend do
   @moduledoc """
   > #### `use Routex.Backend` {: .info}
-  > When use'd this module generates a Routext backend module and
+  > When use'd this module generates a Routex backend module and
   > a configuration struct using the `configure/2` callbacks of
   > the extensions provided in `opts`.
   >
@@ -52,7 +52,7 @@ defmodule Routex.Backend do
       defstruct unquote(config |> Map.to_list() |> Macro.escape())
 
       @typedoc """
-        A Routext backend struct
+        A Routex backend struct
       """
       @type config :: struct()
 

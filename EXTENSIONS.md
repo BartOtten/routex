@@ -23,7 +23,7 @@ result to `Phoenix.Router` for compilation.
 This stage enables extensions to pre-process backend options upfront.
 
 The `configure/2` callback is called with the options provided to
-`Routex.Backend` and the name of the Routext backend. It is expected to return a
+`Routex.Backend` and the name of the Routex backend. It is expected to return a
 new list of options.
 
 Routex collects all options in this stage for subsequent stages. Therefore,
@@ -35,12 +35,12 @@ subsequent stages.
 
 ### Stage 2: Transform
 This stage is meant to change the properties of routes, which are at that moment
-`Phoenix.Router.Route` structs. The routes are grouped by Routext backend and
+`Phoenix.Router.Route` structs. The routes are grouped by Routex backend and
 processed per group, allowing an extension to use accumulating values within one
 iteration.
 
 The `transform/3` callback is called with a list of routes belonging to a
-Routext backend, the name of the backend and the current environment. It is
+Routex backend, the name of the backend and the current environment. It is
 expected to return a list of Phoenix.Router.Route structs.
 
 #### Flattening option values
@@ -99,7 +99,7 @@ In this stage helper functions can be generated which will be added to
 `MyAppWeb.Router.RoutexHelpers`.
 
 The `create_helpers/3` callback is called with a list of routes belonging to a
-Routext backend, the name of the Routext backend and the current environment.
+Routex backend, the name of the Routex backend and the current environment.
 It is expected to return Elixir AST.
 
 As a result the developer only has to `import MyAppWeb.Router.RoutexHelpers`

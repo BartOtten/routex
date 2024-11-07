@@ -6,7 +6,7 @@ defmodule Routex.Processing do
   structs and `create_helpers` callbacks to create one unified Helper module.
 
   **Powerful but thin**
-  Although Routext is able to influence the routes in Phoenix applications in profound
+  Although Routex is able to influence the routes in Phoenix applications in profound
   ways, the framework and it's extensions are a suprisingly lightweight piece
   of compile-time middleware. This is made possible by the way router modules
   are pre-processed by `Phoenix.Router` itself.
@@ -16,7 +16,7 @@ defmodule Routex.Processing do
   route is at that stage a `Phoenix.Router.Route` struct.
 
   Any route enclosed in a `preprocess_using` block has received a `:private`
-  field in which Routex has put which Routext backend to use for that
+  field in which Routex has put which Routex backend to use for that
   particular route. By enumerating the routes, we can process each route using
   the properties of this configuration and set struct values accordingly. This
   processing is nothing more than (re)mapping the Route structs' values.

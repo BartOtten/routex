@@ -38,7 +38,7 @@ defmodule Routex.Extension.Translations do
   - none
 
   ## Use case(s)
-  This extension can be combined with `Routext.Extension.Alternatives` to create
+  This extension can be combined with `Routex.Extension.Alternatives` to create
   multilingual routes.
 
   Use Alternatives to create new branches and provide a `:language` or `:locale` per branch and

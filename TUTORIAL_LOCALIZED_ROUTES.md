@@ -235,6 +235,20 @@ dynamic routes throughout our application, we simply 'takeover' the names used
 by Phoenix in your application and rename the originals. This way you do not
 need to modify all your templates. Convenient.
 
+To not have duplicated imports, add this to your routex_helpers in `example_web.ex`
+
+```diff
+  def routex_helpers do
+    quote do
++      import Phoenix.VerifiedRoutes,
++        except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
+
+      import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
+      alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
+    end
+  end
+```
+
 Now when you start your app with `mix phx.server` and you visit a 'localized'
 page such as `/europe/nl/producten` you will notice that every link on the page
 will keep you within the localized 'branch' `/europe/nl/`.

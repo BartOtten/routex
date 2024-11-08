@@ -37,8 +37,11 @@ defmodule Routex.Extension.VerifiedRoutes do
   ```diff
   # file /lib/example_web.ex
   defp routex_helpers do
-  + import Phoenix.VerifiedRoutes, only: :functions
-    import ExampleWeb.Router.Routex
+  +  import Phoenix.VerifiedRoutes,
+  +      except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
+
+      import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
+      alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
   end
   ```
 

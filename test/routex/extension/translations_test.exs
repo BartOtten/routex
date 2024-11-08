@@ -34,7 +34,7 @@ defmodule Routex.Extension.TranslationsTest do
     exception =
       assert_raise RuntimeError, fn -> Translations.transform(routes, RtxBackend, nil) end
 
-    assert exception.message =~ "neither :language nor :locale was found"
+    assert exception.message =~ "neither the attribute :language nor :locale was found"
   end
 
   test "should raise when no :language and invalid :locale attribute is set in a route" do

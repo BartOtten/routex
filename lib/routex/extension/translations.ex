@@ -168,7 +168,8 @@ defmodule Routex.Extension.Translations do
 
     raise(
       "Routex backend `#{backend}` lists extension `#{__MODULE__}` but
- neither :language nor :locale was found in private.routex of route #{inspect(route, pretty: true)}."
+ neither the attribute :language nor :locale was found in private.routex
+ of route #{inspect(route, pretty: true)}."
     )
   end
 

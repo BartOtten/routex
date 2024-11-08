@@ -54,7 +54,7 @@ and provide a minimal configuration.
 ```diff
 use Routex.Backend,
 extensions: [
-  + Routex.Extension.Alternatives,
++ Routex.Extension.Alternatives,
 ],
 + alternatives: %{
 +      "/" => %{

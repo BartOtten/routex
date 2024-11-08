@@ -25,7 +25,7 @@ Modify the entrypoint your web interface definition.
 # file: lib/example_web.ex
 
 +  use Routex.Router  # always before Phoenix Router
-   use Phoenix.Router, helpers: true
+   use Phoenix.Router, helpers: false
 
 # in controller
    unquote(verified_routes())

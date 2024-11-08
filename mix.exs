@@ -87,7 +87,7 @@ defmodule Routex.MixProject do
       maintainers: ["Bart Otten"],
       licenses: ["MIT"],
       files: ~w(lib .formatter.exs mix.exs README.md LICENSE.md
-                CHANGELOG.md CONTRIBUTING.md USAGE.md EXTENSIONS.md TROUBLESHOOTING.md),
+                CHANGELOG.md CONTRIBUTING.md USAGE.md EXTENSIONS.md TROUBLESHOOTING.md EXTENSION_SUMMARIES.md TUTORIAL_LOCALIZED_ROUTES.md),
       links: %{
         Changelog: "https://hexdocs.pm/routex/changelog.html",
         GitHub: "https://github.com/BartOtten/routex"
@@ -106,7 +106,7 @@ defmodule Routex.MixProject do
       source_url: @source_url,
       assets: %{"assets" => "assets"},
       before_closing_head_tag: &docs_before_closing_head_tag/1,
-      extras: ["README.md", "USAGE.md", "CHANGELOG.md", "EXTENSIONS.md", "TROUBLESHOOTING.md"],
+      extras: ["README.md", "USAGE.md", "CHANGELOG.md", "EXTENSIONS.md", "TROUBLESHOOTING.md", "EXTENSION_SUMMARIES.md", "TUTORIAL_LOCALIZED_ROUTES.md"],
       filter_modules: ~r"Elixir.Routex.*$",
       groups_for_modules: [
         Routex: ~r"Routex\.?[^.]*$",

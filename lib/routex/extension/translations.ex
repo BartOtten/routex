@@ -166,11 +166,9 @@ defmodule Routex.Extension.Translations do
   defp detect_language!(nil, route) do
     backend = route |> Attrs.get(:backend) |> to_string()
 
-    raise(
-      "Routex backend `#{backend}` lists extension `#{__MODULE__}` but
+    raise("Routex backend `#{backend}` lists extension `#{__MODULE__}` but
  neither the attribute :language nor :locale was found in private.routex
- of route #{inspect(route, pretty: true)}."
-    )
+ of route #{inspect(route, pretty: true)}.")
   end
 
   defp detect_language!(other, route) do

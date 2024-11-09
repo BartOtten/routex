@@ -1,9 +1,9 @@
 # Localized Routes with Routex
 
 A core feature of Routex is to enable Localized Routes in Phoenix with
-translated URL's, enhancing user engagement and content relevance. In this
+translated URLs, enhancing user engagement and content relevance. In this
 tutorial we will explain how multiple extensions are combined to have a product
-page with URL's in multiple languages and how you can display links to the
+page with Ural's in multiple languages and how you can display links to the
 localized pages. Without changing a single route in your templates!
 
 
@@ -17,6 +17,10 @@ localized pages. Without changing a single route in your templates!
 This tutorial assumes you have followed the [usage guide](USAGE.md) to setup
 Routex.
 
+If you encounter any issues with Routex or this tutorial, feel free to [open a topic at Elixir
+Forums](https://elixirforum.com/tag/routes) or create an issue at GitHub.
+
+
 ## What we start with
 Currently we have multiple routes to the product page. Your route.ex file
 contains something like the example below.
@@ -24,8 +28,6 @@ contains something like the example below.
       preprocess_using ExampleWeb.RoutexBackend do
         scope "/", ExampleWeb do
           pipe_through :browser
-
-          get "/", PageController, :home
 
           live "/products", ProductLive.Index, :index
           live "/products/new", ProductLive.Index, :new
@@ -43,12 +45,12 @@ When you run `mix phx.routes` you will see those routes as:
     product_index_path  GET    /products/new                          ExampleWeb.ProductLive.Index :new
     product_index_path  GET    /products                              ExampleWeb.ProductLive.Index :index
 
-You want these pages to be accessible from multiple (translated) URL's. So our
-first step is to generate alternative URL's.
+You want these pages to be accessible from multiple (translated) URLs. So our
+first step is to generate alternative routes.
 
-## Step 1: Generate alternative URL's
+## Step 1: Generate alternative URLs
 
-The `Extension.Alternatives` does exactly this. Add it to the list of extensions
+The `Routex.Extension.Alternatives` does exactly this. Add it to the list of extensions
 and provide a minimal configuration.
 
 ```diff
@@ -71,10 +73,10 @@ extensions: [
 +    }
 ```
 
-You can confirm it works by running `mix phx.routes` which now shows a lot more
-routes as alternatives are generated for each route in the `preprocess_using`
-block in your `router.ex`. For example the route to `/products/:id/show/edit`
-has multiple alternatives.
+You can confirm it works by running `mix phx.routes`. It now shows a lot more
+routes as alternatives are generated for each route within the
+`preprocess_using` block. For example the route to `/products/:id/show/edit` has
+multiple alternatives.
 
 ```
 product_show_path           GET     /products/:id/show/edit               ExampleWeb.ProductLive.Show :edit
@@ -90,7 +92,7 @@ translate them
 
 ## Step 2: Translate the alternative routes
 
-The `Extension.Translation` makes routes translatable by splitting the route
+The `Routex.Extension.Translation` makes routes translatable by splitting the route
 into segments (e.g. `["products", "show", "edit"]`) and extracting these
 segments to a `routes.po` file for translation. You might recognize the `.po`
 extension from your Phoenix project; it's the extension used by Gettext. Gettext
@@ -154,12 +156,12 @@ The compilation will fail with the message:
 
 This makes sense. After all, we have multiple routes and a translation of
 segments but Routex does not know which translation to use for what route.
-Appearently we need to set aan attribute `:locale` or `:language` per
+Apparently we need to set an attribute `:locale` or `:language` per
 alternatives.
 
 Luckily this is covered by `Extension.Alternatives` as it supports setting the
 `:attrs` key per branch. Let's replace the alternatives configuration with one
-that also sets the `:locale` attribute. Whule we are add it, we also give the
+that also sets the `:locale` attribute. While we are add it, we also give the
 branches a `:display_name` attribute.
 
 ```diff
@@ -174,7 +176,7 @@ branches a `:display_name` attribute.
 +                "/be" => %{attrs: %{locale: "nl_BE", display_name: "Belgium"}}
              }
            },
-+          "/gb" => %{attrs: %{locale: "en-150", display_name: "Great Brittain"}}
++          "/gb" => %{attrs: %{locale: "en-150", display_name: "Great Britain"}}
          }
        }
      }
@@ -203,7 +205,7 @@ such as `/europe/nl/producten` you will notice that every link on the page will
 bring you back to a default route. In the code the path of the link is written
 like `~p"/products"`. It would be nice if instead of always rendering a link to
 `/products`, Phoenix would instead render a localized link. Enter
-`Extension.VerifiedRoutes`.
+`Routex.Extension.VerifiedRoutes`.
 
 **Note**
 In older Phoenix applications you might find something like
@@ -212,8 +214,8 @@ These are Phoenix Router Helpers and those are deprecated in favor of the
 Verified Routes using `~p"/my_path"`. When you can't migrate, you can use
 `Routex.Extension.RouteHelpers` instead of `Routex.Extension.VerifiedRoutes`.
 
-You might already have guessed it: we are gonna add something to the
-configuration.
+You might already have guessed it: we are gonna add the extension and some
+configuration to the backend.
 
 ```diff
 use Routex.Backend,
@@ -230,8 +232,8 @@ extensions: [
 + verified_path_routex: :path
 ```
 
-By default the extension uses non-standard macro names but as we want to have
-dynamic routes throughout our application, we simply 'takeover' the names used
+By default the extension uses non-standard macro names. As we want to have
+dynamic routes throughout our application, we 'take over' the names used
 by Phoenix in your application and rename the originals. This way you do not
 need to modify all your templates. Convenient.
 
@@ -249,16 +251,35 @@ To not have duplicated imports, add this to your routex_helpers in `example_web.
   end
 ```
 
-Now when you start your app with `mix phx.server` and you visit a 'localized'
-page such as `/europe/nl/producten` you will notice that every link on the page
-will keep you within the localized 'branch' `/europe/nl/`.
+Now when you start your app with `mix phx.server` you will notice an explanation
+is printed about the usage of Routex Verified Routes. This informs other
+developers of the 'take overs'.
 
-Keeping users in a localized environment is great, but giving them an option to
-switch to another locale would be nice. So let's continue one step further.
+```
+Due to the configuration in module `ExampleWeb.RoutexBackend` one or multiple
+Routex variants use the default name of their native Phoenix equivalents. The native
+macro's, sigils or functions have been renamed.
+
+ Native              | Routex
+ -----------------------------------------
+ ~o                  | ~p
+ url_phx             | url
+ path_phx            | path
+
+ Documentation: https://hexdocs.pm/routex/extensions/verified_routes.html
+ ```
+
+
+When you visit a 'localized' page such as `/europe/nl/producten` you will notice
+that every link on the page will keep you within the localized 'branch'
+`/europe/nl/`. Keeping users in a localized environment is great, but giving
+them an option to switch to another locale would be nice.
+
+Let's empower our visitors!
 
 ## Step 4: Show alternative pages to the user
 
-The `Extension.AlternativeGetters` generates function at compile time to
+The `Routex.Extension.AlternativeGetters` generates function at compile time to
 dynamically fetch alternative routes for the current url without overhead. Let's
 once again add the extension.
 
@@ -347,8 +368,7 @@ extension you can add to the mix for extra flexibility and convenience, such as:
   notation.
 * **Routex.Extension.AttrGetters** - Lazy load attributes
 
-If you encounter any issues with Routex, feel free to [open a topic at Elixir
+If you encounter any issues with Routex or this tutorial, feel free to [open a topic at Elixir
 Forums](https://elixirforum.com/tag/routes) or create an issue at GitHub.
 
 Have a nice day!
-

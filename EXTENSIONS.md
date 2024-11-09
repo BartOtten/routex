@@ -20,7 +20,7 @@ result to `Phoenix.Router` for compilation.
 ## Callbacks and stages
 
 ### Stage 1: Configure
-This stage enables extensions to pre-process backend options upfront.
+This stage enables extensions to preprocess backend options upfront.
 
 The `configure/2` callback is called with the options provided to
 `Routex.Backend` and the name of the Routex backend. It is expected to return a

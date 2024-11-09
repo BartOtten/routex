@@ -3,7 +3,7 @@
 Routex relies on extensions to provide features. Each extension provides a
 single feature and should minimize hard dependencies on other extensions.
 Instead, Routex advises to make use of `Routex.Attrs` to share attributes;
-allowing extensions to work together whithout being coupled.
+allowing extensions to work together without being coupled.
 
 The documentation of each extension lists any provided or required
 `Routex.Attrs`.

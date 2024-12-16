@@ -136,7 +136,7 @@ defmodule Routex.Extension.Cldr do
 
     %{
       language: info.language,
-      territory: to_string(info.territory),
+      territory: info |> locale_module.territory_from_locale() |> to_string(),
       locale: to_string(info.cldr_locale_name),
       locale_name: display_name(locale, backend)
     }

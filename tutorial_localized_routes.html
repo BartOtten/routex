@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.34.2">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.3.0-alpha.4">
+
+
+    <title>Localized Routes with Routex — Phoenix Routes Extension Framework v0.3.0-alpha.4</title>
+    <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-K7URE6B4.js"></script>
+    <script src="dist/sidebar_items-CF9D1FC8.js"></script>
+    <script src="docs_config.js"></script>
+    <script async src="dist/html-YIPIRHGU.js"></script>
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="extras" class="page-extra">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v0.3.0-alpha.4
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
+Pages
+        </button>
+      </li>
+
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
+
+
+    </ul>
+  </div>
+
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
+
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
+
+
+</nav>
+
+<main class="content">
+  <output role="status" id="toast"></output>
+
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Phoenix Routes Extension Framework</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.3.0-alpha.4/TUTORIAL_LOCALIZED_ROUTES.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+
+    <span>Localized Routes with Routex</span>
+  </h1>
+
+<p>A core feature of Routex is to enable Localized Routes in Phoenix with
+translated URLs, enhancing user engagement and content relevance. In this
+tutorial we will explain how multiple extensions are combined to have a product
+page with Ural's in multiple languages and how you can display links to the
+localized pages. Without changing a single route in your templates!</p><pre><code class="makeup elixir" translate="no"><span class="w">                    </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                    </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;en_US&quot;</span><span class="w">
+</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">eu</span><span class="o">/</span><span class="n">nederland</span><span class="o">/</span><span class="n">producten</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">bewerken</span><span class="w">  </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;nl_NL&quot;</span><span class="w">
+                    </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">eu</span><span class="o">/</span><span class="n">espana</span><span class="o">/</span><span class="n">producto</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">editar</span><span class="w">        </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;es_ES&quot;</span><span class="w">
+                    </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">gb</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                 </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;en_GB&quot;</span></code></pre><p>This tutorial assumes you have followed the <a href="usage.html">usage guide</a> to setup
+Routex.</p><p>If you encounter any issues with Routex or this tutorial, feel free to <a href="https://elixirforum.com/tag/routes">open a topic at Elixir
+Forums</a> or create an issue at GitHub.</p><h2 id="what-we-start-with" class="section-heading">
+  <a href="#what-we-start-with" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">What we start with</span>
+</h2>
+<p>Currently we have multiple routes to the product page. Your route.ex file
+contains something like the example below.</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="n">preprocess_using</span><span class="w"> </span><span class="nc">ExampleWeb.RoutexBackend</span><span class="w"> </span><span class="k" data-group-id="2002363926-1">do</span><span class="w">
+    </span><span class="n">scope</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ExampleWeb</span><span class="w"> </span><span class="k" data-group-id="2002363926-2">do</span><span class="w">
+      </span><span class="n">pipe_through</span><span class="w"> </span><span class="ss">:browser</span><span class="w">
+
+      </span><span class="n">live</span><span class="w"> </span><span class="s">&quot;/products&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ProductLive.Index</span><span class="p">,</span><span class="w"> </span><span class="ss">:index</span><span class="w">
+      </span><span class="n">live</span><span class="w"> </span><span class="s">&quot;/products/new&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ProductLive.Index</span><span class="p">,</span><span class="w"> </span><span class="ss">:new</span><span class="w">
+      </span><span class="n">live</span><span class="w"> </span><span class="s">&quot;/products/:id/edit&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ProductLive.Index</span><span class="p">,</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+      </span><span class="n">live</span><span class="w"> </span><span class="s">&quot;/products/:id&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ProductLive.Show</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="w">
+      </span><span class="n">live</span><span class="w"> </span><span class="s">&quot;/products/:id/show/edit&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">ProductLive.Show</span><span class="p">,</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+    </span><span class="k" data-group-id="2002363926-2">end</span><span class="w">
+  </span><span class="k" data-group-id="2002363926-1">end</span></code></pre><p>When you run <a href="https://hexdocs.pm/phoenix/1.7.14/Mix.Tasks.Phx.Routes.html"><code class="inline">mix phx.routes</code></a> you will see those routes as:</p><pre><code class="makeup elixir" translate="no"><span class="n">product_show_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">                </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+</span><span class="n">product_show_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="w">                          </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:show</span><span class="w">
+</span><span class="n">product_index_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">    </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                     </span><span class="nc">ExampleWeb.ProductLive.Index</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+</span><span class="n">product_index_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">    </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="n">new</span><span class="w">                          </span><span class="nc">ExampleWeb.ProductLive.Index</span><span class="w"> </span><span class="ss">:new</span><span class="w">
+</span><span class="n">product_index_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">    </span><span class="o">/</span><span class="n">products</span><span class="w">                              </span><span class="nc">ExampleWeb.ProductLive.Index</span><span class="w"> </span><span class="ss">:index</span></code></pre><p>You want these pages to be accessible from multiple (translated) URLs. So our
+first step is to generate alternative routes.</p><h2 id="step-1-generate-alternative-urls" class="section-heading">
+  <a href="#step-1-generate-alternative-urls" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Step 1: Generate alternative URLs</span>
+</h2>
+<p>The <a href="Routex.Extension.Alternatives.html"><code class="inline">Routex.Extension.Alternatives</code></a> does exactly this. Add it to the list of extensions
+and provide a minimal configuration.</p><pre><code class="diff">use Routex.Backend,
+extensions: [
++ Routex.Extension.Alternatives,
+],
++ alternatives: %{
++      &quot;/&quot; =&gt; %{
++        branches: %{
++          &quot;/europe&quot; =&gt; %{
++              branches: %{
++                &quot;/nl&quot; =&gt; %{},
++                &quot;/be&quot; =&gt; %{}
++            }
++          },
++          &quot;/gb&quot; =&gt; %{}
++        }
++      }
++    }</code></pre><p>You can confirm it works by running <a href="https://hexdocs.pm/phoenix/1.7.14/Mix.Tasks.Phx.Routes.html"><code class="inline">mix phx.routes</code></a>. It now shows a lot more
+routes as alternatives are generated for each route within the
+<code class="inline">preprocess_using</code> block. For example the route to <code class="inline">/products/:id/show/edit</code> has
+multiple alternatives.</p><pre><code class="makeup elixir" translate="no"><span class="n">product_show_path</span><span class="w">           </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">               </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+</span><span class="n">product_show_europe_path</span><span class="w">    </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">        </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+</span><span class="n">product_show_europe_be_path</span><span class="w"> </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">be</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">     </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+</span><span class="n">product_show_europe_nl_path</span><span class="w"> </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">nl</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">     </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:edit</span><span class="w">
+</span><span class="n">product_show_gb_path</span><span class="w">        </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">gb</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">            </span><span class="nc">ExampleWeb.ProductLive.Show</span><span class="w"> </span><span class="ss">:edit</span></code></pre><p>As you can see the routes are still in the English language; we need another extension to
+translate them</p><h2 id="step-2-translate-the-alternative-routes" class="section-heading">
+  <a href="#step-2-translate-the-alternative-routes" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Step 2: Translate the alternative routes</span>
+</h2>
+<p>The <code class="inline">Routex.Extension.Translation</code> makes routes translatable by splitting the route
+into segments (e.g. <code class="inline">[&quot;products&quot;, &quot;show&quot;, &quot;edit&quot;]</code>) and extracting these
+segments to a <code class="inline">routes.po</code> file for translation. You might recognize the <code class="inline">.po</code>
+extension from your Phoenix project; it's the extension used by Gettext. Gettext
+is a standard for i18n in different communities, meaning there is a great set of
+tooling for developers and translators. This also means your routes segments can be
+translated with the same tooling as used for all other translations in Phoenix!</p><p>Add the extension and it's minimal configuration.</p><pre><code class="diff">use Routex.Backend,
+extensions: [
+  Routex.Extension.Alternatives,
++ Routex.Extension.Translations,
+],
+  alternatives: %{...},
++ translations_backend: ExampleWeb.Gettext,</code></pre><p>If this is the first time you add translations in your project, you need to
+generate the folder structure which Gettext can use to detect languages to
+translate to. We need two languages in this tutorial: 'en' and 'nl'. As 'en' is
+the default for routes we only need to create translations for 'nl'.</p><pre><code class="makeup elixir" translate="no"><span class="n">mix</span><span class="w"> </span><span class="n">gettext</span><span class="o">.</span><span class="n">extract</span><span class="w">
+</span><span class="n">mix</span><span class="w"> </span><span class="n">gettext</span><span class="o">.</span><span class="n">merge</span><span class="w"> </span><span class="n">priv</span><span class="o">/</span><span class="n">gettext</span><span class="w"> </span><span class="o">--</span><span class="n">locale</span><span class="w"> </span><span class="n">nl</span></code></pre><p>You should see a message that Gettext has generated new translation files which
+can be found in the <code class="inline">priv/gettext/nl</code> folder</p><pre><code class="makeup elixir" translate="no"><span class="n">priv</span><span class="o">/</span><span class="w">
+ </span><span class="n">gettext</span><span class="o">/</span><span class="w">
+   </span><span class="n">nl</span><span class="o">/</span><span class="w">
+     </span><span class="nc">LC_MESSAGES</span><span class="o">/</span><span class="w">
+       </span><span class="n">default</span><span class="o">.</span><span class="n">po</span><span class="w"> </span><span class="c1"># phoenix translations</span><span class="w">
+       </span><span class="n">routes</span><span class="o">.</span><span class="n">po</span><span class="w">  </span><span class="c1"># routex translations</span></code></pre><p>Now you can translate the segments by opening the <code class="inline">routes.po</code> file with your
+favorite <code class="inline">.po</code> editor. Here are a few suggestions:</p><ul><li>GNU Emacs (with po-mode): Linux, MacOSX, and Windows.</li><li>Lokalize: runs on KDE desktop for Linux (replacement for KBabel; formerly known as KAider)</li><li>Poedit: Linux, MacOSX, and Windows</li><li>OmegaT: Linux, MacOSX, and Windows</li><li>Vim: Linux, MacOSX, and Windows with PO ftplugin for easier editing of GNU gettext PO files.</li><li>gted plugin for Eclipse (if you are already using Eclipse)</li><li>gtranslator: Linux/Gnome</li><li>Virtaal: Windows, Mac (Beta version)</li></ul><p>One you have translated the segments, list all routes using <a href="https://hexdocs.pm/phoenix/1.7.14/Mix.Tasks.Phx.Routes.html"><code class="inline">mix phx.routes</code></a>.
+The compilation will fail with the message:</p><pre><code class="makeup elixir" translate="no"><span class="gt">** (RuntimeError) Routex backend `Elixir.ExampleWeb.RoutexBackend` lists extension `Elixir.Routex.Extension.Translations` but</span><span class="w">
+ </span><span class="n">neither</span><span class="w"> </span><span class="ss">:language</span><span class="w"> </span><span class="n">nor</span><span class="w"> </span><span class="ss">:locale</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">private</span><span class="o">.</span><span class="n">routex</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">route</span><span class="w"> </span><span class="p" data-group-id="3299031246-1">%</span><span class="nc" data-group-id="3299031246-1">Phoenix.Router.Route</span><span class="p" data-group-id="3299031246-1">{</span><span class="p" data-group-id="3299031246-2">[</span><span class="n">...</span><span class="p" data-group-id="3299031246-2">]</span><span class="p" data-group-id="3299031246-1">}</span></code></pre><p>This makes sense. After all, we have multiple routes and a translation of
+segments but Routex does not know which translation to use for what route.
+Apparently we need to set an attribute <code class="inline">:locale</code> or <code class="inline">:language</code> per
+alternatives.</p><p>Luckily this is covered by <code class="inline">Extension.Alternatives</code> as it supports setting the
+<code class="inline">:attrs</code> key per branch. Let's replace the alternatives configuration with one
+that also sets the <code class="inline">:locale</code> attribute. While we are add it, we also give the
+branches a <code class="inline">:display_name</code> attribute.</p><pre><code class="diff"> alternatives: %{
+      &quot;/&quot; =&gt; %{
++        attrs: %{locale: &quot;en-150&quot;, display_name: &quot;Global&quot;},
+         branches: %{
+           &quot;/europe&quot; =&gt; %{
++              attrs: %{locale: &quot;en-150&quot;, display_name: &quot;Europe&quot;},
+               branches: %{
++                &quot;/nl&quot; =&gt; %{attrs: %{locale: &quot;nl_NL&quot;, display_name: &quot;The Netherlands&quot;}},
++                &quot;/be&quot; =&gt; %{attrs: %{locale: &quot;nl_BE&quot;, display_name: &quot;Belgium&quot;}}
+             }
+           },
++          &quot;/gb&quot; =&gt; %{attrs: %{locale: &quot;en-150&quot;, display_name: &quot;Great Britain&quot;}}
+         }
+       }
+     }</code></pre><p><strong>Note</strong>
+As <code class="inline">locale: &quot;en-150&quot;</code> seems to be a default, consider using a struct with a default value instead of a map.</p><p>Now when you list all routes using <a href="https://hexdocs.pm/phoenix/1.7.14/Mix.Tasks.Phx.Routes.html"><code class="inline">mix phx.routes</code></a>, you will see some routes
+have been translated. We are getting there!</p><pre><code class="makeup elixir" translate="no"><span class="n">product_show_path</span><span class="w">            </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">
+</span><span class="n">product_show_europe_path</span><span class="w">     </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">
+</span><span class="n">product_show_europe_be_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">be</span><span class="o">/</span><span class="n">producten</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">toon</span><span class="o">/</span><span class="n">bewerken</span><span class="w">
+</span><span class="n">product_show_europe_nl_path</span><span class="w">  </span><span class="nc">GET</span><span class="w">     </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">nl</span><span class="o">/</span><span class="n">producten</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">toon</span><span class="o">/</span><span class="n">bewerken</span></code></pre><p>Now we have the routes it would be nice if users stay within their <code class="inline">locale</code>
+while browsing pages.</p><h2 id="step-3-dynamic-links-in-your-application" class="section-heading">
+  <a href="#step-3-dynamic-links-in-your-application" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Step 3: Dynamic links in your application</span>
+</h2>
+<p>When you start your app with <a href="https://hexdocs.pm/phoenix/1.7.14/Mix.Tasks.Phx.Server.html"><code class="inline">mix phx.server</code></a> and you visit a 'localized' page
+such as <code class="inline">/europe/nl/producten</code> you will notice that every link on the page will
+bring you back to a default route. In the code the path of the link is written
+like <code class="inline">~p&quot;/products&quot;</code>. It would be nice if instead of always rendering a link to
+<code class="inline">/products</code>, Phoenix would instead render a localized link. Enter
+<a href="Routex.Extension.VerifiedRoutes.html"><code class="inline">Routex.Extension.VerifiedRoutes</code></a>.</p><p><strong>Note</strong>
+In older Phoenix applications you might find something like
+<code class="inline">ExampleAppWeb.Router.Helpers.product_path(conn_or_endpoint, :show, &quot;hello&quot;)</code>.
+These are Phoenix Router Helpers and those are deprecated in favor of the
+Verified Routes using <code class="inline">~p&quot;/my_path&quot;</code>. When you can't migrate, you can use
+<a href="Routex.Extension.RouteHelpers.html"><code class="inline">Routex.Extension.RouteHelpers</code></a> instead of <a href="Routex.Extension.VerifiedRoutes.html"><code class="inline">Routex.Extension.VerifiedRoutes</code></a>.</p><p>You might already have guessed it: we are gonna add the extension and some
+configuration to the backend.</p><pre><code class="diff">use Routex.Backend,
+extensions: [
+  Routex.Extension.Alternatives,
+  Routex.Extension.Translations,
++ Routex.Extension.VerifiedRoutes,
+],
+  alternatives: %{...},
+  translations_backend: ExampleWeb.Gettext,
++ verified_sigil_routex: &quot;~p&quot;,
++ verified_sigil_phoenix: &quot;~o&quot;,
++ verified_url_routex: :url,
++ verified_path_routex: :path</code></pre><p>By default the extension uses non-standard macro names. As we want to have
+dynamic routes throughout our application, we 'take over' the names used
+by Phoenix in your application and rename the originals. This way you do not
+need to modify all your templates. Convenient.</p><p>To not have duplicated imports, add this to your routex_helpers in <code class="inline">example_web.ex</code></p><pre><code class="diff">  def routex_helpers do
+    quote do
++      import Phoenix.VerifiedRoutes,
++        except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
+
+      import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
+      alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
+    end
+  end</code></pre><p>Now when you start your app with <a href="https://hexdocs.pm/phoenix/1.7.14/Mix.Tasks.Phx.Server.html"><code class="inline">mix phx.server</code></a> you will notice an explanation
+is printed about the usage of Routex Verified Routes. This informs other
+developers of the 'take overs'.</p><pre><code class="makeup elixir" translate="no"><span class="nc">Due</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">configuration</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="err">`</span><span class="nc">ExampleWeb.RoutexBackend</span><span class="err">`</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">multiple</span><span class="w">
+</span><span class="nc">Routex</span><span class="w"> </span><span class="n">variants</span><span class="w"> </span><span class="kn">use</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">their</span><span class="w"> </span><span class="n">native</span><span class="w"> </span><span class="nc">Phoenix</span><span class="w"> </span><span class="n">equivalents</span><span class="o">.</span><span class="w"> </span><span class="nc">The</span><span class="w"> </span><span class="n">native</span><span class="w">
+</span><span class="n">macro</span><span class="err">&#39;</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">sigils</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">functions</span><span class="w"> </span><span class="n">have</span><span class="w"> </span><span class="n">been</span><span class="w"> </span><span class="n">renamed</span><span class="o">.</span><span class="w">
+
+ </span><span class="nc">Native</span><span class="w">              </span><span class="o">|</span><span class="w"> </span><span class="nc">Routex</span><span class="w">
+ </span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">--</span><span class="o">-</span><span class="w">
+ </span><span class="err">~</span><span class="n">o</span><span class="w">                  </span><span class="o">|</span><span class="w"> </span><span class="err">~</span><span class="n">p</span><span class="w">
+ </span><span class="n">url_phx</span><span class="w">             </span><span class="o">|</span><span class="w"> </span><span class="n">url</span><span class="w">
+ </span><span class="n">path_phx</span><span class="w">            </span><span class="o">|</span><span class="w"> </span><span class="n">path</span><span class="w">
+
+ </span><span class="ss">Documentation</span><span class="p">:</span><span class="w"> </span><span class="n">https</span><span class="ss">://</span><span class="n">hexdocs</span><span class="o">.</span><span class="n">pm</span><span class="o">/</span><span class="n">routex</span><span class="o">/</span><span class="n">extensions</span><span class="o">/</span><span class="n">verified_routes</span><span class="o">.</span><span class="n">html</span></code></pre><p>When you visit a 'localized' page such as <code class="inline">/europe/nl/producten</code> you will notice
+that every link on the page will keep you within the localized 'branch'
+<code class="inline">/europe/nl/</code>. Keeping users in a localized environment is great, but giving
+them an option to switch to another locale would be nice.</p><p>Let's empower our visitors!</p><h2 id="step-4-show-alternative-pages-to-the-user" class="section-heading">
+  <a href="#step-4-show-alternative-pages-to-the-user" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Step 4: Show alternative pages to the user</span>
+</h2>
+<p>The <a href="Routex.Extension.AlternativeGetters.html"><code class="inline">Routex.Extension.AlternativeGetters</code></a> generates function at compile time to
+dynamically fetch alternative routes for the current url without overhead. Let's
+once again add the extension.</p><pre><code class="diff">use Routex.Backend,
+extensions: [
+  Routex.Extension.Alternatives,
+  Routex.Extension.Translations,
+  Routex.Extension.VerifiedRoutes,
++ Routex.Extension.AlternativeGetters,
+],
+  alternatives: %{...},
+  translations_backend: ExampleWeb.Gettext,
+  verified_sigil_routex: &quot;~p&quot;,
+  verified_sigil_phoenix: &quot;~o&quot;,
+  verified_url_routex: :url,
+  verified_path_routex: :path</code></pre><p>All created functions pattern match on a given URL and return the alternatives
+with a <code class="inline">slug</code>, the <code class="inline">match?</code> attribute which is true if the route pattern matches
+the provided path, and <code class="inline">attributes</code> of the route.</p><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="nc">ExampleWeb.Router.RoutexHelpers</span><span class="o">.</span><span class="n">alternatives</span><span class="p" data-group-id="2521960401-1">(</span><span class="s">&quot;https://example.com/products?search=bar#top&quot;</span><span class="p" data-group-id="2521960401-1">)</span><span class="w">
+</span><span class="p" data-group-id="2521960401-2">[</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-3">%</span><span class="nc" data-group-id="2521960401-3">Routex.Extension.AlternativeGetters</span><span class="p" data-group-id="2521960401-3">{</span><span class="w">
+    </span><span class="ss">slug</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/products?search=bar#top&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">attrs</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2521960401-4">%{</span><span class="w">
+      </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Worldwide&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en-US&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="2521960401-5">[</span><span class="n">...</span><span class="p" data-group-id="2521960401-5">]</span><span class="w">
+    </span><span class="p" data-group-id="2521960401-4">}</span><span class="p">,</span><span class="w">
+    </span><span class="ss">match?</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-3">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-6">%</span><span class="nc" data-group-id="2521960401-6">Routex.Extension.AlternativeGetters</span><span class="p" data-group-id="2521960401-6">{</span><span class="w">
+    </span><span class="ss">slug</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/europe/products?search=bar#top&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">attrs</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2521960401-7">%{</span><span class="w">
+      </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Europe&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en-150&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="2521960401-8">[</span><span class="n">...</span><span class="p" data-group-id="2521960401-8">]</span><span class="w">
+    </span><span class="p" data-group-id="2521960401-7">}</span><span class="p">,</span><span class="w">
+    </span><span class="ss">match?</span><span class="p">:</span><span class="w"> </span><span class="no">false</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-6">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-9">%</span><span class="nc" data-group-id="2521960401-9">Routex.Extension.AlternativeGetters</span><span class="p" data-group-id="2521960401-9">{</span><span class="w">
+    </span><span class="ss">slug</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/europe/be/producten?search=bar#top&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">attrs</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="2521960401-10">%{</span><span class="w">
+      </span><span class="ss">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Belgium&quot;</span><span class="p">,</span><span class="w">
+      </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl-BE&quot;</span><span class="p">,</span><span class="w">
+       </span><span class="p" data-group-id="2521960401-11">[</span><span class="n">...</span><span class="p" data-group-id="2521960401-11">]</span><span class="w">
+    </span><span class="p" data-group-id="2521960401-10">}</span><span class="p">,</span><span class="w">
+    </span><span class="ss">match?</span><span class="p">:</span><span class="w"> </span><span class="no">false</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-9">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="2521960401-12">[</span><span class="n">...</span><span class="p" data-group-id="2521960401-12">]</span></code></pre><p>As Routex automatically assigns the current url to <code class="inline">@url</code> we have all
+ingredients instantly available in our templates! It becomes a matter of looping
+over the results to generate links.</p><pre><code class="heex"> &lt;!-- alternatives/1 is located in ExampleWeb.Router.RoutexHelpers which is aliased as Routes --&gt;
+ &lt;.link
+   :for={alternative &lt;- Routes.alternatives(@url)}
+   class=&quot;button&quot;
+   rel=&quot;alternate&quot;
+   hreflang={alternative.attrs.locale}
+   patch={alternative.slug}
+ &gt;
+   &lt;.button class={(alternative.match? &amp;&amp; &quot;bg-[#FD4F00]&quot;) || &quot;&quot;}&gt;
+     &lt;%= alternative.attrs.display_name %&gt;
+   &lt;/.button&gt;
+ &lt;/.link&gt;</code></pre><h2 id="conclusion" class="section-heading">
+  <a href="#conclusion" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Conclusion</span>
+</h2>
+<p>In this tutorial you have learned how to create localized routes for your
+Phoenix application using multiple extensions and how to add custom attributes
+(such as <code class="inline">:locale</code> and <code class="inline">:display_name</code>) to these routes. There are a few more
+extension you can add to the mix for extra flexibility and convenience, such as:</p><ul><li><strong>Routex.Extension.Interpolation</strong> - Use any attribute to customize routes
+(e.g. &quot;/#{locale}/products/#{display_name}/:id/edit&quot;)</li><li><strong>Routex.Extension.Assigns</strong> - Use any attribute in your templates using <code class="inline">@</code>
+notation.</li><li><strong>Routex.Extension.AttrGetters</strong> - Lazy load attributes</li></ul><p>If you encounter any issues with Routex or this tutorial, feel free to <a href="https://elixirforum.com/tag/routes">open a topic at Elixir
+Forums</a> or create an issue at GitHub.</p><p>Have a nice day!</p>
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="extension_summaries.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Routex Extensions
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+  </div>
+</div>
+    <footer class="footer">
+      <p>
+
+          <span class="line">
+            <a href="https://hex.pm/packages/routex/0.3.0-alpha.4" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/routex/0.3.0-alpha.4">Hex Preview</a>
+
+              (<a href="https://preview.hex.pm/preview/routex/0.3.0-alpha.4/show/TUTORIAL_LOCALIZED_ROUTES.md">current file</a>)
+
+          </span>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.34.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.34.2">
+    <meta name="project" content="Phoenix Routes Extension Framework v0.3.0-alpha.4">
+
+
+    <title>Routex.Backend — Phoenix Routes Extension Framework v0.3.0-alpha.4</title>
+    <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-K7URE6B4.js"></script>
+    <script src="dist/sidebar_items-CF9D1FC8.js"></script>
+    <script src="docs_config.js"></script>
+    <script async src="dist/html-YIPIRHGU.js"></script>
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="modules" class="page-module">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v0.3.0-alpha.4
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
+Pages
+        </button>
+      </li>
+
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
+
+
+    </ul>
+  </div>
+
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
+
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
+
+
+</nav>
+
+<main class="content">
+  <output role="status" id="toast"></output>
+
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Phoenix Routes Extension Framework</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.3.0-alpha.4/lib/routex/backend.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+    <span translate="no">Routex.Backend</span> 
+    <small class="app-vsn" translate="no">(Phoenix Routes Extension Framework v0.3.0-alpha.4)</small>
+
+  </h1>
+
+
+    <section id="moduledoc">
+<blockquote><h4 class="info"><code class="inline">use Routex.Backend</code></h4><p>When use'd this module generates a Routex backend module and
+a configuration struct using the <code class="inline">configure/2</code> callbacks of
+the extensions provided in <code class="inline">opts</code>.</p><p>See also: <a href="extensions.html">Routex Extensions</a>.</p></blockquote><p><strong>Example</strong></p><pre><code class="makeup elixir" translate="no"><span class="w"> </span><span class="gp unselectable">iex&gt; </span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">MyApp.RtxBackend</span><span class="w"> </span><span class="k" data-group-id="3662915301-1">do</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="w"> </span><span class="kn">use</span><span class="w"> </span><span class="nc">Routex.Backend</span><span class="p">,</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="w">  </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3662915301-2">[</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="w">   </span><span class="nc">Routex.Extension.VerifiedRoutes</span><span class="p">,</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="w">   </span><span class="nc">Routex.Extension.AttrGetters</span><span class="p">,</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="w">  </span><span class="p" data-group-id="3662915301-2">]</span><span class="p">,</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="w">  </span><span class="ss">extension_x_config</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3662915301-3">[</span><span class="ss">key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;value&quot;</span><span class="p" data-group-id="3662915301-3">]</span><span class="w">
+ </span><span class="gp unselectable">...&gt; </span><span class="k" data-group-id="3662915301-1">end</span><span class="w">
+ </span><span class="gp unselectable">iex&gt; </span><span class="nc">IO</span><span class="o">.</span><span class="n">inspect</span><span class="p" data-group-id="3662915301-4">(</span><span class="p" data-group-id="3662915301-5">%</span><span class="nc" data-group-id="3662915301-5">MyApp.RtxBackend</span><span class="p" data-group-id="3662915301-5">{</span><span class="p" data-group-id="3662915301-5">}</span><span class="p" data-group-id="3662915301-4">)</span><span class="w">
+ </span><span class="p" data-group-id="3662915301-6">%</span><span class="nc" data-group-id="3662915301-6">MyApp.RtxBackend</span><span class="p" data-group-id="3662915301-6">{</span><span class="w">
+   </span><span class="ss">extension_x_config</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3662915301-7">[</span><span class="ss">key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;value&quot;</span><span class="p" data-group-id="3662915301-7">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3662915301-8">[</span><span class="nc">Routex.Extension.VerifiedRoutes</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Extension.AttrGetters</span><span class="p" data-group-id="3662915301-8">]</span><span class="p">,</span><span class="w">
+   </span><span class="ss">verified_sigil_routex</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~l&quot;</span><span class="p">,</span><span class="w">
+   </span><span class="ss">verified_sigil_original</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~o&quot;</span><span class="w">
+ </span><span class="p" data-group-id="3662915301-6">}</span></code></pre><p>Values in the configuration can be overridden by providing an override map to the <code class="inline">:private</code> option of a scope or route.</p><p><strong>Example</strong></p><pre><code class="makeup elixir" translate="no"><span class="n">live</span><span class="w"> </span><span class="o">/</span><span class="n">products</span><span class="p">,</span><span class="w"> </span><span class="nc">MyApp.Web.ProductIndexLive</span><span class="p">,</span><span class="w"> </span><span class="ss">:index</span><span class="p">,</span><span class="w"> </span><span class="ss">private</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8296130669-1">%{</span><span class="ss">rtx</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8296130669-2">%{</span><span class="ss">overridden_key</span><span class="p">:</span><span class="w"> </span><span class="n">value</span><span class="p" data-group-id="8296130669-2">}</span><span class="p" data-group-id="8296130669-1">}</span></code></pre>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-types summary">
+  <h2>
+    <a href="#types">Types</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:t/0" data-no-tooltip translate="no">t()</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>  A Routex backend module</p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="types" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#types">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Types</span>
+    </h1>
+    <div class="types-list">
+<section class="detail" id="t:t/0">
+
+  <div class="detail-header">
+    <a href="#t:t/0" class="detail-link" data-no-tooltip title="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature" translate="no">t()</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v0.3.0-alpha.4/lib/routex/backend.ex#L40" class="icon-action" rel="help" title="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> t() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">module</a>()</pre>
+
+      </div>
+
+<p>  A Routex backend module</p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+      <p>
+
+          <span class="line">
+            <a href="https://hex.pm/packages/routex/0.3.0-alpha.4" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/routex/0.3.0-alpha.4">Hex Preview</a>
+
+          </span>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.34.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

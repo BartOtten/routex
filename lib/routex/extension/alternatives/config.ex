@@ -3,13 +3,13 @@ defmodule Routex.Extension.Alternatives.Config do
   Module to create and validate a Config struct
   """
   # credo:disable-for-next-line
-  alias Routex.Extension.Alternatives, as: PLR
-  alias PLR.Exceptions
-  alias PLR.Branch
-  alias PLR.Branches
+  alias Routex.Extension.Alternatives, as: Alt
+  alias Alt.Exceptions
+  alias Alt.Branch
+  alias Alt.Branches
 
   @type t :: %__MODULE__{
-          branches: %{(binary | nil) => Routex.Extension.Alternatives.Branch.Flat.t()}
+          branches: %{(binary | nil) => Branch.Flat.t()}
         }
   @typep branch :: Branch.Flat.t()
   @typep branch_tuple :: {binary | nil, branch}

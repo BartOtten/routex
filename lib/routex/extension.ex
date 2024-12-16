@@ -11,7 +11,7 @@ defmodule Routex.Extension do
   See also: [Routex Extensions](EXTENSIONS.md)
   """
 
-  @type backend :: Routex.t()
+  @type backend :: Routex.Backend.t()
   @type env :: Macro.Env.t()
   @type opts :: list
   @type routes :: [Phoenix.Router.Route.t()]

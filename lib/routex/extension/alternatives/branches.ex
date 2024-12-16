@@ -48,7 +48,10 @@ defmodule Routex.Extension.Alternatives.Branches do
   @type branches_nested_tuple :: {binary | nil, Branch.Nested.t()}
   @type branch_nested :: Branch.Nested.t()
   @type branch_tuple :: {binary | nil, Branch.Flat.t()}
-  @type opts_branch :: Routex.opts_branch()
+  @type opts_branch :: %{
+          optional(:attrs) => %{atom => any},
+          optional(:branches) => %{binary => opts_branch}
+        }
 
   # return a list of unique values attr to given key. Returns a list
   # of tuples with unique combinations when a list of keys is given.

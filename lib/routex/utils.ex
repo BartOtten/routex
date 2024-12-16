@@ -8,7 +8,7 @@ defmodule Routex.Utils do
   the terminal during compile time.
   """
   # credo:disable-for-lines:2
-  @spec print(input :: iodata) :: binary
+  @spec print(input :: iodata) :: :ok
   def print(input), do: IO.puts([">> " | input])
 
   @doc """

@@ -53,12 +53,12 @@ defmodule Routex.Extension.Cloak do
 
             static =
               if idx == 0 do
-                nil
+                []
               else
-                idx |> to_string()
+                [to_string(idx)]
               end
 
-            path = ["/", dynamics || [], static || []] |> Path.join() |> Path.absname()
+            path = ["/", dynamics, static] |> Path.join() |> Path.absname()
             cloak_map = Map.put_new(cloak_map, route.path, path)
             route = %{route | path: path}
 

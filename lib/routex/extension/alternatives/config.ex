@@ -42,7 +42,7 @@ defmodule Routex.Extension.Alternatives.Config do
   @doc false
   @spec validate_root_slug!(t) :: t
   def validate_root_slug!(%__MODULE__{branches: branches} = opts) do
-    unless Enum.any?(branches, fn {_branch, branch_opts} -> branch_opts.branch_prefix == "/" end),
+    if !Enum.any?(branches, fn {_branch, branch_opts} -> branch_opts.branch_prefix == "/" end),
       do: raise(Exceptions.MissingRootSlugError)
 
     opts

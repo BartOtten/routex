@@ -69,13 +69,13 @@ defmodule Routex.Extension.Translations do
     auto_compile? =
       Version.match?(System.version(), ">= 1.14.0")
 
-    unless auto_compile? or gettext_in_compilers?,
+    if !(auto_compile? or gettext_in_compilers?),
       do:
         Logger.warning(
           "When route translations are updated, run `mix compile --force [MyWebApp].Route"
         )
 
-    unless Keyword.get(config, :translations_backend),
+    if !Keyword.get(config, :translations_backend),
       do: raise("Expected `:translations_backend` to be set in #{to_string(backend)}")
 
     [{:translations_domain, Keyword.get(config, :translations_domain, @default_domain)} | config]

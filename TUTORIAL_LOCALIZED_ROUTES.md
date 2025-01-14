@@ -1,10 +1,15 @@
 # Localized Routes with Routex
 
-A core feature of Routex is to enable Localized Routes in Phoenix with
-translated URLs, enhancing user engagement and content relevance. In this
-tutorial we will explain how multiple extensions are combined to have a product
-page with Ural's in multiple languages and how you can display links to the
-localized pages. Without changing a single route in your templates!
+A core feature of Routex is to enable Localized Routes in Phoenix. Optionally with
+translated URLs, enhancing user engagement and content relevance.
+
+In this tutorial we will explain how multiple extensions are combined to...
+1. have a product page with regional URL's
+2. (optional) use translated routes
+2. using automatically localized verified routes
+3. display links to other locales
+
+All without changing a single route in your templates!
 
 
                         ⇒ /products/:id/edit                    @loc.locale = "en_US"
@@ -13,17 +18,16 @@ localized pages. Without changing a single route in your templates!
                         ⇒ /gb/products/:id/edit                 @loc.locale = "en_GB"
 
 
-
 This tutorial assumes you have followed the [usage guide](USAGE.md) to setup
 Routex.
 
 If you encounter any issues with Routex or this tutorial, feel free to [open a topic at Elixir
-Forums](https://elixirforum.com/tag/routes) or create an issue at GitHub.
+Forums](https://elixirforum.com/tag/routex) or create an issue at GitHub.
 
 
 ## What we start with
-Currently we have multiple routes to the product page. Your route.ex file
-contains something like the example below.
+This tutorial uses an example Router with multiple routes to the product page.
+The route.ex file contains something like the example below.
 
       preprocess_using ExampleWeb.RoutexBackend do
         scope "/", ExampleWeb do
@@ -45,12 +49,11 @@ When you run `mix phx.routes` you will see those routes as:
     product_index_path  GET    /products/new                          ExampleWeb.ProductLive.Index :new
     product_index_path  GET    /products                              ExampleWeb.ProductLive.Index :index
 
-You want these pages to be accessible from multiple (translated) URLs. So our
-first step is to generate alternative routes.
+You want these pages to be accessible from multiple (translated) URLs.
 
 ## Step 1: Generate alternative URLs
 
-The `Routex.Extension.Alternatives` does exactly this. Add it to the list of extensions
+The `Routex.Extension.Alternatives` generates alternative routes. Add it to the list of extensions
 and provide a minimal configuration.
 
 ```diff
@@ -90,7 +93,7 @@ As you can see the routes are still in the English language; we need another ext
 translate them
 
 
-## Step 2: Translate the alternative routes
+## (optional) Step 2: Translate the alternative routes
 
 The `Routex.Extension.Translation` makes routes translatable by splitting the route
 into segments (e.g. `["products", "show", "edit"]`) and extracting these
@@ -182,10 +185,7 @@ branches a `:display_name` attribute.
      }
 ```
 
-**Note**
-As `locale: "en-150"` seems to be a default, consider using a struct with a default value instead of a map.
-
-Now when you list all routes using `mix phx.routes`, you will see some routes
+When you list all routes using `mix phx.routes`, you will see some routes
 have been translated. We are getting there!
 
 ```
@@ -201,18 +201,18 @@ while browsing pages.
 ## Step 3: Dynamic links in your application
 
 When you start your app with `mix phx.server` and you visit a 'localized' page
-such as `/europe/nl/producten` you will notice that every link on the page will
-bring you back to a default route. In the code the path of the link is written
+such as `/europe/nl/producten`, you will notice that every link on the page will
+bring you back to the non-locale route. In the code the path of the link is written
 like `~p"/products"`. It would be nice if instead of always rendering a link to
-`/products`, Phoenix would instead render a localized link. Enter
+`/products`, Phoenix would instead render a localized link. This is done by 
 `Routex.Extension.VerifiedRoutes`.
 
-**Note**
-In older Phoenix applications you might find something like
-`ExampleAppWeb.Router.Helpers.product_path(conn_or_endpoint, :show, "hello")`.
-These are Phoenix Router Helpers and those are deprecated in favor of the
-Verified Routes using `~p"/my_path"`. When you can't migrate, you can use
-`Routex.Extension.RouteHelpers` instead of `Routex.Extension.VerifiedRoutes`.
+> **Note**
+> In older Phoenix applications you might find something like
+> `ExampleAppWeb.Router.Helpers.product_path(conn_or_endpoint, :show, "hello")`.
+> These are Phoenix Router Helpers and those are deprecated in favor of the
+> Verified Routes using `~p"/my_path"`. When you can't migrate, you can use
+> `Routex.Extension.RouteHelpers` instead of `Routex.Extension.VerifiedRoutes`.
 
 You might already have guessed it: we are gonna add the extension and some
 configuration to the backend.
@@ -271,9 +271,9 @@ macro's, sigils or functions have been renamed.
 
 
 When you visit a 'localized' page such as `/europe/nl/producten` you will notice
-that every link on the page will keep you within the localized 'branch'
+that every link on the page will keep you within the localized environment
 `/europe/nl/`. Keeping users in a localized environment is great, but giving
-them an option to switch to another locale would be nice.
+them an option to switch to another locale would be even better.
 
 Let's empower our visitors!
 
@@ -369,6 +369,6 @@ extension you can add to the mix for extra flexibility and convenience, such as:
 * **Routex.Extension.AttrGetters** - Lazy load attributes
 
 If you encounter any issues with Routex or this tutorial, feel free to [open a topic at Elixir
-Forums](https://elixirforum.com/tag/routes) or create an issue at GitHub.
+Forums](https://elixirforum.com/tag/routex) or create an issue at GitHub.
 
 Have a nice day!

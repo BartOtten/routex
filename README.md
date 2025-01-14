@@ -22,9 +22,10 @@ them yourself without having to worry about the plumbing.
 * **Dynamic Routing**: Routex supports complex route structures, including
   localized alternatives.
 * **Extension driven**: Being extension driven, Routex can be adapted to your
-  needs without overhead of unused features. It's architecture allows you to write
-  your own features without having to worry about breaking existing functionality. Routex ships with extensions covering a wide range of use cases. Have a look at
-[a summary of extensions](EXTENSION_SUMMARIES.md).
+  needs without overhead of unused features. It's architecture allows you to
+  write your own features without having to worry about breaking existing
+  functionality. Routex ships with extensions covering a wide range of use
+  cases. Have a look at [a summary of extensions](EXTENSION_SUMMARIES.md).
 * **Optimized for Performance**: Built to fit directly into the Phoenix routing
   system and with a focus on compile time, Routex enhances functionality without
   adding runtime overhead, ensuring that applications run as fast as ever.

@@ -41,15 +41,11 @@ defmodule Routex.Backend do
 
   @spec __using__(opts :: list) :: Macro.output()
   defmacro __using__(opts) do
-    opts = process_opts(opts, __CALLER__)
+    opts = execute_config_callbacks(opts, __CALLER__)
     extensions = Keyword.get(opts, :extensions, [])
 
-    # Workaround: Manually create an unchecked struct as the actual struct is
-    # not yet defined.
-    config = opts |> Map.new() |> Map.put(:__struct__, __CALLER__.module)
-
     quote do
-      defstruct unquote(config |> Map.to_list() |> Macro.escape())
+      defstruct unquote(Macro.escape(opts))
 
       @typedoc """
         A Routex backend struct
@@ -57,22 +53,25 @@ defmodule Routex.Backend do
       @type config :: struct()
 
       @spec config :: config
-      def config, do: unquote(Macro.escape(config))
+      def config, do: %__MODULE__{}
 
       @spec extensions :: [module]
       def extensions, do: unquote(Macro.escape(extensions))
     end
   end
 
-  defp process_opts(opts, env) do
+  defp execute_config_callbacks(opts, env) do
     {opts, _binding} = Code.eval_quoted(opts, [], env)
 
-    for extension <- opts[:extensions], extension != [], reduce: opts do
-      acc ->
-        ext_mod = Macro.expand_once(extension, env)
-        conf_mod = env.module
+    reduced_opts =
+      for extension <- opts[:extensions], extension != [], reduce: opts do
+        acc ->
+          ext_mod = Macro.expand_once(extension, env)
+          conf_mod = env.module
 
-        Processing.exec_when_defined(conf_mod, ext_mod, :configure, acc, [acc, conf_mod])
-    end
+          Processing.exec_when_defined(conf_mod, ext_mod, :configure, acc, [acc, conf_mod])
+      end
+
+    Keyword.new(reduced_opts)
   end
 end

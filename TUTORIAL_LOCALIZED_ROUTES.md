@@ -115,6 +115,32 @@ extensions: [
 + translations_backend: ExampleWeb.Gettext,
 ```
 
+As Routex need to know which translation to use for what route, we need to set
+an attribute `:locale` or `:language` per alternative.
+
+Luckily this is covered by `Extension.Alternatives` as it supports setting the
+`:attrs` key per branch. Let's extend the alternatives configuration with by
+setting the `:locale` attribute. While we are add it, we also give the branches
+a `:display_name` attribute.
+
+```diff
+ alternatives: %{
+      "/" => %{
++        attrs: %{locale: "en-150", display_name: "Global"},
+         branches: %{
+           "/europe" => %{
++              attrs: %{locale: "en-150", display_name: "Europe"},
+               branches: %{
++                "/nl" => %{attrs: %{locale: "nl_NL", display_name: "The Netherlands"}},
++                "/be" => %{attrs: %{locale: "nl_BE", display_name: "Belgium"}}
+             }
+           },
++          "/gb" => %{attrs: %{locale: "en-150", display_name: "Great Britain"}}
+         }
+       }
+     }
+```
+
 If this is the first time you add translations in your project, you need to
 generate the folder structure which Gettext can use to detect languages to
 translate to. We need two languages in this tutorial: 'en' and 'nl'. As 'en' is
@@ -140,53 +166,18 @@ priv/
 Now you can translate the segments by opening the `routes.po` file with your
 favorite `.po` editor. Here are a few suggestions:
 
-* GNU Emacs (with po-mode): Linux, MacOSX, and Windows.
-* Lokalize: runs on KDE desktop for Linux (replacement for KBabel; formerly known as KAider)
-* Poedit: Linux, MacOSX, and Windows
-* OmegaT: Linux, MacOSX, and Windows
-* Vim: Linux, MacOSX, and Windows with PO ftplugin for easier editing of GNU gettext PO files.
-* gted plugin for Eclipse (if you are already using Eclipse)
-* gtranslator: Linux/Gnome
-* Virtaal: Windows, Mac (Beta version)
+* `GNU Emacs (with po-mode)`: Linux, MacOSX, and Windows.
+* `Lokalize`: runs on KDE desktop for Linux (replacement for KBabel; formerly known as KAider)
+* `Poedit`: Linux, MacOSX, and Windows
+* `OmegaT`: Linux, MacOSX, and Windows
+* `Vim`: Linux, MacOSX, and Windows with PO ftplugin for easier editing of GNU gettext PO files.
+* `gted plugin for Eclipse`: (if you are already using Eclipse)
+* `gtranslator`: Linux/Gnome
+* `Virtaal`: Windows, Mac (Beta version)
 
-One you have translated the segments, list all routes using `mix phx.routes`.
-The compilation will fail with the message:
-
-```
-** (RuntimeError) Routex backend `Elixir.ExampleWeb.RoutexBackend` lists extension `Elixir.Routex.Extension.Translations` but
- neither :language nor :locale was found in private.routex of route %Phoenix.Router.Route{[...]}
-```
-
-This makes sense. After all, we have multiple routes and a translation of
-segments but Routex does not know which translation to use for what route.
-Apparently we need to set an attribute `:locale` or `:language` per
-alternatives.
-
-Luckily this is covered by `Extension.Alternatives` as it supports setting the
-`:attrs` key per branch. Let's replace the alternatives configuration with one
-that also sets the `:locale` attribute. While we are add it, we also give the
-branches a `:display_name` attribute.
-
-```diff
- alternatives: %{
-      "/" => %{
-+        attrs: %{locale: "en-150", display_name: "Global"},
-         branches: %{
-           "/europe" => %{
-+              attrs: %{locale: "en-150", display_name: "Europe"},
-               branches: %{
-+                "/nl" => %{attrs: %{locale: "nl_NL", display_name: "The Netherlands"}},
-+                "/be" => %{attrs: %{locale: "nl_BE", display_name: "Belgium"}}
-             }
-           },
-+          "/gb" => %{attrs: %{locale: "en-150", display_name: "Great Britain"}}
-         }
-       }
-     }
-```
-
-When you list all routes using `mix phx.routes`, you will see some routes
-have been translated. We are getting there!
+Once you have translated the route segments, list all routes using `mix
+phx.routes`. You will see some routes have been translated. We are getting
+there!
 
 ```
 product_show_path            GET     /products/:id/show/edit
@@ -204,7 +195,7 @@ When you start your app with `mix phx.server` and you visit a 'localized' page
 such as `/europe/nl/producten`, you will notice that every link on the page will
 bring you back to the non-locale route. In the code the path of the link is written
 like `~p"/products"`. It would be nice if instead of always rendering a link to
-`/products`, Phoenix would instead render a localized link. This is done by 
+`/products`, Phoenix would instead render a localized link. This is done by
 `Routex.Extension.VerifiedRoutes`.
 
 > **Note**
@@ -233,7 +224,7 @@ extensions: [
 ```
 
 By default the extension uses non-standard macro names. As we want to have
-dynamic routes throughout our application, we 'take over' the names used
+dynamic routes throughout our application, we choose to override the names used
 by Phoenix in your application and rename the originals. This way you do not
 need to modify all your templates. Convenient.
 

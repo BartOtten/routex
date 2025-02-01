@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.35.1">
+    <meta name="project" content="Phoenix Routes Extension Framework v1.0.0">
+
+
+    <title>Change Log — Phoenix Routes Extension Framework v1.0.0</title>
+    <link rel="stylesheet" href="dist/html-elixir-P45HOAC7.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-K7URE6B4.js"></script>
+    <script src="dist/sidebar_items-CC066850.js"></script>
+    <script src="docs_config.js"></script>
+    <script async src="dist/html-PVRIOB7F.js"></script>
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="extras" class="page-extra">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.0.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
+Pages
+        </button>
+      </li>
+
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
+
+
+    </ul>
+  </div>
+
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
+
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
+
+
+</nav>
+
+<main class="content">
+  <output role="status" id="toast"></output>
+
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Phoenix Routes Extension Framework</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/CHANGELOG.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+
+    <span>Change Log</span>
+  </h1>
+
+<p>All notable changes to this project will be documented in this file.
+See <a href="Https://conventionalcommits.org">Conventional Commits</a> for commit guidelines.</p><!-- changelog --><h2 id="v0-3-0-alpha-4-2024-11-04" class="section-heading">
+  <a href="#v0-3-0-alpha-4-2024-11-04" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.3.0-alpha.3...v0.3.0-alpha.4">v0.3.0-alpha.4</a> (2024-11-04)</span>
+</h2>
+<h2 id="v0-3-0-alpha-3-2024-10-28" class="section-heading">
+  <a href="#v0-3-0-alpha-3-2024-10-28" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.3.0-alpha.2...v0.3.0-alpha.3">v0.3.0-alpha.3</a> (2024-10-28)</span>
+</h2>
+<h3 id="features" class="section-heading">
+  <a href="#features" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Features:</span>
+</h3>
+<ul><li>cldr: add adaptor for projects using Cldr</li></ul><h3 id="bug-fixes" class="section-heading">
+  <a href="#bug-fixes" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Bug Fixes:</span>
+</h3>
+<ul><li><p>core: preprocess_using does not accept options</p></li><li><p>mix: do not override dep :ssl_verify_fun</p></li></ul><h2 id="v0-3-0-alpha-2-2024-10-23" class="section-heading">
+  <a href="#v0-3-0-alpha-2-2024-10-23" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.3.0-alpha.1...v0.3.0-alpha.2">v0.3.0-alpha.2</a> (2024-10-23)</span>
+</h2>
+<h3 id="breaking-changes" class="section-heading">
+  <a href="#breaking-changes" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Breaking Changes:</span>
+</h3>
+<ul><li><p>dev: rename development aid functions</p></li><li><p>alternatives: rename :is_current? to :match?</p></li><li><p>translations: depend on Gettext greater than 0.26.0</p></li></ul><h3 id="bug-fixes-1" class="section-heading">
+  <a href="#bug-fixes-1" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Bug Fixes:</span>
+</h3>
+<ul><li><p>docs: warnings about referencing Phoenix.Router.Route</p></li><li><p>core: rename is_private/1 to private?/1</p></li><li><p>ci: update Github actions</p></li><li><p>core: warning during compilation about usage of :warn</p></li></ul><h2 id="v0-3-0-alpha-1-2024-10-21" class="section-heading">
+  <a href="#v0-3-0-alpha-1-2024-10-21" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.3.0-alpha.1...v0.3.0-alpha.1">v0.3.0-alpha.1</a> (2024-10-21)</span>
+</h2>
+<h3 id="breaking-changes-1" class="section-heading">
+  <a href="#breaking-changes-1" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Breaking Changes:</span>
+</h3>
+<ul><li><p>core: remove Routex.Path module</p></li><li><p>core: split Extension Utils module</p></li><li><p>alternatives: rename scope to branch</p></li></ul><h3 id="features-1" class="section-heading">
+  <a href="#features-1" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Features:</span>
+</h3>
+<ul><li><p>core: merge private Routex attrs into socket</p></li><li><p>verified: branching macro's of all arities of ~p, url and path</p></li><li><p>core: enable AST-free manipulation of routes with interpolation</p></li><li><p>alternatives: indicate if an alternative route <code class="inline">is_current?</code></p></li><li><p>interpol: add extension for interpolation of routes</p></li><li><p>translations: distinct locale and language</p></li><li><p>core: introduce Branching module</p></li><li><p>core: introduce Matchable module</p></li></ul><h2 id="v0-2-0-alpha-8-2023-10-18" class="section-heading">
+  <a href="#v0-2-0-alpha-8-2023-10-18" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.2.0-alpha.7...v0.2.0-alpha.8">v0.2.0-alpha.8</a> (2023-10-18)</span>
+</h2>
+<h3 id="bug-fixes-2" class="section-heading">
+  <a href="#bug-fixes-2" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Bug Fixes:</span>
+</h3>
+<ul><li>translations: reliably extract segments to translate</li></ul><h2 id="v0-2-0-alpha-7-2023-05-31" class="section-heading">
+  <a href="#v0-2-0-alpha-7-2023-05-31" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.1.0-alpha.7...v0.2.0-alpha.7">v0.2.0-alpha.7</a> (2023-05-31)</span>
+</h2>
+<h3 id="features-2" class="section-heading">
+  <a href="#features-2" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Features:</span>
+</h3>
+<ul><li>utils: use verbose defaults for esc_inspect/2</li></ul><h3 id="bug-fixes-3" class="section-heading">
+  <a href="#bug-fixes-3" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Bug Fixes:</span>
+</h3>
+<ul><li>route: swallowed routes due to nonunique map key</li></ul><h2 id="v0-1-0-alpha-6-2023-05-30" class="section-heading">
+  <a href="#v0-1-0-alpha-6-2023-05-30" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.1.0-alpha.5...v0.1.0-alpha.6">v0.1.0-alpha.6</a> (2023-05-30)</span>
+</h2>
+<h2 id="v0-1-0-alpha-5-2023-05-05" class="section-heading">
+  <a href="#v0-1-0-alpha-5-2023-05-05" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.1.0-alpha.5...v0.1.0-alpha.5">v0.1.0-alpha.5</a> (2023-05-05)</span>
+</h2>
+<h3 id="features-3" class="section-heading">
+  <a href="#features-3" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Features:</span>
+</h3>
+<ul><li>add ROUTEX_DEBUG for compilation debugging (#3)</li></ul><h3 id="bug-fixes-4" class="section-heading">
+  <a href="#bug-fixes-4" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Bug Fixes:</span>
+</h3>
+<ul><li>verified: let Phoenix handle missing routes</li></ul>
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="usage.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Usage
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="extensions.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Routex Extensions
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+      <p>
+
+          <span class="line">
+            <a href="https://hex.pm/packages/routex/1.0.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/routex/1.0.0">Hex Preview</a>
+
+              (<a href="https://preview.hex.pm/preview/routex/1.0.0/show/CHANGELOG.md">current file</a>)
+
+          </span>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.35.1) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.35.1">
+    <meta name="project" content="Phoenix Routes Extension Framework v1.0.0">
+
+
+    <title>Routex.Matchable — Phoenix Routes Extension Framework v1.0.0</title>
+    <link rel="stylesheet" href="dist/html-elixir-P45HOAC7.css" />
+
+
+    <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
+    <script src="dist/handlebars.templates-K7URE6B4.js"></script>
+    <script src="dist/sidebar_items-CC066850.js"></script>
+    <script src="docs_config.js"></script>
+    <script async src="dist/html-PVRIOB7F.js"></script>
+<link rel="stylesheet" href="assets/doc.css">
+  </head>
+  <body data-type="modules" class="page-module">
+    <script>
+
+      try {
+        var settings = JSON.parse(localStorage.getItem('ex_doc:settings') || '{}');
+
+        if (settings.theme === 'dark' ||
+           ((settings.theme === 'system' || settings.theme == null) &&
+             window.matchMedia('(prefers-color-scheme: dark)').matches)
+           ) {
+          document.body.classList.add('dark')
+        }
+      } catch (error) { }
+    </script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Phoenix Routes Extension Framework
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.0.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
+Pages
+        </button>
+      </li>
+
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
+
+
+    </ul>
+  </div>
+
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
+
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
+
+
+</nav>
+
+<main class="content">
+  <output role="status" id="toast"></output>
+
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Phoenix Routes Extension Framework</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+    <span translate="no">Routex.Matchable</span> 
+    <small class="app-vsn" translate="no">(Phoenix Routes Extension Framework v1.0.0)</small>
+
+  </h1>
+
+
+    <section id="moduledoc">
+<p>Matchables are an essential part of Routex. They are used to match run time
+routes with compile time routes.</p><p>This module provides functions to create Matchables, convert them to match
+pattern AST as well as function heads AST and to check if the routing values
+of two Matchable records match.</p>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#match?/2" data-no-tooltip translate="no">match?(record_1, record_2)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Returns whether two Matchable records match on their route defining properties. The first argument
+supports string interpolation syntax (e.g &quot;:param&quot; and &quot;*&quot;) forming wildcards.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#matchable/1" data-no-tooltip translate="no">matchable(args \\ [])</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#matchable/2" data-no-tooltip translate="no">matchable(record, args)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#new/1" data-no-tooltip translate="no">new(input)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Converts a binary URL, <code class="inline">Phoenix.Router.Route</code> or (sigil) AST argument into a Matchable record.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#placeholders_to_ast/2" data-no-tooltip translate="no">placeholders_to_ast(path, dyns)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#to_ast_segments/1" data-no-tooltip translate="no">to_ast_segments(record)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#to_func/4" data-no-tooltip translate="no">to_func(match_pattern, name, other_args \\ [], body)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Creates a function named <code class="inline">name</code> which the first argument matching
+a Matchable record pattern. Other arguments can be given with either a
+catch all or a pattern.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#to_pattern/1" data-no-tooltip translate="no">to_pattern(route)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>Returns a match pattern for given <code class="inline">Matchable</code> record or <code class="inline">Phoenix.Router.Route</code>. The pattern can be used either as
+function argument or in a function body. As the patterns bind values, they can be used to convert input from
+one pattern to another.</p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#to_string/1" data-no-tooltip translate="no">to_string(record)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p> A non conflicting function mimicking <a href="#to_string/1"><code class="inline">to_string/1</code></a></p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+    <div class="functions-list">
+<section class="detail" id="match?/2">
+
+  <div class="detail-header">
+    <a href="#match?/2" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">match?(record_1, record_2)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L327" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Returns whether two Matchable records match on their route defining properties. The first argument
+supports string interpolation syntax (e.g &quot;:param&quot; and &quot;*&quot;) forming wildcards.</p><h2 id="match?/2-example" class="section-heading">
+  <a href="#match?/2-example" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Example</span>
+</h2>
+<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="n">route_record</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="2080367325-1">%</span><span class="nc" data-group-id="2080367325-1">Phoenix.Router.Route</span><span class="p" data-group-id="2080367325-1">{</span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/posts/:id&quot;</span><span class="p" data-group-id="2080367325-1">}</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="2080367325-2">(</span><span class="p" data-group-id="2080367325-2">)</span><span class="w">
+   </span><span class="o">&gt;</span><span class="w"> </span><span class="n">matching_record</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/posts/1/foo=bar#top&quot;</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="2080367325-3">(</span><span class="p" data-group-id="2080367325-3">)</span><span class="w">
+   </span><span class="o">&gt;</span><span class="w"> </span><span class="n">unmatched_record</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/unmatched/1/foo=bar#op&quot;</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="2080367325-4">(</span><span class="p" data-group-id="2080367325-4">)</span><span class="w">
+
+</span><span class="gp unselectable">iex&gt; </span><span class="n">match?</span><span class="p" data-group-id="2080367325-5">(</span><span class="n">route_record</span><span class="p">,</span><span class="w"> </span><span class="n">matching_record</span><span class="p" data-group-id="2080367325-5">)</span><span class="w">
+</span><span class="no">true</span><span class="w">
+</span><span class="n">iex</span><span class="w"> </span><span class="n">match?</span><span class="p" data-group-id="2080367325-6">(</span><span class="n">route_record</span><span class="p">,</span><span class="w"> </span><span class="n">unmatched_record</span><span class="p" data-group-id="2080367325-6">)</span><span class="w">
+</span><span class="no">false</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="matchable/1">
+
+    <span id="matchable/0"></span>
+
+  <div class="detail-header">
+    <a href="#matchable/1" class="detail-link" data-no-tooltip aria-label="Link to this macro">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">matchable(args \\ [])</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L17" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+      <span class="note">(macro)</span>
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="matchable/2">
+
+  <div class="detail-header">
+    <a href="#matchable/2" class="detail-link" data-no-tooltip aria-label="Link to this macro">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">matchable(record, args)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L17" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+      <span class="note">(macro)</span>
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="new/1">
+
+  <div class="detail-header">
+    <a href="#new/1" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">new(input)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L45" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Converts a binary URL, <code class="inline">Phoenix.Router.Route</code> or (sigil) AST argument into a Matchable record.</p><h2 id="new/1-examples" class="section-heading">
+  <a href="#new/1-examples" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Examples</span>
+</h2>
+<pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/posts/1?foo=bar#top&quot;</span><span class="w">
+     </span><span class="o">&gt;</span><span class="w"> </span><span class="n">route</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5353309801-1">%</span><span class="nc" data-group-id="5353309801-1">Phoenix.Router.Route</span><span class="p" data-group-id="5353309801-1">{</span><span class="ss">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/posts/:id&quot;</span><span class="p" data-group-id="5353309801-1">}</span><span class="w">
+     </span><span class="o">&gt;</span><span class="w"> </span><span class="n">ast</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5353309801-2">{</span><span class="ss">:&lt;&lt;&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-3">[</span><span class="p" data-group-id="5353309801-3">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-4">[</span><span class="s">&quot;/products/&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-5">{</span><span class="ss">:&quot;::&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-6">[</span><span class="p" data-group-id="5353309801-6">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-7">[</span><span class="p" data-group-id="5353309801-8">{</span><span class="p" data-group-id="5353309801-9">{</span><span class="ss">:.</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-10">[</span><span class="p" data-group-id="5353309801-10">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-11">[</span><span class="nc">Kernel</span><span class="p">,</span><span class="w"> </span><span class="ss">:to_string</span><span class="p" data-group-id="5353309801-11">]</span><span class="p" data-group-id="5353309801-9">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-12">[</span><span class="ss">from_interpolation</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="p" data-group-id="5353309801-12">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-13">[</span><span class="p" data-group-id="5353309801-14">{</span><span class="ss">:id</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-15">[</span><span class="p" data-group-id="5353309801-15">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Elixir</span><span class="p" data-group-id="5353309801-14">}</span><span class="p" data-group-id="5353309801-13">]</span><span class="p" data-group-id="5353309801-8">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-16">{</span><span class="ss">:binary</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-17">[</span><span class="p" data-group-id="5353309801-17">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Elixir</span><span class="p" data-group-id="5353309801-16">}</span><span class="p" data-group-id="5353309801-7">]</span><span class="p" data-group-id="5353309801-5">}</span><span class="p" data-group-id="5353309801-4">]</span><span class="p" data-group-id="5353309801-2">}</span><span class="w">
+
+</span><span class="gp unselectable">iex&gt; </span><span class="n">path_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="5353309801-18">(</span><span class="n">path</span><span class="p" data-group-id="5353309801-18">)</span><span class="w">
+</span><span class="p" data-group-id="5353309801-19">{</span><span class="ss">:matchable</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-20">[</span><span class="no">nil</span><span class="p" data-group-id="5353309801-20">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-21">[</span><span class="s">&quot;posts&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p" data-group-id="5353309801-21">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;foo=bar&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;top&quot;</span><span class="p">,</span><span class="w"> </span><span class="no">false</span><span class="p" data-group-id="5353309801-19">}</span><span class="w">
+
+</span><span class="gp unselectable">iex&gt; </span><span class="n">route_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="5353309801-22">(</span><span class="n">route</span><span class="p" data-group-id="5353309801-22">)</span><span class="w">
+</span><span class="p" data-group-id="5353309801-23">{</span><span class="ss">:matchable</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-24">[</span><span class="p" data-group-id="5353309801-24">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-25">[</span><span class="s">&quot;posts&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;:id&quot;</span><span class="p" data-group-id="5353309801-25">]</span><span class="p">,</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w"> </span><span class="no">false</span><span class="p" data-group-id="5353309801-23">}</span><span class="w">
+
+</span><span class="gp unselectable">iex&gt; </span><span class="n">ast_match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="5353309801-26">(</span><span class="n">ast</span><span class="p" data-group-id="5353309801-26">)</span><span class="w">
+</span><span class="p" data-group-id="5353309801-27">{</span><span class="ss">:matchable</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-28">[</span><span class="p" data-group-id="5353309801-28">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-29">[</span><span class="s">&quot;posts&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-30">{</span><span class="ss">:&quot;::&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-31">[</span><span class="p" data-group-id="5353309801-31">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-32">[</span><span class="p" data-group-id="5353309801-33">{</span><span class="p" data-group-id="5353309801-34">{</span><span class="ss">:.</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-35">[</span><span class="p" data-group-id="5353309801-35">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-36">[</span><span class="nc">Kernel</span><span class="p">,</span><span class="w"> </span><span class="ss">:to_string</span><span class="p" data-group-id="5353309801-36">]</span><span class="p" data-group-id="5353309801-34">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-37">[</span><span class="ss">from_interpolation</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="p" data-group-id="5353309801-37">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-38">[</span><span class="p" data-group-id="5353309801-39">{</span><span class="ss">:id</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-40">[</span><span class="p" data-group-id="5353309801-40">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Elixir</span><span class="p" data-group-id="5353309801-39">}</span><span class="p" data-group-id="5353309801-38">]</span><span class="p" data-group-id="5353309801-33">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-41">{</span><span class="ss">:binary</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5353309801-42">[</span><span class="p" data-group-id="5353309801-42">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Elixir</span><span class="p" data-group-id="5353309801-41">}</span><span class="p" data-group-id="5353309801-32">]</span><span class="p" data-group-id="5353309801-30">}</span><span class="p" data-group-id="5353309801-29">]</span><span class="p">,</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w"> </span><span class="no">false</span><span class="p" data-group-id="5353309801-27">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="placeholders_to_ast/2">
+
+  <div class="detail-header">
+    <a href="#placeholders_to_ast/2" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">placeholders_to_ast(path, dyns)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L141" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="to_ast_segments/1">
+
+  <div class="detail-header">
+    <a href="#to_ast_segments/1" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">to_ast_segments(record)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L298" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="to_func/4">
+
+    <span id="to_func/3"></span>
+
+  <div class="detail-header">
+    <a href="#to_func/4" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">to_func(match_pattern, name, other_args \\ [], body)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L207" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Creates a function named <code class="inline">name</code> which the first argument matching
+a Matchable record pattern. Other arguments can be given with either a
+catch all or a pattern.</p><p>The Matchable pattern is bound to <code class="inline">pattern</code></p><h2 id="to_func/4-example" class="section-heading">
+  <a href="#to_func/4-example" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Example</span>
+</h2>
+<p>   iex&gt; &quot;/some/path&quot;</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="o">&gt;</span><span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="6042869799-1">(</span><span class="p" data-group-id="6042869799-1">)</span><span class="w">
+  </span><span class="o">&gt;</span><span class="w">  </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Matchable</span><span class="o">.</span><span class="n">to_func</span><span class="p" data-group-id="6042869799-2">(</span><span class="ss">:my_func</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="6042869799-3">[</span><span class="ss">pattern_arg</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;fixed&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">:catchall_arg</span><span class="p" data-group-id="6042869799-3">]</span><span class="p">,</span><span class="w"> </span><span class="k">quote</span><span class="p" data-group-id="6042869799-4">(</span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:ok</span><span class="p" data-group-id="6042869799-4">)</span><span class="p" data-group-id="6042869799-2">)</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="to_pattern/1">
+
+  <div class="detail-header">
+    <a href="#to_pattern/1" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">to_pattern(route)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L259" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p>Returns a match pattern for given <code class="inline">Matchable</code> record or <code class="inline">Phoenix.Router.Route</code>. The pattern can be used either as
+function argument or in a function body. As the patterns bind values, they can be used to convert input from
+one pattern to another.</p><p><em>Example</em></p><pre><code class="makeup elixir" translate="no"><span class="gp unselectable">iex&gt; </span><span class="s">&quot;/original/:arg1/:arg2&quot;</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="9374250648-1">(</span><span class="p" data-group-id="9374250648-1">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">to_pattern</span><span class="p" data-group-id="9374250648-2">(</span><span class="p" data-group-id="9374250648-2">)</span><span class="w">
+</span><span class="p" data-group-id="9374250648-3">{</span><span class="ss">:{}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-4">[</span><span class="p" data-group-id="9374250648-4">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-5">[</span><span class="ss">:matchable</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-6">{</span><span class="ss">:hosts</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-7">[</span><span class="p" data-group-id="9374250648-7">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-6">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-8">[</span><span class="s">&quot;original&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-9">{</span><span class="ss">:arg1</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-10">[</span><span class="p" data-group-id="9374250648-10">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-9">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-11">{</span><span class="ss">:arg2</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-12">[</span><span class="p" data-group-id="9374250648-12">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-11">}</span><span class="p" data-group-id="9374250648-8">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-13">{</span><span class="ss">:query</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-14">[</span><span class="p" data-group-id="9374250648-14">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-13">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-15">{</span><span class="ss">:fragment</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-16">[</span><span class="p" data-group-id="9374250648-16">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-15">}</span><span class="p">,</span><span class="w"> </span><span class="no">false</span><span class="p" data-group-id="9374250648-5">]</span><span class="p" data-group-id="9374250648-3">}</span><span class="w">
+
+</span><span class="gp unselectable">iex&gt; </span><span class="s">&quot;/recomposed/:arg2/:arg1&quot;</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="9374250648-17">(</span><span class="p" data-group-id="9374250648-17">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">to_pattern</span><span class="p" data-group-id="9374250648-18">(</span><span class="p" data-group-id="9374250648-18">)</span><span class="w">
+</span><span class="p" data-group-id="9374250648-19">{</span><span class="ss">:{}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-20">[</span><span class="p" data-group-id="9374250648-20">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-21">[</span><span class="ss">:matchable</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-22">{</span><span class="ss">:hosts</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-23">[</span><span class="p" data-group-id="9374250648-23">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-22">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-24">[</span><span class="s">&quot;recomposed&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-25">{</span><span class="ss">:arg2</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-26">[</span><span class="p" data-group-id="9374250648-26">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-25">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-27">{</span><span class="ss">:arg1</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-28">[</span><span class="p" data-group-id="9374250648-28">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-27">}</span><span class="p" data-group-id="9374250648-24">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-29">{</span><span class="ss">:query</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-30">[</span><span class="p" data-group-id="9374250648-30">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-29">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-31">{</span><span class="ss">:fragment</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-32">[</span><span class="p" data-group-id="9374250648-32">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-31">}</span><span class="p">,</span><span class="w"> </span><span class="no">false</span><span class="p" data-group-id="9374250648-21">]</span><span class="p" data-group-id="9374250648-19">}</span><span class="w">
+
+
+</span><span class="gp unselectable">iex&gt; </span><span class="s">&quot;/original/segment_1/segment_2&quot;</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">new</span><span class="p" data-group-id="9374250648-33">(</span><span class="p" data-group-id="9374250648-33">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="o">.</span><span class="n">to_pattern</span><span class="p" data-group-id="9374250648-34">(</span><span class="p" data-group-id="9374250648-34">)</span><span class="w">
+</span><span class="p" data-group-id="9374250648-35">{</span><span class="ss">:{}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-36">[</span><span class="p" data-group-id="9374250648-36">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-37">[</span><span class="ss">:matchable</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-38">{</span><span class="ss">:hosts</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-39">[</span><span class="p" data-group-id="9374250648-39">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-38">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-40">[</span><span class="s">&quot;original&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;segment_1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;segment_2&quot;</span><span class="p" data-group-id="9374250648-40">]</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-41">{</span><span class="ss">:query</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-42">[</span><span class="p" data-group-id="9374250648-42">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-41">}</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-43">{</span><span class="ss">:fragment</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="9374250648-44">[</span><span class="p" data-group-id="9374250648-44">]</span><span class="p">,</span><span class="w"> </span><span class="nc">Routex.Matchable</span><span class="p" data-group-id="9374250648-43">}</span><span class="p">,</span><span class="w"> </span><span class="no">false</span><span class="p" data-group-id="9374250648-37">]</span><span class="p" data-group-id="9374250648-35">}</span></code></pre>
+  </section>
+</section>
+<section class="detail" id="to_string/1">
+
+  <div class="detail-header">
+    <a href="#to_string/1" class="detail-link" data-no-tooltip aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <h1 class="signature" translate="no">to_string(record)</h1>
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.0.0/lib/routex/matchable.ex#L293" class="icon-action" rel="help" aria-label="View Source">
+       <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+<p> A non conflicting function mimicking <a href="#to_string/1"><code class="inline">to_string/1</code></a></p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+      <p>
+
+          <span class="line">
+            <a href="https://hex.pm/packages/routex/1.0.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/routex/1.0.0">Hex Preview</a>
+
+          </span>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Phoenix Routes Extension Framework.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.35.1) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

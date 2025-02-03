@@ -1,14 +1,14 @@
 defmodule Routex.Extension.VerifiedRoutes do
   # credo:disable-for-this-file Credo.Check.Refactor.IoPuts
   @moduledoc ~S"""
-  Supports the use of unmodified route paths in controllers and templates while using transformed
-  and/or branching paths with compile-time verification and dynamic runtime behavior.
+  Supports the use of original route paths in controllers and templates. Generates code
+  to tranform template paths into transformed paths at runtime without performance impact.
 
   > #### Implementation summary {:.info}
   > Each sigil and function eventualy delegates to the official
   > `Phoenix.VerifiedRoutes`.  If a non-branching route is provided it will
   > simply delegate to the official Phoenix function. If a branching route is
-  > provided, it will use a branching mechanism before delegation.
+  > provided, it will use a branching mechanism before delegating.
 
   ## Alternative Verified Route sigil
   Provides a sigil (default: `~l`) to verify transformed and/or branching routes.
@@ -189,9 +189,10 @@ defmodule Routex.Extension.VerifiedRoutes do
     Routex.Utils.print([
       """
       \n-- Notice --
-      This project uses Routex generated variants of the official Phoenix Verified Routes.
-      While the Native variants directly delegate to the official Phoenix macro's, the
-      Routex variants apply route transfomations and/or automated branching before delegation.
+      Routex extension VerifiedRoutes generates variants of the
+      official Phoenix VerifiedRoutes macro's. While the Native macro's
+      directly delegate to the official Phoenix macro's, the Routex variants
+      apply route transfomations and/or automated branching before delegation.
       """,
       warning_msg,
       macro_names_table,

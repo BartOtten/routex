@@ -21,7 +21,7 @@ defmodule Routex.Dev do
   Helper function to inspect AST as formatted code. Returns the
   input.
 
-  **Example**
+  ## Examples
 
       iex> ast = quote do: Map.put(my_map, :key, value)
       iex> print_ast(ast)

@@ -1,10 +1,10 @@
 defmodule Routex.Matchable do
   @moduledoc """
   Matchables are an essential part of Routex. They are used to match run time
-  routes with compile time routes.
+  routes with compile time routes and enable reordered route segments.
 
   This module provides functions to create Matchables, convert them to match
-  pattern AST as well as function heads AST and to check if the routing values
+  pattern AST as well as function head AST, and check if the routing values
   of two Matchable records match.
   """
 
@@ -28,9 +28,9 @@ defmodule Routex.Matchable do
 
   ## Examples
 
-  	iex> path = "/posts/1?foo=bar#top"
-  		 > route = %Phoenix.Router.Route{path: "/posts/:id"}
-  		 > ast = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
+    iex> path = "/posts/1?foo=bar#top"
+    iex> route = %Phoenix.Router.Route{path: "/posts/:id"}
+    iex> ast = {:<<>>, [], ["/products/", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}]}
 
   	iex> path_match = Routex.Matchable.new(path)
   	{:matchable, [nil], ["posts", "1"], "foo=bar", "top", false}
@@ -197,12 +197,12 @@ defmodule Routex.Matchable do
   a Matchable record pattern. Other arguments can be given with either a
   catch all or a pattern.
 
-  The Matchable pattern is bound to `pattern`
+  The Matchable pattern is bound to variable `pattern`
 
   ## Example
-     iex> "/some/path"
-        >  |> Matchable.new()
-        >  |> Matchable.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
+      iex> "/some/path"
+         >  |> Matchable.new()
+         >  |> Matchable.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
   """
   def to_func(match_pattern, name, other_args \\ [], body)
 
@@ -239,13 +239,14 @@ defmodule Routex.Matchable do
   end
 
   @doc """
-  Returns a match pattern for given `Matchable` record or `Phoenix.Router.Route`. The pattern can be used either as
-  function argument or in a function body. As the patterns bind values, they can be used to convert input from
-  one pattern to another.
+  Returns a match pattern for given `Matchable` record or `Phoenix.Router.Route`.
+  The pattern can be used either as function argument or in a function body. As
+  the pattern binds values, the bindings can be used to convert input from one
+  pattern to another.
 
 
-  *Example*
-      iex> "/original/:arg1/:arg2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
+  ## Examples
+    iex> "/original/:arg1/:arg2" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
   	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", {:arg1, [], Routex.Matchable}, {:arg2, [], Routex.Matchable}], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
 
   	iex> "/recomposed/:arg2/:arg1" |> Routex.Matchable.new() |> Routex.Matchable.to_pattern()
@@ -309,18 +310,20 @@ defmodule Routex.Matchable do
   end
 
   @doc """
-  Returns whether two Matchable records match on their route defining properties. The first argument
-  supports string interpolation syntax (e.g ":param" and "*") forming wildcards.
+  Returns whether two Matchable records match on their route defining
+  properties. The first argument supports param en wildcard syntax
+  (e.g ":param" and "*").
 
   ## Example
 
       iex> route_record = %Phoenix.Router.Route{path: "/posts/:id"} |> Routex.Matchable.new()
-         > matching_record = "/posts/1/foo=bar#top" |> Routex.Matchable.new()
-         > unmatched_record = "/unmatched/1/foo=bar#op" |> Routex.Matchable.new()
+      iex> matching_record = "/posts/1/foo=bar#top" |> Routex.Matchable.new()
+      iex> non_matching_record = "/other/1/foo=bar#op" |> Routex.Matchable.new()
 
       iex> match?(route_record, matching_record)
       true
-      iex match?(route_record, unmatched_record)
+
+      iex match?(route_record, non_matching_record)
       false
   """
 

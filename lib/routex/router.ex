@@ -9,7 +9,7 @@ defmodule Routex.Router do
   > plug `Routex.Processing` between the definition of routes and the
   > compilation of the router module. It also imports the `preprocess_using`
   > macro which can be used to mark routes for Routex preprocessing using the
-  > Routex configuration/backend provided as first argument.
+  > Routex backend provided as first argument.
   """
 
   @supported_methods [

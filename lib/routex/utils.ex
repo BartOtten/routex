@@ -13,7 +13,7 @@ defmodule Routex.Utils do
 
   @doc """
   Returns the AST to get the current branch from process dict or from  assigns, conn or socket
-  based on the available variables in the __CALLER__ module.
+  based on the available variables in the `caller` module.
   """
   @spec get_helper_ast(caller :: Macro.Env.t()) :: Macro.output()
   def get_helper_ast(caller) do

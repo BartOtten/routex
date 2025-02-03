@@ -110,10 +110,10 @@ full list can be lazy loaded when needed.
 [Attribute Getters Documentation](https://hexdocs.pm/routex/Routex.Extension.AttrGetters.html)
 
 
-## Cldr Adaptor
+## Cldr Adapter
 Adapter for projects using :ex_cldr.
 
-[Cldr Adaptor Documentation](https://hexdocs.pm/routex/Routex.Extension.Cldr.html)
+[Cldr Adapter Documentation](https://hexdocs.pm/routex/Routex.Extension.Cldr.html)
 
 
 ## Cloak (show case)
@@ -129,7 +129,7 @@ templates.
 
 
       Original                 Rewritten     Result (product_id: 88, 89, 90)
-      /products                ⇒ /01         ⇒   /01
+      /products                ⇒     /01     ⇒    /01
       /products/:id/edit       ⇒ /:id/02     ⇒ /88/02, /89/02, /90/02 etc...
       /products/:id/show/edit  ⇒ /:id/03     ⇒ /88/03, /89/03, /90/03 etc...
 

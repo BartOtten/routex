@@ -5,8 +5,29 @@ defmodule Routex.Extension.Cloak do
 
   > #### Warning {: .warning}
   >
-  > This extension is intended for testing and demonstration. It's
-  > behavior may change over time.
+  > This extension is intended for testing and demonstration. It may change at
+  > any given moment to generate other routes without prior notice.
+
+
+  The Cloak extension demonstrates how Routex enables extensions to transform
+  routes beyond recognition without breaking Phoenix' native and Routex' routing
+  features.
+
+  Currently it numbers all routes. Starting at 1 and incremening the counter for
+  each route. It also shifts the parameter to the left; causing a chaotic route
+  structure.
+
+  Do note: this still works with the Verified Routes extension. You can use the
+  original, non transformed, routes in templates (e.g. `~p"/products/%{product}"`)
+  and still be sure the transformed routes rendered at runtime (e.g. `/88/2` when product.id = 88)
+  are valid routes.
+
+  ## Do (not) try this at home
+  - Try this extension with a route generating extension like
+  `Routex.Extension.Alternatives` for even more chaos.
+
+  - Adapt this extension to use character repetition instead of numbers. Can you
+  guess where `/90/**` leads to?
 
 
   ## Configuration
@@ -20,10 +41,12 @@ defmodule Routex.Extension.Cloak do
   ],
   ```
 
-   ## Pseudo result
-      /products/  ⇒ /1
-      /products/:id/edit  ⇒ rewrite: /:id/02      ⇒ in browser: /1/02, /2/02/ etc...
-      /products/:id/show/edit  ⇒ rewrite: /:id/03   ⇒ in browser: /1/03, /2/03/ etc...
+  ## Pseudo result
+      Original                 Rewritten    Result (product_id: 88, 89, 90)
+      /products                ⇒     /1     ⇒    /1
+      /products/:id/edit       ⇒ /:id/2     ⇒ /88/2, /89/2, /90/2 etc...
+      /products/:id/show/edit  ⇒ /:id/3     ⇒ /88/3, /89/3, /90/3 etc...
+
 
   ## `Routex.Attrs`
   **Requires**
@@ -32,6 +55,7 @@ defmodule Routex.Extension.Cloak do
   **Sets**
   - none
   """
+
   @behaviour Routex.Extension
 
   @interpolate ":"

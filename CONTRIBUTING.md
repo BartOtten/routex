@@ -11,10 +11,10 @@ Use the issues tracker for:
 * [Submitting pull requests](#pull-requests)
 
 Please **do not** use the issue tracker for personal support requests nor feature requests.
-Feature and support requests should be created on the Elixir forum and be tagged with at least `phoenix_routex`
+Feature and support requests should be created on the Elixir forum and be tagged with at least `routex`
 
-* [Support Request](https://elixirforum.com/tags/#PLACEHOLDER)
-* [Feature Request](https://elixirforum.com/t/#PLACEHOLDER)
+* [Support Request](https://elixirforum.com/tag/routex)
+* [Feature Request](https://elixirforum.com/t/routex/69181)
 
 We do our best to keep the issue tracker tidy and organized, making it useful
 for everyone. For example, we classify open issues per perceived difficulty,

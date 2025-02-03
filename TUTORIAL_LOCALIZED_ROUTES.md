@@ -244,7 +244,7 @@ To not have duplicated imports, add this to your routex_helpers in `example_web.
 
 Now when you start your app with `mix phx.server` you will notice an explanation
 is printed about the usage of Routex Verified Routes. This informs other
-developers of the 'take overs'.
+developers of the overrides.
 
 ```
 Due to the configuration in module `ExampleWeb.RoutexBackend` one or multiple

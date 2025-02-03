@@ -5,6 +5,25 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [1.0.0](https://github.com/BartOtten/routex/compare/v1.0.0...1.0.0) (2025-02-03)
+
+
+
+
+### Features:
+
+* support Phoenix Liveview >= 1.0
+
+### Bug Fixes:
+
+* ci: upgrade artifact actions in workflow
+
+* core: comp. error - cannot set :__struct__ in struct definition
+
+* incorrect typespecs
+
+* cldr: use territory_from_locale for territory resolution
+
 ## [v0.3.0-alpha.4](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.3...v0.3.0-alpha.4) (2024-11-04)
 
 

@@ -7,32 +7,37 @@
 
 # Routex: Supercharge your Phoenix Router
 
-Routex is a powerful, developer-friendly routing library build on top of Phoenix
+Routex is a powerful routing library build on top of Phoenix
 Router. It is designed to simplify route manipulation —giving developers a new
 level of control over route management. Whether it’s multilingual URLs, route
-interpolation, or alternative route management, Routex can deliver.
+obfuscation or alternative routes generation: Routex can do.
 
 Due to its focus on flexibility, Routex is suited for both small and large-scale
 projects, allowing for seamless integration into existing codebases or entirely
-new applications. You simply enable the extensions your project needs or write
-them yourself without having to worry about the plumbing.
+new applications. You simply enable the extensions your project needs. Missing a
+feature? Write your own extension without having to know the nitty gritty
+details of the routing core.
 
 ## Top Features and Benefits
 
 * **Dynamic Routing**: Routex supports complex route structures, including
   localized alternatives.
+
 * **Extension driven**: Being extension driven, Routex can be adapted to your
-  needs without overhead of unused features. It's architecture allows you to
-  write your own features without having to worry about breaking existing
-  functionality. Routex ships with extensions covering a wide range of use
-  cases. Have a look at [a summary of extensions](EXTENSION_SUMMARIES.md).
-* **Optimized for Performance**: Built to fit directly into the Phoenix routing
-  system and with a focus on compile time, Routex enhances functionality without
-  adding runtime overhead, ensuring that applications run as fast as ever.
+  specific needs. It's architecture allows you to write your own routing
+  features without having to worry about breaking existing functionality. Routex
+  ships with extensions covering a wide range of use cases.
+  Have a look at [a summary of extensions](EXTENSION_SUMMARIES.md).
+
+* **Optimized for Performance**: Built to fit between route configuration and
+route compilation. Routex enhances Phoenix routing without adding runtime
+overhead, ensuring that applications run as fast as ever.
+
 * **Detailed Documentation**: Comprehensive, well-organized documentation
   provides clear guidance on installation, configuration, and best practices,
   making Routex approachable for developers at all levels. For example: If you
-  are interested in localized routes have a look at the [Localized Routes Tutorial](TUTORIAL_LOCALIZED_ROUTES.md).
+  are interested in localized routes have a look at the
+  [Localized Routes Tutorial](TUTORIAL_LOCALIZED_ROUTES.md).
 
 
 ## Demo
@@ -52,41 +57,45 @@ instructions.
 Pages](https://bartotten.github.io/routex) (development).
 
 
-## Routex vs Cldr Routes vs Phoenix Localized Routes
+## Routex vs Cldr Routes vs Phoenix Router
 
-The capabilities and advancements within `Routex` surpass those of `Phoenix
-Localized Routes`, offering a comprehensive array of features. As Phoenix
-Localized Routes has stagnated in its development, developers are strongly
-advised to transition to Routex for a more robust solution.
+`Phoenix`'s router (>= 1.8) and the use of the`:path_prefixes` option is by far
+the easiest option. It adds prefixes to your routes for the well known
+`/:language/products/` route format. Absolute basic, but buildin!
 
-When considering `Routex` against `Cldr Routes`, it's akin to comparing Apple to
-Linux. Cldr Routes is a limited walled garden but is developed by the main Cldr
-developer ensuring maximum compatibility. Routex on the other hand boasts a
-wider and more dynamic feature scope providing maximum freedom. Its primary
-advantages over Cldr Routes are it's extension mechanism and the minimized
-necessity for code modifications throughout a codebase.
+`Cldr Routes` adds the ability to use translated routes. It's main advantage is
+also it's main disadvantage: being part of the Cldr suite ensure maximum
+compatibility with that suite but also requires the (quite heavy) Cldr
+dependency.
 
-But why choose when you can have Cldr through [the Cldr extension for
-Routex](`Routex.Extension.Cldr`)?
+`Routex` is *[extension driven](EXTENSION_SUMMARIES.md)*. Routex boast the
+widest, most dynamic feature scope and can be [easily extended](EXTENSIONS.md)
+if the need arises. Like Phoenix' router, Routex minimizes necessity for code
+modifications throughout your code base and does not depend on anything else.
+It's main advantage is the lack of limits: it makes every route transformation
+and every route feature possible.
+
+ps. If you use Cldr but rather use Routex for routing, see [the Cldr extension for
+Routex](`Routex.Extension.Cldr`).
+
 
 ### Comparison table
 
-| Feature             | Routex     | Cldr Routes | PLR        |
-|---------------------|------------|-------------|------------|
-| Route encapsulation | Full  [^1] | Limited     | Limited    |
-| Route manipulation  | Full  [^2] | Limited     | Limited    |
-| Route interpolation | Full       | Limited     | No         |
-| Alternative Routes  | Full       | Cldr        | Full       |
-| Translation         | ☑          | ☑          |  ☑         |
-| Route Helpers       | ☑          | ☑          |  ☑         |
-| Verified Routes     | ☑          | ☑          |  ☐         |
-| Drop-in replacement | ☑     [^3] | ☐          |  ☑         |
-| Standalone          | ☑          | ☐          |  ☐         |
-| Modular             | ☑          | ☐          |  ☐         |
-| Extendable          | ☑          | ☐          |  ☐         |
+| Feature             | Routex     | Cldr Routes | Phoenix >= 1.8 |
+|---------------------|------------|-------------|----------------|
+| Route encapsulation | Full  [^1] | Limited     | Limited        |
+| Route manipulation  | Full  [^2] | Limited     | Limited        |
+| Route interpolation | Full       | Limited     | Limited        |
+| Alternative Routes  | Full       | Cldr        | Limited        |
+| Verified Routes     | ☑          | ☑           | ☑              |
+| Translation         | ☑          | ☑           | ☐              |
+| Route Helpers       | ☑          | depr.       | depr.          |
+| Drop-in replacement | ☑     [^3] | ☐           | -              |
+| Standalone          | ☑          | ☐           | -              |
+| Modular             | ☑          | ☐           | -              |
+| Extendable          | ☑          | ☐           | -              |
 
-[^1]: Routex' `preprocesss_using` is not bound to Phoenix (session) scopes
-[^2]: [Crazy example](https://github.com/BartOtten/routex/blob/main/lib/routex/extension/cloak.ex)
-[^3]: Routex *can* be configured to shim original Phoenix functionality (for
-    example: `~p` and `url/2`) while Cldr Routes mandates code modifications
-    (for example: `~p` -> `~q` and `url/2` -> `url_q/2`)
+[^1]: Routex' `preprocesss_using` is not bound to Phoenix (session) scopes  
+[^2]: [Crazy example](https://hexdocs.pm/routex/Routex.Extension.Cloak.html)  
+[^3]: *Optionally* Routex can be configured to shim original Phoenix functionality (for example: `~p` and `url/2`) or
+mimick Cldr Routes using [an adapter extension](https://hexdocs.pm/routex/Routex.Extension.Cldr.html).

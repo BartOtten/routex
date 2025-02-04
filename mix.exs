@@ -3,7 +3,7 @@ defmodule Routex.MixProject do
 
   @source_url "https://github.com/BartOtten/routex"
   @version "1.0.0"
-  @name "Phoenix Routes Extension Framework"
+  @name "Routex"
 
   def project do
     [
@@ -91,7 +91,9 @@ defmodule Routex.MixProject do
                 CHANGELOG.md CONTRIBUTING.md USAGE.md EXTENSIONS.md TROUBLESHOOTING.md EXTENSION_SUMMARIES.md TUTORIAL_LOCALIZED_ROUTES.md),
       links: %{
         Changelog: "https://hexdocs.pm/routex/changelog.html",
-        GitHub: "https://github.com/BartOtten/routex"
+        GitHub: "https://github.com/BartOtten/routex",
+        Demo: "https://routex.fly.dev/",
+        Tutorial: "https://hexdocs.pm/routex/tutorial_localized_routes.html"
       }
     ]
   end
@@ -103,18 +105,25 @@ defmodule Routex.MixProject do
   defp docs do
     [
       main: "readme",
+      logo: "assets/logo.png",
       source_ref: "v#{@version}",
       source_url: @source_url,
       assets: %{"assets" => "assets"},
       before_closing_head_tag: &docs_before_closing_head_tag/1,
       extras: [
-        "README.md",
-        "USAGE.md",
-        "CHANGELOG.md",
-        "EXTENSIONS.md",
-        "TROUBLESHOOTING.md",
-        "EXTENSION_SUMMARIES.md",
-        "TUTORIAL_LOCALIZED_ROUTES.md"
+        "README.md": [title: "Overview"],
+        "USAGE.md": [title: "Getting started"],
+        "EXTENSION_SUMMARIES.md": [title: "Included extensions"],
+        "EXTENSIONS.md": [title: "Extensions"],
+        "TROUBLESHOOTING.md": [title: "Troubleshooting"],
+        "CHANGELOG.md": [title: "Changelog"],
+        "guides/LOCALIZED_ROUTES.md": [title: "Localized Routes"]
+      ],
+      groups_for_extras: [
+        "The project": ["README.md", "EXTENSION_SUMMARIES.md"],
+        Guides: ["USAGE.md"] ++ Path.wildcard("guides/*.md"),
+        Extra: ["CHANGELOG.md", "TROUBLESHOOTING.md"],
+        Development: ["EXTENSIONS.md"]
       ],
       filter_modules: ~r"Elixir.Routex.*$",
       groups_for_modules: [
@@ -126,8 +135,12 @@ defmodule Routex.MixProject do
         Routex.Extension.Alternatives,
         Routex.Extension
       ],
-      skip_undefined_reference_warnings_on: &String.match?(&1, ~r/Phoenix.Router.Route/),
-      skip_code_autolink_to: &String.match?(&1, ~r/Phoenix.Router.Route/)
+      skip_undefined_reference_warnings_on: [
+        "Routex.Extension",
+        "Routex.Processing",
+        "Routex.Route"
+      ],
+      skip_code_autolink_to: ["Phoenix.Router.Route"]
     ]
   end
 

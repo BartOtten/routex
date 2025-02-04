@@ -28,18 +28,30 @@ enhance user engagement and content relevance.
 [Translations Documentation](https://hexdocs.pm/routex/Routex.Extension.Translations.html)
 
 
-### Multilingual Routes
+## Interpolation
 
-The Alternatives extension can be combined with the Translations extension to
-create multilingual routes. The Alternatives extension can provide the :locale
-attribute used by the Translations extension.
+With this extension enabled, *any* attribute assigned to a route can be used
+for route interpolation. Most effective with an extension which enables
+alternative routes generation (such as extension `Alternatives`).
 
-	Original            Step 1: Alternatives               Step 2: Translations
-						⇒ /products/:id/edit               ⇒ /products/:id/edit
-	/products/:id/edit  ⇒ /eu/nederland/products/:id/edit  ⇒ /eu/nederland/producten/:id/bewerken
-						⇒ /eu/espana/products/:id/edit	   ⇒ /eu/espana/producto/:id/editar
-						⇒ /gb/products/:id/edit            ⇒ /gb/products/:id/edit
+    /product/#{territory}/:id/#{language}  => /product/europe/:id/nl
 
+[Interpolation Documentation](https://hexdocs.pm/routex/Routex.Extension.Interpolation.html)
+
+> ### Multilingual Routes {: .neutral}
+> The Alternatives extension can be combined with the Translations and Interpolation
+> extension to create multilingual routes. The Alternatives extension can provide the `:locale`
+> attribute used by the Translations extension and other attributes to use with the Interpolation
+> extension.
+>
+> Guide: [Localized Routes with Routex](guides/LOCALIZED_ROUTES.md)
+>
+> 	  Original            Step 1: Alternatives                Step 2: Translations
+> 						  ⇒ /products/:id/edit                ⇒ /products/:id/edit
+> 	  /products/:id/edit  ⇒ /eu/netherlands/products/:id/edit ⇒ /eu/nederland/producten/:id/bewerken
+> 						  ⇒ /eu/spain/products/:id/edit	      ⇒ /eu/espana/producto/:id/editar
+> 						  ⇒ /gb/products/:id/edit             ⇒ /gb/products/:id/edit
+>
 
 ## Alternative Getters
 
@@ -65,27 +77,6 @@ It also provides branching variants of `url/{2,3,4}` and `path/{2,3}`.
 
 [Verified Routes Documentation](https://hexdocs.pm/routex/Routex.Extension.VerifiedRoutes.html)
 
-
-## Route Helpers
-
-Creates Phoenix Helpers that have the ability to branch based on the current
-alternative branch of a user. Optionally these helpers can replace the original
-Phoenix Route Helpers as they are drop-ins.
-
-[Route Helpers Documentation](https://hexdocs.pm/routex/Routex.Extension.RouteHelpers.html)
-
-
-## Interpolation
-
-With this extension enabled, *any* attribute assigned to a route can be used
-for route interpolation. Most effective with an extension which enables
-alternative routes generation (such as extension `Alternatives`).
-
-    /product/#{territory}/:id/#{language}  => /product/europe/:id/nl
-
-[Interpolation Documentation](https://hexdocs.pm/routex/Routex.Extension.Interpolation.html)
-
-
 ## Assigns
 
 With this extension you can add (a subset of) attributes set by other extensions
@@ -104,17 +95,30 @@ Creates a helper function `attrs/1` to get all `Routex.Attrs` of a route. As
 `Routex` sets the `@url` assign you can simply get all attributes for the
 current page with `attrs(@url)`.
 
-This way the `assigns` can be a subset of the full list of attributes but the
-full list can be lazy loaded when needed.
+The benefit over `assigns` is not loading the attributes into the process memory,
+but stil be able to easily access them when needed.
+
+*Tip*: use Assigns for attributes always required and Attribute Getters for
+those that are conditionally.
+
 
 [Attribute Getters Documentation](https://hexdocs.pm/routex/Routex.Extension.AttrGetters.html)
 
 
 ## Cldr Adapter
+
 Adapter for projects using :ex_cldr.
 
 [Cldr Adapter Documentation](https://hexdocs.pm/routex/Routex.Extension.Cldr.html)
 
+
+## Route Helpers
+
+Creates Phoenix Helpers that have the ability to branch based on the current
+alternative branch of a user. Optionally these helpers can replace the original
+Phoenix Route Helpers as they are drop-ins.
+
+[Route Helpers Documentation](https://hexdocs.pm/routex/Routex.Extension.RouteHelpers.html)
 
 ## Cloak (show case)
 

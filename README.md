@@ -1,9 +1,11 @@
+# 
+![Logo of Routex](assets/logo_horizontal.png "Routex Logo")
+
 ![Coveralls](https://img.shields.io/coveralls/github/BartOtten/routex)
 [![Build Status](https://github.com/BartOtten/routex/actions/workflows/elixir.yml/badge.svg?event=push)](https://github.com/BartOtten/routex/actions/workflows/elixir.yml)
 [![Last Updated](https://img.shields.io/github/last-commit/BartOtten/routex.svg)](https://github.com/BartOtten/routex/commits/main)
 [![Hex.pm](https://img.shields.io/hexpm/v/routex)](https://hex.pm/packages/routex)
 ![Hex.pm](https://img.shields.io/hexpm/l/routex)
-
 
 # Routex: Supercharge your Phoenix Router
 
@@ -37,18 +39,18 @@ overhead, ensuring that applications run as fast as ever.
   provides clear guidance on installation, configuration, and best practices,
   making Routex approachable for developers at all levels. For example: If you
   are interested in internationalization (i18n) or localization (l10n) have a
-  look at the [Localized Routes Tutorial](TUTORIAL_LOCALIZED_ROUTES.md).
-
-
-## Demo
-
-See Routex in action at the [official Routex Demo page](https://routex.fly.dev/).
+  look at the [Localized Routes Guide](guides/LOCALIZED_ROUTES.md).
 
 
 ## Requirements and Installation
 
 See the [Usage Guide](USAGE.md) for the requirements and installation
 instructions.
+
+
+## Online Demo
+
+See Routex in action at the [official Routex Demo page](https://routex.fly.dev/).
 
 
 ## Documentation

@@ -115,6 +115,7 @@ defmodule Routex.MixProject do
         "USAGE.md": [title: "Getting started"],
         "EXTENSION_SUMMARIES.md": [title: "Included extensions"],
         "EXTENSIONS.md": [title: "Extensions"],
+        "COMPARISON.md": [title: "Routing solutions compared"],
         "TROUBLESHOOTING.md": [title: "Troubleshooting"],
         "CHANGELOG.md": [title: "Changelog"],
         "guides/LOCALIZED_ROUTES.md": [title: "Localized Routes"]
@@ -122,7 +123,7 @@ defmodule Routex.MixProject do
       groups_for_extras: [
         "The project": ["README.md", "EXTENSION_SUMMARIES.md"],
         Guides: ["USAGE.md"] ++ Path.wildcard("guides/*.md"),
-        Extra: ["CHANGELOG.md", "TROUBLESHOOTING.md"],
+        Extra: ["COMPARISON.md", "CHANGELOG.md", "TROUBLESHOOTING.md"],
         Development: ["EXTENSIONS.md"]
       ],
       filter_modules: ~r"Elixir.Routex.*$",

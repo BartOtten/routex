@@ -7,21 +7,21 @@
 
 # Routex: Supercharge your Phoenix Router
 
-Routex is a powerful routing library build on top of Phoenix
-Router. It is designed to simplify route manipulation —giving developers a new
-level of control over route management. Whether it’s multilingual URLs, route
-obfuscation or alternative routes generation: Routex can do.
+Routex is the most powerful routing library for Phoenix Framework. It is
+designed to simplify route manipulation —giving developers unlimited control
+over their app routes. Having a very custom need? Write your own extension
+without having to know the nitty gritty details of the routing core.
 
-Due to its focus on flexibility, Routex is suited for both small and large-scale
-projects, allowing for seamless integration into existing codebases or entirely
-new applications. You simply enable the extensions your project needs. Missing a
-feature? Write your own extension without having to know the nitty gritty
-details of the routing core.
+Routex ships with *optional* extensions for internationalization, multilingual URLs,
+route obfuscation, alternative routes generation and [many more](EXTENSION_SUMMARIES.md).
 
 ## Top Features and Benefits
 
-* **Dynamic Routing**: Routex supports complex route structures, including
-  localized alternatives.
+* **No dependencies, no state**: Routex does not require any external dependency
+  and works *by default* without proces state (e.g. no need for `Gettext.put_locale/1`).
+
+* **Powerful transformations**: Routex supports advanced route transformations, including
+  everything needed for internationalization (i18n) and localization (l10n).
 
 * **Extension driven**: Being extension driven, Routex can be adapted to your
   specific needs. It's architecture allows you to write your own routing
@@ -29,15 +29,15 @@ details of the routing core.
   ships with extensions covering a wide range of use cases.
   Have a look at [a summary of extensions](EXTENSION_SUMMARIES.md).
 
-* **Optimized for Performance**: Built to fit between route configuration and
+* **Optimized for performance**: Built to fit between route configuration and
 route compilation. Routex enhances Phoenix routing without adding runtime
 overhead, ensuring that applications run as fast as ever.
 
-* **Detailed Documentation**: Comprehensive, well-organized documentation
+* **Detailed documentation**: Comprehensive, well-organized documentation
   provides clear guidance on installation, configuration, and best practices,
   making Routex approachable for developers at all levels. For example: If you
-  are interested in localized routes have a look at the
-  [Localized Routes Tutorial](TUTORIAL_LOCALIZED_ROUTES.md).
+  are interested in internationalization (i18n) or localization (l10n) have a
+  look at the [Localized Routes Tutorial](TUTORIAL_LOCALIZED_ROUTES.md).
 
 
 ## Demo
@@ -71,7 +71,7 @@ dependency.
 `Routex` is *[extension driven](EXTENSION_SUMMARIES.md)*. Routex boast the
 widest, most dynamic feature scope and can be [easily extended](EXTENSIONS.md)
 if the need arises. Like Phoenix' router, Routex minimizes necessity for code
-modifications throughout your code base and does not depend on anything else.
+modifications throughout your code base and does not add dependencies.
 It's main advantage is the lack of limits: it makes every route transformation
 and every route feature possible.
 

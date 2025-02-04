@@ -35,36 +35,36 @@ defmodule Routex.Branching do
 
   ** Example **
 
-  We want to create a branching variant of the `url` macro in `Phoenix,.VerifiedRoutes` module. The original
+  We want to create a branching variant of the `url` macro in `Phoenix.VerifiedRoutes` module. The original
   macro generates code that simply prints the given path argument, but we want to it to write multiple clauses and
   prefix the given argument based on the clause.
 
-    defmacro url(path, opts \\ []) do -> quote do IO.puts(path) end
+      defmacro url(path, opts \\ []) do -> quote do IO.puts(path) end
 
   Given this code:
 
-    defmodule MyMod do
-      def transform_arg(pattern, arg, extra), do: "/" <> extra <> "/europe/" <> pattern <> "/" <> arg end
-    end
+      defmodule MyMod do
+        def transform_arg(pattern, arg, extra), do: "/" <> extra <> "/europe/" <> pattern <> "/" <> arg end
+      end
 
-    patterns = ["en", "nl"]
-    match_binding = var!(external_var)
-    arg_pos = fn arity -> arity - 1 end)
-    arg_transformer = {MyMod, transform_arg, ["my_extra"]}
-    opts = [as: :url, orig: :url_original, arg_pos: arg_pos, arg_transformer: arg_transformer]
+      patterns = ["en", "nl"]
+      match_binding = var!(external_var)
+      arg_pos = fn arity -> arity - 1 end)
+      arg_transformer = {MyMod, transform_arg, ["my_extra"]}
+      opts = [as: :url, orig: :url_original, arg_pos: arg_pos, arg_transformer: arg_transformer]
 
-    branch_macro(patterns, match_binding, OriginalModule, :url, opts)
+      branch_macro(patterns, match_binding, OriginalModule, :url, opts)
 
   A new macro is build which outputs the AST of the original macro, wrapped in a case clause given transformed arguments.
 
-    defmacro url(path, opts \\ []) do
-  	  quote do
-  	    case external_var do
-  			 "en" -> Original.Module.url( "/" <> "my_extra" <> "/europe/en/" <> path, opts)
-  			 "nl" -> Original.Module.url("/" <> "my_extra" <> "/europe/nl/" <> path, opts)
-  		 end
+      defmacro url(path, opts \\ []) do
+  	    quote do
+  	      case external_var do
+  	  		 "en" -> Original.Module.url( "/" <> "my_extra" <> "/europe/en/" <> path, opts)
+  	  		 "nl" -> Original.Module.url("/" <> "my_extra" <> "/europe/nl/" <> path, opts)
+  	  	 end
+         end
        end
-     end
 
 
   For more examples, please see the test module `Routex.BranchingTest`.

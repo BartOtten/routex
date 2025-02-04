@@ -58,46 +58,6 @@ See Routex in action at the [official Routex Demo page](https://routex.fly.dev/)
 [HexDocs](https://hexdocs.pm/routex) (stable) and [GitHub
 Pages](https://bartotten.github.io/routex) (development).
 
-
-## Routex vs Cldr Routes vs Phoenix Router
-
-`Phoenix`'s router (>= 1.8) and the use of the`:path_prefixes` option is by far
-the easiest option. It adds prefixes to your routes for the well known
-`/:language/products/` route format. Absolute basic, but buildin!
-
-`Cldr Routes` adds the ability to use translated routes. It's main advantage is
-also it's main disadvantage: being part of the Cldr suite ensure maximum
-compatibility with that suite but also requires the (quite heavy) Cldr
-dependency.
-
-`Routex` is *[extension driven](EXTENSION_SUMMARIES.md)*. Routex boast the
-widest, most dynamic feature scope and can be [easily extended](EXTENSIONS.md)
-if the need arises. Like Phoenix' router, Routex minimizes necessity for code
-modifications throughout your code base and does not add dependencies.
-It's main advantage is the lack of limits: it makes every route transformation
-and every route feature possible.
-
-ps. If you use Cldr but rather use Routex for routing, see [the Cldr extension for
-Routex](`Routex.Extension.Cldr`).
-
-
-### Comparison table
-
-| Feature             | Routex     | Cldr Routes | Phoenix >= 1.8 |
-|---------------------|------------|-------------|----------------|
-| Route encapsulation | Full  [^1] | Limited     | Limited        |
-| Route manipulation  | Full  [^2] | Limited     | Limited        |
-| Route interpolation | Full       | Limited     | Limited        |
-| Alternative Routes  | Full       | Cldr        | Limited        |
-| Verified Routes     | ☑          | ☑           | ☑              |
-| Translation         | ☑          | ☑           | ☐              |
-| Route Helpers       | ☑          | depr.       | depr.          |
-| Drop-in replacement | ☑     [^3] | ☐           | -              |
-| Standalone          | ☑          | ☐           | -              |
-| Modular             | ☑          | ☐           | -              |
-| Extendable          | ☑          | ☐           | -              |
-
-[^1]: Routex' `preprocesss_using` is not bound to Phoenix (session) scopes  
-[^2]: [Crazy example](https://hexdocs.pm/routex/Routex.Extension.Cloak.html)  
-[^3]: *Optionally* Routex can be configured to shim original Phoenix functionality (for example: `~p` and `url/2`) or
-mimick Cldr Routes using [an adapter extension](https://hexdocs.pm/routex/Routex.Extension.Cldr.html).
+## Routex compared to...
+We published [a guide](COMPARISON.md) with the  intended to help you understand the differences, strengths,
+and tradeoffs when deciding which routing solution best fits your needs.

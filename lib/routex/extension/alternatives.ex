@@ -4,6 +4,9 @@ defmodule Routex.Extension.Alternatives do
   module. Branches can be nested and each branch can provide `Routex.Attrs` to be shared
   with other extensions.
 
+  > #### In combination with... {: .neutral}
+  > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZED_ROUTES.md)
+
   ## Configuration
   ```diff
   # file /lib/example_web/routex_backend.ex
@@ -41,10 +44,13 @@ defmodule Routex.Extension.Alternatives do
   ```
 
   ## Pseudo result
+  ```elixir
+      Router              Generated                         Attributes
                           ⇒ /products/:id/edit              locale: "en", contact: "rootexample.com"
       /products/:id/edit  ⇒ /europe/nl/products/:id/edit    locale: "nl", contact: "verkoop@example.nl"
                           ⇒ /europe/be/products/:id/edit    locale: "nl", contact: "handel@example.be"
                           ⇒ /gb/products/:id/edit           locale: "en", contact: "sales@example.com"
+   ```
 
   ## `Routex.Attrs`
   **Requires**

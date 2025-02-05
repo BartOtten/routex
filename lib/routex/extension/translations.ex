@@ -7,9 +7,12 @@ defmodule Routex.Extension.Translations do
   for translation. At compile-time it combines the translated segments to transform routes.
 
   This extension expects either a `:language` attribute or a `:locale` attribute. When only
-  `:locale` is provided it will try to extract the language from the locale tag. This algorithm is
+  `:locale` is provided it will try to extract the language from the locale tag. This algorithm
   covers Alpha-2 and Alpha-3 codes (see:
   [ISO](https://datatracker.ietf.org/doc/html/rfc5646#section-2.2.1))
+
+  > #### In combination with... {: .neutral}
+  > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZED_ROUTES.md)
 
   ## Configuration
   ```diff

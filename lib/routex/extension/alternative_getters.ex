@@ -1,7 +1,7 @@
 defmodule Routex.Extension.AlternativeGetters do
   @moduledoc """
-  Creates helper functions to get a list of alternative slugs and their Routex
-  attributes by providing the function a binary url.
+  Creates helper functions to get a list of maps alternative slugs and their `Routex.Attrs`
+  by providing a binary url. Sets `match?: true` for the url matching record.
 
   ## Configuration
   ```diff
@@ -15,17 +15,24 @@ defmodule Routex.Extension.AlternativeGetters do
   ],
   ```
 
-  ## `Routex.Attrs`
-  **Requires**
-  - none
+  ## Usage example
+  ```elixir
+  <!-- @url is made available by Routex -->
+  <!-- alternatives/1 is located in ExampleWeb.Router.RoutexHelpers aliased as Routes -->
+  <.link
+     :for={alternative <- Routes.alternatives(@url)}
+     class="button"
+     rel="alternate"
+     hreflang={alternative.attrs.locale}
+     patch={alternative.slug}
+   >
+     <.button class={(alternative.match? && "highlighted") || ""}>
+       <%= alternative.attrs.display_name %>
+     </.button>
+   </.link>
+  ```
 
-  **Sets**
-  - none
-
-  ## Helpers
-  - alternatives(url :: String.t()) :: struct()
-
-  **Example**
+  ## Pseudo result
   ```elixir
   iex> ExampleWeb.Router.RoutexHelpers.alternatives("/products/12?foo=baz")
   [ %Routex.Extension.AlternativeGetters{
@@ -38,7 +45,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
     %Routex.Extension.AlternativeGetters{
     slug: "/europe/products/12/?foo=baz",
-    match?: true,
+    match?: false,
     attrs: %{
       __branch__: [0, 12, 1],
       __origin__: "/products/:id",
@@ -46,7 +53,7 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
    %Routex.Extension.AlternativeGetters{
     slug: "/asia/products/12/?foo=baz",
-    match?: true,
+    match?: false,
     attrs: %{
       __branch__: [0, 12, 1],
       __origin__: "/products/:id",
@@ -54,6 +61,17 @@ defmodule Routex.Extension.AlternativeGetters do
     }},
   ]
   ```
+
+  ## `Routex.Attrs`
+  **Requires**
+  - none
+
+  **Sets**
+  - none
+
+  ## Helpers
+  - alternatives(url :: String.t()) :: struct()
+
   """
   @behaviour Routex.Extension
 

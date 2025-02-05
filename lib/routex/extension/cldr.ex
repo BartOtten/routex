@@ -7,8 +7,8 @@ defmodule Routex.Extension.Cldr do
   ## Interpolating Locale Data
 
   Interpolation is provided by `Routex.Extension.Interpolation`, which
-  is able to use any `Routex.Attr` for interpolation. See it's documentation
-  for additional options.
+  is able to use any `Routex.Attr` for interpolation into your routes.
+  See it's documentation for additional options.
 
   When using this Cldr extension, the following interpolations are supported as they
   are set as `Routex.Attr`:
@@ -18,11 +18,11 @@ defmodule Routex.Extension.Cldr do
   * `language` will interpolate the Cldr language name
   * `territory` will interpolate the Cldr territory code
 
-  Some examples are:
+  Some examples:
   ```elixir
   preprocess_using ExampleWeb.RoutexBackend do
     scope "/#{territory}/territory/" do
-      get "/#{locale}/locale/pages/:page", PageController, :show
+      get "/locale/pages/:page/#{locale}/", PageController, :show
       get "/language/#{language}/pages/:page", PageController, :show
     end
   end
@@ -67,29 +67,6 @@ defmodule Routex.Extension.Cldr do
    more options and the pseudo result.
 
   ```
-   alternatives: %{
-    "/" => %{
-      attrs: %{
-        language: "en",
-        locale: "en",
-        territory: "US",
-        locale_display: "English (United States)"
-      },
-      branches: %{
-        "/en" => %{
-          language: "en",
-          locale: "en",
-          territory: "US",
-          locale_dispay: "English"
-        },
-        "/fr" => %{
-          language: "fr",
-          locale: "fr",
-          territory: "FR",
-          locale_display: "français"
-        }
-     }
-   }
 
   ```
 

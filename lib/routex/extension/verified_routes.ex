@@ -1,8 +1,8 @@
 defmodule Routex.Extension.VerifiedRoutes do
   # credo:disable-for-this-file Credo.Check.Refactor.IoPuts
   @moduledoc ~S"""
-  Supports the use of original route paths in controllers and templates. Generates code
-  to tranform template paths into transformed paths at runtime without performance impact.
+  Supports the use of original route paths in controllers and templates while rendering
+  transformed route paths at runtime without performance impact.
 
   > #### Implementation summary {:.info}
   > Each sigil and function eventualy delegates to the official
@@ -10,13 +10,13 @@ defmodule Routex.Extension.VerifiedRoutes do
   > simply delegate to the official Phoenix function. If a branching route is
   > provided, it will use a branching mechanism before delegating.
 
-  ## Alternative Verified Route sigil
+  #### Alternative Verified Route sigil
   Provides a sigil (default: `~l`) to verify transformed and/or branching routes.
   The sigil to use can be set to `~p` to override the default of Phoenix as
   it is a drop-in replacement. If you choose to override the default Phoenix sigil,
   it is renamed (default: `~o`) and can be used when unaltered behavior is required.
 
-  ## Variants of url/{2,3,4} and path/{2,3}
+  #### Variants of url/{2,3,4} and path/{2,3}
   Provides branching variants of (and delegates to) macro's provided by
   `Phoenix.VerifiedRoutes`. Both new macro's detect whether branching should be
   applied.
@@ -64,23 +64,26 @@ defmodule Routex.Extension.VerifiedRoutes do
   + verified_path_phoenix: :path_native,
   ```
 
-  ## Pseudo result (simplified)
-      # given Routex is configured to use ~l
-      # given Phoenix is assigned ~o (for example clarity)
+  ## Pseudo result
+  ```elixir
+  # given Routex behavior is assigned ~l
+  # given the default behavior is assigned ~o
+  # given the official macro of Phoenix is assigned ~p
 
-      # given other extensions have caused a route transformation
-      ~o"/products/#{product}"   ⇒  ~p"/products/#{products}"
-      ~l"/products/#{product}"   ⇒  ~p"/transformed/products/#{product}"
+  # given another extension has transformed the route
+  ~o"/products/#{product}"   ⇒  ~p"/products/#{products}"
+  ~l"/products/#{product}"   ⇒  ~p"/transformed/products/#{product}"
 
-      # given another extension has generated branches / alternative routes
-      ~o"/products/#{product}"  ⇒  ~p"/products/#{products}"
-      ~l"/products/#{product}"  ⇒
-              case branch do
-                nil ⇒  ~p"/products/#{product}"
-                "en" ⇒  ~p"/products/en/#{product}"
-                "eu_nl" ⇒  ~p"/europe/nl/products/#{product}"
-                "eu_be" ⇒  ~p"/europe/be/products/#{product}"
-              end
+  # given another extension has generated branches / alternative routes
+  ~o"/products/#{product}"  ⇒  ~p"/products/#{products}"
+  ~l"/products/#{product}"  ⇒
+          case current_branch do
+            nil     ⇒  ~p"/products/#{product}"
+            "en"    ⇒  ~p"/products/en/#{product}"
+            "eu_nl" ⇒  ~p"/europe/nl/products/#{product}"
+            "eu_be" ⇒  ~p"/europe/be/products/#{product}"
+          end
+  ```
 
   ## `Routex.Attrs`
   **Requires**

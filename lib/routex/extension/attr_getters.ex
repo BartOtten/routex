@@ -1,8 +1,13 @@
 defmodule Routex.Extension.AttrGetters do
   @moduledoc """
   Creates helper functions to get the `Routex.Attrs` given a binary url or a
-  list of path segments. This way the attributes for route can be lazily
-  loaded.
+  list of path segments. Use this to lazy load attributes instead of adding them
+  upfront to assigns.
+
+  > #### In combination with... {: .neutral}
+  > Other extensions set `Routex.Attrs`. The attributes an extension sets is listed in it's documentation.
+  > To define custom attributes for routes have a look at `Routex.Extension.Alternatives`
+
 
   ## Configuration
   ```diff
@@ -14,18 +19,7 @@ defmodule Routex.Extension.AttrGetters do
   ],
   ```
 
-  ## `Routex.Attrs`
-  **Requires**
-  - none
-
-  **Sets**
-  - none
-
-  ## Helpers
-  - attrs(url :: binary) :: map()
-  - attrs(segments :: list) :: map()
-
-  **Example**
+  ## Pseudo result
   ```elixir
   iex> ExampleWeb.Router.RoutexHelpers.attrs("/europe/nl/producten/?foo=baz")
   %{
@@ -38,6 +32,17 @@ defmodule Routex.Extension.AttrGetters do
     branch_helper: "europe_nl",
   }
   ```
+
+  ## `Routex.Attrs`
+  **Requires**
+  - none
+
+  **Sets**
+  - none
+
+  ## Helpers
+  - attrs(url :: binary) :: map()
+  - attrs(segments :: list) :: map()
   """
 
   @behaviour Routex.Extension

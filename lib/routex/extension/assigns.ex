@@ -1,7 +1,12 @@
 defmodule Routex.Extension.Assigns do
   @moduledoc """
-  Extracts `Routex.Attrs` from the route and makes them available in components
-  and controllers with the `@` assigns operator (optionally under a namespace).
+  Extracts `Routex.Attrs` from a route and makes them available in components
+  and controllers with the assigns operator `@` (optionally under a namespace).
+
+  > #### In combination with... {: .neutral}
+  > Other extensions set `Routex.Attrs`. The attributes an extension sets is listed in it's documentation.
+  > To define custom attributes for routes have a look at `Routex.Extension.Alternatives`
+
 
   ## Options
   - `namespace`: when set creates a named collection of `Routex.Attrs`
@@ -21,7 +26,7 @@ defmodule Routex.Extension.Assigns do
 
   ## Pseudo result
       # in (h)eex template
-      @rtx.branch_helper   ⇒  "eu_nl"
+      @rtx.branch_helper  ⇒  "eu_nl"
       @rtx.locale         ⇒  "nl"
       @rtx.contact        ⇒  "verkoop@example.nl"
       @rtx.name           ⇒  "The Netherlands"

@@ -27,11 +27,11 @@ the Cldr ecosystem.
 
 ## Routex
 
-Routex takes routing in Phoenix to the next level. It is built as an
-[extension-driven](EXTENSION_SUMMARIES.md) router on top of Phoenix Router. Its
-extension-driven design means you get all the benefits of translated routes—like
-those offered by Cldr Routes—plus a broader, more customizable set of features
-that can be tailored to virtually any routing challenge.
+Routex takes routing in Phoenix to the next level. It is built as
+[extension-driven](EXTENSION_SUMMARIES.md) middleware leveraging Phoenix Router
+itself. Its extension-driven design means you get all the benefits of translated
+routes—like those offered by Cldr Routes—plus a broader, more customizable set
+of features that can be tailored to virtually any routing challenge.
 
 Whether you need complete route translation, advanced route manipulation,
 obfuscation, or alternative route generation, Routex provides a full suite of
@@ -52,8 +52,8 @@ bridge the gap using [the Cldr extension for Routex](`Routex.Extension.Cldr`).
 |---------------------|------------|---------------------|----------------|
 | Route encapsulation | Full  [^1] | Limited             | Limited        |
 | Route manipulation  | Full  [^2] | Limited             | Limited        |
-| Route interpolation | Full       | Limited             | Limited        |
-| Alternative Routes  | Full       | Translation focused | Limited        |
+| Route interpolation | Full       | Limited             | Prefix only    |
+| Alternative Routes  | Full       | Translation focused | Prefix only    |
 | Verified Routes     | ☑          | ☑                   | ☑              |
 | Translation         | ☑          | ☑                   | ☐              |
 | Route Helpers       | ☑          | depr.               | depr.          |

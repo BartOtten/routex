@@ -3,6 +3,10 @@ defmodule Routex.Extension.Cldr do
   Adapter for projects using :ex_cldr. It generates the configuration
   for `Routex.Extension.Alternatives`.
 
+  > #### Ejecting the CLDR extension {: .neutral}
+  > Using the Cldr adapter provides the advantage of keeping your localized routes
+  > in sync with the configuration of Cldr. The disadvantage is a lack of flexibility.
+  > If you ever need more flexibility, you can [eject the Cldr extension](#module-eject-the-cldr-adapter).
 
   ## Interpolating Locale Data
 
@@ -66,8 +70,44 @@ defmodule Routex.Extension.Cldr do
    See the documentation of `Routex.Extension.Alternatives` to see
    more options and the pseudo result.
 
+  ## Eject the Cldr adapter
+  This extension abstracts away the configuration of `Routex.Extension.Alternatives`. You may want
+  to customize things beyond what `Routex.Extension.Cldr` provides. When you eject, you copy
+  the generated configuration into the Routex backend.
+
+  In other words, instead of relying on the preconfigured “black box” provided by this extension, you
+  now have full access to—and responsibility for—the configuration of `Routex.Extension.Alternatives`.
+
+  #### Copy the generated configuration into your Routex backend**
+
+  Call the `config/0` function on you backend (e.g. `ExampleWeb.RoutexBackend.config()`)
+  in IEX. Copy the `alternatives: %{...}` section to your Routex backend.
+
+  ```diff
+  defmodule ExampleWeb.RoutexBackend do
+  use Routex.Backend,
+  extensions: [...],
+  + alternatives: %{...}
   ```
 
+  #### Remove references to Cldr
+
+  ```diff
+  defmodule ExampleWeb.RoutexBackend do
+  use Routex.Backend,
+  extensions: [
+  -  Routex.Extension.Cldr,
+  ],
+  - cldr_backend: MyApp.Cldr,
+  ```
+
+  ```diff
+  defmodule ExampleWeb.Router
+  - require ExampleWeb.Cldr
+
+  use ExampleWeb, :router
+
+  import ExampleWeb.UserAuth
   ```
 
   ## `Routex.Attrs`

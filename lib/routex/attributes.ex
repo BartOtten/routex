@@ -1,17 +1,21 @@
 defmodule Routex.Attrs do
   @moduledoc """
-    Provides an interface to access and update Routex attributes.
+  Provides an interface to access and update Routex attributes.
 
-    Extensions can make use of `Routex.Attrs` values provided by Routex itself,
+  Extensions can make use of `Routex.Attrs` values provided by Routex itself,
   Routex backends and other extensions. As those values are attributes to a
   route, extension B can use values attributed to a route by extension A.
 
-    * To make the availability of the attributes as predictable as possible, Routex
-    uses a flat structure.
-    * Extension developers are encouraged to put as much information into the attributes
-    as possible.
-    * Extensions should add any fallback/default they might use themselves to the
-    attributes.
+  > #### In combination with... {: .neutral}
+  > Other extensions set `Routex.Attrs`. The attributes an extension sets is listed in it's documentation.
+  > To define custom attributes for routes have a look at `Routex.Extension.Alternatives`
+
+  * To make the availability of the attributes as predictable as possible, Routex
+  uses a flat structure.
+  * Extension developers are encouraged to put as much information into the attributes
+  as possible.
+  * Extensions should add any fallback/default they might use themselves to the
+  attributes.
   """
 
   @doc """

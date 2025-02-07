@@ -87,8 +87,7 @@ defmodule Routex.MixProject do
       maintainers: ["Bart Otten"],
       licenses: ["MIT"],
       files:
-        ~w(lib .formatter.exs mix.exs docs README.md LICENSE.md
-                CHANGELOG.md CONTRIBUTING.md USAGE.md),
+        ~w(lib .formatter.exs mix.exs docs README.md LICENSE.md CHANGELOG.md CONTRIBUTING.md USAGE.md),
       links: %{
         Changelog: "https://hexdocs.pm/routex/changelog.html",
         GitHub: "https://github.com/BartOtten/routex",

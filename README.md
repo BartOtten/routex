@@ -15,7 +15,7 @@ need to handle even the most demanding routing requirements.
 
 Routex comes with extensions for internationalization (i18n), localization
 (l10n), translated (multilingual) URLs, alternative routes generation and [many
-more](EXTENSION_SUMMARIES.md). Its modern extensible architecture enables you to easily
+more](docs/EXTENSION_SUMMARIES.md). Its modern extensible architecture enables you to easily
 build custom solutions that work harmoniously with other extensions.
 
 ## Top Features and Benefits
@@ -30,7 +30,7 @@ build custom solutions that work harmoniously with other extensions.
   specific needs. It's architecture allows you to write your own routing
   features without having to worry about breaking existing functionality. Routex
   ships with extensions covering a wide range of use cases.
-  Have a look at [a summary of extensions](EXTENSION_SUMMARIES.md).
+  Have a look at [a summary of extensions](docs/EXTENSION_SUMMARIES.md).
 
 * **Optimized for performance**: Built to fit between route configuration and
   route compilation. Routex enhances Phoenix routing without adding runtime
@@ -40,7 +40,7 @@ build custom solutions that work harmoniously with other extensions.
   provides clear guidance on installation, configuration, and best practices,
   making Routex approachable for developers at all levels. For example: If you
   are interested in internationalization (i18n) or localization (l10n) have a
-  look at the [Localized Routes Guide](guides/LOCALIZED_ROUTES.md).
+  look at the [Localized Routes Guide](docs/guides/LOCALIZED_ROUTES.md).
 
 
 ## Installation and usage
@@ -60,11 +60,11 @@ instructions.
 
 To help you understand where Routex fits in.
 
-### [How Routex and Phoenix Router Work Together](ROUTEX_AND_PHOENIX_ROUTER.md)
+### [How Routex and Phoenix Router Work Together](docs/ROUTEX_AND_PHOENIX_ROUTER.md)
 Understanding how Routex, its extensions, and Phoenix Router work together can
 be tricky at first sight. To help you understand, we came up with an anology.
 
-### [Routex compared to Phoenix Router and Cldr Routes](COMPARISON.md)
+### [Routex compared to Phoenix Router and Cldr Routes](docs/COMPARISON.md)
 We published a comparison with the intended to help you understand
 the differences, strengths, and tradeoffs when deciding which routing solution
 best fits your needs.

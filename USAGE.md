@@ -106,5 +106,5 @@ routes)
 + end
 ```
 
-When you run into issues, please have a look at the [Troubleshooting](TROUBLESHOOTING.md)
+When you run into issues, please have a look at the [Troubleshooting](docs/TROUBLESHOOTING.md)
 

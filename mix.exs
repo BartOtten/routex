@@ -113,24 +113,24 @@ defmodule Routex.MixProject do
       extras: [
         "README.md": [title: "Overview"],
         "USAGE.md": [title: "Getting started"],
-        "EXTENSION_SUMMARIES.md": [title: "Included extensions"],
-        "ROUTEX_AND_PHOENIX_ROUTER.md": [title: "Routex and Phoenix Router"],
-        "EXTENSIONS.md": [title: "Extensions"],
-        "COMPARISON.md": [title: "Routing solutions compared"],
-        "TROUBLESHOOTING.md": [title: "Troubleshooting"],
+        "docs/EXTENSION_SUMMARIES.md": [title: "Included extensions"],
+        "docs/ROUTEX_AND_PHOENIX_ROUTER.md": [title: "Routex and Phoenix Router"],
+        "docs/EXTENSION_DEVELOPMENT.md": [title: "Extensions"],
+        "docs/COMPARISON.md": [title: "Routing solutions compared"],
+        "docs/TROUBLESHOOTING.md": [title: "Troubleshooting"],
         "CHANGELOG.md": [title: "Changelog"],
-        "guides/LOCALIZED_ROUTES.md": [title: "Localized Routes"]
+        "docs/guides/LOCALIZED_ROUTES.md": [title: "Localized Routes"]
       ],
       groups_for_extras: [
-        "The project": ["README.md", "EXTENSION_SUMMARIES.md"],
-        Guides: ["USAGE.md"] ++ Path.wildcard("guides/*.md"),
+        "The project": ["README.md", "docs/EXTENSION_SUMMARIES.md"],
+        Guides: ["USAGE.md"] ++ Path.wildcard("docs/guides/*.md"),
         Extra: [
-          "ROUTEX_AND_PHOENIX_ROUTER.md",
-          "COMPARISON.md",
+          "docs/ROUTEX_AND_PHOENIX_ROUTER.md",
+          "docs/COMPARISON.md",
           "CHANGELOG.md",
-          "TROUBLESHOOTING.md"
+          "docs/TROUBLESHOOTING.md"
         ],
-        Development: ["EXTENSIONS.md"]
+        Development: ["docs/EXTENSION_DEVELOPMENT.md"]
       ],
       filter_modules: ~r"Elixir.Routex.*$",
       groups_for_modules: [

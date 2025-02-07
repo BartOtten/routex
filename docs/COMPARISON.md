@@ -1,4 +1,4 @@
-# Comparisation
+# Phoenix Framework routing solutions compared
 
 This guide is intended to help you understand the differences, strengths,
 and tradeoffs when deciding which routing solution best fits your needs.

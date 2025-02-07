@@ -9,18 +9,19 @@
 
 # Routex: Supercharge your Phoenix Router
 
-Routex is the most powerful routing library for Phoenix Framework. It is
-designed to simplify route manipulation —giving developers unlimited control
-over their app routes. Having a very custom need? Write your own extension
-without having to know the nitty gritty details of the routing core.
+This powerful library works together with Phoenix Router to provide the ultimate
+routing solution. It simplifies route manipulation, giving you the control you
+need to handle even the most demanding routing requirements.
 
-Routex ships with *optional* extensions for internationalization, multilingual URLs,
-route obfuscation, alternative routes generation and [many more](EXTENSION_SUMMARIES.md).
+Routex comes with extensions for internationalization (i18n), localization
+(l10n), translated (multilingual) URLs, alternative routes generation and [many
+more](EXTENSION_SUMMARIES.md). Its modern extensible architecture enables you to easily
+build custom solutions that work harmoniously with other extensions.
 
 ## Top Features and Benefits
 
-* **No dependencies, no state**: Routex does not require any external dependency
-  and works *by default* without proces state (e.g. no need for `Gettext.put_locale/1`).
+* **No dependencies, no state**: Routex is unique in not requiring any external dependency
+  and works *by default* without proces state.
 
 * **Powerful transformations**: Routex supports advanced route transformations, including
   everything needed for internationalization (i18n) and localization (l10n).
@@ -32,8 +33,8 @@ route obfuscation, alternative routes generation and [many more](EXTENSION_SUMMA
   Have a look at [a summary of extensions](EXTENSION_SUMMARIES.md).
 
 * **Optimized for performance**: Built to fit between route configuration and
-route compilation. Routex enhances Phoenix routing without adding runtime
-overhead, ensuring that applications run as fast as ever.
+  route compilation. Routex enhances Phoenix routing without adding runtime
+  overhead, ensuring that applications run as fast as ever.
 
 * **Detailed documentation**: Comprehensive, well-organized documentation
   provides clear guidance on installation, configuration, and best practices,
@@ -42,22 +43,28 @@ overhead, ensuring that applications run as fast as ever.
   look at the [Localized Routes Guide](guides/LOCALIZED_ROUTES.md).
 
 
-## Requirements and Installation
+## Installation and usage
 
-See the [Usage Guide](USAGE.md) for the requirements and installation
+**[Usage Guide](USAGE.md)** - requirements and installation.
 instructions.
 
-
-## Online Demo
-
-See Routex in action at the [official Routex Demo page](https://routex.fly.dev/).
+**[Documentation](https://hexdocs.pm/routex)** - from step-by-step guides till in-depth explanations.
 
 
-## Documentation
+## Give it a try!
+**[Online demo](https://routex.fly.dev/)** - have a look or get the
+[code](https://github.com/BartOtten/routex_example/).
 
-[HexDocs](https://hexdocs.pm/routex) (stable) and [GitHub
-Pages](https://bartotten.github.io/routex) (development).
 
-## Routex compared to...
-We published [a guide](COMPARISON.md) with the  intended to help you understand the differences, strengths,
-and tradeoffs when deciding which routing solution best fits your needs.
+## Articles
+
+To help you understand where Routex fits in.
+
+### [How Routex and Phoenix Router Work Together](ROUTEX_AND_PHOENIX_ROUTER.md)
+Understanding how Routex, its extensions, and Phoenix Router work together can
+be tricky at first sight. To help you understand, we came up with an anology.
+
+### [Routex compared to Phoenix Router and Cldr Routes](COMPARISON.md)
+We published a comparison with the intended to help you understand
+the differences, strengths, and tradeoffs when deciding which routing solution
+best fits your needs.

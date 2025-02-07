@@ -5,7 +5,7 @@ defmodule Routex.Backend do
   > a configuration struct using the `configure/2` callbacks of
   > the extensions provided in `opts`.
   >
-  > See also: [Routex Extensions](EXTENSIONS.md).
+  > See also: [Routex Extensions](EXTENSION_DEVELOPMENT.md).
 
   **Example**
 

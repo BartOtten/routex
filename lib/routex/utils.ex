@@ -12,6 +12,23 @@ defmodule Routex.Utils do
   def print(input), do: IO.puts([">> " | input])
 
   @doc """
+  Prints an alert. Should be used when printing critical alerts in
+  the terminal during compile time.
+  """
+  # credo:disable-for-lines:11
+  @spec alert(input :: iodata) :: :ok
+  def alert(input),
+    do:
+      IO.puts([
+        IO.ANSI.blink_slow(),
+        IO.ANSI.light_red_background(),
+        "Critical",
+        IO.ANSI.reset(),
+        " ",
+        input
+      ])
+
+  @doc """
   Returns the AST to get the current branch from process dict or from  assigns, conn or socket
   based on the available variables in the `caller` module.
   """

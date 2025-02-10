@@ -118,7 +118,8 @@ defmodule Routex.MixProject do
         "docs/COMPARISON.md": [title: "Routing solutions compared"],
         "docs/TROUBLESHOOTING.md": [title: "Troubleshooting"],
         "CHANGELOG.md": [title: "Changelog"],
-        "docs/guides/LOCALIZED_ROUTES.md": [title: "Localized Routes"]
+        "docs/guides/LOCALIZED_ROUTES.md": [title: "Localized Routes"],
+        "docs/guides/LOCALIZATION_VS_TRANSLATION.md": [title: "Localization vs Translation"]
       ],
       groups_for_extras: [
         "The project": ["README.md", "docs/EXTENSION_SUMMARIES.md"],

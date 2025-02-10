@@ -30,6 +30,7 @@ defmodule Routex.Processing do
   """
 
   alias Routex.Attrs
+  alias Routex.Utils
 
   @type backend :: module
   @type extension_module :: module
@@ -48,8 +49,8 @@ defmodule Routex.Processing do
     wrap_in_task = System.get_env("ROUTEX_DEBUG") == "true"
 
     if wrap_in_task do
-      IO.warn(
-        "\n\n!! Routex processing is wrapped in a task for debugging purposes. Compilation will fail !!\n\n"
+      Utils.alert(
+        "Routex processing is wrapped in a task for debugging purposes. Compilation will fail"
       )
 
       task = Task.async(fn -> execute_callbacks(env) end)

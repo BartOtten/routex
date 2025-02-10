@@ -59,6 +59,7 @@ and provide a minimal configuration.
 ```diff
 use Routex.Backend,
 extensions: [
+  Routex.Extension.AttrGetters, # required
 + Routex.Extension.Alternatives,
 ],
 + alternatives: %{
@@ -108,6 +109,7 @@ Add the extension and it's minimal configuration.
 ```diff
 use Routex.Backend,
 extensions: [
+  Routex.Extension.AttrGetters, # required
   Routex.Extension.Alternatives,
 + Routex.Extension.Translations,
 ],
@@ -211,6 +213,7 @@ configuration to the backend.
 ```diff
 use Routex.Backend,
 extensions: [
+  Routex.Extension.AttrGetters, # required
   Routex.Extension.Alternatives,
   Routex.Extension.Translations,
 + Routex.Extension.VerifiedRoutes,
@@ -277,6 +280,7 @@ once again add the extension.
 ```diff
 use Routex.Backend,
 extensions: [
+  Routex.Extension.AttrGetters, # required
   Routex.Extension.Alternatives,
   Routex.Extension.Translations,
   Routex.Extension.VerifiedRoutes,

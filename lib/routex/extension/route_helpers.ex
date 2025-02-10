@@ -13,8 +13,8 @@ defmodule Routex.Extension.RouteHelpers do
   defmodule ExampleWeb.RoutexBackend do
     use Routex.Backend,
     extensions: [
-  +   Routex.Extension.RouteHelpers,
-      Routex.Extension.AttrGetters
+      Routex.Extension.AttrGetters,  # required
+  +   Routex.Extension.RouteHelpers
   ],
   ```
 

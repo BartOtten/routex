@@ -51,10 +51,10 @@ defmodule Routex.Extension.VerifiedRoutes do
   defmodule ExampleWeb.RoutexBackend do
     use Routex.Backend,
     extensions: [
+      Routex.Extension.AttrGetters, # required
       Routex.Extension.Alternatives,
       [...]
-  +   Routex.Extension.VerifiedRoutes,
-      Routex.Extension.AttrGetters
+  +   Routex.Extension.VerifiedRoutes
   ],
   + verified_sigil_routex: "~p",
   + verified_sigil_phoenix: "~o",

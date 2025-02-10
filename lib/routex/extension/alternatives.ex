@@ -23,6 +23,7 @@ defmodule Routex.Extension.Alternatives do
 
   use Routex.Backend,
   extensions: [
+    Routex.Extension.AttrGetters, # required
   + Routex.Extension.Alternatives,
   Routex.Extension.AttrGetters
   ],

@@ -18,8 +18,8 @@ defmodule Routex.Extension.Assigns do
   defmodule ExampleWeb.RoutexBackend do
     use Routex.Backend,
     extensions: [
-  +   Routex.Extension.Assigns,
-  Routex.Extension.AttrGetters
+      Routex.Extension.AttrGetters, # required
+  +   Routex.Extension.Assigns
   ],
   + assigns: %{namespace: :rtx, attrs: [:branch_helper, :locale, :contact, :name]}
   ```

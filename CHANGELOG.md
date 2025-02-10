@@ -5,7 +5,7 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
-## [1.0.0](https://github.com/BartOtten/routex/compare/v1.0.0...1.0.0) (2025-02-03)
+## [v1.0.0](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.4...v1.0.0) (2025-02-03)
 
 
 

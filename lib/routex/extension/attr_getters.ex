@@ -4,6 +4,9 @@ defmodule Routex.Extension.AttrGetters do
   list of path segments. Use this to lazy load attributes instead of adding them
   upfront to assigns.
 
+  This extension provides the required `attrs/1` helper function, used by
+  Routex to assign helper attributes in the generated `on_mount/4` callback.
+
   > #### In combination with... {: .neutral}
   > Other extensions set `Routex.Attrs`. The attributes an extension sets is listed in it's documentation.
   > To define custom attributes for routes have a look at `Routex.Extension.Alternatives`
@@ -15,7 +18,7 @@ defmodule Routex.Extension.AttrGetters do
   defmodule ExampleWeb.RoutexBackend do
     use Routex.Backend,
     extensions: [
-  +   Routex.Extension.AttrGetters,
+  +   Routex.Extension.AttrGetters,  # required
   ],
   ```
 

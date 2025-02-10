@@ -20,6 +20,11 @@ defmodule Routex.Extension.Interpolation do
   > Verified Routes. The routes will be rendered with interpolated attributes
   > at run time.
 
+  ## Configuration
+
+  none
+
+
   ## Usage
   ```elixir
   # file /lib/example_web/routes.ex

@@ -37,13 +37,12 @@ defmodule Routex.Extension.Cldr do
   defmodule ExampleWeb.RoutexBackend do
   use Routex.Backend,
   extensions: [
+    Routex.Extension.AttrGetters, # required
   + Routex.Extension.Cldr,
   + Routex.Extension.Alternatives,
   + Routex.Extension.Interpolation, #  when using routes with interpolation
   + Routex.Extension.Translations,  # when using translated routes
-  + Routex.Extension.VerifiedRoutes,
-    [...]
-    Routex.Extension.AttrGetters
+  + Routex.Extension.VerifiedRoutes
   ],
   + cldr_backend: MyApp.Cldr,
   + translations_backend: MyApp.Gettext,  #  when using translated routes

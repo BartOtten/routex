@@ -180,6 +180,17 @@ defmodule Routex.Processing do
       |> Macro.prewalker()
       |> Enum.any?(&match?({:def, _meta1, [{:attrs, _meta2, _args} | _rest]}, &1))
 
+    # instead of raising which makes testing hard, we print an error message.
+    !has_attr_func &&
+      Routex.Utils.alert([
+        inspect(module),
+        """
+        .attrs/1` not found. Please include an extension providing
+                 the `attrs/1` function (such as `Routex.Extension.AttrGetters`) in
+                 the Routex backend extensions list.
+        """
+      ])
+
     prelude =
       quote do
         require Logger
@@ -211,7 +222,7 @@ defmodule Routex.Processing do
            Phoenix.LiveView.assign(
              socket,
              [url: url, __branch__: opts.__branch__] ++
-               Map.to_list(opts.assigns)
+               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
            )}
         end
       else
@@ -229,7 +240,7 @@ defmodule Routex.Processing do
            Phoenix.Component.assign(
              socket,
              [url: url, __branch__: opts.__branch__] ++
-               Map.to_list(opts.assigns)
+               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
            )}
         end
       end

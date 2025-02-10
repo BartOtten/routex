@@ -65,7 +65,8 @@ configuration of extensions.
 defmodule ExampleWeb.RoutexBackend do
 use Routex.Backend,
   extensions: [
-  # ...list of extensions...
+  Routex.Extension.AttrGetters,  # required
+  # ...other extensions...
   ],
 end
 ```

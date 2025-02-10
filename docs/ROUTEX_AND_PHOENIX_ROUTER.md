@@ -5,8 +5,12 @@
  should not be used.
 </small>
 
-Understanding how Routex, its extensions, and Phoenix Router work together can
-be tricky. To make it clearer, let's use an analogy.
+How Routex, its extensions, and the Phoenix Router work together can be better
+understood through an analogy. As the saying goes, "a picture is worth a
+thousand words," this document also includes an illustrative blueprint.
+
+
+## Anology: the housing project
 
 Imagine you're a *real estate developer* planning to build several houses. You
 have a general vision for the houses (your route definitions in `route.ex`) and
@@ -99,6 +103,63 @@ This leads to the second key concept:
 > **Routex also creates helpful accessory functions that you can use with the
 > houses (routes) built by Phoenix Router.** These functions streamline common
 > tasks and improve the overall experience.
+
+
+## Example blueprint
+
+A picture paints a thousand words, or so they say. The blueprint clearly shows
+how Routex is middleware, plugged between two stages of Phoenix route generation.
+
+Also shown is the use two co-operating extensions: `Translations` uses the
+`:language` attribute set by `Alternatives`.
+
+<pre class="mermaid">
+flowchart TD
+ subgraph subGraph1["Routex"]
+        F["ExampleWeb.RoutexBackend.ex"]
+        G["configure/2 callbacks"]
+        H["Alternatives.transform/3 callback"]
+        I["Translations.transform/3 callback"]
+        J["create_helpers/3 callbacks"]
+     K["ExampleWeb.Router.RoutexHelpers"]
+  end
+  subgraph subGraph0["Phoenix"]
+        A["ExampleWeb.Router.ex"]
+        B["Convert to Phoenix.Routes.Route structs"]
+        C["Generate route functions"]
+        D["ExampleWeb.Router"]
+  end
+  A -- "/products/:id" --> B
+  B -- "%{path: /products/:id}" --> H
+  F -- "extensions: [Alternatives, Translations]" --> G
+  G --> H
+  H -- "%{path: ..., attrs: %{lang: fr}}
+       %{path: ..., attrs: %{lang: es}}" --> I
+  I -- "%{path: /produit/:id, attrs: ...}
+       %{path: /producto/:id, attrs: ...}" --> C & J
+  C -- "def match?(/produit/:id), do: ProductController
+      def match?(/producto/:id), do: ProductController" --> D
+  J -- "def alternatives(/products/:id) do
+        %{path: /produit/:id, attrs: %{lang: fr}}
+        %{path: /producto/:id, attrs: %{lang: es}}
+      end" --> K
+
+  F:::routex
+  G:::routex
+  H:::routex
+  I:::routex
+  J:::routex
+  K:::routex
+  A:::phoenix
+  B:::phoenix
+  C:::phoenix
+  D:::phoenix
+ classDef routex  fill:#4d4d4d, stroke:#888, stroke-width:2px, color:#ffffff
+ classDef phoenix  stroke-width:1px, stroke-dasharray: 0, stroke:#616161, fill:#FF6D00, color:#424242
+ style subGraph0 fill:#FFFFFF, stroke:#757575
+ style subGraph1 fill:#FFFFFF, stroke:#757575
+</pre>
+
 
 ## Conclusion
 Phoenix Router and Routex, along with its extensions, form a powerful

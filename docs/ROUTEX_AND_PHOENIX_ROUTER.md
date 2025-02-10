@@ -10,7 +10,7 @@ understood through an analogy. As the saying goes, "a picture is worth a
 thousand words," this document also includes an illustrative blueprint.
 
 
-## Anology: the housing project
+## Analogy: the housing project
 
 Imagine you're a *real estate developer* planning to build several houses. You
 have a general vision for the houses (your route definitions in `route.ex`) and

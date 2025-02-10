@@ -62,7 +62,7 @@ To help you understand where Routex fits in.
 
 ### [How Routex and Phoenix Router Work Together](docs/ROUTEX_AND_PHOENIX_ROUTER.md)
 Understanding how Routex, its extensions, and Phoenix Router work together can
-be tricky at first sight. To help you understand, we came up with an anology.
+be tricky at first sight. To help you understand, we came up with an analogy.
 
 ### [Routex compared to Phoenix Router and Cldr Routes](docs/COMPARISON.md)
 We published a comparison with the intended to help you understand

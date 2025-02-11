@@ -17,6 +17,7 @@ defmodule Routex.Matchable do
   defrecord(:matchable,
     hosts: [],
     path: [],
+    trailing_slash: [],
     query: [],
     fragment: []
   )
@@ -57,41 +58,35 @@ defmodule Routex.Matchable do
     # 1.16x slower (+0.29 μs) | 0.74x memory usage (-168 B)
 
     regex =
-      ~r{^(([a-z][a-z0-9\+\-\.]*):)?(//([^/?#]*))?((?:(?:[^#?]*):?\#{)*(?:[^?#]*))(\?([^#](*:?\#{)[^#]*))?(#(.*))?}i
+      ~r"^(?P<scheme>[a-z][a-z0-9+\-.]*:)?(?P<authority>(?:\/\/)?[^/?#]*)(?P<path>(?:(?:\/(?:[^/?#]+|#\{[^}]+\}))+)?)(?P<trailing_slash>\/?)(?P<query>\?[^#]*)?(?P<fragment>#[^#]*)?$"
 
     parts = Regex.run(regex, input)
 
     destructure [
                   _full,
-                  # 1
                   _scheme_with_colon,
-                  # 2
-                  _scheme,
-                  # 3
-                  _authority_with_slashes,
-                  # 4
                   authority,
-                  # 5
-                  path,
-                  # 6
+                  maybe_path,
+                  maybe_trailing_slash,
                   query_with_question_mark,
-                  # 7
-                  _query,
-                  # 8
-                  fragment_with_hash,
-                  # 9
-                  _fragment
+                  fragment_with_hash
                 ],
                 parts
 
     authority = nillify(authority)
-    path = nillify(path)
+
+    {path, trailing_slash} =
+      if maybe_path == "" && maybe_trailing_slash == @path_separator,
+        do: {@path_separator, []},
+        else: {nillify(maybe_path), nillify(maybe_trailing_slash)}
+
     query_with_question_mark = nillify(query_with_question_mark)
     fragment_with_hash = nillify(fragment_with_hash)
 
     matchable(
       hosts: authority && List.wrap(authority),
       path: path && split_path(path),
+      trailing_slash: trailing_slash && List.wrap(trailing_slash),
       query: query_with_question_mark && List.wrap(query_with_question_mark),
       fragment: fragment_with_hash && List.wrap(fragment_with_hash)
     )
@@ -272,10 +267,11 @@ defmodule Routex.Matchable do
     hosts_ast = Macro.var(:hosts, __MODULE__)
     query_ast = Macro.var(:query, __MODULE__)
     fragment_ast = Macro.var(:fragment, __MODULE__)
+    trailing_slash_ast = Macro.var(:trailing_slash, __MODULE__)
 
     quote do
-      {:matchable, unquote(hosts_ast), unquote(path_ast), unquote(query_ast),
-       unquote(fragment_ast)}
+      {:matchable, unquote(hosts_ast), unquote(path_ast), unquote(trailing_slash_ast),
+       unquote(query_ast), unquote(fragment_ast)}
     end
   end
 
@@ -292,8 +288,10 @@ defmodule Routex.Matchable do
   """
 
   def to_string(record) do
-    matchable(path: path, query: query, fragment: fragment) = record
-    Enum.join([path, query, fragment])
+    matchable(path: path, trailing_slash: trailing_slash, query: query, fragment: fragment) =
+      record
+
+    Enum.join([path, trailing_slash, query, fragment])
   end
 
   def to_ast_segments(record) do

@@ -64,10 +64,11 @@ defmodule Routex.Extension.Assigns do
           %{assigns: Map.new([{namespace, Map.new(assigns)}])}
         end
 
-      # using direct manipulation
+      # duplicated for easy access in conn while also providing it as an Attr
       %{
         route
-        | private: Map.put(route.private, :routex, Map.merge(route.private.routex, assigns_map))
+        | private: Map.put(route.private, :routex, Map.merge(route.private.routex, assigns_map)),
+          assigns: Map.merge(route.assigns || %{}, assigns_map.assigns)
       }
     end
   end

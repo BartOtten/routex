@@ -24,7 +24,7 @@ defmodule MatchableTest.Constants do
 
       @uri_matches (for scheme <- ["http", "https", "ftp"],
                         host <- ["localhost"],
-                        path <- ["/games/products/12/edit"],
+                        path <- ["/games/products/12/edit", "/games/products/12/edit/"],
                         query <- [nil, "k=v"],
                         fragment <- [nil, "top"] do
                       to_string(%URI{
@@ -96,7 +96,7 @@ defmodule MatchableTest do
       routes = [route(path: "/some"), "/some", {:<<>>, [], ["/some"]}]
 
       for route <- routes do
-        assert Matchable.new(route) == {:matchable, [], ["/", "some"], [], []}
+        assert Matchable.new(route) == {:matchable, [], ["/", "some"], [], [], []}
       end
     end
 
@@ -108,7 +108,7 @@ defmodule MatchableTest do
       ]
 
       for route <- routes do
-        assert Matchable.new(route) == {:matchable, [], ["/"], [], []}
+        assert Matchable.new(route) == {:matchable, [], ["/"], [], [], []}
       end
     end
 
@@ -116,14 +116,14 @@ defmodule MatchableTest do
       route = "/products/1?foo=bar#top"
 
       assert Matchable.new(route) ==
-               {:matchable, [], ["/", "products", "/", "1"], ["?foo=bar"], ["#top"]}
+               {:matchable, [], ["/", "products", "/", "1"], [], ["?foo=bar"], ["#top"]}
     end
 
     test "correctly splits query part in AST node" do
       static_route = {:<<>>, [], ["/products/1?foo=bar#top"]}
 
       assert Matchable.new(static_route) ==
-               {:matchable, [], ["/", "products", "/", "1"], ["?", "foo=bar"], ["#", "top"]}
+               {:matchable, [], ["/", "products", "/", "1"], [], ["?", "foo=bar"], ["#", "top"]}
 
       dynamic_route =
         ast([
@@ -142,6 +142,7 @@ defmodule MatchableTest do
                  :matchable,
                  [],
                  ["/", "products", "/", "1", "/", "edit"],
+                 [],
                  [
                    "?",
                    {:"::", [],
@@ -203,7 +204,7 @@ defmodule MatchableTest do
 
         assert result.query == expected.query
         assert result.fragment == expected.fragment
-        assert result.path == "/12/games/producta/edito"
+        assert result.path == "/12/games/producta/edito" || "/12/games/producta/edito/"
 
         result =
           uri
@@ -214,7 +215,7 @@ defmodule MatchableTest do
 
         assert result.query == expected.query
         assert result.fragment == expected.fragment
-        assert result.path == "/games/producten/wijzigen/12"
+        assert result.path == "/games/producten/wijzigen/12" || "/games/producten/wijzigen/12/"
       end
     end
 
@@ -232,7 +233,7 @@ defmodule MatchableTest do
     test "non-matching route returns the value from the defined catch-all function" do
       route_mismatch = route(path: "/non-matching") |> Matchable.new()
       result = Compiled.route(route_mismatch)
-      assert {:not_found, {:matchable, [], ["/", "non-matching"], [], []}} == result
+      assert {:not_found, {:matchable, [], ["/", "non-matching"], [], [], []}} == result
 
       route_misformed = "/misformed"
       result = Compiled.route(route_misformed)

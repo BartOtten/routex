@@ -7,6 +7,7 @@ defmodule Routex.Extension do
   - transform
   - post_transform
   - create_helpers
+  - liveview_hooks
 
   See also: [Routex Extensions](EXTENSIONS.md)
   """
@@ -40,6 +41,15 @@ defmodule Routex.Extension do
   @callback post_transform(routes, backend, env) :: routes
 
   @doc """
+  The `liveview_hooks/3` callback is called in the last stage with a list of
+  routes belonging to a Routex backend, the name of the Routex backend and
+  the current environment. It is expected to return Elixir AST.
+
+  The AST is included in `MyAppWeb.Router.RoutexHelpers.on_mount`.
+  """
+  @callback liveview_hooks(routes, backend, env) :: Macro.output()
+
+  @doc """
   The `create_helpers/3` callback is called in the last stage with a list of
   routes belonging to a Routex backend, the name of the Routex backend and
   the current environment. It is expected to return Elixir AST.
@@ -48,5 +58,9 @@ defmodule Routex.Extension do
   """
   @callback create_helpers(routes, backend, env) :: Macro.output()
 
-  @optional_callbacks transform: 3, create_helpers: 3, configure: 2, post_transform: 3
+  @optional_callbacks configure: 2,
+                      transform: 3,
+                      post_transform: 3,
+                      create_helpers: 3,
+                      liveview_hooks: 3
 end

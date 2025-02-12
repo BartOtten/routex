@@ -133,6 +133,28 @@ defmodule Routex.Extension.Translations do
     [prelude | triggers_ast]
   end
 
+  @impl Routex.Extension
+  def liveview_hooks(_routes, _backend, _env) do
+    quote context: Routex.Processing do
+      socket =
+        Phoenix.LiveView.attach_hook(
+          socket,
+          unquote(__MODULE__),
+          :handle_params,
+          &unquote(__MODULE__).handle_params/3
+        )
+    end
+  end
+
+  @doc """
+  Hook attached to the `handle_params` stage in the LiveView life cycle
+  """
+  def handle_params(_params, url, socket) do
+    opts = socket.private.routex.helpers_mod.attrs(url)
+    Gettext.put_locale(opts.language || opts.locale)
+    {:cont, socket}
+  end
+
   defp translate(path, locale, backend, domain)
 
   defp translate(path, locale, backend, domain) when is_binary(path) do

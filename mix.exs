@@ -2,7 +2,7 @@ defmodule Routex.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/BartOtten/routex"
-  @version "1.0.0"
+  @version "1.1.0"
   @name "Routex"
 
   def project do

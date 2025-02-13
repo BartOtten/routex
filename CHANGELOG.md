@@ -5,6 +5,23 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.1.0](https://github.com/BartOtten/routex/compare/v1.0.0...v1.1.0) (2025-02-13)
+
+
+
+
+### Features:
+
+* provide assigns directly in conn
+
+* core: add function to print critical messages
+
+### Bug Fixes:
+
+* match patterns fail on trailing slash
+
+* undefined on_mount/4, silent missing attrs/1
+
 ## [v1.0.0](https://github.com/BartOtten/routex/compare/v0.3.0-alpha.4...v1.0.0) (2025-02-03)
 
 

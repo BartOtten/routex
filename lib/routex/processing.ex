@@ -36,6 +36,14 @@ defmodule Routex.Processing do
   @type extension_module :: module
   @type routes :: [Phoenix.Router.Route.t(), ...]
 
+  @supported_livecycle_stages [
+    :handle_params,
+    :handle_event,
+    :handle_info,
+    :handle_async,
+    :after_render
+  ]
+
   @doc """
   Callback executed before compilation of a `Phoenix Router`. This callback is added
   to the `@before_compile` callbacks by `Routex.Router`.
@@ -71,19 +79,42 @@ defmodule Routex.Processing do
     # grouping per config module allows extensions to use accumulated values.
     routes_per_backend = group_by_backend(routes)
 
-    # phase 1: transform route structs
+    # phase 1: configure (done elsewhere)
+
+    # phase 2: transform route structs
     processed_routes_per_backend_p1 =
       for {backend, routes} <- routes_per_backend do
         {backend, transform_routes(routes, backend, env)}
       end
 
-    # phase 2: post transform route structs
+    # phase 3: post transform route structs
     processed_routes_per_backend_p2 =
       for {backend, routes} <- processed_routes_per_backend_p1 do
         {backend, post_transform_routes(routes, backend, env)}
       end
 
-    # phase 3: generate ast for helpers
+    # phase 4: generate ast for LiveView hooks and Plugs
+    liveview_hooks_ast =
+      for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
+        create_liveview_hooks(routes, backend, env)
+      end
+      |> List.flatten()
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    on_mount_ast = on_mount_ast(liveview_hooks_ast, env)
+
+    plug_calls_ast =
+      for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
+        create_plug_call(routes, backend, env)
+      end
+      |> List.flatten()
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    plug_ast = plug_ast(plug_calls_ast, env)
+
+    # phase 5: generate ast for helper functions
     helpers_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_helper_functions(routes, backend, env)
@@ -100,7 +131,7 @@ defmodule Routex.Processing do
     |> remove_build_info()
     |> write_routes(env)
 
-    create_helper_module(helpers_ast, env)
+    create_helper_module(helpers_ast, on_mount_ast, plug_ast, env)
 
     IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
     :ok
@@ -110,7 +141,7 @@ defmodule Routex.Processing do
     routes
     |> Enum.with_index()
     |> Enum.map(&put_initial_attrs/1)
-    |> Enum.group_by(&Attrs.get(&1, :backend))
+    |> Enum.group_by(&Attrs.get(&1, :__backend__))
   end
 
   defp put_initial_attrs({{route, exprs}, index}),
@@ -128,9 +159,9 @@ defmodule Routex.Processing do
     Attrs.merge(route, values)
   end
 
-  @spec helper_mod_name(Macro.Env.t()) :: module
+  @spec helper_mod_name(module) :: module
   @doc false
-  def helper_mod_name(env), do: Module.concat([env.module, :RoutexHelpers])
+  def helper_mod_name(router), do: Module.concat([router, :RoutexHelpers])
 
   @spec transform_routes(routes, backend, Macro.Env.t()) :: routes
   defp transform_routes(routes, nil, _env), do: routes
@@ -156,6 +187,80 @@ defmodule Routex.Processing do
     end
   end
 
+  @spec create_liveview_hooks(routes, backend, Macro.Env.t()) :: Macro.t()
+  defp create_liveview_hooks(_routes, nil, _env), do: nil
+
+  defp create_liveview_hooks(_routes, backend, env) do
+    Code.ensure_loaded!(backend)
+    helper_mod = Routex.Processing.helper_mod_name(env.module)
+
+    for callback <- @supported_livecycle_stages do
+      ast =
+        for ext <- backend.extensions() do
+          if callback_exists?(ext, callback, 3) do
+            quote do
+              {_, socket} = unquote(ext).unquote(callback)(params, url, socket, attrs)
+            end
+          end
+        end
+        |> Enum.reject(&is_nil/1)
+        |> Enum.uniq()
+
+      if ast != [] do
+        quote context: Routex.Processing do
+          socket =
+            Phoenix.LiveView.attach_hook(
+              socket,
+              unquote(backend),
+              unquote(callback),
+              fn params, url, socket ->
+                attrs = unquote(helper_mod).attrs(url)
+                unquote_splicing(ast)
+                {:cont, socket}
+              end
+            )
+        end
+      end
+    end
+  end
+
+  @spec plug_ast(plug_call_ast :: Macro.t(), env :: Macro.Env.t()) :: Macro.t()
+  defp plug_ast(_plug_calls_ast, nil), do: nil
+
+  defp plug_ast(plug_calls_ast, _env) do
+    quote do
+      def init(opts), do: opts
+      unquote_splicing(plug_calls_ast)
+    end
+  end
+
+  defp create_plug_call(_routes, nil, _env), do: nil
+
+  defp create_plug_call(_routes, backend, env) do
+    Code.ensure_loaded!(backend)
+    helper_mod = Routex.Processing.helper_mod_name(env.module)
+
+    ast =
+      for ext <- backend.extensions() do
+        if callback_exists?(ext, :call, 2) do
+          quote do
+            conn = unquote(ext).unquote(:call)(conn, opts, attrs)
+          end
+        end
+      end
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    quote do
+      def call(conn = %{private: %{routex: %{__backend__: unquote(backend)}}}, opts) do
+        url = Map.get(conn, :request_path)
+        attrs = unquote(helper_mod).attrs(url)
+
+        unquote_splicing(ast)
+      end
+    end
+  end
+
   defp create_helper_functions(routes, backend, env) do
     for extension <- backend.extensions(), extension != [] do
       exec_when_defined(backend, extension, :create_helpers, nil, [
@@ -166,10 +271,10 @@ defmodule Routex.Processing do
     end
   end
 
-  @spec create_helper_module(Macro.t(), Macro.Env.t()) ::
+  @spec create_helper_module(Macro.t(), Macro.t(), Macro.t(), Macro.Env.t()) ::
           {:module, module, binary, term}
-  defp create_helper_module(extensions_ast, env) do
-    module = helper_mod_name(env)
+  defp create_helper_module(extensions_ast, on_mount_ast, plug_ast, env) do
+    module = helper_mod_name(env.module)
     IO.puts(["Create or update helper module ", inspect(module)])
 
     # the on_mount callback relies on the availability of `attr/1`. As
@@ -194,67 +299,54 @@ defmodule Routex.Processing do
     prelude =
       quote do
         require Logger
-        unquote((has_attr_func && on_mount_ast(env)) || nil)
       end
 
-    ast = [prelude | extensions_ast] |> List.flatten() |> Enum.uniq()
+    ast = [prelude, extensions_ast, on_mount_ast, plug_ast] |> List.flatten() |> Enum.uniq()
     :ok = Macro.validate(ast)
     Module.create(module, ast, env)
   end
 
-  defp on_mount_ast(env) do
-    {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
-    module = helper_mod_name(env)
+  defp on_mount_ast(liveview_hooks_ast, env) do
+    module = Routex.Processing.helper_mod_name(env.module)
 
-    assign_code =
-      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
-        quote do
-          opts = unquote(module).attrs(url)
-
-          socket =
-            %{
-              socket
-              | private:
-                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
-            }
-
-          {:cont,
-           Phoenix.LiveView.assign(
-             socket,
-             [url: url, __branch__: opts.__branch__] ++
-               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
-           )}
-        end
-      else
-        quote do
-          opts = unquote(module).attrs(url)
-
-          socket =
-            %{
-              socket
-              | private:
-                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
-            }
-
-          {:cont,
-           Phoenix.Component.assign(
-             socket,
-             [url: url, __branch__: opts.__branch__] ++
-               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
-           )}
-        end
+    rtx_liveview_hook_ast =
+      quote context: Routex.Processing do
+        socket =
+          Phoenix.LiveView.attach_hook(
+            socket,
+            unquote(__MODULE__),
+            :handle_params,
+            &unquote(module).handle_params/3
+          )
       end
 
     quote do
       def on_mount(_key, params, session, socket) do
+        unquote(rtx_liveview_hook_ast)
+        unquote_splicing(liveview_hooks_ast)
+        {:cont, socket}
+      end
+
+      def handle_params(_params, url, socket) do
+        # as :helpers_mod is not yet set in the socket, we do manually
+        opts = unquote(module).attrs(url)
+
         socket =
-          Phoenix.LiveView.attach_hook(
+          %{
+            socket
+            | private:
+                Map.put(socket.private, :routex, %{
+                  helpers_mod: unquote(module),
+                  url: url,
+                  __branch__: opts.__branch__
+                })
+          }
+
+        socket =
+          Phoenix.Component.assign(
             socket,
-            :set_rtx,
-            :handle_params,
-            fn _params, url, socket ->
-              unquote(assign_code)
-            end
+            url: url,
+            __branch__: opts.__branch__
           )
 
         {:cont, socket}

@@ -5,17 +5,10 @@
 
 Routex Extensions extend the functionality provided by Routex to transform
 routes or generate new route based helper functions. Each extension is a module
-which implements the `Routex.Extension` behaviour. It has to implement one or
-multiple callbacks:
-
-- configure/2
-- transform/3
-- post_transform/3
-- create_helpers/3
-- liveview_hooks/3
+which implements the `Routex.Extension` behaviour.
 
 Routex will call those callbacks at different stages before Routex handsoff the
-result to `Phoenix.Router` for compilation.
+list with routes to `Phoenix.Router` for compilation.
 
 
 ## Callbacks and stages
@@ -95,16 +88,18 @@ route's attributes, unaware of how that locale was initially configured.
 The `post_transform` stage is meant to set `Routex.Attrs` knowing all other
 properties of a route are available and no path with be transformed any further.
 
-### Stage 4: Create LiveView hooks
-In this stage hooks can be generated which will be added to the `on_mount`
-callback in `MyAppWeb.Router.RoutexHelpers`.
+### Stage 4: Create livecycle callbacks (Plug's and LiveView Hooks)
+Routex will detect if certain Phoenix livecycle functions are available in
+extensions. The callbacks are chained and added to Plug `call` and LiveView
+`on_mount` callbacks in `MyAppWeb.Router.RoutexHelpers`.
 
-As a result the developer only has to add `on_mount(ExampleWeb.Router.RoutexHelpers)`
-for all hooks to be included in the app.
+As a result the developer only has to add `plug MyAppWeb.Router.RoutexHelpers`
+and `on_mount(ExampleWeb.Router.RoutexHelpers)` for all extensions' plugs and
+hooks to be included in the app.
 
-The `liveview_hooks/3` callback is called with a list of routes belonging to a
-Routex backend, the name of the Routex backend and the current environment.
-It is expected to return Elixir AST, manipulating the `socket` binding.
+The first given arguments given to these callbacks adhere to the official
+specifications. One additional argument, `attrs` is added with the
+`Routex.Attrs` of the current route.
 
 ### Stage 5: Create helper functions
 In this stage helper functions can be generated which will be added to

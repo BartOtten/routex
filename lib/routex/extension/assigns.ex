@@ -73,29 +73,15 @@ defmodule Routex.Extension.Assigns do
     end
   end
 
-  @impl Routex.Extension
-  def liveview_hooks(_routes, _backend, _env) do
-    quote context: Routex.Processing do
-      socket =
-        Phoenix.LiveView.attach_hook(
-          socket,
-          unquote(__MODULE__),
-          :handle_params,
-          &unquote(__MODULE__).handle_params/3
-        )
-    end
-  end
-
   @doc """
   Hook attached to the `handle_params` stage in the LiveView life cycle
   """
-  def handle_params(_params, url, socket) do
-    opts = socket.private.routex.helpers_mod.attrs(url)
-
+  @impl Routex.Extension
+  def handle_params(_params, _url, socket, attrs \\ %{}) do
     socket =
       Phoenix.Component.assign(
         socket,
-        opts |> Map.get(:assigns, %{}) |> Map.to_list()
+        attrs |> Map.get(:assigns, %{}) |> Map.to_list()
       )
 
     {:cont, socket}

@@ -134,25 +134,23 @@ defmodule Routex.Extension.Translations do
   end
 
   @impl Routex.Extension
-  def liveview_hooks(_routes, _backend, _env) do
-    quote context: Routex.Processing do
-      socket =
-        Phoenix.LiveView.attach_hook(
-          socket,
-          unquote(__MODULE__),
-          :handle_params,
-          &unquote(__MODULE__).handle_params/3
-        )
-    end
-  end
-
   @doc """
   Hook attached to the `handle_params` stage in the LiveView life cycle
   """
-  def handle_params(_params, url, socket) do
-    opts = socket.private.routex.helpers_mod.attrs(url)
-    Gettext.put_locale(opts.language || opts.locale)
+  def handle_params(_params, _url, socket, attrs \\ %{}) do
+    set_locale(attrs[:locale], attrs[:language])
     {:cont, socket}
+  end
+
+  @impl Routex.Extension
+  def call(conn, _opts, attrs \\ %{}) do
+    set_locale(attrs[:locale], attrs[:language])
+    conn
+  end
+
+  def set_locale(locale, language) do
+    function_exported?(Gettext,:put_locale, 1) && apply(Gettext, :put_locale, [language || locale])
+    function_exported?(Cldr,:put_locale, 1) && apply(Cldr, :put_locale, [locale || language])
   end
 
   defp translate(path, locale, backend, domain)
@@ -189,7 +187,7 @@ defmodule Routex.Extension.Translations do
   defp detect_language!(<<lang::binary-size(3), ?_, _rest::binary>>, _route), do: lang
 
   defp detect_language!(nil, route) do
-    backend = route |> Attrs.get(:backend) |> to_string()
+    backend = route |> Attrs.get(:__backend__) |> to_string()
 
     raise("Routex backend `#{backend}` lists extension `#{__MODULE__}` but
  neither the attribute :language nor :locale was found in private.routex

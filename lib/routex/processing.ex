@@ -54,7 +54,7 @@ defmodule Routex.Processing do
 
     # Enable to get more descriptive error messages during development.
     # Causes compilation failure when enabled.
-    wrap_in_task = System.get_env("ROUTEX_DEBUG") == "true"
+    wrap_in_task = debug?()
 
     if wrap_in_task do
       Utils.alert(
@@ -66,6 +66,10 @@ defmodule Routex.Processing do
     else
       execute_callbacks(env)
     end
+  end
+
+  defp debug? do
+    System.get_env("ROUTEX_DEBUG") == "true"
   end
 
   @doc """
@@ -94,6 +98,7 @@ defmodule Routex.Processing do
       end
 
     # phase 4: generate ast for LiveView hooks and Plugs
+
     liveview_hooks_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_liveview_hooks(routes, backend, env)
@@ -193,6 +198,7 @@ defmodule Routex.Processing do
   defp create_liveview_hooks(_routes, backend, env) do
     Code.ensure_loaded!(backend)
     helper_mod = Routex.Processing.helper_mod_name(env.module)
+    fn_ast = fn_ast(backend, :socket)
 
     for callback <- @supported_livecycle_stages do
       ast =
@@ -206,7 +212,8 @@ defmodule Routex.Processing do
         |> Enum.reject(&is_nil/1)
         |> Enum.uniq()
 
-      if ast != [] do
+      # TODO: This wont work for things like after_render callback
+      if ast != [] || (callback == :handle_params && fn_ast != []) do
         quote context: Routex.Processing do
           socket =
             Phoenix.LiveView.attach_hook(
@@ -215,6 +222,7 @@ defmodule Routex.Processing do
               unquote(callback),
               fn params, url, socket ->
                 attrs = unquote(helper_mod).attrs(url)
+                unquote_splicing(fn_ast)
                 unquote_splicing(ast)
                 {:cont, socket}
               end
@@ -222,6 +230,51 @@ defmodule Routex.Processing do
         end
       end
     end
+  end
+
+  @doc """
+  Generates Abstract Syntax Tree (AST) to be included in LiveView's `on_mount` (when the type is :socket)
+  and Plug's `call` (when the type is :conn). Skips the call to `mod.fun` if `args` includes an argument specific to
+  either type and skips the call to mod.func . Arguments specific to a type are injected into the AST as variables.
+  """
+
+  def fn_ast(backend, type) do
+    config = backend.config()
+
+    args_per_type = %{
+      socket: MapSet.new([:params, :uri, :socket]),
+      conn: MapSet.new([:conn])
+    }
+
+    config
+    |> Map.get(:attrs_into, [])
+    |> Enum.filter(fn {_mod, _fun, args} ->
+      args_ms = MapSet.new(args)
+
+      (type == :socket && MapSet.disjoint?(args_ms, args_per_type.conn)) ||
+        (type == :conn && MapSet.disjoint?(args_ms, args_per_type.socket))
+    end)
+    |> Enum.map(fn {mod, fun, args} ->
+      fun_args =
+        Enum.map(args, fn arg ->
+          cond do
+            match?("Elixir." <> _, Atom.to_string(arg)) -> arg
+            MapSet.member?(args_per_type[type], arg) -> Macro.var(arg, Routex.Processing)
+            is_atom(arg) -> quote do: attrs[unquote(arg)] || unquote(arg)
+          end
+        end)
+
+      if :socket in args || :conn in args do
+        quote context: Routex.Processing do
+          unquote(Macro.var(type, Routex.Processing)) =
+            unquote(mod).unquote(fun)(unquote_splicing(fun_args))
+        end
+      else
+        quote context: Routex.Processing do
+          unquote(mod).unquote(fun)(unquote_splicing(fun_args))
+        end
+      end
+    end)
   end
 
   @spec plug_ast(plug_call_ast :: Macro.t(), env :: Macro.Env.t()) :: Macro.t()
@@ -240,6 +293,8 @@ defmodule Routex.Processing do
     Code.ensure_loaded!(backend)
     helper_mod = Routex.Processing.helper_mod_name(env.module)
 
+    fn_ast = fn_ast(backend, :conn)
+
     ast =
       for ext <- backend.extensions() do
         if callback_exists?(ext, :call, 2) do
@@ -256,7 +311,10 @@ defmodule Routex.Processing do
         url = Map.get(conn, :request_path)
         attrs = unquote(helper_mod).attrs(url)
 
+        unquote_splicing(fn_ast)
         unquote_splicing(ast)
+
+        conn
       end
     end
   end
@@ -329,7 +387,7 @@ defmodule Routex.Processing do
 
       def handle_params(_params, url, socket) do
         # as :helpers_mod is not yet set in the socket, we do manually
-        opts = unquote(module).attrs(url)
+        attrs = unquote(module).attrs(url)
 
         socket =
           %{
@@ -338,7 +396,7 @@ defmodule Routex.Processing do
                 Map.put(socket.private, :routex, %{
                   helpers_mod: unquote(module),
                   url: url,
-                  __branch__: opts.__branch__
+                  __branch__: attrs.__branch__
                 })
           }
 
@@ -346,7 +404,7 @@ defmodule Routex.Processing do
           Phoenix.Component.assign(
             socket,
             url: url,
-            __branch__: opts.__branch__
+            __branch__: attrs.__branch__
           )
 
         {:cont, socket}

@@ -97,8 +97,7 @@ defmodule Routex.Processing do
         {backend, post_transform_routes(routes, backend, env)}
       end
 
-    # phase 4: generate ast for LiveView hooks and Plugs
-
+    # phase 4: generate AST for LiveView hooks and Plugs
     liveview_hooks_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_liveview_hooks(routes, backend, env)
@@ -119,7 +118,7 @@ defmodule Routex.Processing do
 
     plug_ast = plug_ast(plug_calls_ast, env)
 
-    # phase 5: generate ast for helper functions
+    # phase 5: generate AST for helper functions
     helpers_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_helper_functions(routes, backend, env)
@@ -233,12 +232,70 @@ defmodule Routex.Processing do
   end
 
   @doc """
-  Generates Abstract Syntax Tree (AST) to be included in LiveView's `on_mount` (when the type is :socket)
-  and Plug's `call` (when the type is :conn). Skips the call to `mod.fun` if `args` includes an argument specific to
-  either type and skips the call to mod.func . Arguments specific to a type are injected into the AST as variables.
+  Generates Abstract Syntax Tree (AST) to be included in Plug's `call`.
+
+  **Special keys**
+  1. `:conn`: converted to variable `conn`, which is provided by the `call` function head. Causes the result of the function to be assigned to `conn` in return.
+  2. `:socket`, `:params`, or `:uri`: this function will not be included.
+  3. key in `attrs`: converted to variable `attrs[key]`
+
+  **Example**
+  ```elixir
+  attrs_into: [
+  {Plug.Conn, :merge_assigns, [:conn, :assigns]},  # rule 1
+  {Phoenix.Component, :assign, [:socket, :assigns]},  # rule 2
+  {Gettext, :put_locale, [:locale]},  # rule 3
+  ]
+  ```
+
+  **Pseudo result**
+  ```elixir
+  def call(conn, opts , attrs \\ %{}) do
+     conn = Plug.Conn.merge_assigns(conn, attrs[:assigns])
+     Gettext.put_locale(attrs[:locale])
+
+     conn
+  end
+  ```
+
+  """
+  def plug_funcall_ast(backend) do
+    fn_ast(backend, :conn)
+  end
+
+  @doc """
+  Generates Abstract Syntax Tree (AST) to be included in a `handle_params` livecycle hook.
+
+  **Special keys**
+  1. `:socket`, `:params`, or `:uri`: converted to variables, which are provided by the `handle_params` function head. Causes the result of the function to be assigned to `socket` in return.
+  2. `conn`: this function will not be included.
+  3. key in `attrs`: converted to variable `attrs[key]`
+
+  **Example**
+  ```elixir
+  attrs_into: [
+  {Plug.Conn, :merge_assigns, [:conn, :assigns]},  # rule 1
+  {Phoenix.Component, :assign, [:socket, :assigns]},  # rule 2
+  {Gettext, :put_locale, [:locale]},  # rule 3
+  ]
+  ```
+
+  **Pseudo result**
+  ```elixir
+  def handle_params(params, uri, socket , attrs \\ %{}) do
+    socket = Phoenix.Component.assign(socket, attrs[:assigns])
+    Gettext.put_locale(attrs[:locale])
+
+    {:cont, socket}
+  end
+  ```
   """
 
-  def fn_ast(backend, type) do
+  def on_mount_funcall_ast(backend) do
+    fn_ast(backend, :socket)
+  end
+
+  defp fn_ast(backend, type) do
     config = backend.config()
 
     args_per_type = %{

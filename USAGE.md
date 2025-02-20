@@ -86,6 +86,9 @@ routes)
 
 ```diff
 # file: router.ex
+  pipeline :browser do
++     plug __MODULE__.RoutexHelpers
+  end
   scope "/", ExampleWeb, host: "admin.", as: :admin do
     pipe_through :browser
 

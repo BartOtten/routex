@@ -14,7 +14,6 @@ defmodule Routex.Extension do
 
   """
 
-
   @type backend :: Routex.Backend.t()
   @type env :: Macro.Env.t()
   @type opts :: list
@@ -58,14 +57,22 @@ defmodule Routex.Extension do
 
   for {stage, _arity} <- @supported_livecycle_stages do
     @doc ~s"""
-    Callback for the `#{stage}` livecycle stage with the same name. Receives an additional argument `attrs` with `Routex.Attrs` for the current
-    route. See also [Livecycle callbacks](#livecycle-callbacks)
+    Callback for the `#{stage}` livecycle stage with the same name. Receives an
+    additional argument `attrs` with `Routex.Attrs` of the current route. See
+    also [Livecycle callbacks](#livecycle-callbacks)
 
     The callback should return either `{:cont, socket}` or `{:halt, socket}`
     """
     @callback unquote(stage)(params, url, socket, attrs) :: {:cont, %Phoenix.Socket{}}
   end
 
+  @doc ~s"""
+  Callback for the Plug pipeline. Receives an additional argument `attrs` with
+  `Routex.Attrs` of the current route. See also [Livecycle
+  callbacks]
+
+  The callback should return `conn`
+  """
   @callback call(conn, opts, attrs) :: conn
 
   @doc """
@@ -79,6 +86,4 @@ defmodule Routex.Extension do
 
   @optional_callbacks [configure: 2, transform: 3, post_transform: 3, create_helpers: 3, call: 3] ++
                         @supported_livecycle_stages
-
-  
 end

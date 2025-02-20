@@ -128,7 +128,7 @@ defmodule Routex.Extension.Interpolation do
         key = attr |> String.to_atom()
 
         error_msg =
-          "#{route |> Attrs.get(:backend) |> to_string()} lists this extention but key :#{key} was not found in private.routex of route #{inspect(Macro.escape(route), pretty: true)}."
+          "#{route |> Attrs.get(:__backend__) |> to_string()} lists this extention but key :#{key} was not found in private.routex of route #{inspect(Macro.escape(route), pretty: true)}."
 
         route
         |> Attrs.get!(key, error_msg)

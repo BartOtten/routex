@@ -67,9 +67,29 @@ defmodule Routex.Extension.Assigns do
       # duplicated for easy access in conn while also providing it as an Attr
       %{
         route
-        | private: Map.put(route.private, :routex, Map.merge(route.private.routex, assigns_map)),
-          assigns: Map.merge(route.assigns || %{}, assigns_map.assigns)
+        | private: Map.put(route.private, :routex, Map.merge(route.private.routex, assigns_map))
+          # assigns: Map.merge(route.assigns || %{}, assigns_map.assigns)
       }
     end
+  end
+
+  @doc """
+  Hook attached to the `handle_params` stage in the LiveView life cycle
+  """
+  @impl Routex.Extension
+  def handle_params(_params, _uri, socket, attrs \\ %{}) do
+    assigns = Map.get(attrs, :assigns, %{})
+    socket = Phoenix.Component.assign(socket, assigns)
+
+    {:cont, socket}
+  end
+
+  @doc """
+  Plug added to the Plug pipeline
+  """
+  @impl Routex.Extension
+  def call(conn, _opts, attrs \\ %{}) do
+    assigns = Map.get(attrs, :assigns, [])
+    Plug.Conn.merge_assigns(conn, assigns)
   end
 end

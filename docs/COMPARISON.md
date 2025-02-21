@@ -48,6 +48,10 @@ library](https://github.com/elixir-cldr/cldr). It therefor requires the
 integration and configuration of the `Cldr` and `Gettext` libraries. Depending
 on your project this might require additional setup besides Cldr Routes itself.
 
+The monolitic approach, in contrast to Routex, in combination with it's
+maintenance of the author of Cldr ensures the seamless integration with the Cldr
+ecosystem.
+
 **Routex**, on the other hand, is designed as an standalone, extensible
 framework. As a result Routex has no hard dependency on other libraries.
 However, enabled extensions may used other libraries (such as Gettext for
@@ -61,12 +65,12 @@ only the components and dependencies necessary for their specific use case.
 
 **Cldr Routes**' design may establish certain limitations when it comes to
 adding new features or modifying existing behavior in Cldr Routes. Due to its
-tight integration with the `Cldr` and `Gettext` libraries new feature or change
-in behavior will likely need to align with the overall structure and
-functionality of `Cldr`. To implement a new feature or slightly different
-behavior downstream, developers typically need to fork the project.
+tight integration with the Cldr library new feature or change in behavior will
+likely need to align with the overall structure and functionality of Cldr. To
+implement a new feature or slightly different behavior downstream, developers
+typically need to fork the project.
 
-**Routex**, in contrast, simplifies the process of adding new features or
+**Routex**, in contrast, tries to simplify the process of adding new features or
 modifying existing behavior.
 
 Developers can create custom extensions that integrate seamlessly with the core
@@ -109,23 +113,21 @@ codebase modifications.
 
 ## Comparison Table
 
-| Feature                 | Routex                       | Cldr Routes                                          | Phoenix Router |
-|-------------------------|------------------------------|------------------------------------------------------|----------------|
-| **Localized routes**    | Yes                          | Yes                                                  | Basic          |
-| **Translated routes**   | Yes                          | Yes                                                  | No             |
-| **Route modifications** | Yes                          | No                                                   | No             |
-| **Drop-in Replacement** | Yes                          | No                                                   | N/A            |
-| **Extensible**          | Yes                          | No                                                   | Basic          |
-| **Route Manipulation**  | Limitless                    | Tailored for localization needs                       | Basic          |
-| **Dependencies**        | None                         | Cldr, Gettext                                        | None           |
-| **Code modifications**  | Minimal                      | Neutral                                              | Nihil          |
-|-------------------------|------------------------------|------------------------------------------------------|----------------|
-| **Generated code:**     |                              |                                                      |                |
-| **Helper functions**    | Many, provided by extensions | - Link headers\n - Route helpers \n- Verified routes | N/A            |
-| **Conn Plugs**          | Yes                          | No                                                   | No             |
-| **Liveview Hooks**      | Yes                          | No                                                   | No             |
-
-    ---
+| Feature                 | Routex                       | Cldr Routes                                              | Phoenix Router |
+|-------------------------|------------------------------|----------------------------------------------------------|----------------|
+| **Localized routes**    | Yes                          | Yes                                                      | Basic          |
+| **Translated routes**   | Yes                          | Yes                                                      | No             |
+| **Route modifications** | Yes                          | No                                                       | No             |
+| **Drop-in Replacement** | Yes                          | No                                                       | N/A            |
+| **Extensible**          | Yes                          | No                                                       | Basic          |
+| **Route Manipulation**  | Limitless                    | Tailored for localization needs                          | Basic          |
+| **Dependencies**        | None                         | Cldr, Gettext                                            | None           |
+| **Code modifications**  | Minimal                      | Neutral                                                  | Nihil          |
+|                         |                              |                                                          |                |
+| **Generated code:**     |                              |                                                          |                |
+| **Helper functions**    | Many, provided by extensions | - Link headers - Route helpers - Verified routes | N/A            |
+| **Conn Plugs**          | Yes                          | No                                                       | No             |
+| **Liveview Hooks**      | Yes                          | No                                                       | No             |
 
 In summary, each routing solution brings valuable capabilities to the table. Phoenix Router offers a reliable, built-in option for standard routing needs. Cldr Routes provides a specialized approach for multilingual URL management within the Cldr ecosystem. Meanwhile, Routex stands out with its advanced, customizable, and extension-driven approach—making it a versatile choice for those who require more than the basics.
 

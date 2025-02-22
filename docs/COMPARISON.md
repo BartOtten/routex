@@ -26,8 +26,8 @@ is the base other solutions build upon.
 
 Since version 1.8, it supports runtime path prefixing which automatically
 prefixes routes in templates with the result of one or multiple functions. This
-feature enables the most basic route localization, known for it's language
-prefixes (e.g `/en/products/12/edit` and `/fr/products/12/edit`)
+feature enables the most basic, and common, route localization known for it's
+language prefixes (e.g `/en/products` and `/fr/products`).
 
 
 ## Comparing Cldr Routes and Routex

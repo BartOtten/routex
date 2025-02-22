@@ -59,7 +59,8 @@ the feature set virtually limitless.
 - Custom assigns per route
 - Automated Liveview livecycle hooks and Plugs
 - Alternative routes
-- Reordered path segments
+- Reordered route segments
+- Route obfuscation
 - etc.
 
 

@@ -1,27 +1,33 @@
-# Phoenix Framework routing solutions compared
+# Routing Solutions for Phoenix: A Comparison of Key Differences
 
-When working with the Phoenix framework, developers may seek solutions to their
-routing needs; ranging from common needs such as internationalization and
-localization to more rare needs such as route obfuscation.
+When working with the Phoenix framework, developers often seek solutions to
+address their routing needs. These routing needs range from common requirements
+such as internationalization and localization to more specialized needs such as
+route obfuscation.
 
-This guide outlines three notable routing solutions within the Phoenix
-ecosystem. Each solution has a different scope -ranging from basic to virtually
-endless- allowing you to select the one that best aligns with your application's
+This comparison includes three notable routing solutions within the Phoenix
+ecosystem. Each solution has a different scope—ranging from basic to virtually
+endless—allowing you to select the one that best aligns with your application's
 requirements.
 
-In this comparison, we will delve into several aspects, including functionality
-and extensibility, compatibility with existing codebases, runtime features, and
-customization options. By the end of this article, you will have a clear
-understanding of the strengths and limitations of each library, enabling you to
-make an informed decision for your Phoenix project.
+We will delve into several aspects which differ significantly, including
+functionality and extensibility, compatibility with existing codebases, runtime
+features, and customization options.
+
+By the end of this article, you will have a clear understanding of the strengths
+and limitations of each library, enabling you to make an informed decision for
+your Phoenix project.
 
 
+## Phoenix Router, the basic buildin
 
-## Phoenix Router, the buildin option
+The Phoenix Router is the built‐in routing system of the Phoenix framework. It
+is the base other solutions build upon.
 
-The Phoenix Router is the built‐in routing system of the Phoenix framework.
 Since version 1.8, it supports runtime path prefixing which automatically
-prefixes routes in templates with the result of one or multiple functions.
+prefixes routes in templates with the result of one or multiple functions. This
+feature enables the most basic route localization, known for it's language
+prefixes (e.g `/en/products/12/edit` and `/fr/products/12/edit`)
 
 
 ## Comparing Cldr Routes and Routex
@@ -44,6 +50,17 @@ helpers, making it easier for developers to work with localized routes.
 matches the internationalization and localization features of Cldr Routes, but
 adds support for a wider range of routing needs. It's open-ended design makes
 the feature set virtually limitless.
+
+*Both*
+- Localized routes
+- Translated route segments
+
+*Routex only*
+- Custom assigns per route
+- Automated Liveview livecycle hooks and Plugs
+- Alternative routes
+- Reordered path segments
+- etc.
 
 
 #### Architecture

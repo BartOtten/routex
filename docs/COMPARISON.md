@@ -2,12 +2,19 @@
 
 When working with the Phoenix framework, developers may seek solutions to their
 routing needs; ranging from common needs such as internationalization and
-localization to more rare needs as route obfuscation.
+localization to more rare needs such as route obfuscation.
 
 This guide outlines three notable routing solutions within the Phoenix
 ecosystem. Each solution has a different scope -ranging from basic to virtually
 endless- allowing you to select the one that best aligns with your application's
 requirements.
+
+In this comparison, we will delve into several aspects, including functionality
+and extensibility, compatibility with existing codebases, runtime features, and
+customization options. By the end of this article, you will have a clear
+understanding of the strengths and limitations of each library, enabling you to
+make an informed decision for your Phoenix project.
+
 
 
 ## Phoenix Router, the buildin option
@@ -52,9 +59,8 @@ the Cldr-suite ensures a seamless integration and consistent API within the Cldr
 ecosystem.
 
 **Routex** is designed as an standalone, extensible framework. As a result
-Routex has no hard dependency on other libraries. However, enabled extensions
-may used other libraries; such as Gettext for the translation extension or Cldr
-for the Cldr adapter extension.
+Routex has no hard dependency on other libraries. However, some extensions
+may use other libraries such as Gettext or Cldr when enabled.
 
 This modular approach provides developers with the flexibility to incorporate
 only the features and dependencies necessary for their specific use case.
@@ -129,19 +135,32 @@ codebase modifications.
 | **Conn Plugs**       | Yes                          | No                                               | No  |
 | **Liveview Hooks**   | Yes                          | No                                               | No  |
 
-In summary, each routing solution brings valuable capabilities to the table.
 
-**Phoenix Router** offers a reliable, built-in option for standard routing
-needs.
-
-**Cldr Routes** provides a specialized approach for multilingual URL management
-within the Cldr ecosystem.
-
-**Routex** stands out with its dependency free, customizable, and extension-driven
-approach—making it a versatile choice for those who require more than the basics
-and those not (yet) willing to add Cldr to their project.
 
 <sub>
 Routex can be configured to shim original Phoenix functionality (for example: `~p` and `url/2`) or
 mimic Cldr Routes using the [Cldr adapter extension](https://hexdocs.pm/routex/Routex.Extension.Cldr.html).
 </sub>
+
+
+## Conclusion
+
+In summary, each routing solution brings valuable capabilities to the table.
+
+**Phoenix Router** offers a reliable, built-in option for standard routing
+needs.
+
+**Cldr Routes** is primarily designed to extend the capabilities of the `Cldr`
+library, focusing on localization and internationalization. It provides
+compile-time translations for route paths using `Gettext`, enabling users to
+navigate applications using localized terms. However, the tight integration with
+`Cldr` and `Gettext` libraries imposes certain limitations on customization and
+flexibility.
+
+**Routex**, on the other hand, offers a more flexible and extensible
+architecture that not only matches the internationalization and localization
+features of Cldr Routes but goes beyond. Routex includes all the features
+provided by Cldr Routes and adds additional functionalities without the need for
+workarounds. Its modular approach allows developers to incorporate only the
+components necessary for their specific use case, making it a comprehensive
+solution for advanced routing needs.

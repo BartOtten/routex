@@ -43,7 +43,7 @@ defmodule Routex.Route do
 
   @doc "Returns routes grouped by the combination of method and origin path"
   def group_by_method_and_origin(routes) do
-    routes |> Enum.group_by(&{&1.verb, &1.private.routex.__origin__})
+    routes |> Enum.group_by(&{&1.verb, Routex.Attrs.get!(&1, :__origin__)})
   end
 
   @doc """

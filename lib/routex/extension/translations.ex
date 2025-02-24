@@ -152,7 +152,8 @@ defmodule Routex.Extension.Translations do
     function_exported?(Gettext, :put_locale, 1) &&
       apply(Gettext, :put_locale, [language || locale])
 
-    function_exported?(Cldr, :put_locale, 1) && apply(Cldr, :put_locale, [locale || language])
+    function_exported?(Cldr, :put_locale, 1) &&
+      apply(Cldr, :put_locale, [locale || language])
   end
 
   defp translate(path, locale, backend, domain)

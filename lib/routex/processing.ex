@@ -36,13 +36,6 @@ defmodule Routex.Processing do
   @type extension_module :: module
   @type routes :: [Phoenix.Router.Route.t(), ...]
 
-  @supported_livecycle_stages [
-    handle_params: [:params, :uri, :socket],
-    handle_event: [:event, :params, :socket],
-    handle_info: [:msg, :socket],
-    handle_async: [:name, :async_fun_result, :socket]
-  ]
-
   @doc """
   Callback executed before compilation of a `Phoenix Router`. This callback is added
   to the `@before_compile` callbacks by `Routex.Router`.
@@ -96,42 +89,26 @@ defmodule Routex.Processing do
         {backend, post_transform_routes(routes, backend, env)}
       end
 
-    # phase 4: generate AST for LiveView hooks and Plugs
-    backends = Keyword.keys(processed_routes_per_backend_p2)
-
-    liveview_hooks_ast_per_backend =
-      create_liveview_hooks(@supported_livecycle_stages, backends, env)
-
-    on_mount_ast = on_mount_ast(liveview_hooks_ast_per_backend, env)
-
-    plug_calls_ast =
-      for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
-        create_plug_call(routes, backend, env)
-      end
-      |> List.flatten()
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-
-    plug_ast = plug_ast(plug_calls_ast, env)
-
     # phase 5: generate AST for helper functions
     helpers_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_helper_functions(routes, backend, env)
       end
 
+    liveview_hook_ast = Routex.LiveViewHook.build(processed_routes_per_backend_p2, env)
+    plug_ast = Routex.Plug.build(processed_routes_per_backend_p2, env)
+
+    create_helper_module(helpers_ast, liveview_hook_ast, plug_ast, env)
+
     # restore routes order
     new_routes =
       processed_routes_per_backend_p2
-      |> Enum.map(&elem(&1, 1))
-      |> List.flatten()
+      |> Enum.flat_map(&elem(&1, 1))
       |> Enum.sort_by(&Attrs.get(&1, :__branch__))
 
     new_routes
     |> remove_build_info()
     |> write_routes(env)
-
-    create_helper_module(helpers_ast, on_mount_ast, plug_ast, env)
 
     IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
     :ok
@@ -154,9 +131,9 @@ defmodule Routex.Processing do
       |> Map.put(:__branch__, [index])
 
     overrides = Map.get(route.private, :rtx, %{})
-    values = Map.merge(meta, overrides)
+    attrs = Map.merge(meta, overrides)
 
-    Attrs.merge(route, values)
+    Attrs.merge(route, attrs)
   end
 
   @spec helper_mod_name(module) :: module
@@ -187,186 +164,6 @@ defmodule Routex.Processing do
     end
   end
 
-  defp on_mount_ast(liveview_hooks_ast, env) do
-    # backends = Keywords.keys(liveview_hooks_ast_per_backend)
-    module = Routex.Processing.helper_mod_name(env.module)
-
-    rtx_liveview_hook_ast =
-      quote context: Routex.Processing do
-        socket =
-          Phoenix.LiveView.attach_hook(
-            socket,
-            unquote(__MODULE__),
-            :handle_params,
-            &unquote(module).handle_params/3
-          )
-      end
-
-    quote do
-      def on_mount(_key, params, session, socket) do
-        unquote(rtx_liveview_hook_ast)
-        unquote(liveview_hooks_ast)
-        {:cont, socket}
-      end
-
-      def handle_params(_params, uri, socket) do
-        # as :helpers_mod is not yet set in the socket, we do manually
-        attrs = unquote(module).attrs(uri)
-
-        socket =
-          %{
-            socket
-            | private:
-                Map.put(socket.private, :routex, %{
-                  helpers_mod: unquote(module),
-                  url: uri,
-                  __branch__: attrs.__branch__
-                })
-          }
-
-        socket =
-          Phoenix.Component.assign(
-            socket,
-            url: uri,
-            __branch__: attrs.__branch__
-          )
-
-        {:cont, socket}
-      end
-    end
-  end
-
-  defp build_cases(callback, callback_vars, cbs_per_backend) do
-    for {backend, cbs} <- cbs_per_backend, cbs != [] do
-      with_clauses =
-        for ext <- cbs do
-          quote do
-            {:cont, socket} <- unquote(ext).unquote(callback)(unquote_splicing(callback_vars))
-          end
-        end
-
-      with_statement =
-        quote do
-          with unquote_splicing(with_clauses) do
-            {:cont, socket}
-          end
-        end
-
-      quote do
-        unquote(backend) -> unquote(with_statement)
-      end
-    end
-    |> List.flatten()
-  end
-
-  defp build_functions(_callback, _hook_vars, [] = _cases, _helper_mod), do: nil
-
-  defp build_functions(:handle_params, hook_vars, cases, helper_mod) do
-    quote do
-      fn unquote_splicing(hook_vars) ->
-        attrs = unquote(helper_mod).attrs(uri)
-
-        case attrs.__backend__ do
-          [unquote_splicing(cases)]
-        end
-      end
-    end
-  end
-
-  defp build_functions(_callback, hook_vars, cases, helper_mod) do
-    quote do
-      fn unquote_splicing(hook_vars) ->
-        attrs = unquote(helper_mod).attrs(socket.private.routex.url)
-
-        case attrs.__backend__ do
-          [unquote_splicing(cases)]
-        end
-      end
-    end
-  end
-
-  defp build_hook(callback, fun) do
-    quote context: Routex.Processing do
-      socket =
-        Phoenix.LiveView.attach_hook(
-          socket,
-          __MODULE__,
-          unquote(callback),
-          unquote(fun)
-        )
-    end
-  end
-
-  # @spec create_liveview_hooks(map, backend) :: Macro.t()
-  defp create_liveview_hooks(livecycle_stages, backends, env) do
-    liveview_hooks_map =
-      for {callback, args} = stage <- livecycle_stages, into: %{} do
-        per_backend_result =
-          for backend <- backends, backend != nil, into: %{} do
-            extensions =
-              for ext <- backend.extensions(),
-                  function_exported?(ext, callback, length(args) + 1) do
-                ext
-              end
-
-            {backend, extensions}
-          end
-
-        {stage, per_backend_result}
-      end
-
-    helper_mod = Routex.Processing.helper_mod_name(env.module)
-
-    for {{callback, args}, cbs_per_backend} <- liveview_hooks_map do
-      hook_vars = Enum.map(args, fn arg -> Macro.var(arg, Routex.Processing) end)
-      callback_vars = hook_vars ++ [Macro.var(:attrs, Routex.Processing)]
-
-      cases = build_cases(callback, callback_vars, cbs_per_backend)
-      fun = build_functions(callback, hook_vars, cases, helper_mod)
-
-      if fun, do: build_hook(callback, fun)
-    end
-  end
-
-  @spec plug_ast(plug_call_ast :: Macro.t(), env :: Macro.Env.t()) :: Macro.t()
-  defp plug_ast(_plug_calls_ast, nil), do: nil
-
-  defp plug_ast(plug_calls_ast, _env) do
-    quote do
-      def init(opts), do: opts
-      unquote_splicing(plug_calls_ast)
-    end
-  end
-
-  defp create_plug_call(_routes, nil, _env), do: nil
-
-  defp create_plug_call(_routes, backend, env) do
-    Code.ensure_loaded!(backend)
-    helper_mod = Routex.Processing.helper_mod_name(env.module)
-
-    ast =
-      for ext <- backend.extensions() do
-        if function_exported?(ext, :call, 2) do
-          quote do
-            conn = unquote(ext).unquote(:call)(conn, opts, attrs)
-          end
-        end
-      end
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-
-    quote do
-      def call(conn = %{private: %{routex: %{__backend__: unquote(backend)}}}, opts) do
-        url = Map.get(conn, :request_path)
-        attrs = unquote(helper_mod).attrs(url)
-
-        unquote_splicing(ast)
-
-        conn
-      end
-    end
-  end
-
   defp create_helper_functions(routes, backend, env) do
     for extension <- backend.extensions(), extension != [] do
       exec_when_defined(backend, extension, :create_helpers, nil, [
@@ -383,9 +180,9 @@ defmodule Routex.Processing do
     module = helper_mod_name(env.module)
     IO.puts(["Create or update helper module ", inspect(module)])
 
-    # the on_mount callback relies on the availability of `attr/1`. As
-    # we need to know if it's available upfront, we check the extension AST
-    # to know if one of the extensions provided such helper.
+    # various callbacks rely on the availability of `attr/1`. As we need to know
+    # its availability before compilation, we check the extension AST to know if
+    # one of the extensions provided such helper.
     has_attr_func =
       extensions_ast
       |> Macro.prewalker()

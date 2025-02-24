@@ -46,7 +46,7 @@ defmodule Routex.Processing do
 
     # Enable to get more descriptive error messages during development.
     # Causes compilation failure when enabled.
-    wrap_in_task = System.get_env("ROUTEX_DEBUG") == "true"
+    wrap_in_task = debug?()
 
     if wrap_in_task do
       Utils.alert(
@@ -60,6 +60,10 @@ defmodule Routex.Processing do
     end
   end
 
+  defp debug? do
+    System.get_env("ROUTEX_DEBUG") == "true"
+  end
+
   @doc """
   The main function of this module. Receives as only argument the environment of a
   Phoenix router module.
@@ -71,36 +75,40 @@ defmodule Routex.Processing do
     # grouping per config module allows extensions to use accumulated values.
     routes_per_backend = group_by_backend(routes)
 
-    # phase 1: transform route structs
+    # phase 1: configure (done elsewhere)
+
+    # phase 2: transform route structs
     processed_routes_per_backend_p1 =
       for {backend, routes} <- routes_per_backend do
         {backend, transform_routes(routes, backend, env)}
       end
 
-    # phase 2: post transform route structs
+    # phase 3: post transform route structs
     processed_routes_per_backend_p2 =
       for {backend, routes} <- processed_routes_per_backend_p1 do
         {backend, post_transform_routes(routes, backend, env)}
       end
 
-    # phase 3: generate ast for helpers
+    # phase 5: generate AST for helper functions
     helpers_ast =
       for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
         create_helper_functions(routes, backend, env)
       end
 
+    liveview_hook_ast = Routex.LiveViewHook.build(processed_routes_per_backend_p2, env)
+    plug_ast = Routex.Plug.build(processed_routes_per_backend_p2, env)
+
+    create_helper_module(helpers_ast, liveview_hook_ast, plug_ast, env)
+
     # restore routes order
     new_routes =
       processed_routes_per_backend_p2
-      |> Enum.map(&elem(&1, 1))
-      |> List.flatten()
+      |> Enum.flat_map(&elem(&1, 1))
       |> Enum.sort_by(&Attrs.get(&1, :__branch__))
 
     new_routes
     |> remove_build_info()
     |> write_routes(env)
-
-    create_helper_module(helpers_ast, env)
 
     IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
     :ok
@@ -110,7 +118,7 @@ defmodule Routex.Processing do
     routes
     |> Enum.with_index()
     |> Enum.map(&put_initial_attrs/1)
-    |> Enum.group_by(&Attrs.get(&1, :backend))
+    |> Enum.group_by(&Attrs.get(&1, :__backend__))
   end
 
   defp put_initial_attrs({{route, exprs}, index}),
@@ -123,14 +131,14 @@ defmodule Routex.Processing do
       |> Map.put(:__branch__, [index])
 
     overrides = Map.get(route.private, :rtx, %{})
-    values = Map.merge(meta, overrides)
+    attrs = Map.merge(meta, overrides)
 
-    Attrs.merge(route, values)
+    Attrs.merge(route, attrs)
   end
 
-  @spec helper_mod_name(Macro.Env.t()) :: module
+  @spec helper_mod_name(module) :: module
   @doc false
-  def helper_mod_name(env), do: Module.concat([env.module, :RoutexHelpers])
+  def helper_mod_name(router), do: Module.concat([router, :RoutexHelpers])
 
   @spec transform_routes(routes, backend, Macro.Env.t()) :: routes
   defp transform_routes(routes, nil, _env), do: routes
@@ -166,15 +174,15 @@ defmodule Routex.Processing do
     end
   end
 
-  @spec create_helper_module(Macro.t(), Macro.Env.t()) ::
+  @spec create_helper_module(Macro.t(), Macro.t(), Macro.t(), Macro.Env.t()) ::
           {:module, module, binary, term}
-  defp create_helper_module(extensions_ast, env) do
-    module = helper_mod_name(env)
+  defp create_helper_module(extensions_ast, on_mount_ast, plug_ast, env) do
+    module = helper_mod_name(env.module)
     IO.puts(["Create or update helper module ", inspect(module)])
 
-    # the on_mount callback relies on the availability of `attr/1`. As
-    # we need to know if it's available upfront, we check the extension AST
-    # to know if one of the extensions provided such helper.
+    # various callbacks rely on the availability of `attr/1`. As we need to know
+    # its availability before compilation, we check the extension AST to know if
+    # one of the extensions provided such helper.
     has_attr_func =
       extensions_ast
       |> Macro.prewalker()
@@ -194,72 +202,11 @@ defmodule Routex.Processing do
     prelude =
       quote do
         require Logger
-        unquote((has_attr_func && on_mount_ast(env)) || nil)
       end
 
-    ast = [prelude | extensions_ast] |> List.flatten() |> Enum.uniq()
+    ast = [prelude, extensions_ast, on_mount_ast, plug_ast] |> List.flatten() |> Enum.uniq()
     :ok = Macro.validate(ast)
     Module.create(module, ast, env)
-  end
-
-  defp on_mount_ast(env) do
-    {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
-    module = helper_mod_name(env)
-
-    assign_code =
-      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
-        quote do
-          opts = unquote(module).attrs(url)
-
-          socket =
-            %{
-              socket
-              | private:
-                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
-            }
-
-          {:cont,
-           Phoenix.LiveView.assign(
-             socket,
-             [url: url, __branch__: opts.__branch__] ++
-               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
-           )}
-        end
-      else
-        quote do
-          opts = unquote(module).attrs(url)
-
-          socket =
-            %{
-              socket
-              | private:
-                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
-            }
-
-          {:cont,
-           Phoenix.Component.assign(
-             socket,
-             [url: url, __branch__: opts.__branch__] ++
-               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
-           )}
-        end
-      end
-
-    quote do
-      def on_mount(_key, params, session, socket) do
-        socket =
-          Phoenix.LiveView.attach_hook(
-            socket,
-            :set_rtx,
-            :handle_params,
-            fn _params, url, socket ->
-              unquote(assign_code)
-            end
-          )
-
-        {:cont, socket}
-      end
-    end
   end
 
   defp remove_build_info(routes) do
@@ -301,6 +248,8 @@ defmodule Routex.Processing do
   end
 
   defp callback_exists?(module, callback, arity) do
-    module.__info__(:functions)[callback] == arity
+    module.__info__(:functions)
+    |> Keyword.get_values(callback)
+    |> Enum.any?(&(&1 == arity))
   end
 end

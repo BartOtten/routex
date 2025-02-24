@@ -86,8 +86,8 @@ defmodule Routex.Extension.Interpolation do
       for {{_verb, path}, routes} <- exception.duplicated do
         origins =
           routes
-          |> Enum.uniq_by(& &1.private.routex.__origin__)
-          |> Enum.map(&"\n - line: #{&1.line}, path: #{&1.private.routex.__origin__}")
+          |> Enum.uniq_by(&Routex.Attrs.get!(&1, :__origin__))
+          |> Enum.map(&"\n - line: #{&1.line}, path: #{Routex.Attrs.get!(&1, :__origin__)}")
 
         duplicates =
           for route <- routes do
@@ -128,7 +128,7 @@ defmodule Routex.Extension.Interpolation do
         key = attr |> String.to_atom()
 
         error_msg =
-          "#{route |> Attrs.get(:backend) |> to_string()} lists this extention but key :#{key} was not found in private.routex of route #{inspect(Macro.escape(route), pretty: true)}."
+          "#{route |> Attrs.get(:__backend__) |> to_string()} lists this extention but key :#{key} was not found in private.routex of route #{inspect(Macro.escape(route), pretty: true)}."
 
         route
         |> Attrs.get!(key, error_msg)

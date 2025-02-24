@@ -108,7 +108,7 @@ defmodule Routex.Extension.Alternatives do
     global_prefix? = Map.get(config, :alternatives_prefix, true)
 
     for {{_branch, branch_opts}, suborder} <- Enum.with_index(config.branches) do
-      path_prefix? = Map.get(route.private.routex, :alternatives_prefix, global_prefix?)
+      path_prefix? = Routex.Attrs.get(route, :alternatives_prefix, global_prefix?)
 
       path =
         if path_prefix? do

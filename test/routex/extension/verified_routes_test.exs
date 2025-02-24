@@ -12,7 +12,7 @@ end
 
 defmodule RtxBackend do
   use Routex.Backend,
-    extensions: [Routex.Extension.VerifiedRoutes],
+    extensions: [Routex.Extension.AttrGetters, Routex.Extension.VerifiedRoutes],
     verified_sigil_routex: "~p",
     verified_sigil_original: "~o"
 end

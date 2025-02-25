@@ -95,6 +95,26 @@ defmodule Routex.Utils do
     0
   end
 
+  # TODO: remove when we depend on Elixir 1.12+
+  @doc """
+  Backward compatible version of `Code.ensure_compiled!/1`
+  """
+  @spec ensure_compiled!(module()) :: module()
+  if function_exported?(Code, :ensure_compiled!, 1) do
+    def ensure_compiled!(mod), do: Code.ensure_compiled!(mod)
+  else
+    def ensure_compiled!(mod) do
+      case Code.ensure_compiled(mod) do
+        {:module, ^mod} ->
+          mod
+
+        {:error, reason} ->
+          raise ArgumentError,
+                "could not load module #{inspect(mod)} due to reason #{inspect(reason)}"
+      end
+    end
+  end
+
   defp list_available_module_vars(caller) do
     caller.versioned_vars
     |> Enum.filter(fn

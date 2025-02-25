@@ -63,6 +63,8 @@ defmodule Routex.Router do
     Macro.postwalk(ast, fn
       node = {method, _opts, _args} when method in @supported_methods ->
         backend = Macro.expand_once(backend, __CALLER__)
+        Routex.Utils.ensure_compiled!(backend)
+
         wrap_in_scope(node, backend, opts)
 
       {{:., _meta, [Kernel, :to_string]}, _meta2, [{binding, _meta3, _args3}]} ->

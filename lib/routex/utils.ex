@@ -9,7 +9,7 @@ defmodule Routex.Utils do
   """
   # credo:disable-for-lines:2
   @spec print(input :: iodata) :: :ok
-  def print(input), do: IO.puts([">> " | input])
+  def print(input), do: IO.write([">> ", input, "\n"])
 
   @doc """
   Prints an alert. Should be used when printing critical alerts in
@@ -19,13 +19,14 @@ defmodule Routex.Utils do
   @spec alert(input :: iodata) :: :ok
   def alert(input),
     do:
-      IO.puts([
+      IO.write([
         IO.ANSI.blink_slow(),
         IO.ANSI.light_red_background(),
         "Critical",
         IO.ANSI.reset(),
         " ",
-        input
+        input,
+        "\n"
       ])
 
   @doc """
@@ -95,6 +96,7 @@ defmodule Routex.Utils do
     0
   end
 
+  # credo:disable-for-next-line
   # TODO: remove when we depend on Elixir 1.12+
   @doc """
   Backward compatible version of `Code.ensure_compiled!/1`

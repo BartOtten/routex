@@ -1,4 +1,3 @@
-# credo:disable-for-this-file Credo.Check.Refactor.IoPuts
 defmodule Routex.Processing do
   @moduledoc """
   This module provides everything needed to process Phoenix routes. It executes
@@ -42,7 +41,7 @@ defmodule Routex.Processing do
   """
   @spec __before_compile__(Macro.Env.t()) :: :ok
   def __before_compile__(env) do
-    IO.puts(["Start: Processing routes with ", inspect(__MODULE__)])
+    IO.write(["Start: Processing routes with ", inspect(__MODULE__), "\n"])
 
     # Enable to get more descriptive error messages during development.
     # Causes compilation failure when enabled.
@@ -102,7 +101,7 @@ defmodule Routex.Processing do
 
     create_helper_module(helpers_ast, env)
 
-    IO.puts(["End: ", inspect(__MODULE__), " completed route processing."])
+    IO.write(["End: ", inspect(__MODULE__), " completed route processing.", "\n"])
     :ok
   end
 
@@ -172,7 +171,7 @@ defmodule Routex.Processing do
           {:module, module, binary, term}
   defp create_helper_module(extensions_ast, env) do
     module = helper_mod_name(env)
-    IO.puts(["Create or update helper module ", inspect(module)])
+    IO.write(["Create or update helper module ", inspect(module), "\n"])
 
     # the on_mount callback relies on the availability of `attr/1`. As
     # we need to know if it's available upfront, we check the extension AST
@@ -295,7 +294,7 @@ defmodule Routex.Processing do
 
       IO.write([processing_print, postprint])
       result = apply(extension_module, callback, args)
-      IO.puts(["\r", complete_print, postprint])
+      IO.write(["\r", complete_print, postprint, "\n"])
       result
     else
       default

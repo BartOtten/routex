@@ -124,6 +124,9 @@ defmodule Routex.Extension.Cldr do
   require Logger
 
   def configure(config, _backend) do
+    # causes a newline for output printed by Cldr
+    IO.write("\n")
+
     backend = Keyword.get(config, :cldr_backend)
     root_attrs = backend.default_locale() |> get_attributes(backend)
 

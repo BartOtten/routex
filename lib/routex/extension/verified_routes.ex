@@ -129,7 +129,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   def create_helpers(routes, backend, _env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
-    IO.puts("")
+    IO.write("\n")
 
     config = backend.config()
     match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
@@ -187,7 +187,7 @@ defmodule Routex.Extension.VerifiedRoutes do
 
     macro_names_table = table(config)
 
-    IO.puts("")
+    IO.write("\n")
 
     Routex.Utils.print([
       """

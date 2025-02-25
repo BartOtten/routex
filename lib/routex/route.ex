@@ -1,11 +1,37 @@
 defmodule Routex.Route do
+  @type t :: %__MODULE__{
+          private: %{:routex => %{__branch__: list(), __origin__: binary}, optional(any) => any}
+        }
+
+  defstruct %Phoenix.Router.Route{private: %{routex: %{__branch__: [], __origin__: nil}}}
+            |> Map.from_struct()
+            |> Keyword.new()
+
   @moduledoc """
   Function for working with Routex augmented Phoenix Routes
   """
-  alias Phoenix.Router.Route
   alias Routex.Attrs
+  alias __MODULE__
 
   @default_nesting_offset 0
+
+  @doc """
+  Returns a `Routex.Route`
+  """
+  @spec new(Phoenix.Router.Route.t()) :: t()
+  def new(%Phoenix.Router.Route{} = route) do
+    new = route |> Map.from_struct() |> ensure_routex()
+    struct(__MODULE__, new)
+  end
+
+  @doc """
+  Returns a `Routex.Route`
+  """
+  @spec to_phx(t()) :: Phoenix.Router.Route.t()
+  def to_phx(%Routex.Route{} = route) do
+    new = route |> Map.from_struct()
+    struct(Phoenix.Router.Route, new)
+  end
 
   @doc """
   Returns the nesting level of an (ancestor) route. By default
@@ -62,5 +88,18 @@ defmodule Routex.Route do
     else
       apply(Route, :exprs, [route])
     end
+  end
+
+  # Ensures that the container has a :routex key in its :private map.
+  defp ensure_routex(%{private: %{}} = route_sock_or_conn) do
+    update_in(route_sock_or_conn, [Access.key(:private, %{})], fn private ->
+      Map.put_new(private, :routex, %{})
+    end)
+  end
+
+  defp ensure_routex(%{private: nil} = route_sock_or_conn) do
+    route_sock_or_conn
+    |> Map.put(:private, %{})
+    |> ensure_routex()
   end
 end

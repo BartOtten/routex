@@ -1,7 +1,7 @@
 defmodule Routex.AttributesTest do
   use ExUnit.Case, async: true
 
-  alias Phoenix.Router.Route
+  alias Routex.Route
   import Routex.Attrs
 
   test "private?" do

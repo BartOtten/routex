@@ -4,7 +4,7 @@ defmodule Routex.Extension.AttrGettersTest.HelpersModule do
   @path "/foo/bar"
 
   route =
-    %Phoenix.Router.Route{private: %{}, path: @path, trailing_slash?: false}
+    %Routex.Route{private: %{}, path: @path, trailing_slash?: false}
     |> Routex.Attrs.put(:rtx_1, "r1")
     |> Routex.Attrs.put(:rtx_2, "r2")
 

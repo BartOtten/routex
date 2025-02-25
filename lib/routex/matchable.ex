@@ -92,7 +92,7 @@ defmodule Routex.Matchable do
     )
   end
 
-  def new(%Phoenix.Router.Route{} = route) do
+  def new(%Routex.Route{} = route) do
     matchable(
       hosts: route.hosts || [],
       path: split_path(route.path)
@@ -229,7 +229,7 @@ defmodule Routex.Matchable do
     end
   end
 
-  def to_func(%Phoenix.Router.Route{} = route, name, other_args, body) do
+  def to_func(%Routex.Route{} = route, name, other_args, body) do
     to_func(new(route), name, other_args, body)
   end
 
@@ -252,7 +252,7 @@ defmodule Routex.Matchable do
   	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
   """
 
-  def to_pattern(%Phoenix.Router.Route{} = route),
+  def to_pattern(%Routex.Route{} = route),
     do: route |> new() |> to_pattern()
 
   def to_pattern(record) when is_tuple(record) do

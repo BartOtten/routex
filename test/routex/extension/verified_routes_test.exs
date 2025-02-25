@@ -129,47 +129,47 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   # setup function. This way we can use the original test cases from Phoenix
   # VerifiedRoutes.
   @routes [
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/",
       kind: :match,
       private: %{routex: %{__branch__: [0, 1], __origin__: "/"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt1",
       kind: :match,
       private: %{routex: %{__branch__: [0, 0], __origin__: "/"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt2",
       kind: :match,
       private: %{routex: %{__branch__: [0, 2], __origin__: "/"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/posts",
       kind: :match,
       private: %{routex: %{__branch__: [1, 1], __origin__: "/posts"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt1/postsa/",
       kind: :match,
       private: %{routex: %{__branch__: [1, 0], __origin__: "/posts"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt2/postsb/",
       kind: :match,
       private: %{routex: %{__branch__: [1, 2], __origin__: "/posts"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/posts/:id",
       kind: :match,
       private: %{routex: %{__branch__: [2, 1], __origin__: "/posts/:id"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt1/:id/postsa/",
       kind: :match,
       private: %{routex: %{__branch__: [2, 0], __origin__: "/posts/:id"}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt2/:id/postsb/",
       kind: :match,
       private: %{routex: %{__branch__: [2, 2], __origin__: "/posts/:id"}}

@@ -4,19 +4,19 @@ defmodule MatchableTest.Constants do
   """
   defmacro __using__(_) do
     quote do
-      @route %Phoenix.Router.Route{
+      @route %Routex.Route{
         hosts: [],
         path: "/:category/products/:id/edit",
         trailing_slash?: false
       }
 
-      @product_route_spanish %Phoenix.Router.Route{
+      @product_route_spanish %Routex.Route{
         hosts: [],
         path: "/:id/:category/producta/edito",
         trailing_slash?: false
       }
 
-      @product_route_dutch %Phoenix.Router.Route{
+      @product_route_dutch %Routex.Route{
         hosts: [],
         path: "/:category/producten/wijzigen/:id",
         trailing_slash?: false
@@ -88,7 +88,7 @@ defmodule MatchableTest do
   alias __MODULE__.Setup.Compiled
   alias Routex.Matchable
 
-  def route(input), do: Map.merge(%Phoenix.Router.Route{}, Map.new(input))
+  def route(input), do: Map.merge(%Routex.Route{}, Map.new(input))
   def ast(input), do: {:<<>>, [], input}
 
   describe "new/1" do

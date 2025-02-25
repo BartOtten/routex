@@ -14,7 +14,12 @@ defmodule Routex.Extension do
   @type backend :: Routex.Backend.t()
   @type env :: Macro.Env.t()
   @type opts :: list
-  @type routes :: [Phoenix.Router.Route.t()]
+  @type routes :: nonempty_list(Routex.Route.t())
+  @type params :: map
+  @type url :: binary()
+  @type socket :: Phoenix.Socket.t()
+  @type conn :: Plug.Conn.t()
+  @type attrs :: map
 
   @doc """
   The `configure/2` callback is called in the first stage with the options

@@ -60,13 +60,13 @@ defmodule Routex.Extension.AlternativesTest do
 
   test "generates new routes" do
     routes = [
-      %Phoenix.Router.Route{path: "/", verb: :get, private: %{routex: %{__branch__: [0]}}},
-      %Phoenix.Router.Route{
+      %Routex.Route{path: "/", verb: :get, private: %{routex: %{__branch__: [0]}}},
+      %Routex.Route{
         path: "/products/:id",
         verb: :get,
         private: %{routex: %{__branch__: [1]}}
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         path: "/posts/:id",
         verb: :get,
         private: %{routex: %{alternatives_prefix: false, __branch__: [2]}}
@@ -74,7 +74,7 @@ defmodule Routex.Extension.AlternativesTest do
     ]
 
     expected = [
-      %Phoenix.Router.Route{
+      %Routex.Route{
         assigns: nil,
         helper: nil,
         hosts: nil,
@@ -101,7 +101,7 @@ defmodule Routex.Extension.AlternativesTest do
         verb: :get,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         assigns: nil,
         helper: nil,
         hosts: nil,
@@ -128,7 +128,7 @@ defmodule Routex.Extension.AlternativesTest do
         verb: :get,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -155,7 +155,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -182,7 +182,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -209,7 +209,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -236,7 +236,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -263,7 +263,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -290,7 +290,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -318,7 +318,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -346,7 +346,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,
@@ -374,7 +374,7 @@ defmodule Routex.Extension.AlternativesTest do
         trailing_slash?: nil,
         warn_on_verify?: nil
       },
-      %Phoenix.Router.Route{
+      %Routex.Route{
         verb: :get,
         line: nil,
         kind: nil,

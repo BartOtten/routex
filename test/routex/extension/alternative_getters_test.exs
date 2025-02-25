@@ -5,37 +5,37 @@ defmodule Routex.Extension.AlternativeGettersTest do
   import ListAssertions
 
   routes = [
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/",
       kind: :match,
       private: %{routex: %{__branch__: [0]}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/products",
       kind: :match,
       private: %{routex: %{__branch__: [1, 0]}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt1/productsa",
       kind: :match,
       private: %{routex: %{__branch__: [1, 1]}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt2/productsb",
       kind: :match,
       private: %{routex: %{__branch__: [1, 2]}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/products/:id",
       kind: :match,
       private: %{routex: %{__branch__: [2, 0]}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt1/:id/productsa/",
       kind: :match,
       private: %{routex: %{__branch__: [2, 1]}}
     },
-    %Phoenix.Router.Route{
+    %Routex.Route{
       path: "/alt2/:id/productsb/",
       kind: :match,
       private: %{routex: %{__branch__: [2, 2]}}

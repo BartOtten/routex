@@ -16,7 +16,8 @@ defmodule Routex.Attrs do
   * Extensions should add any fallback/default they might use to the attributes.
   """
 
-  @type container :: %{private: map()}
+  @type container ::
+          Routex.Route.t() | Phoenix.Router.Route.t() | Phoenix.Socket.t() | Plug.Conn.t()
   @type key :: atom()
   @type value :: any()
   @type attrs_fun :: (map() -> Enumerable.t())
@@ -119,13 +120,13 @@ defmodule Routex.Attrs do
 
   When no key is provided, returns the entire attributes map.
   """
-  @spec get(container(), key() | nil, value()) :: value() | map()
+  @spec get(container(), key() | nil, value() | map()) :: value() | map()
   def get(route_sock_or_conn, key \\ nil, default \\ nil)
 
-  def get(route_sock_or_conn, nil, _default) do
+  def get(route_sock_or_conn, nil, default) do
     case route_sock_or_conn.private do
       %{routex: attrs} -> attrs
-      _ -> %{}
+      _ -> default || %{}
     end
   end
 

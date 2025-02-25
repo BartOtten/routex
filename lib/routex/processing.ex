@@ -136,7 +136,7 @@ defmodule Routex.Processing do
   defp transform_routes(routes, nil, _env), do: routes
 
   defp transform_routes(routes, backend, env) do
-    Code.ensure_loaded!(backend)
+    Utils.ensure_compiled!(backend)
 
     for extension <- backend.extensions(), extension != [], reduce: routes do
       acc ->
@@ -148,7 +148,7 @@ defmodule Routex.Processing do
   defp post_transform_routes(routes, nil, _env), do: routes
 
   defp post_transform_routes(routes, backend, env) do
-    Code.ensure_loaded!(backend)
+    Utils.ensure_compiled!(backend)
 
     for extension <- backend.extensions(), extension != [], reduce: routes do
       acc ->
@@ -157,6 +157,8 @@ defmodule Routex.Processing do
   end
 
   defp create_helper_functions(routes, backend, env) do
+    Utils.ensure_compiled!(backend)
+
     for extension <- backend.extensions(), extension != [] do
       exec_when_defined(backend, extension, :create_helpers, nil, [
         routes,

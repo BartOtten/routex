@@ -86,6 +86,13 @@ routes)
 
 ```diff
 # file: router.ex
+  pipeline :browser do
+      [..]
+      plug :put_secure_browser_headers
+      plug :fetch_current_user
++     plug :routex
+  end
+
   scope "/", ExampleWeb, host: "admin.", as: :admin do
     pipe_through :browser
 

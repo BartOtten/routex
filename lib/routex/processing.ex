@@ -171,94 +171,48 @@ defmodule Routex.Processing do
     module = helper_mod_name(env)
     IO.write(["Create or update helper module ", inspect(module), "\n"])
 
-    # the on_mount callback relies on the availability of `attr/1`. As
-    # we need to know if it's available upfront, we check the extension AST
-    # to know if one of the extensions provided such helper.
-    has_attr_func =
-      extensions_ast
-      |> Macro.prewalker()
-      |> Enum.any?(&match?({:def, _meta1, [{:attrs, _meta2, _args} | _rest]}, &1))
+    stubs =
+      for {fun, arity} <- [attrs: 1, on_mount: 4, plug: 2] do
+        if not callback_exists?(extensions_ast, fun, arity) do
+          Routex.Utils.print([
+            inspect(module),
+            ".",
+            to_string(fun),
+            "/",
+            to_string(arity),
+            " not found. Using stub."
+          ])
 
-    # instead of raising which makes testing hard, we print an error message.
-    !has_attr_func &&
-      Routex.Utils.alert([
-        inspect(module),
-        """
-        .attrs/1` not found. Please include an extension providing
-                 the `attrs/1` function (such as `Routex.Extension.AttrGetters`) in
-                 the Routex backend extensions list.
-        """
-      ])
+          case fun do
+            :attrs ->
+              quote do
+                @doc "Stub for attrs/1 returning an empty map."
+                def attr(url), do: %{}
+              end
+
+            :on_mount ->
+              quote do
+                @doc "Stub for on_mount returning `{:cont, socket}` with unmodified socket"
+                def on_mount(_key, _params, _session, socket), do: {:cont, socket}
+              end
+
+            :plug ->
+              quote do
+                @doc "Stub for plug/2 returning the conn unmodified"
+                def plug(conn, _opts), do: conn
+              end
+          end
+        end
+      end
 
     prelude =
       quote do
         require Logger
-        unquote((has_attr_func && on_mount_ast(env)) || nil)
       end
 
-    ast = [prelude | extensions_ast] |> List.flatten() |> Enum.uniq()
+    ast = [prelude, stubs | extensions_ast] |> List.flatten() |> Enum.uniq()
     :ok = Macro.validate(ast)
     Module.create(module, ast, env)
-  end
-
-  defp on_mount_ast(env) do
-    {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
-    module = helper_mod_name(env)
-
-    assign_code =
-      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
-        quote do
-          opts = unquote(module).attrs(url)
-
-          socket =
-            %{
-              socket
-              | private:
-                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
-            }
-
-          {:cont,
-           Phoenix.LiveView.assign(
-             socket,
-             [url: url, __branch__: opts.__branch__] ++
-               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
-           )}
-        end
-      else
-        quote do
-          opts = unquote(module).attrs(url)
-
-          socket =
-            %{
-              socket
-              | private:
-                  Map.put(socket.private, :routex, %{url: url, __branch__: opts.__branch__})
-            }
-
-          {:cont,
-           Phoenix.Component.assign(
-             socket,
-             [url: url, __branch__: opts.__branch__] ++
-               (opts |> Map.get(:assigns, %{}) |> Map.to_list())
-           )}
-        end
-      end
-
-    quote do
-      def on_mount(_key, params, session, socket) do
-        socket =
-          Phoenix.LiveView.attach_hook(
-            socket,
-            :set_rtx,
-            :handle_params,
-            fn _params, url, socket ->
-              unquote(assign_code)
-            end
-          )
-
-        {:cont, socket}
-      end
-    end
   end
 
   defp remove_build_info(routes) do
@@ -299,7 +253,16 @@ defmodule Routex.Processing do
     end
   end
 
-  defp callback_exists?(module, callback, arity) do
+  defp callback_exists?(module, callback, arity) when is_atom(module) do
     module.__info__(:functions)[callback] == arity
+  end
+
+  defp callback_exists?(ast, function, arity) do
+    ast
+    |> Macro.prewalker()
+    |> Enum.find_value(false, fn
+      {:def, _meta1, [{^function, _meta2, args} | _rest]} -> length(args) == arity
+      _other -> false
+    end)
   end
 end

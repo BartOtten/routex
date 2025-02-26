@@ -68,7 +68,7 @@ defmodule Routex.Processing do
     routes =
       env.module
       |> Module.get_attribute(:phoenix_routes)
-      |> put_initial_attrs()
+      |> put_initial_attrs(env)
 
     # grouping per config module allows extensions to use accumulated values.
     routes_per_backend = Enum.group_by(routes, &Attrs.get(&1, :__backend__))
@@ -108,8 +108,10 @@ defmodule Routex.Processing do
     :ok
   end
 
-  @spec put_initial_attrs(routes :: [Phoenix.Router.Route.t()]) :: [Phoenix.Router.Route.t()]
-  defp put_initial_attrs(routes) do
+  @spec put_initial_attrs([Phoenix.Router.Route.t()], Macro.Env.t()) :: [Phoenix.Router.Route.t()]
+  defp put_initial_attrs(routes, env) do
+    helper_module = helper_mod_name(env)
+
     routes
     |> Enum.with_index()
     |> Enum.map(fn {route, index} ->
@@ -117,6 +119,7 @@ defmodule Routex.Processing do
         Map.new()
         |> Map.put(:__origin__, route.path)
         |> Map.put(:__branch__, [index])
+        |> Map.put(:__helper_mod__, helper_module)
 
       overrides = Map.get(route.private, :rtx, %{})
       attrs = Map.merge(meta, overrides)

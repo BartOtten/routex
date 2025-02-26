@@ -167,7 +167,7 @@ defmodule Routex.Extension.Translations do
   defp detect_language!(<<lang::binary-size(3), ?_, _rest::binary>>, _route), do: lang
 
   defp detect_language!(nil, route) do
-    backend = route |> Attrs.get(:backend) |> to_string()
+    backend = route |> Attrs.get(:__backend__) |> to_string()
 
     raise("Routex backend `#{backend}` lists extension `#{__MODULE__}` but
  neither the attribute :language nor :locale was found in private.routex

@@ -65,10 +65,13 @@ defmodule Routex.Processing do
   """
   @spec execute_callbacks(Macro.Env.t()) :: :ok
   def execute_callbacks(env) do
-    routes = env.module |> Module.get_attribute(:phoenix_routes)
+    routes =
+      env.module
+      |> Module.get_attribute(:phoenix_routes)
+      |> put_initial_attrs()
 
     # grouping per config module allows extensions to use accumulated values.
-    routes_per_backend = group_by_backend(routes)
+    routes_per_backend = Enum.group_by(routes, &Attrs.get(&1, :__backend__))
 
     # phase 1: transform route structs
     processed_routes_per_backend_p1 =
@@ -105,26 +108,21 @@ defmodule Routex.Processing do
     :ok
   end
 
-  defp group_by_backend(routes) do
+  @spec put_initial_attrs(routes :: [Phoenix.Router.Route.t()]) :: [Phoenix.Router.Route.t()]
+  defp put_initial_attrs(routes) do
     routes
     |> Enum.with_index()
-    |> Enum.map(&put_initial_attrs/1)
-    |> Enum.group_by(&Attrs.get(&1, :backend))
-  end
+    |> Enum.map(fn {route, index} ->
+      meta =
+        Map.new()
+        |> Map.put(:__origin__, route.path)
+        |> Map.put(:__branch__, [index])
 
-  defp put_initial_attrs({{route, exprs}, index}),
-    do: {put_initial_attrs({route, index}), exprs}
+      overrides = Map.get(route.private, :rtx, %{})
+      attrs = Map.merge(meta, overrides)
 
-  defp put_initial_attrs({route, index}) do
-    meta =
-      Map.new()
-      |> Map.put(:__origin__, route.path)
-      |> Map.put(:__branch__, [index])
-
-    overrides = Map.get(route.private, :rtx, %{})
-    values = Map.merge(meta, overrides)
-
-    Attrs.merge(route, values)
+      Attrs.merge(route, attrs)
+    end)
   end
 
   @spec helper_mod_name(Macro.Env.t()) :: module

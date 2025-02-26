@@ -89,7 +89,7 @@ defmodule Routex.Router do
             private: %{
               routex:
                 Map.new([
-                  {:backend, unquote(backend)}
+                  {:__backend__, unquote(backend)}
                   | unquote(opts)
                 ])
             } do

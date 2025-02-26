@@ -69,4 +69,24 @@ defmodule Routex.Extension.Assigns do
       Routex.Attrs.merge(route, assigns_map)
     end
   end
+
+  @doc """
+  Hook attached to the `handle_params` stage in the LiveView life cycle
+  """
+  @impl Routex.Extension
+  def handle_params(_params, _uri, socket, attrs \\ %{}) do
+    assigns = Map.get(attrs, :assigns, %{})
+    socket = Phoenix.Component.assign(socket, assigns)
+
+    {:cont, socket}
+  end
+
+  @doc """
+  Plug added to the Plug pipeline
+  """
+  @impl Routex.Extension
+  def plug(conn, _opts, attrs \\ %{}) do
+    assigns = Map.get(attrs, :assigns, [])
+    Plug.Conn.merge_assigns(conn, assigns)
+  end
 end

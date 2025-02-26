@@ -47,6 +47,7 @@ defmodule Routex.Extension.Plugs do
       end
 
     quote do
+      @doc "Plug of Routex encapsulating extension plugs, Plug.call/2 behaviour"
       def plug(%{private: %{routex: %{__backend__: unquote(backend)}}} = conn, opts) do
         url = Map.get(conn, :request_path)
         attrs = unquote(helper_mod).attrs(url)

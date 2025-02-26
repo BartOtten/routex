@@ -16,3 +16,5 @@
   font-size: 1rem;
   margin-left: 0.5em;
 }
+
+.hidden-at-hexdocs {display: none;}

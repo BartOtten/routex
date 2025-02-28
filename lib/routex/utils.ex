@@ -7,9 +7,20 @@ defmodule Routex.Utils do
   Prints an indented text. Should be used when printing messages in
   the terminal during compile time.
   """
+
   # credo:disable-for-lines:2
-  @spec print(input :: iodata) :: :ok
-  def print(input), do: IO.write([">> ", input, "\n"])
+  @spec print(module(), input :: iodata) :: :ok
+  def print(module \\ nil, input)
+  def print(nil, nil), do: :noop
+
+  def print(module, input) do
+    prefix = (module && [inspect(module), " "]) || ""
+    IO.write([prefix, ">> ", sanitize(input), IO.ANSI.reset(), "\n"])
+  end
+
+  defp sanitize(input) when is_atom(input), do: to_string(input)
+  defp sanitize(input) when is_list(input), do: Enum.reject(input, &is_nil/1)
+  defp sanitize(input) when is_binary(input), do: input
 
   @doc """
   Prints an alert. Should be used when printing critical alerts in

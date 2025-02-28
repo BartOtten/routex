@@ -95,6 +95,7 @@ defmodule Routex.Branching do
     mod_name = module |> Module.split() |> Enum.join(".")
 
     Utils.print(
+      __MODULE__,
       "Generate branching variant of: #{mod_name}.#{macro}/#{arities_str} => #{as}/#{arities_str}"
     )
 

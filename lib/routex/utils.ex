@@ -28,15 +28,15 @@ defmodule Routex.Utils do
   """
   # credo:disable-for-lines:11
   @spec alert(input :: iodata) :: :ok
-  def alert(input),
+  def alert(title \\ "Critical", input),
     do:
       IO.write([
         IO.ANSI.blink_slow(),
         IO.ANSI.light_red_background(),
-        "Critical",
+        sanitize(title),
         IO.ANSI.reset(),
         " ",
-        input,
+        sanitize(input),
         "\n"
       ])
 

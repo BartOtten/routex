@@ -8,8 +8,9 @@ defmodule Routex.Utils do
   the terminal during compile time.
   """
   # credo:disable-for-lines:2
-  @spec print(input :: iodata) :: :ok
-  def print(input), do: IO.write([">> ", input, "\n"])
+  @spec print(module(), input :: iodata) :: :ok
+  def print(module \\ nil, input),
+    do: IO.write([inspect(module), " >> ", input, IO.ANSI.reset(), " \n"])
 
   @doc """
   Prints an alert. Should be used when printing critical alerts in

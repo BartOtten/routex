@@ -9,8 +9,16 @@ defmodule Routex.Utils do
   """
   # credo:disable-for-lines:2
   @spec print(module(), input :: iodata) :: :ok
-  def print(module \\ nil, input),
-    do: IO.write([inspect(module), " >> ", input, IO.ANSI.reset(), " \n"])
+  def print(module \\ nil, input)
+  def print(nil, nil), do: :noop
+
+  def print(module, input) do
+    IO.write([inspect(module), " >> ", sanitize(input), IO.ANSI.reset(), "\n"])
+  end
+
+  defp sanitize(input) when is_atom(input), do: to_string(input)
+  defp sanitize(input) when is_list(input), do: Enum.reject(input, &is_nil/1)
+  defp sanitize(input) when is_binary(input), do: input
 
   @doc """
   Prints an alert. Should be used when printing critical alerts in
@@ -18,15 +26,15 @@ defmodule Routex.Utils do
   """
   # credo:disable-for-lines:11
   @spec alert(input :: iodata) :: :ok
-  def alert(input),
+  def alert(title \\ "Critical", input),
     do:
       IO.write([
         IO.ANSI.blink_slow(),
         IO.ANSI.light_red_background(),
-        "Critical",
+        sanitize(title),
         IO.ANSI.reset(),
         " ",
-        input,
+        sanitize(input),
         "\n"
       ])
 

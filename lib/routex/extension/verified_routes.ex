@@ -179,9 +179,10 @@ defmodule Routex.Extension.VerifiedRoutes do
       if Enum.any?(config, fn {_, mapping} -> mapping.phoenix == mapping.routex end),
         do: [
           """
-          \nDue to the configuration in module `#{inspect(config_module)}` one or multiple
-          Routex variants use the default name of their native Phoenix equivalents. The native
-          macro's, sigils or functions have been renamed.
+          \nIn the `#{inspect(config_module)}` module, the configuration allows
+          one or more Routex variants to use the default names of their native
+          Phoenix equivalents. As a result, the native macros, sigils, or
+          functions have been renamed to avoid conflicts.
           """
         ]
 
@@ -189,18 +190,19 @@ defmodule Routex.Extension.VerifiedRoutes do
 
     IO.write("\n")
 
-    Routex.Utils.print([
+    Routex.Utils.print(__MODULE__, [
       """
-      \n-- Notice --
-      Routex extension VerifiedRoutes generates variants of the
-      official Phoenix VerifiedRoutes macro's. While the Native macro's
-      directly delegate to the official Phoenix macro's, the Routex variants
-      apply route transfomations and/or automated branching before delegation.
+      \n
+      The `Routex.Extension.VerifiedRoutes` module extends the functionality of
+      the official `Phoenix.VerifiedRoutes` macros by generating variants that
+      include route transformations and/or automated branching before delegating
+      to the native Phoenix macros.
       """,
       warning_msg,
       macro_names_table,
       """
-      Documentation: https://hexdocs.pm/routex/extensions/verified_routes.html
+      For detailed documentation, please visit:
+      https://hexdocs.pm/routex/extensions/verified_routes.html
       """
     ])
   end

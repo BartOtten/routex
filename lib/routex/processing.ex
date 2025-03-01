@@ -45,8 +45,8 @@ defmodule Routex.Processing do
   end
 
   @doc false
-  @spec helper_mod_name(Macro.Env.t()) :: module
-  def helper_mod_name(env), do: Module.concat([env.module, :RoutexHelpers])
+  @spec helper_mod_name(module()) :: module
+  def helper_mod_name(module), do: Module.concat([module, :RoutexHelpers])
 
   @doc """
   The main function of this module. Receives as only argument the environment of a
@@ -70,7 +70,7 @@ defmodule Routex.Processing do
     |> remove_build_info()
     |> write_routes(env)
 
-    module = helper_mod_name(env)
+    module = helper_mod_name(env.module)
 
     ast_per_extension
     |> generate_helper_ast(module)

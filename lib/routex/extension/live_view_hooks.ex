@@ -40,7 +40,7 @@ defmodule Routex.Extension.LiveViewHooks do
 
   @spec create_helpers([Phoenix.Router.Route.t()], module(), Macro.Env.t()) :: Macro.output()
   def create_helpers(_routes, _backend, env) do
-    helper_mod = Routex.Processing.helper_mod_name(env)
+    helper_mod = Routex.Processing.helper_mod_name(env.module)
     rtx_hook = build_routex_hook(helper_mod)
 
     extension_hooks =

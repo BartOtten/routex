@@ -99,6 +99,13 @@ defmodule Routex.Matchable do
     )
   end
 
+  def new(%{} = route) do
+    matchable(
+      hosts: route.hosts || [],
+      path: split_path(route.path)
+    )
+  end
+
   def new({:<<>>, _meta, path_segments}), do: new(path_segments)
 
   def new(path_segments) when is_list(path_segments) do

@@ -96,6 +96,7 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   import Routex.Branching
 
+  alias Routex.Attrs
   alias Routex.Matchable
 
   require Logger
@@ -134,6 +135,16 @@ defmodule Routex.Extension.VerifiedRoutes do
     config = backend.config()
     match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
     to_macro_name = fn "~" <> letter -> String.to_atom("sigil_" <> letter) end
+
+    routes =
+      Enum.map(routes, fn route ->
+        attrs = Attrs.get(route)
+
+        {rtx_attrs, _} = Map.split(attrs, [:__branch__, :__origin__])
+        {phx_attrs, _} = Map.split(route, [:path, :hosts])
+
+        Map.merge(rtx_attrs, phx_attrs)
+      end)
 
     macros_ast = [
       branch_macro(
@@ -263,11 +274,11 @@ defmodule Routex.Extension.VerifiedRoutes do
       do: clause_segments_transformer(route, segments)
 
     def clause_segments_transformer(route, segments) do
-      orig_record = route |> Routex.Attrs.get!(:__origin__) |> Matchable.new()
+      orig_record = route.__origin__ |> Matchable.new()
       arg_record = segments |> Matchable.new()
 
       if Matchable.match?(orig_record, arg_record) do
-        route |> Routex.Attrs.get!(:__branch__) |> List.last()
+        route.__branch__ |> List.last()
       else
         :skip
       end
@@ -287,7 +298,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     end
 
     def argument_segments_transformer(pattern, segments) do
-      orig_record = pattern |> Routex.Attrs.get!(:__origin__) |> Matchable.new()
+      orig_record = pattern.__origin__ |> Matchable.new()
       orig_pattern = orig_record |> Matchable.to_pattern()
       new_pattern = pattern |> Matchable.new() |> Matchable.to_pattern()
       arg_record = segments |> Matchable.new()

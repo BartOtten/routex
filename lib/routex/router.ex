@@ -39,6 +39,7 @@ defmodule Routex.Router do
     quote do
       @before_compile Routex.Processing
       import unquote(__MODULE__), only: [preprocess_using: 2, preprocess_using: 3]
+      defdelegate routex(conn, opts), to: __MODULE__.RoutexHelpers, as: :plug
     end
   end
 

@@ -80,14 +80,25 @@ defmodule Routex.Extension.RouteHelpers do
 
     routes_per_origin = Route.group_by_nesting(routes)
 
+    mapped_routes_per_origin =
+      for {origin, routes} <- routes_per_origin do
+        routes =
+          for route <- routes do
+            %{__branch__: Attrs.get(route, :__branch__), helper: route.helper}
+          end
+
+        {origin, routes}
+      end
+      |> Map.new()
+
     prelude =
       quote do
+        @routes_per_origin unquote(Macro.escape(mapped_routes_per_origin))
         defdelegate static_path(arg1, arg2), to: unquote(Module.concat(env.module, "Helpers"))
       end
 
     helpers_ast =
-      for {_origin, routes} <- routes_per_origin do
-        esc_routes = Macro.escape(routes)
+      for {origin, routes} <- routes_per_origin do
         router = env.module
 
         for nr <- [2, 3],
@@ -111,9 +122,7 @@ defmodule Routex.Extension.RouteHelpers do
 
             {true, _lv?} ->
               quote do
-                unquote(
-                  dynamic_fn_with_arity(orig_fun_name, fn_args, [esc_routes, router, suffix])
-                )
+                unquote(dynamic_fn_with_arity(orig_fun_name, fn_args, [origin, router, suffix]))
               end
           end
         end
@@ -128,14 +137,14 @@ defmodule Routex.Extension.RouteHelpers do
 
     quote do
       case unquote(helper_ast) do
-        unquote(cases)
+        [unquote_splicing(cases)]
       end
     end
   end
 
   def build_case_clauses(routes, router, suffix, args) do
     for route <- routes do
-      ref = route |> Attrs.get(:__branch__) |> List.last()
+      ref = route.__branch__ |> List.last()
       helper = (route.helper <> suffix) |> String.to_atom()
       helper_module = Module.concat(router, :Helpers)
 
@@ -147,11 +156,17 @@ defmodule Routex.Extension.RouteHelpers do
     |> Enum.uniq()
   end
 
-  def dynamic_fn_with_arity(fn_name, fn_args, opts) do
+  def dynamic_fn_with_arity(fn_name, fn_args, [origin | rest]) do
     quote do
       defmacro unquote(fn_name)(unquote_splicing(fn_args)) do
-        base_args = [__CALLER__ | unquote(opts)]
-        args = [base_args, [unquote_splicing(fn_args)]]
+
+        args = [
+          __CALLER__,
+          @routes_per_origin[unquote(origin)],
+          unquote(router),
+          unquote(suffix),
+          unquote(fn_args)
+        ]
 
         # credo:disable-for-next-line
         Routex.Extension.RouteHelpers.build_case(args)

@@ -99,38 +99,46 @@ defmodule Routex.Branching do
       "Generate branching variant of: #{mod_name}.#{macro}/#{arities_str} => #{as}/#{arities_str}"
     )
 
-    for arity <- arities do
-      # The value of option :arg_pos is at this point a function which defines
-      # the argument (position) which should be branched. Anonymous functions
-      # can't enter the world of AST. That's why we evaluate :arg_pos at this
-      # point and replace it with the resulting value.
-      # Furthermore, we subtract 1 to make it a 0-based index value.
-      args = Macro.generate_arguments(arity, __MODULE__)
-      opts = Keyword.update(opts, :arg_pos, 0, &(&1.(arity) - 1))
-
+    prelude =
       quote do
         require Routex.Branching
 
-        defmacro unquote(orig_macro)(unquote_splicing(args)) do
-          Routex.Branching.build_default(
-            unquote(module),
-            unquote(macro),
-            unquote(args)
-          )
-        end
+        @patterns unquote(patterns)
+      end
 
-        defmacro unquote(as)(unquote_splicing(args)) do
-          Routex.Branching.build_case(
-            unquote(patterns),
-            unquote(match_binding),
-            unquote(module),
-            unquote(macro),
-            unquote(args),
-            unquote(opts |> Macro.escape())
-          )
+    macros =
+      for arity <- arities do
+        # The value of option :arg_pos is at this point a function which defines
+        # the argument (position) which should be branched. Anonymous functions
+        # can't enter the world of AST. That's why we evaluate :arg_pos at this
+        # point and replace it with the resulting value.
+        # Furthermore, we subtract 1 to make it a 0-based index value.
+        args = Macro.generate_arguments(arity, __MODULE__)
+        opts = Keyword.update(opts, :arg_pos, 0, &(&1.(arity) - 1))
+
+        quote do
+          defmacro unquote(orig_macro)(unquote_splicing(args)) do
+            Routex.Branching.build_default(
+              unquote(module),
+              unquote(macro),
+              unquote(args)
+            )
+          end
+
+          defmacro unquote(as)(unquote_splicing(args)) do
+            Routex.Branching.build_case(
+              @patterns,
+              unquote(match_binding),
+              unquote(module),
+              unquote(macro),
+              unquote(args),
+              unquote(opts |> Macro.escape())
+            )
+          end
         end
       end
-    end
+
+    [prelude | macros]
   end
 
   defp get_arities!(module, macro) do

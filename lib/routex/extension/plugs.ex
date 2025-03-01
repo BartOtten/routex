@@ -37,7 +37,7 @@ defmodule Routex.Extension.Plugs do
 
   defp create_callbacks(_routes, backend, env) do
     Code.ensure_loaded!(backend)
-    helper_mod = Routex.Processing.helper_mod_name(env)
+    helper_mod = Routex.Processing.helper_mod_name(env.module)
 
     ast =
       for ext <- backend.extensions(), function_exported?(ext, :plug, 2) do

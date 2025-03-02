@@ -116,6 +116,6 @@ defmodule Routex.Extension.RouteHelpersTest do
         ]
       }
 
-    assert expected == RouteHelpers.build_case([[__ENV__, @routes, MyRouter, "_suffix"], []])
+    assert expected == RouteHelpers.build_case([__ENV__, @routes, MyRouter, "_suffix", []])
   end
 end

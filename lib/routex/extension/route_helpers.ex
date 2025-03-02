@@ -1,62 +1,61 @@
 defmodule Routex.Extension.RouteHelpers do
   @moduledoc ~S"""
-  Provides route helpers with support for automatic selecting alternatives
-  routes. The helpers can be used to override Phoenix' defaults as they are
-  a drop-in replacements.
+  This module provides route helpers that support the automatic selection of
+  alternative routes. These helpers can serve as drop-in replacements for
+  Phoenix's default route helpers.
 
-  Only use this extension when you make use of extensions generating alternative
-  routes, as otherwise the result will be the same as the official helpers.
+  Use this extension only if your application leverages extensions that
+  generate alternative routes. Otherwise, the result will be identical to the
+  official helpers provided by Phoenix.
 
   ## Configuration
-  ```diff
-  # file /lib/example_web/routex_backend.ex
-  defmodule ExampleWeb.RoutexBackend do
-    use Routex.Backend,
-    extensions: [
-      Routex.Extension.AttrGetters,  # required
-  +   Routex.Extension.RouteHelpers
-  ],
-  ```
 
-  Phoenix < 1.7 created an alias `Routes` by default. You can either replace it
-  or add an alias for RoutexHelpers. Phoenix >= 1.7 deprecated the helpers
-  in favor of Verified Routes.
+  In versions of Phoenix prior to 1.7, an alias `Routes` was created by
+  default. You can either replace this alias or add an alias for
+  `RoutexHelpers`. Note that Phoenix 1.7 and later have deprecated these
+  helpers in favor of Verified Routes.
 
-  In the example below we 'override' the default `Routes` alias to use
-  Routex' Route Helpers as a drop-in replacement, but keep the original helpers
-  functions available by using alias `OriginalRoutes`.
+  In the example below, we override the default `Routes` alias to use Routex's
+  Route Helpers as a drop-in replacement, while keeping the original helper
+  functions available under the alias `OriginalRoutes`:
 
-
-  ```diff
+  ^^^diff
   # file /lib/example_web.ex
   defp routex_helpers do
-
   + alias ExampleWeb.Router.Helpers, as: OriginalRoutes
   + alias ExampleWeb.Router.RoutexHelpers, as: Routes
-
   end
-  ```
+  ^^^
 
-  ## Pseudo result
-      # When alternatives are created it uses auto-selection to keep the user 'in branch'.
+  ## Pseudo Result
 
-      # in (h)eex template
-      <a href={Routes.product_index_path(@socket, :show, product)}>Product #1</a>
+  When alternative routes are created, auto-selection is used to keep the user
+  within a specific branch.
 
-      # is replaced during during compilation with:
-      case alternative do
-         nil ⇒  "/products/#{product}"
-        "en" ⇒  "/products/#{product}"
-        "nl" ⇒  "/europe/nl/products/#{product}"
-        "be" ⇒  "/europe/be/products/#{product}"
-      end
+  ### Example in a (h)eex template:
+
+  ^^^html
+  <a href={Routes.product_index_path(@socket, :show, product)}>Product #1</a>
+  ^^^
+
+  ### Result after compilation:
+
+  ^^^elixir
+  case alternative do
+     nil ⇒  "/products/#{product}"
+    "en" ⇒  "/products/#{product}"
+    "nl" ⇒  "/europe/nl/products/#{product}"
+    "be" ⇒  "/europe/be/products/#{product}"
+  end
+  ^^^
 
   ## `Routex.Attrs`
-  **Requires**
-  - none
 
-  **Sets**
-  - none
+  **Requires:**
+  - None
+
+  **Sets:**
+  - None
   """
 
   @behaviour Routex.Extension
@@ -65,12 +64,37 @@ defmodule Routex.Extension.RouteHelpers do
   alias Routex.Route
   alias Routex.Utils
 
-  require Logger
-
   @interpolate ":"
 
   @impl Routex.Extension
-  def create_helpers(routes, _backend, env) do
+  @doc """
+  Creates the route helpers for the given routes if the `:phoenix_helpers`
+  attribute is set.
+
+  ## Parameters
+  - `routes`: The list of routes to create helpers for.
+  - `backend`: The backend module (not used).
+  - `env`: The macro environment.
+
+  ## Returns
+  A list of quoted expressions representing the generated helpers.
+  """
+  @spec create_helpers(list(Route.t()), module(), Macro.Env.t()) :: list(Macro.t())
+  def create_helpers(routes, backend, env) do
+    if Module.get_attribute(env.module, :phoenix_helpers, false) do
+      do_create_helpers(routes, backend, env)
+    else
+      []
+    end
+  rescue
+    _in_test_env -> do_create_helpers(routes, backend, env)
+  end
+
+  @pdoc """
+  Internal function to create the route helpers for the given routes.
+  """
+  @spec do_create_helpers(list(Route.t()), module(), Macro.Env.t()) :: list(Macro.t())
+  defp do_create_helpers(routes, _backend, env) do
     IO.write("\n")
 
     Routex.Utils.print(
@@ -84,7 +108,10 @@ defmodule Routex.Extension.RouteHelpers do
       for {origin, routes} <- routes_per_origin do
         routes =
           for route <- routes do
-            %{__branch__: Attrs.get(route, :__branch__), helper: route.helper}
+            %{
+              private: %{routex: %{__branch__: Attrs.get(route, :__branch__)}},
+              helper: route.helper
+            }
           end
 
         {origin, routes}
@@ -114,16 +141,16 @@ defmodule Routex.Extension.RouteHelpers do
           fn_args = Macro.generate_unique_arguments(arity, __MODULE__)
           orig_helper_module = Module.concat(router, :Helpers)
 
-          case {route.path == Attrs.get(route, :__origin__), route.plug == Phoenix.LiveView.Plug} do
-            {false, _lv?} ->
-              quote do
-                unquote(dynamic_delegate_with_arity(orig_helper_module, orig_fun_name, fn_args))
-              end
-
-            {true, _lv?} ->
-              quote do
-                unquote(dynamic_fn_with_arity(orig_fun_name, fn_args, [origin, router, suffix]))
-              end
+          if route.path == Attrs.get(route, :__origin__) do
+            quote do
+              unquote(
+                dynamic_defmacro_with_arity(orig_fun_name, fn_args, [origin, router, suffix])
+              )
+            end
+          else
+            quote do
+              unquote(dynamic_defdelegate_with_arity(orig_helper_module, orig_fun_name, fn_args))
+            end
           end
         end
       end
@@ -131,7 +158,14 @@ defmodule Routex.Extension.RouteHelpers do
     [prelude, helpers_ast]
   end
 
-  def build_case([[caller, routes, router, suffix], args]) do
+  @pdoc """
+  Builds a case definition for the given routes and arguments.
+
+  Called from templates during compilation
+  """
+  @doc false
+  @spec build_case(list(any())) :: Macro.t()
+  def build_case([caller, routes, router, suffix, args]) do
     cases = build_case_clauses(routes, router, suffix, args)
     helper_ast = Utils.get_helper_ast(caller)
 
@@ -142,9 +176,13 @@ defmodule Routex.Extension.RouteHelpers do
     end
   end
 
-  def build_case_clauses(routes, router, suffix, args) do
+  @pdoc """
+  Builds the case clauses for the given routes and arguments.
+  """
+  @spec build_case_clauses(list(Route.t()), module(), String.t(), list(any())) :: list(Macro.t())
+  defp build_case_clauses(routes, router, suffix, args) do
     for route <- routes do
-      ref = route.__branch__ |> List.last()
+      ref = route |> Routex.Attrs.get(:__branch__) |> List.last()
       helper = (route.helper <> suffix) |> String.to_atom()
       helper_module = Module.concat(router, :Helpers)
 
@@ -156,10 +194,15 @@ defmodule Routex.Extension.RouteHelpers do
     |> Enum.uniq()
   end
 
-  def dynamic_fn_with_arity(fn_name, fn_args, [origin | rest]) do
+  @pdoc """
+  Generates a defmacro with the given name and arguments.
+
+  Arguments are wrapped in a list for formatting purposes.
+  """
+  @spec dynamic_defmacro_with_arity(atom(), list(Macro.t()), list(any())) :: Macro.t()
+  defp dynamic_defmacro_with_arity(fn_name, fn_args, [origin, router, suffix]) do
     quote do
       defmacro unquote(fn_name)(unquote_splicing(fn_args)) do
-
         args = [
           __CALLER__,
           @routes_per_origin[unquote(origin)],
@@ -174,9 +217,15 @@ defmodule Routex.Extension.RouteHelpers do
     end
   end
 
-  def dynamic_delegate_with_arity(helper_module, fn_name, fn_args) do
+  @pdoc """
+  Generates a defdelegate with the given name and arguments.
+  """
+  @spec dynamic_defdelegate_with_arity(module(), atom(), list(Macro.t())) :: Macro.t()
+  defp dynamic_defdelegate_with_arity(helper_module, fn_name, fn_args) do
     quote do
       defdelegate unquote(fn_name)(unquote_splicing(fn_args)), to: unquote(helper_module)
     end
   end
+
+  _silence_unused = @pdoc
 end

@@ -208,7 +208,7 @@ defmodule Routex.Extension.RouteHelpers do
           @routes_per_origin[unquote(origin)],
           unquote(router),
           unquote(suffix),
-          unquote_splicing(fn_args)
+          unquote(fn_args)
         ]
 
         # credo:disable-for-next-line

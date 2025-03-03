@@ -89,14 +89,16 @@ defmodule Routex.Backend do
     backend = Keyword.get(opts, :__backend__)
     enforce_reduction_limit!(reduction, backend)
 
-    extensions = Keyword.get(opts, :extensions, [])
+    extensions = opts |> Keyword.get(:extensions, [])
     Enum.each(extensions, &ensure_availability!/1)
     extensions_per_callback = map_extensions_per_callback(extensions)
     new_opts = apply_callback_per_extension(extensions_per_callback[:configure], :configure, opts)
-    new_extensions = Keyword.get(new_opts, :extensions, [])
+    new_extensions = new_opts |> Keyword.get(:extensions, []) |> List.flatten() |> Enum.uniq()
 
-    if new_extensions == extensions do
-      new_extensions_per_callback = map_extensions_per_callback(extensions)
+    c = fn l -> l |> Enum.sort() |> Enum.uniq() end
+
+    if c.(new_extensions) == c.(extensions) do
+      new_extensions_per_callback = map_extensions_per_callback(new_extensions)
       {new_opts, new_extensions_per_callback}
     else
       prepare_unquoted(new_opts, reduction + 1)

@@ -143,7 +143,11 @@ defmodule Routex.MixProject do
         Routex.Extension
       ],
       skip_undefined_reference_warnings_on: [
+        "Routex.Attrs",
         "Routex.Extension",
+        "Routex.Extension.LiveViewHooks",
+        "Routex.Extension.Plugs",
+        "Routex.Extension.RouteHelpers",
         "Routex.Processing",
         "Routex.Route"
       ],

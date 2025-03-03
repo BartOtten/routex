@@ -139,8 +139,11 @@ defmodule Routex.Extension.VerifiedRoutes do
     routes =
       Enum.map(routes, fn route ->
         attrs = Attrs.get(route)
-        {m, _} = Map.split(attrs, [:__branch__, :__origin__])
-        m |> Map.put(:path, route.path)
+
+        {rtx_attrs, _} = Map.split(attrs, [:__branch__, :__origin__])
+        {phx_attrs, _} = Map.split(route, [:path, :hosts])
+
+        Map.merge(rtx_attrs, phx_attrs)
       end)
 
     macros_ast = [
@@ -297,7 +300,7 @@ defmodule Routex.Extension.VerifiedRoutes do
     def argument_segments_transformer(pattern, segments) do
       orig_record = pattern.__origin__ |> Matchable.new()
       orig_pattern = orig_record |> Matchable.to_pattern()
-      new_pattern = pattern.path |> Matchable.new() |> Matchable.to_pattern()
+      new_pattern = pattern |> Matchable.new() |> Matchable.to_pattern()
       arg_record = segments |> Matchable.new()
 
       if Matchable.match?(orig_record, arg_record) do

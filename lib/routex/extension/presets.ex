@@ -1,14 +1,4 @@
 defmodule Routex.Extension.Preset do
-  @doc """
-   Replaces the name of the preset with the the presets' list of extensions.
-  """
-  def expand(preset_name, preset_extensions, extensions) do
-    Enum.flat_map(extensions, fn
-      ^preset_name -> preset_extensions
-      x -> [x]
-    end)
-  end
-
   def merge(preset, config, module) do
     Keyword.merge(config, preset, fn
       :extensions, config, preset -> expand(module, preset, config)
@@ -16,9 +6,17 @@ defmodule Routex.Extension.Preset do
     end)
   end
 
+  # Replaces the name of the preset with the the presets' list of extensions.
+  defp expand(preset_name, preset_extensions, extensions) do
+    Enum.flat_map(extensions, fn
+      ^preset_name -> preset_extensions
+      x -> [x]
+    end)
+  end
+
   defmodule Minimal do
     @moduledoc """
-      Provides the minimal set of extensions for Routex to work.
+    Routex preset which provides a basic set of extensions to build upon.
     """
     @behaviour Routex.Extension
     alias Routex.Extension.Preset
@@ -28,8 +26,8 @@ defmodule Routex.Extension.Preset do
       preset = [
         extensions: [
           Routex.Extension.AttrGetters,
-          Routex.Extension.Plugs,
-          Routex.Extension.LiveViewHooks
+          Routex.Extension.LiveViewHooks,
+          Routex.Extension.Plugs
         ]
       ]
 
@@ -39,8 +37,11 @@ defmodule Routex.Extension.Preset do
 
   defmodule Alternatives do
     @moduledoc """
-      Provides a Routex preset to work with alternatives Routes
-      while acting like a drop-in solution.
+    Routex preset to generate alternative routes and seamlessly integrate them
+    with existing codebases.
+
+    The drop-in nature of the preset means you can enable alternative routes
+    with minimal changes to your existing codebase.
     """
     @behaviour Routex.Extension
     alias Routex.Extension.Preset
@@ -49,13 +50,28 @@ defmodule Routex.Extension.Preset do
     def configure(config, _backend) do
       preset = [
         extensions: [
-          Routex.Extension.Preset.Minimal,
-          Routex.Extension.Alternatives,
+          Preset.Minimal,
           Routex.Extension.AlternativeGetters,
+          Routex.Extension.Alternatives,
           Routex.Extension.Assigns,
-          Routex.Extension.VerifiedRoutes,
-          Routex.Extension.RouteHelpers
+          Routex.Extension.RouteHelpers,
+          Routex.Extension.VerifiedRoutes
         ],
+        alternatives: %{
+          "/" => %{
+            attrs: %{locale: "en-150", display_name: "Global"},
+            branches: %{
+              "/branch_1" => %{
+                attrs: %{locale: "en-150", display_name: "Branch 1"},
+                branches: %{
+                  "/branch_1_1" => %{attrs: %{locale: "en-150", display_name: "Branch 1 sub 1"}},
+                  "/branch_1_2" => %{attrs: %{locale: "en-150", display_name: "Branch 1 sub 2"}}
+                }
+              },
+              "/branch_2" => %{attrs: %{locale: "en-150", display_name: "Branch 2"}}
+            }
+          }
+        },
         verified_sigil_routex: "~p",
         verified_sigil_phoenix: "~o",
         verified_url_routex: :url,
@@ -66,10 +82,21 @@ defmodule Routex.Extension.Preset do
     end
   end
 
-  defmodule LocalizedRoutes do
+  defmodule PhoenixI18n do
     @moduledoc """
-      Routex preset to work with localized routes
+    The preset automatically creates routes for multiple languages, Routex
+    preset for Phoenix internationalization (i18n) and Phoenix localization
+    (l10n). Designed to help developers effortlessly handle multiple languages
+    and locales in their Phoenix applications.
+
+    This preset generates alternative routes for different locales / languages
+    and provides locale / language aware routing. Reducing the manual effort
+    required to manage localized routes.
+
+    The drop-in nature of the preset means you can enable localization with
+    minimal changes to your existing codebase.
     """
+
     @behaviour Routex.Extension
     alias Routex.Extension.Preset
 
@@ -77,18 +104,25 @@ defmodule Routex.Extension.Preset do
     def configure(config, _backend) do
       preset = [
         extensions: [
-          Routex.Extension.Preset.Alternatives,
-          Routex.Extension.Interpolation
-        ]
+          Preset.Alternatives
+          # Routex.Extension.PutLocale
+        ],
+        gettext_module: Module.concat(Mix.Phoenix.base(), Gettext)
       ]
 
       Preset.merge(preset, config, __MODULE__)
     end
   end
 
-  defmodule FullLocalization do
+  defmodule PhoenixL10n do
+    @moduledoc "Placeholder for Phoenix localization (l10n). Have a look at Routex.Extension.Preset.PhoenixI18n."
+  end
+
+  defmodule TranslatedRoutes do
     @moduledoc """
-      Routex preset to enable full l10n / i18n applications.
+      Routex preset witch adds route translation on top of route localization / internationalization.
+
+     Enables users to enter URLs using localized terms which can enhance user engagement and content relevance.
     """
     @behaviour Routex.Extension
     alias Routex.Extension.Preset
@@ -97,7 +131,7 @@ defmodule Routex.Extension.Preset do
     def configure(config, _backend) do
       preset = [
         extensions: [
-          Routex.Extension.Preset.LocalizedRoutes,
+          Preset.PhoenixI18n,
           Routex.Extension.Translations
         ],
         gettext_module: Module.concat(Mix.Phoenix.base(), Gettext)

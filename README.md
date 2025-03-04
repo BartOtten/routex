@@ -18,6 +18,11 @@ Routex comes with extensions for internationalization (i18n), localization
 more](docs/EXTENSION_SUMMARIES.md). Its modern extensible architecture enables you to easily
 build custom solutions that work harmoniously with other extensions.
 
+<p class="hidden-at-hexdocs">
+This documentation reflects the main branch. For the latest
+stable release, refer to [Hexdocs](https://hexdocs.pm/routex/readme.html).
+</p>
+
 ## Top Features and Benefits
 
 * **No dependencies, no state**: Routex is unique in not requiring any external dependency

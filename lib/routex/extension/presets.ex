@@ -104,8 +104,8 @@ defmodule Routex.Extension.Preset do
     def configure(config, _backend) do
       preset = [
         extensions: [
-          Preset.Alternatives
-          # Routex.Extension.PutLocale
+          Preset.Alternatives,
+          Routex.Extension.PutLocale
         ],
         gettext_module: Module.concat(Mix.Phoenix.base(), Gettext)
       ]
@@ -118,7 +118,7 @@ defmodule Routex.Extension.Preset do
     @moduledoc "Placeholder for Phoenix localization (l10n). Have a look at Routex.Extension.Preset.PhoenixI18n."
   end
 
-  defmodule TranslatedRoutes do
+  defmodule PhoenixI18nPlus do
     @moduledoc """
       Routex preset witch adds route translation on top of route localization / internationalization.
 

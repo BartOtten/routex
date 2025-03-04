@@ -9,8 +9,10 @@ defmodule Routex.Extension.Assigns do
 
 
   ## Options
-  - `namespace`: when set creates a named collection of `Routex.Attrs`
-  - `attrs`: when set defines keys of `Routex.Attrs` to make available
+  - `namespace`: when set creates a named collection: assigns available as @namespace.key
+  - `attrs`: If attrs is not set, all Routex.Attrs are included. If attrs is set
+    to a list of keys, only the specified subset of attributes will be
+    available.
 
   ## Configuration
   ```diff

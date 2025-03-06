@@ -1,8 +1,8 @@
 defmodule Routex.Extension.LiveViewHooks do
   @moduledoc """
-  Build and attach LiveView hooks. provided by Routex extensions.
+  Attach LiveView hooks provided by Routex extensions.
 
-  This module generates quoted functions to inject into LiveView's
+  This extension generates quoted functions to inject into LiveView's
   lifecycle stages. The hooks are built from a set of supported lifecycle
   callbacks provided by extensions.
 
@@ -11,52 +11,148 @@ defmodule Routex.Extension.LiveViewHooks do
   `Routex.Attrs` of the current route.
   """
 
-  @supported_livecycle_stages [
+  @behaviour Routex.Extension
+
+  @storage_key __MODULE__
+  @supported_lifecycle_stages [
     handle_params: [:params, :uri, :socket],
     handle_event: [:event, :params, :socket],
     handle_info: [:msg, :socket],
     handle_async: [:name, :async_fun_result, :socket]
   ]
 
-  @storage_key __MODULE__
+  @impl Routex.Extension
+  @doc """
+  Detect supported lifecycle callbacks in extensions and adds
+  them to `opts[:hooks]`.
 
+  Detects and registers supported lifecycle callbacks from other extensions.
+  Returns an updated keyword list with the valid callbacks accumulated
+  under the `:hooks` key.
+
+  **Supported callbacks:**
+  #{inspect(@supported_lifecycle_stages)}
+  """
+  def configure(opts, _backend) do
+    opts = Keyword.put_new(opts, :hooks, [])
+    extensions = Keyword.get(opts, :extensions, [])
+
+    for extension <- extensions,
+        {callback, params} <- @supported_lifecycle_stages,
+        function_exported?(extension, callback, length(params) + 1),
+        reduce: opts do
+      acc ->
+        update_in(acc, [:hooks, callback], &[extension | List.wrap(&1)])
+    end
+  end
+
+  @impl Routex.Extension
+  @doc false
+  # Cheat.
   def post_transform(routes, backend, env) do
     Module.register_attribute(env.module, @storage_key, accumulate: true)
-    Module.put_attribute(env.module, @storage_key, {backend, routes})
+    Module.put_attribute(env.module, @storage_key, backend)
 
     routes
   end
 
   @doc """
-  Builds Routex LiveView hooks.
+  Generates Routex' LiveView `on_mount/4` hook, which inlines the lifecycle
+  stage hooks provided by other extensions.
 
-  Returns a list of quoted expressions defining `on_mount/4` and `handle_params/3`.
-
-  ## Examples
-
-      iex> Routex.LiveViewHook.build(%{BackendA => ...}, env)
-      [on_mount_ast, handle_params_ast]
+  Returns  on_mount/4` and an initial `handle_params/3`.
   """
-
+  @impl Routex.Extension
   @spec create_helpers([Phoenix.Router.Route.t()], module(), Macro.Env.t()) :: Macro.output()
   def create_helpers(_routes, _backend, env) do
-    helper_mod = Routex.Processing.helper_mod_name(env.module)
-    rtx_hook = build_routex_hook(helper_mod)
+    backends = Module.get_attribute(env.module, @storage_key)
 
-    extension_hooks =
-      env.module
-      |> Module.get_attribute(@storage_key)
-      |> create_liveview_hooks(@supported_livecycle_stages, helper_mod)
+    rtx_hook = build_routex_hook()
+    extension_hooks = create_liveview_hooks(backends, @supported_lifecycle_stages)
 
-    on_mount_ast = add_to_on_mount([rtx_hook | extension_hooks])
-    handle_params_ast = build_handle_params(helper_mod)
+    on_mount_ast = build_on_mount_ast([rtx_hook | extension_hooks])
+    handle_params_ast = build_handle_params()
+    socket_reducer_ast = build_socket_reducer()
 
-    [on_mount_ast, handle_params_ast]
+    [on_mount_ast, handle_params_ast, socket_reducer_ast]
+  end
+
+  defp build_socket_reducer do
+    quote do
+      def reduce_socket(enumerable, acc, fun) do
+        {result, flag} =
+          Enum.reduce_while(enumerable, {acc, :cont}, fn elem, {acc, _flag} ->
+            case fun.(elem, acc) do
+              {:cont, new_acc} -> {:cont, {new_acc, :cont}}
+              {:halt, new_acc} -> {:halt, {new_acc, :halt}}
+            end
+          end)
+
+        {flag, result}
+      end
+    end
+  end
+
+  # Creates LiveView hooks for each supported lifecycle stage using the provided routes and helper module.
+  @spec create_liveview_hooks(list(), keyword()) :: [] | [Macro.output()]
+  defp create_liveview_hooks(backends, lifecycle_stages) do
+    Enum.reduce(lifecycle_stages, [], fn {callback, args}, acc ->
+      per_backend_result =
+        for backend <- backends,
+            config = backend.config(),
+            extensions <- Keyword.get_values(config.hooks, callback),
+            do: {backend, extensions}
+
+      # credo:disable-for-lines:2
+      hook_vars = Enum.map(args, &Macro.var(&1, __MODULE__))
+      callback_vars = hook_vars ++ [Macro.var(:attrs, __MODULE__)]
+
+      cases = build_cases(callback, callback_vars, per_backend_result)
+      fun = build_functions(hook_vars, cases)
+
+      hook = if fun, do: build_hook(callback, fun), else: nil
+
+      if hook do
+        [hook | acc]
+      else
+        acc
+      end
+    end)
+  end
+
+  # Builds case clauses for a given callback from per-backend extension callbacks.
+  @spec build_cases(atom(), Macro.output(), keyword()) :: Macro.output()
+  defp build_cases(callback, callback_vars, extensions_per_backend) do
+    Enum.flat_map(extensions_per_backend, fn {backend, extensions} ->
+      quote do
+        unquote(backend) ->
+          reduce_socket(unquote(extensions), socket, fn ext, socket ->
+            ext.unquote(callback)(unquote_splicing(callback_vars))
+          end)
+      end
+    end)
+  end
+
+  # Builds a callback function for the given lifecycle stage based on backend cases.
+  @spec build_functions(Macro.output(), Macro.output()) :: Macro.output() | nil
+  defp build_functions(_hook_vars, []), do: nil
+
+  defp build_functions(hook_vars, cases) do
+    quote do
+      fn unquote_splicing(hook_vars) ->
+        # not each callback has the uri param
+        attrs = socket |> Routex.Attrs.get!(:url) |> attrs()
+
+        case attrs.__backend__ do
+          [unquote_splicing(cases)]
+        end
+      end
+    end
   end
 
   # Returns a quoted definition for `handle_params/3` that assigns Routex attributes to the socket.
-  @spec build_handle_params(module()) :: Macro.output()
-  defp build_handle_params(helper_mod) do
+  @spec build_handle_params :: Macro.output()
+  defp build_handle_params do
     {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
 
     module =
@@ -70,12 +166,11 @@ defmodule Routex.Extension.LiveViewHooks do
       @spec handle_params(map(), binary(), Phoenix.LiveView.Socket.t()) ::
               {:cont, Phoenix.LiveView.Socket.t()}
       def handle_params(_params, uri, socket) do
-        # Manually set the :routex key as helpers_mod is not yet in the socket.
-        attrs = unquote(helper_mod).attrs(uri)
+        attrs = attrs(uri)
 
         merge_rtx_attrs = fn socket ->
           Routex.Attrs.merge(socket, %{
-            helpers_mod: unquote(helper_mod),
+            helpers_mod: unquote(nil),
             url: uri,
             __branch__: attrs.__branch__
           })
@@ -92,66 +187,36 @@ defmodule Routex.Extension.LiveViewHooks do
   end
 
   # Returns a quoted expression that attaches the Routex hook for `handle_params` to the socket.
-  @spec build_routex_hook(module()) :: Macro.output()
-  defp build_routex_hook(helper_mod) do
+  @spec build_routex_hook :: Macro.output()
+  defp build_routex_hook do
     quote do
-      socket =
-        Phoenix.LiveView.attach_hook(
-          socket,
-          unquote(__MODULE__),
-          :handle_params,
-          &unquote(helper_mod).handle_params/3
-        )
+      Phoenix.LiveView.attach_hook(__MODULE__, :handle_params, &handle_params/3)
     end
   end
 
   # Returns a quoted definition of `on_mount/4` which splices in provided hook AST blocks.
-  @spec add_to_on_mount(Macro.output()) :: Macro.output()
-  defp add_to_on_mount(hooks_ast) do
+  @spec build_on_mount_ast(Macro.output()) :: Macro.output()
+  defp build_on_mount_ast(hooks_ast) do
+    piped_hooks =
+      Enum.reduce(
+        hooks_ast,
+        quote do
+          socket
+        end,
+        fn hook, acc ->
+          quote do
+            unquote(acc) |> unquote(hook)
+          end
+        end
+      )
+
     quote do
       @spec on_mount(term(), map(), map(), Phoenix.LiveView.Socket.t()) ::
-              {:cont, Phoenix.LiveView.Socket.t()}
+              {:cont, Phoenix.LiveView.Socket.t()} | {:halt, Phoenix.LiveView.Socket.t()}
+      @doc "Implements the on_mount"
       def on_mount(_key, _params, _session, socket) do
-        unquote_splicing(hooks_ast)
+        socket = unquote(piped_hooks)
         {:cont, socket}
-      end
-    end
-  end
-
-  # Builds case clauses for a given callback from per-backend extension callbacks.
-  @spec build_cases(atom(), Macro.output(), map()) :: Macro.output()
-  defp build_cases(callback, callback_vars, extensions_per_backend) do
-    for {backend, extensions} <- extensions_per_backend, extensions != [] do
-      clauses =
-        for ext <- extensions do
-          quote do
-            {:cont, socket} <- unquote(ext).unquote(callback)(unquote_splicing(callback_vars))
-          end
-        end
-
-      quote do
-        unquote(backend) ->
-          # credo:disable-for-next-line
-          with unquote_splicing(clauses) do
-            {:cont, socket}
-          end
-      end
-    end
-    |> List.flatten()
-  end
-
-  # Builds a callback function for the given lifecycle stage based on backend cases.
-  @spec build_functions(Macro.output(), Macro.output(), module()) :: Macro.output() | nil
-  defp build_functions(_hook_vars, [], _helper_mod), do: nil
-
-  defp build_functions(hook_vars, cases, helper_mod) do
-    quote do
-      fn unquote_splicing(hook_vars) ->
-        attrs = socket |> Routex.Attrs.get!(:url) |> unquote(helper_mod).attrs()
-
-        case attrs.__backend__ do
-          [unquote_splicing(cases)]
-        end
       end
     end
   end
@@ -160,38 +225,7 @@ defmodule Routex.Extension.LiveViewHooks do
   @spec build_hook(atom(), Macro.output()) :: Macro.output()
   defp build_hook(callback, fun) do
     quote do
-      socket =
-        Phoenix.LiveView.attach_hook(
-          socket,
-          __MODULE__,
-          unquote(callback),
-          unquote(fun)
-        )
+      Phoenix.LiveView.attach_hook(unquote(__MODULE__), unquote(callback), unquote(fun))
     end
-  end
-
-  # Creates LiveView hooks for each supported lifecycle stage using the provided routes and helper module.
-  @spec create_liveview_hooks(keyword(), keyword(), module()) :: [] | [Macro.output()]
-  defp create_liveview_hooks(routes_per_backend, livecycle_stages, helper_mod) do
-    backends = Keyword.keys(routes_per_backend)
-
-    Enum.reduce(livecycle_stages, [], fn {callback, args}, acc ->
-      per_backend_result =
-        for backend <- backends, backend != nil, into: %{} do
-          extensions =
-            backend.extensions()
-            |> Enum.filter(&function_exported?(&1, callback, length(args) + 1))
-
-          {backend, extensions}
-        end
-
-      hook_vars = Enum.map(args, &Macro.var(&1, __MODULE__))
-      callback_vars = Enum.concat(hook_vars, [Macro.var(:attrs, __MODULE__)])
-      cases = build_cases(callback, callback_vars, per_backend_result)
-      fun = build_functions(hook_vars, cases, helper_mod)
-
-      hook = if fun, do: build_hook(callback, fun), else: []
-      [hook | acc] |> List.flatten()
-    end)
   end
 end

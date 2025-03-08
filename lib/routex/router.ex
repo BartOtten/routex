@@ -12,6 +12,8 @@ defmodule Routex.Router do
   > Routex backend provided as first argument.
   """
 
+  @backends :backends
+
   @supported_types [
     :get,
     :post,
@@ -36,10 +38,18 @@ defmodule Routex.Router do
 
   @spec __using__(opts :: list) :: Macro.output()
   defmacro __using__(_options) do
-    quote do
+    caller_module = __CALLER__.module
+
+    Module.register_attribute(caller_module, @backends, [])
+
+    quote bind_quoted: [caller_module: caller_module] do
       @before_compile Routex.Processing
-      import unquote(__MODULE__), only: [preprocess_using: 2, preprocess_using: 3]
-      defdelegate routex(conn, opts), to: Routex.Processing.helper_mod_name(__MODULE__), as: :plug
+
+      import Routex.Router, only: [preprocess_using: 2, preprocess_using: 3]
+
+      defdelegate routex(conn, opts),
+        to: Routex.Processing.helper_mod_name(caller_module),
+        as: :plug
     end
   end
 
@@ -61,8 +71,16 @@ defmodule Routex.Router do
 
   @spec preprocess_using(module, opts :: list, do: ast :: Macro.t()) :: ast :: Macro.t()
   defmacro preprocess_using(backend, opts \\ [], do: ast) do
-        backend = Macro.expand_once(backend, __CALLER__)
-        Routex.Utils.ensure_compiled!(backend)
+    backend = Macro.expand_once(backend, __CALLER__)
+    router = __CALLER__.module
+
+    Routex.Utils.ensure_compiled!(backend)
+
+    # instead of accumulating (possible causing duplicate values) we add the
+    # backend to the current list and replace the attribute with the result.
+    current_backends = Module.get_attribute(router, @backends, [])
+    new_backends = Enum.uniq([backend | current_backends])
+    Module.put_attribute(router, @backends, new_backends)
 
     Macro.postwalk(ast, fn
       node = {route_method, _route_opts, _route_args} when route_method in @supported_types ->

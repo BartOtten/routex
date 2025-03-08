@@ -12,7 +12,7 @@ defmodule Routex.Router do
   > Routex backend provided as first argument.
   """
 
-  @supported_methods [
+  @supported_types [
     :get,
     :post,
     :put,
@@ -26,9 +26,9 @@ defmodule Routex.Router do
     :resources
   ]
 
-  @unsupported_methods []
+  @unsupported_types []
 
-  @default_methods [
+  @default_types [
     :get,
     :head,
     :options
@@ -44,11 +44,11 @@ defmodule Routex.Router do
   end
 
   @doc false
-  def __supported_methods__, do: @supported_methods
+  def __supported_types__, do: @supported_types
   @doc false
-  def __unsupported_methods__, do: @unsupported_methods
+  def __unsupported_types__, do: @unsupported_types
   @doc false
-  def __default_methods__, do: @default_methods
+  def __default_types__, do: @default_types
 
   @doc """
   Wraps each enclosed route in a scope, marking it for processing by Routex
@@ -61,11 +61,11 @@ defmodule Routex.Router do
 
   @spec preprocess_using(module, opts :: list, do: ast :: Macro.t()) :: ast :: Macro.t()
   defmacro preprocess_using(backend, opts \\ [], do: ast) do
-    Macro.postwalk(ast, fn
-      node = {method, _opts, _args} when method in @supported_methods ->
         backend = Macro.expand_once(backend, __CALLER__)
         Routex.Utils.ensure_compiled!(backend)
 
+    Macro.postwalk(ast, fn
+      node = {route_method, _route_opts, _route_args} when route_method in @supported_types ->
         wrap_in_scope(node, backend, opts)
 
       {{:., _meta, [Kernel, :to_string]}, _meta2, [{binding, _meta3, _args3}]} ->
@@ -78,11 +78,7 @@ defmodule Routex.Router do
 
   # Routes within a `preprocess_using` block are wrapped in a scope which
   # provides the most uniform interface to pass extra information to the
-  # routes.
-
-  # Example:
-  # :resources lack the :private option and their line numbers after expansion
-  # do not match the line number of their 'parent' definition.
+  # different types of routes due to the variation in their arguments.
 
   defp wrap_in_scope(node, backend, opts) do
     quote do

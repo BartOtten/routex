@@ -13,7 +13,7 @@ defmodule Routex.Extension.LiveViewHooks do
 
   @behaviour Routex.Extension
 
-  @storage_key __MODULE__
+  @backends :backends
   @supported_lifecycle_stages [
     handle_params: [:params, :uri, :socket],
     handle_event: [:event, :params, :socket],
@@ -21,7 +21,6 @@ defmodule Routex.Extension.LiveViewHooks do
     handle_async: [:name, :async_fun_result, :socket]
   ]
 
-  @impl Routex.Extension
   @doc """
   Detect supported lifecycle callbacks in extensions and adds
   them to `opts[:hooks]`.
@@ -33,27 +32,20 @@ defmodule Routex.Extension.LiveViewHooks do
   **Supported callbacks:**
   #{inspect(@supported_lifecycle_stages)}
   """
+  @impl Routex.Extension
+  @spec configure(opts :: keyword(), backend :: module()) :: opts :: keyword()
   def configure(opts, _backend) do
     opts = Keyword.put_new(opts, :hooks, [])
     extensions = Keyword.get(opts, :extensions, [])
 
-    for extension <- extensions,
-        {callback, params} <- @supported_lifecycle_stages,
-        function_exported?(extension, callback, length(params) + 1),
-        reduce: opts do
-      acc ->
-        update_in(acc, [:hooks, callback], &[extension | List.wrap(&1)])
-    end
-  end
-
-  @impl Routex.Extension
-  @doc false
-  # Cheat.
-  def post_transform(routes, backend, env) do
-    Module.register_attribute(env.module, @storage_key, accumulate: true)
-    Module.put_attribute(env.module, @storage_key, backend)
-
-    routes
+    _opts =
+      for extension <- extensions,
+          {callback, params} <- @supported_lifecycle_stages,
+          function_exported?(extension, callback, length(params) + 1),
+          reduce: opts do
+        acc ->
+          update_in(acc, [:hooks, callback], &[extension | List.wrap(&1)])
+      end
   end
 
   @doc """
@@ -65,7 +57,7 @@ defmodule Routex.Extension.LiveViewHooks do
   @impl Routex.Extension
   @spec create_helpers([Phoenix.Router.Route.t()], module(), Macro.Env.t()) :: Macro.output()
   def create_helpers(_routes, _backend, env) do
-    backends = Module.get_attribute(env.module, @storage_key)
+    backends = Module.get_attribute(env.module, @backends)
 
     rtx_hook = build_routex_hook()
     extension_hooks = create_liveview_hooks(backends, @supported_lifecycle_stages)
@@ -79,7 +71,7 @@ defmodule Routex.Extension.LiveViewHooks do
 
   defp build_socket_reducer do
     quote do
-      def reduce_socket(enumerable, acc, fun) do
+      defp reduce_socket(enumerable, acc, fun) do
         {result, flag} =
           Enum.reduce_while(enumerable, {acc, :cont}, fn elem, {acc, _flag} ->
             case fun.(elem, acc) do
@@ -100,7 +92,8 @@ defmodule Routex.Extension.LiveViewHooks do
       per_backend_result =
         for backend <- backends,
             config = backend.config(),
-            extensions <- Keyword.get_values(config.hooks, callback),
+            hooks = Map.get(config, :hooks, []),
+            extensions <- Keyword.get_values(hooks, callback),
             do: {backend, extensions}
 
       # credo:disable-for-lines:2

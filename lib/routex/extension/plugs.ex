@@ -11,7 +11,7 @@ defmodule Routex.Extension.Plugs do
 
   @behaviour Routex.Extension
 
-  @storage_key __MODULE__
+  @backends :backends
   @supported_callbacks [
     plug: [:conn, :opts]
   ]
@@ -25,6 +25,7 @@ defmodule Routex.Extension.Plugs do
   - `plug/3`: `Plug.Conn.call/2` with additional attributes argument
   """
   @impl Routex.Extension
+  @spec configure(opts :: keyword(), backend :: module()) :: opts :: keyword()
   def configure(opts, _backend) do
     opts = Keyword.put_new(opts, :plugs, [])
     extensions = Keyword.get(opts, :extensions, [])
@@ -41,18 +42,6 @@ defmodule Routex.Extension.Plugs do
     end)
   end
 
-  @impl Routex.Extension
-  @doc false
-  # Side-effect function used to register backend information.
-  # This function registers the backend in the module attribute and returns the
-  # unchanged routes. It is used by Routex during the transformation phase.
-  def post_transform(routes, backend, env) do
-    Module.register_attribute(env.module, @storage_key, accumulate: true)
-    Module.put_attribute(env.module, @storage_key, backend)
-
-    routes
-  end
-
   @doc """
   Generates a plug hook for Routex that inlines plugs provided by other extensions.
 
@@ -62,10 +51,11 @@ defmodule Routex.Extension.Plugs do
   @impl Routex.Extension
   @spec create_helpers([Phoenix.Router.Route.t()], module(), Macro.Env.t()) :: Macro.output()
   def create_helpers(_routes, _backend, env) do
-    backends = Module.get_attribute(env.module, @storage_key)
+    backends = Module.get_attribute(env.module, @backends)
 
     Enum.map(backends, fn backend ->
-      [{_callback, extensions}] = backend.config().plugs
+      plugs = Map.get(backend.config(), :plugs, [])
+      extensions = Keyword.get(plugs, :plug, [])
 
       quote do
         @doc "Plug of Routex encapsulating extension plugs for #{unquote(backend)}"
@@ -73,7 +63,7 @@ defmodule Routex.Extension.Plugs do
         def plug(%{private: %{routex: %{__backend__: unquote(backend)}}} = conn, opts) do
           url =
             case {conn.request_path, conn.query_string} do
-              {path, nil} -> path
+              {path, ""} -> path
               {path, query} -> "#{path}?#{query}"
             end
 

@@ -55,7 +55,16 @@ defmodule Routex.Extension.Translations do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
+  alias Routex.Types
+
   require Logger
+
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type routes :: Types.routes()
 
   @separator "/"
   @interpolate ":"
@@ -63,6 +72,7 @@ defmodule Routex.Extension.Translations do
   @default_domain "routes"
 
   @impl Routex.Extension
+  @spec configure(opts(), backend()) :: opts()
   def configure(config, backend) do
     gettext_in_compilers? =
       Mix.Project.get!().project()
@@ -85,6 +95,7 @@ defmodule Routex.Extension.Translations do
   end
 
   @impl Routex.Extension
+  @spec transform(routes, backend, env) :: routes
   def transform(routes, config_backend, _env) do
     config = config_backend.config()
 
@@ -102,6 +113,7 @@ defmodule Routex.Extension.Translations do
   end
 
   @impl Routex.Extension
+  @spec create_helpers(routes, backend, env) :: ast
   # creates gettext triggers so route segments are extracted into a translation file
   def create_helpers(routes, config_backend, _env) do
     config = config_backend.config()

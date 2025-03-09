@@ -5,6 +5,7 @@ defmodule Routex.HelperFallbacks do
   defmacro __using__(_) do
     quote do
       @doc "Fallback for attrs/1 returning an empty map."
+      @spec attrs(url :: binary()) :: no_return()
       def attrs(url),
         do:
           raise("""
@@ -19,9 +20,11 @@ defmodule Routex.HelperFallbacks do
           """)
 
       @doc "Fallback for on_mount returning `{:cont, socket}` with unmodified socket"
+      @spec on_mount(atom(), map(), map(), Phoenix.Socket.t()) :: {:cont, Phoenix.Socket.t()}
       def on_mount(_key, _params, _session, socket), do: {:cont, socket}
 
       @doc "Fallback for plug/2 returning the conn unmodified"
+      @spec plug(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
       def plug(conn, _opts), do: conn
 
       defoverridable attrs: 1, on_mount: 4, plug: 2

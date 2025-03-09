@@ -62,7 +62,17 @@ defmodule Routex.Extension.RouteHelpers do
 
   alias Routex.Attrs
   alias Routex.Route
+  alias Routex.Types
   alias Routex.Utils
+
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type routes :: Types.routes()
+
+  @type helper_module :: module()
 
   @interpolate ":"
 
@@ -79,7 +89,7 @@ defmodule Routex.Extension.RouteHelpers do
   ## Returns
   A list of quoted expressions representing the generated helpers.
   """
-  @spec create_helpers(list(Route.t()), module(), Macro.Env.t()) :: list(Macro.t())
+  @spec create_helpers(routes, backend, env) :: ast
   def create_helpers(routes, backend, env) do
     if Module.get_attribute(env.module, :phoenix_helpers, false) do
       do_create_helpers(routes, backend, env)
@@ -93,7 +103,7 @@ defmodule Routex.Extension.RouteHelpers do
   @pdoc """
   Internal function to create the route helpers for the given routes.
   """
-  @spec do_create_helpers(list(Route.t()), module(), Macro.Env.t()) :: list(Macro.t())
+  @spec do_create_helpers(routes, backend, env) :: list(Macro.t())
   defp do_create_helpers(routes, _backend, env) do
     IO.write("\n")
 
@@ -179,7 +189,7 @@ defmodule Routex.Extension.RouteHelpers do
   @pdoc """
   Builds the case clauses for the given routes and arguments.
   """
-  @spec build_case_clauses(list(Route.t()), module(), String.t(), list(any())) :: list(Macro.t())
+  @spec build_case_clauses(routes, backend, String.t(), list(any())) :: list(Macro.t())
   defp build_case_clauses(routes, router, suffix, args) do
     for route <- routes do
       ref = route |> Routex.Attrs.get(:__branch__) |> List.last()
@@ -220,7 +230,7 @@ defmodule Routex.Extension.RouteHelpers do
   @pdoc """
   Generates a defdelegate with the given name and arguments.
   """
-  @spec dynamic_defdelegate_with_arity(module(), atom(), list(Macro.t())) :: Macro.t()
+  @spec dynamic_defdelegate_with_arity(helper_module, atom(), list(Macro.t())) :: Macro.t()
   defp dynamic_defdelegate_with_arity(helper_module, fn_name, fn_args) do
     quote do
       defdelegate unquote(fn_name)(unquote_splicing(fn_args)), to: unquote(helper_module)

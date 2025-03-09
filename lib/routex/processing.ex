@@ -29,16 +29,21 @@ defmodule Routex.Processing do
   """
 
   alias Routex.Attrs
+  alias Routex.Types
 
-  @type backend :: module
-  @type extension_module :: module
-  @type routes :: [Phoenix.Router.Route.t(), ...]
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type routes :: Types.routes()
+  @type extension_module :: module()
 
   @doc """
   Callback executed before compilation of a `Phoenix Router`. This callback is added
   to the `@before_compile` callbacks by `Routex.Router`.
   """
-  @spec __before_compile__(Macro.Env.t()) :: :ok
+  @spec __before_compile__(env()) :: :ok
   def __before_compile__(env) do
     IO.write(["Start: Processing routes with ", inspect(__MODULE__), "\n"])
     execute_callbacks(env)
@@ -52,10 +57,11 @@ defmodule Routex.Processing do
   The main function of this module. Receives as only argument the environment of a
   Phoenix router module.
   """
-  @spec execute_callbacks(Macro.Env.t()) :: :ok
+  @spec execute_callbacks(env) :: :ok
   def execute_callbacks(env),
     do: execute_callbacks(env, Module.get_attribute(env.module, :phoenix_routes))
 
+  @spec execute_callbacks(env, routes) :: :ok
   def execute_callbacks(env, routes) when is_list(routes) do
     helper_mod_name = helper_mod_name(env.module)
 
@@ -84,9 +90,6 @@ defmodule Routex.Processing do
 
   defp debug?, do: System.get_env("ROUTEX_DEBUG") == "true"
 
-  @spec put_initial_attrs(routes :: [Phoenix.Router.Route.t()], router :: module()) :: [
-          Phoenix.Router.Route.t()
-        ]
   defp put_initial_attrs(routes, helper_mod_name) do
     routes
     |> Enum.with_index()
@@ -170,7 +173,7 @@ defmodule Routex.Processing do
     |> Enum.sort_by(&Attrs.get(&1, :__branch__))
   end
 
-  @spec create_helper_module(Macro.t(), module(), Macro.Env.t()) ::
+  @spec create_helper_module(ast(), module(), env()) ::
           {:module, module, binary, term}
   defp create_helper_module(ast, module, env) do
     IO.write(["Create or update helper module ", inspect(module), "\n"])

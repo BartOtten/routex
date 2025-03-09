@@ -15,6 +15,15 @@ defmodule Routex.Extension.PutLocale do
 
   @behaviour Routex.Extension
 
+  alias Routex.Types
+
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type routes :: Types.routes()
+
   @doc """
   Hook attached to the `handle_params` stage in the LiveView life cycle. Inlined by Routex.
   """
@@ -32,6 +41,7 @@ defmodule Routex.Extension.PutLocale do
   end
 
   @impl Routex.Extension
+  @spec create_helpers(routes, backend, env) :: ast
   def create_helpers(_routes, backend, _env) do
     ast = build_ast(backend)
 

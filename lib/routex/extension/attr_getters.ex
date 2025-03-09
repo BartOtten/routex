@@ -52,8 +52,17 @@ defmodule Routex.Extension.AttrGetters do
 
   alias Routex.Attrs
   alias Routex.Matchable
+  alias Routex.Types
+
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type routes :: Types.routes()
 
   @impl Routex.Extension
+  @spec create_helpers(routes, backend, env) :: ast
   def create_helpers(routes, _backend, _env) do
     prelude =
       quote do

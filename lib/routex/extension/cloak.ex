@@ -58,10 +58,20 @@ defmodule Routex.Extension.Cloak do
 
   @behaviour Routex.Extension
 
+  alias Routex.Types
+
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type routes :: Types.routes()
+
   @interpolate ":"
   @catch_all "*"
 
   @impl Routex.Extension
+  @spec transform(routes, backend, env) :: routes
   def transform(routes, _backend, _env) do
     {routes, _} =
       for {route, idx} <- Enum.with_index(routes, 0), reduce: {[], %{}} do

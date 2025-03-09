@@ -7,10 +7,15 @@ defmodule Routex.Extension do
   See also: [Routex Extensions](EXTENSION_DEVELOPMENT.md)
   """
 
-  @type backend :: Routex.Backend.t()
-  @type env :: Macro.Env.t()
-  @type opts :: list
-  @type routes :: [Phoenix.Router.Route.t()]
+  alias Routex.Types
+
+  @type ast :: Types.ast()
+  @type backend :: Types.backend()
+  @type config :: Types.config()
+  @type env :: Types.env()
+  @type opts :: Types.opts()
+  @type route :: Types.route()
+  @type routes :: Types.routes()
 
   @doc """
   The `configure/2` callback is called in the first stage with the options

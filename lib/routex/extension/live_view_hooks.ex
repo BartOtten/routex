@@ -34,6 +34,7 @@ defmodule Routex.Extension.LiveViewHooks do
   **Supported callbacks:**
   #{inspect(@supported_lifecycle_stages)}
   """
+
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(opts, _backend) do
@@ -58,8 +59,8 @@ defmodule Routex.Extension.LiveViewHooks do
   """
   @impl Routex.Extension
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(routes, _backend, _env) do
-    backends = Route.get_backends(routes)
+  def create_helpers(_routes, _backend, env) do
+    backends = Module.get_attribute(env.module, @backends)
 
     rtx_hook = build_routex_hook()
     extension_hooks = create_liveview_hooks(backends, @supported_lifecycle_stages)

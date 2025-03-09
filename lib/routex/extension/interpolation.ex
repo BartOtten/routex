@@ -54,6 +54,7 @@ defmodule Routex.Extension.Interpolation do
   @behaviour Routex.Extension
 
   alias Routex.Attrs
+  alias Routex.Types, as: T
 
   require Logger
 
@@ -108,6 +109,7 @@ defmodule Routex.Extension.Interpolation do
   end
 
   @impl Routex.Extension
+  @spec transform(T.routes(), T.backend(), T.env()) :: T.routes()
   def transform(routes, _backend, _env) do
     routes
     |> Enum.map(&interpolate/1)

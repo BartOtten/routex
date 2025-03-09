@@ -9,7 +9,21 @@ defmodule Routex.Matchable do
   """
 
   import Record
+
+  alias Routex.Types, as: T
+
   require Record
+
+  @type t ::
+          record(:matchable,
+            hosts: list(),
+            path: list(),
+            trailing_slash: list(),
+            query: list(),
+            fragment: list()
+          )
+
+  @type multi :: binary() | map() | list() | T.ast() | T.route()
 
   @path_separator "/"
   @ast_placeholder "_RTX_"
@@ -43,6 +57,7 @@ defmodule Routex.Matchable do
   	{:matchable, [], ["posts", {:"::", [], [{{:., [], [Kernel, :to_string]}, [from_interpolation: true], [{:id, [], Elixir}]}, {:binary, [], Elixir}]}], nil, nil, false}
 
   """
+  @spec new(input :: multi()) :: t()
   def new(input) when is_binary(input) do
     # Mimmicks the regex from URI.parse/1 but does not consider a hash (`#`) start of a
     # fragment when directly followed by a curly bracket (`{`) as the combination `#{` is used
@@ -140,7 +155,7 @@ defmodule Routex.Matchable do
   defp nillify(nil), do: []
   defp nillify(other), do: other
 
-  def placeholders_to_ast(path, dyns) do
+  defp placeholders_to_ast(path, dyns) do
     codepoint_to_integer = fn codepoint ->
       <<codepoint>> |> Kernel.to_string() |> String.to_integer()
     end
@@ -206,6 +221,7 @@ defmodule Routex.Matchable do
          >  |> Matchable.new()
          >  |> Matchable.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
   """
+  @spec to_func(pattern :: t(), name :: atom, args :: keyword(), T.ast()) :: T.ast()
   def to_func(match_pattern, name, other_args \\ [], body)
 
   def to_func(record, name, other_args, body) when is_tuple(record) do
@@ -259,6 +275,7 @@ defmodule Routex.Matchable do
   	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
   """
 
+  @spec to_pattern(T.route() | t()) :: T.ast()
   def to_pattern(%Phoenix.Router.Route{} = route),
     do: route |> new() |> to_pattern()
 
@@ -301,6 +318,10 @@ defmodule Routex.Matchable do
     Enum.join([path, trailing_slash, query, fragment])
   end
 
+  @doc """
+  Takes a record and returns a list of ast, each element matching one segment.
+  """
+  @spec to_ast_segments(t()) :: list(T.ast())
   def to_ast_segments(record) do
     s = matchable(record, :path) || []
     q = matchable(record, :query) || []
@@ -332,6 +353,7 @@ defmodule Routex.Matchable do
       false
   """
 
+  @spec match?(multi() | t(), multi | t()) :: boolean()
   def match?(record_1, record_2)
       when is_record(record_1, :matchable) and is_record(record_2, :matchable) do
     segments_1 = matchable(record_1, :path)

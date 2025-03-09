@@ -78,10 +78,12 @@ defmodule Routex.Extension.AlternativeGetters do
   alias Routex.Attrs
   alias Routex.Matchable
   alias Routex.Route
+  alias Routex.Types, as: T
 
   defstruct [:slug, :attrs, match?: false]
 
   @impl Routex.Extension
+  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, _backend, _env) do
     prelude =
       quote do

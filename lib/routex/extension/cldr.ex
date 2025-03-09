@@ -121,8 +121,12 @@ defmodule Routex.Extension.Cldr do
   """
 
   @behaviour Routex.Extension
+
+  alias Routex.Types, as: T
+
   require Logger
 
+  @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(config, _backend) do
     # causes a newline for output printed by Cldr
     IO.write("\n")
@@ -167,7 +171,7 @@ defmodule Routex.Extension.Cldr do
     (cldr_locales ++ gettext_locales) |> Enum.uniq()
   end
 
-  def display_name(locale, backend) do
+  defp display_name(locale, backend) do
     {:ok, result} =
       Module.concat(backend, LocaleDisplay).display_name(locale,
         locale: locale,

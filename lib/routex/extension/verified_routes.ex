@@ -98,6 +98,7 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   alias Routex.Attrs
   alias Routex.Matchable
+  alias Routex.Types, as: T
 
   require Logger
   require Phoenix.VerifiedRoutes
@@ -111,6 +112,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   }
 
   @impl Routex.Extension
+  @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(config, backend) do
     final_config_map = merge_defaults_and_config(@defaults, config)
     print_message(final_config_map, backend)
@@ -127,6 +129,7 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
 
   @impl Routex.Extension
+  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, backend, _env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space

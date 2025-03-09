@@ -70,6 +70,7 @@ defmodule Routex.Extension.Alternatives do
   alias Routex.Attrs
   alias Routex.Extension.Alternatives.Branches
   alias Routex.Extension.Alternatives.Config
+  alias Routex.Types, as: T
 
   @expandable_route_methods [
     :get,
@@ -85,6 +86,7 @@ defmodule Routex.Extension.Alternatives do
   ]
 
   @impl Routex.Extension
+  @spec configure(T.config(), T.backend()) :: T.config()
   def configure(config, _backend) do
     branches_nested = Branches.add_precomputed_values!(config[:alternatives])
     expansion_config = Config.new!(branches_nested: branches_nested)
@@ -93,6 +95,7 @@ defmodule Routex.Extension.Alternatives do
   end
 
   @impl Routex.Extension
+  @spec transform(T.routes(), T.backend(), T.env()) :: T.routes()
   def transform(routes, backend, _env) do
     config = backend.config()
 

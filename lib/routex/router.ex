@@ -12,6 +12,8 @@ defmodule Routex.Router do
   > Routex backend provided as first argument.
   """
 
+  alias Routex.Types
+
   @supported_types [
     :get,
     :post,
@@ -59,10 +61,10 @@ defmodule Routex.Router do
   extensions. Format: `[rtx.{binding}]`.
   """
 
-  @spec preprocess_using(module, opts :: list, do: ast :: Macro.t()) :: ast :: Macro.t()
+  @spec preprocess_using(T.backend(), T.opts(), do: T.ast()) :: T.ast()
   defmacro preprocess_using(backend, opts \\ [], do: ast) do
-        backend = Macro.expand_once(backend, __CALLER__)
-        Routex.Utils.ensure_compiled!(backend)
+    backend = Macro.expand_once(backend, __CALLER__)
+    Routex.Utils.ensure_compiled!(backend)
 
     Macro.postwalk(ast, fn
       node = {route_method, _route_opts, _route_args} when route_method in @supported_types ->

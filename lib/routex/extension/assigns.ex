@@ -47,17 +47,10 @@ defmodule Routex.Extension.Assigns do
 
   @behaviour Routex.Extension
 
-  alias Routex.Types
-
-  @type ast :: Types.ast()
-  @type backend :: Types.backend()
-  @type config :: Types.config()
-  @type env :: Types.env()
-  @type opts :: Types.opts()
-  @type routes :: Types.routes()
+  alias Routex.Types, as: T
 
   @impl Routex.Extension
-  @spec post_transform(routes, backend, env) :: routes
+  @spec post_transform(T.routes(), T.backend(), T.env()) :: T.routes()
   def post_transform(routes, backend, _env) do
     config = backend.config()
     namespace = get_in(config, [Access.key(:assigns), :namespace])

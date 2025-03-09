@@ -122,18 +122,11 @@ defmodule Routex.Extension.Cldr do
 
   @behaviour Routex.Extension
 
-  alias Routex.Types
+  alias Routex.Types, as: T
 
   require Logger
 
-  @type ast :: Types.ast()
-  @type backend :: Types.backend()
-  @type config :: Types.config()
-  @type env :: Types.env()
-  @type opts :: Types.opts()
-  @type routes :: Types.routes()
-
-  @spec configure(opts(), backend()) :: opts()
+  @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(config, _backend) do
     # causes a newline for output printed by Cldr
     IO.write("\n")

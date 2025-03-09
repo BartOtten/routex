@@ -8,11 +8,7 @@ defmodule Routex.Utils do
   the terminal during compile time.
   """
 
-  alias Routex.Types
-
-  @type ast :: Types.ast()
-  @type env :: Types.env()
-  @type route :: Types.route()
+  alias Routex.Types, as: T
 
   # credo:disable-for-lines:2
   @spec print(module(), input :: iodata) :: :ok
@@ -50,7 +46,7 @@ defmodule Routex.Utils do
   Returns the AST to get the current branch from process dict or from  assigns, conn or socket
   based on the available variables in the `caller` module.
   """
-  @spec get_helper_ast(caller :: env) :: ast
+  @spec get_helper_ast(caller :: T.env()) :: T.ast()
   def get_helper_ast(caller) do
     quote do
       if branch = Process.get(:rtx_branch) do
@@ -95,7 +91,7 @@ defmodule Routex.Utils do
     end
   end
 
-  @spec get_branch(route) :: integer()
+  @spec get_branch(T.route() | map | Plug.Conn.t() | Phoenix.Socket.t()) :: integer()
   def get_branch(%{private: %{routex: %{__branch__: branch}}}) do
     List.last(branch)
   end

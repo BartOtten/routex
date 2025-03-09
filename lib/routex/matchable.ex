@@ -10,7 +10,7 @@ defmodule Routex.Matchable do
 
   import Record
 
-  alias Routex.Types
+  alias Routex.Types, as: T
 
   require Record
 
@@ -22,11 +22,8 @@ defmodule Routex.Matchable do
             query: list(),
             fragment: list()
           )
-  @type ast :: Types.ast()
-  @type env :: Types.env()
-  @type route :: Types.route()
-  @type routes :: Types.routes()
-  @type multi :: binary() | route() | map() | list() | ast()
+
+  @type multi :: binary() | map() | list() | T.ast() | T.route()
 
   @path_separator "/"
   @ast_placeholder "_RTX_"
@@ -224,7 +221,7 @@ defmodule Routex.Matchable do
          >  |> Matchable.new()
          >  |> Matchable.to_func(:my_func, [pattern_arg: "fixed", :catchall_arg], quote(do: :ok))
   """
-  @spec to_func(pattern :: t(), name :: atom, args :: keyword(), ast()) :: ast()
+  @spec to_func(pattern :: t(), name :: atom, args :: keyword(), T.ast()) :: T.ast()
   def to_func(match_pattern, name, other_args \\ [], body)
 
   def to_func(record, name, other_args, body) when is_tuple(record) do
@@ -278,7 +275,7 @@ defmodule Routex.Matchable do
   	{:{}, [], [:matchable, {:hosts, [], Routex.Matchable}, ["original", "segment_1", "segment_2"], {:query, [], Routex.Matchable}, {:fragment, [], Routex.Matchable}, false]}
   """
 
-  @spec to_pattern(route() | t()) :: ast()
+  @spec to_pattern(T.route() | t()) :: T.ast()
   def to_pattern(%Phoenix.Router.Route{} = route),
     do: route |> new() |> to_pattern()
 
@@ -324,7 +321,7 @@ defmodule Routex.Matchable do
   @doc """
   Takes a record and returns a list of ast, each element matching one segment.
   """
-  @spec to_ast_segments(t()) :: list(ast())
+  @spec to_ast_segments(t()) :: list(T.ast())
   def to_ast_segments(record) do
     s = matchable(record, :path) || []
     q = matchable(record, :query) || []

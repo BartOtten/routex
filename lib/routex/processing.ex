@@ -29,21 +29,16 @@ defmodule Routex.Processing do
   """
 
   alias Routex.Attrs
-  alias Routex.Types
+  alias Routex.Types, as: T
 
-  @type ast :: Types.ast()
-  @type backend :: Types.backend()
-  @type config :: Types.config()
-  @type env :: Types.env()
-  @type opts :: Types.opts()
-  @type routes :: Types.routes()
   @type extension_module :: module()
+  @type helper_module :: module()
 
   @doc """
   Callback executed before compilation of a `Phoenix Router`. This callback is added
   to the `@before_compile` callbacks by `Routex.Router`.
   """
-  @spec __before_compile__(env()) :: :ok
+  @spec __before_compile__(T.env()) :: :ok
   def __before_compile__(env) do
     IO.write(["Start: Processing routes with ", inspect(__MODULE__), "\n"])
     execute_callbacks(env)
@@ -57,11 +52,11 @@ defmodule Routex.Processing do
   The main function of this module. Receives as only argument the environment of a
   Phoenix router module.
   """
-  @spec execute_callbacks(env) :: :ok
+  @spec execute_callbacks(T.env()) :: :ok
   def execute_callbacks(env),
     do: execute_callbacks(env, Module.get_attribute(env.module, :phoenix_routes))
 
-  @spec execute_callbacks(env, routes) :: :ok
+  @spec execute_callbacks(T.env(), T.routes()) :: :ok
   def execute_callbacks(env, routes) when is_list(routes) do
     helper_mod_name = helper_mod_name(env.module)
 
@@ -173,7 +168,7 @@ defmodule Routex.Processing do
     |> Enum.sort_by(&Attrs.get(&1, :__branch__))
   end
 
-  @spec create_helper_module(ast(), module(), env()) ::
+  @spec create_helper_module(T.ast(), helper_module, T.env()) ::
           {:module, module, binary, term}
   defp create_helper_module(ast, module, env) do
     IO.write(["Create or update helper module ", inspect(module), "\n"])

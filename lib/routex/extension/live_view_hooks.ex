@@ -13,14 +13,7 @@ defmodule Routex.Extension.LiveViewHooks do
 
   @behaviour Routex.Extension
 
-  alias Routex.Types
-
-  @type ast :: Types.ast()
-  @type backend :: Types.backend()
-  @type config :: Types.config()
-  @type env :: Types.env()
-  @type opts :: Types.opts()
-  @type routes :: Types.routes()
+  alias Routex.Types, as: T
 
   @backends :backends
   @supported_lifecycle_stages [
@@ -42,7 +35,7 @@ defmodule Routex.Extension.LiveViewHooks do
   #{inspect(@supported_lifecycle_stages)}
   """
   @impl Routex.Extension
-  @spec configure(opts(), backend()) :: opts()
+  @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(opts, _backend) do
     opts = Keyword.put_new(opts, :hooks, [])
     extensions = Keyword.get(opts, :extensions, [])
@@ -64,7 +57,7 @@ defmodule Routex.Extension.LiveViewHooks do
   Returns  on_mount/4` and an initial `handle_params/3`.
   """
   @impl Routex.Extension
-  @spec create_helpers(routes, backend, env) :: ast
+  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(_routes, _backend, env) do
     backends = Module.get_attribute(env.module, @backends)
 

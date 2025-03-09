@@ -11,14 +11,7 @@ defmodule Routex.Extension.Plugs do
 
   @behaviour Routex.Extension
 
-  alias Routex.Types
-
-  @type ast :: Types.ast()
-  @type backend :: Types.backend()
-  @type config :: Types.config()
-  @type env :: Types.env()
-  @type opts :: Types.opts()
-  @type routes :: Types.routes()
+  alias Routex.Types, as: T
 
   @backends :backends
   @supported_callbacks [
@@ -34,7 +27,7 @@ defmodule Routex.Extension.Plugs do
   - `plug/3`: `Plug.Conn.call/2` with additional attributes argument
   """
   @impl Routex.Extension
-  @spec configure(opts, backend) :: opts
+  @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(opts, _backend) do
     opts = Keyword.put_new(opts, :plugs, [])
     extensions = Keyword.get(opts, :extensions, [])
@@ -58,7 +51,7 @@ defmodule Routex.Extension.Plugs do
   encapsulates all the plug callbacks registered by Routex extension backends.
   """
   @impl Routex.Extension
-  @spec create_helpers(routes, backend, env) :: ast
+  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(_routes, _backend, env) do
     backends = Module.get_attribute(env.module, @backends)
 

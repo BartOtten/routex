@@ -62,15 +62,8 @@ defmodule Routex.Extension.RouteHelpers do
 
   alias Routex.Attrs
   alias Routex.Route
-  alias Routex.Types
+  alias Routex.Types, as: T
   alias Routex.Utils
-
-  @type ast :: Types.ast()
-  @type backend :: Types.backend()
-  @type config :: Types.config()
-  @type env :: Types.env()
-  @type opts :: Types.opts()
-  @type routes :: Types.routes()
 
   @type helper_module :: module()
 
@@ -89,7 +82,7 @@ defmodule Routex.Extension.RouteHelpers do
   ## Returns
   A list of quoted expressions representing the generated helpers.
   """
-  @spec create_helpers(routes, backend, env) :: ast
+  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, backend, env) do
     if Module.get_attribute(env.module, :phoenix_helpers, false) do
       do_create_helpers(routes, backend, env)
@@ -103,7 +96,7 @@ defmodule Routex.Extension.RouteHelpers do
   @pdoc """
   Internal function to create the route helpers for the given routes.
   """
-  @spec do_create_helpers(routes, backend, env) :: list(Macro.t())
+  @spec do_create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   defp do_create_helpers(routes, _backend, env) do
     IO.write("\n")
 
@@ -189,7 +182,7 @@ defmodule Routex.Extension.RouteHelpers do
   @pdoc """
   Builds the case clauses for the given routes and arguments.
   """
-  @spec build_case_clauses(routes, backend, String.t(), list(any())) :: list(Macro.t())
+  @spec build_case_clauses(T.routes(), T.backend(), String.t(), list(any())) :: T.ast()
   defp build_case_clauses(routes, router, suffix, args) do
     for route <- routes do
       ref = route |> Routex.Attrs.get(:__branch__) |> List.last()

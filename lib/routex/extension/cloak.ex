@@ -67,32 +67,31 @@ defmodule Routex.Extension.Cloak do
   @spec transform(T.routes(), T.backend(), T.env()) :: T.routes()
   def transform(routes, _backend, _env) do
     {routes, _} =
-      for {route, idx} <- Enum.with_index(routes, 0), reduce: {[], %{}} do
-        {routes, cloak_map} ->
-          if path = cloak_map[route.path] do
-            route = %{route | path: path}
-            {[route | routes], cloak_map}
-          else
-            dynamics =
-              route.path
-              |> Path.split()
-              |> Enum.filter(&(&1 === @catch_all || String.starts_with?(&1, @interpolate)))
+      routes
+      |> Enum.with_index()
+      |> Enum.reduce({[], %{}}, fn {route, idx}, {routes, cloak_map} ->
+        if path = cloak_map[route.path] do
+          route = %{route | path: path}
+          {[route | routes], cloak_map}
+        else
+          dynamics =
+            route.path
+            |> Path.split()
+            |> Enum.filter(&(&1 === @catch_all || String.starts_with?(&1, @interpolate)))
 
-            static =
-              if idx == 0 do
-                []
-              else
-                [to_string(idx)]
-              end
+          static = static_to_segment(idx)
 
-            path = ["/", dynamics, static] |> Path.join() |> Path.absname()
-            cloak_map = Map.put_new(cloak_map, route.path, path)
-            route = %{route | path: path}
+          path = ["/", dynamics, static] |> Path.join() |> Path.absname()
+          cloak_map = Map.put_new(cloak_map, route.path, path)
+          route = %{route | path: path}
 
-            {[route | routes], cloak_map}
-          end
-      end
+          {[route | routes], cloak_map}
+        end
+      end)
 
     routes
   end
+
+  defp static_to_segment(0), do: []
+  defp static_to_segment(idx), do: [to_string(idx)]
 end

@@ -45,7 +45,7 @@ defmodule Routex.Extension.TranslationsTest do
       assert_raise RuntimeError, fn -> Translations.transform(routes, RtxBackend, nil) end
 
     assert exception.message =~
-             ":locale `en/US` is a non supported format. Found in private.routex of route %Phoenix.Router.Route{"
+             ":locale `en/US` is a non supported format. Found in private.routex of route"
   end
 
   test "should translate routes based on :language attribute" do

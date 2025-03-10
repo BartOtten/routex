@@ -84,7 +84,7 @@ defmodule Routex.Extension.RouteHelpers do
   """
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, backend, env) do
-    if Module.get_attribute(env.module, :phoenix_helpers, false) do
+    if Utils.get_attribute(env.module, :phoenix_helpers, false) do
       do_create_helpers(routes, backend, env)
     else
       []

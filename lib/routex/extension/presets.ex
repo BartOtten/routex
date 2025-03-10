@@ -105,7 +105,6 @@ defmodule Routex.Extension.Preset do
       preset = [
         extensions: [
           Preset.Alternatives
-          # Routex.Extension.PutLocale
         ],
         gettext_module: Module.concat(Mix.Phoenix.base(), Gettext)
       ]

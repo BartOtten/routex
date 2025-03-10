@@ -8,6 +8,14 @@ defmodule Routex.Route do
   @default_nesting_offset 0
 
   @doc """
+  Returns a list of unique backends
+  """
+  @spec get_backends(T.routes()) :: list(T.backend())
+  def get_backends(routes) do
+    routes |> Enum.map(&Routex.Attrs.get(&1, :__backend__)) |> Enum.uniq()
+  end
+
+  @doc """
   Returns the nesting level of an (ancestor) route. By default
   the parent. This can be adjusted by providing an negative depth offset.
   """

@@ -107,6 +107,28 @@ defmodule Routex.Utils do
     0
   end
 
+  @doc """
+  Test env aware variant of Module.get_attribute. Delegates to
+  `Module.get_attribute/3` in non-test environments. In test environment it
+  returns the result of `Module.get_attribute/3` or an empty list when the
+  module is already compiled.
+  """
+  if Mix.env() == :test do
+    def get_attribute(module, key, default \\ nil) do
+      Module.get_attribute(module, key, default)
+    rescue
+      ArgumentError ->
+        alert(
+          "TEST MODE",
+          "Used fallback for `get_attributes(#{module}, #{key})`, returning an empty list"
+        )
+
+        []
+    end
+  else
+    defdelegate get_attribute(module, key, default \\ nil), to: Module
+  end
+
   # credo:disable-for-next-line
   # TODO: remove when we depend on Elixir 1.12+
   @doc """

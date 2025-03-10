@@ -149,7 +149,8 @@ defmodule Routex.MixProject do
         "Routex.Extension.Plugs",
         "Routex.Extension.RouteHelpers",
         "Routex.Processing",
-        "Routex.Route"
+        "Routex.Route",
+        "Routex.Types"
       ],
       skip_code_autolink_to: ["Phoenix.Router.Route"]
     ]

@@ -57,9 +57,11 @@ defmodule Routex.Processing do
     do: execute_callbacks(env, Module.get_attribute(env.module, :phoenix_routes))
 
   def execute_callbacks(env, routes) when is_list(routes) do
+    helper_mod_name = helper_mod_name(env.module)
+
     backend_routes_callbacks =
       routes
-      |> put_initial_attrs()
+      |> put_initial_attrs(helper_mod_name)
       |> group_by_backend()
       |> add_callbacks_map()
 
@@ -70,11 +72,9 @@ defmodule Routex.Processing do
     |> remove_build_info()
     |> write_routes(env)
 
-    module = helper_mod_name(env.module)
-
     ast_per_extension
-    |> generate_helper_ast(module)
-    |> create_helper_module(module, env)
+    |> generate_helper_ast(helper_mod_name)
+    |> create_helper_module(helper_mod_name, env)
 
     IO.write(["End: ", inspect(__MODULE__), " completed route processing.", "\n"])
     :ok
@@ -87,13 +87,14 @@ defmodule Routex.Processing do
     routes
     |> Enum.with_index()
     |> Enum.map(fn {route, index} ->
-      meta =
-        Map.new()
-        |> Map.put(:__origin__, route.path)
-        |> Map.put(:__branch__, [index])
+      rtx = %{
+        __origin__: route.path,
+        __branch__: [index],
+        __helper_mod__: helper_mod_name
+      }
 
       overrides = Map.get(route.private, :rtx, %{})
-      attrs = Map.merge(meta, overrides)
+      attrs = Map.merge(rtx, overrides)
 
       Attrs.merge(route, attrs)
     end)

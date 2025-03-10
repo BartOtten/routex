@@ -5,6 +5,7 @@ defmodule Routex.Route do
   alias Phoenix.Router.Route
   alias Routex.Attrs
   alias Routex.Types, as: T
+  alias Routex.Utils
 
   @default_nesting_offset 0
 
@@ -70,7 +71,7 @@ defmodule Routex.Route do
   @spec exprs(T.route(), T.env()) :: map
   def exprs(route, env) do
     if Kernel.function_exported?(Route, :exprs, 2) do
-      forwards = env.module |> Module.get_attribute(:phoenix_forwards)
+      forwards = env.module |> Utils.get_attribute(:phoenix_forwards)
       apply(Route, :exprs, [route, forwards])
     else
       apply(Route, :exprs, [route])

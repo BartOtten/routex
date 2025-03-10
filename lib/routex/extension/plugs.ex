@@ -11,8 +11,8 @@ defmodule Routex.Extension.Plugs do
 
   @behaviour Routex.Extension
 
-  alias Routex.Types, as: T
   alias Routex.Route
+  alias Routex.Types, as: T
 
   @supported_callbacks [
     plug: [:conn, :opts]
@@ -52,8 +52,8 @@ defmodule Routex.Extension.Plugs do
   """
   @impl Routex.Extension
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(_routes, _backend, env) do
-    backends = Module.get_attribute(env.module, @backends)
+  def create_helpers(routes, _backend, _env) do
+    backends = Route.get_backends(routes)
 
     Enum.map(backends, fn backend ->
       plugs = Map.get(backend.config(), :plugs, [])

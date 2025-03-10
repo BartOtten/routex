@@ -6,7 +6,7 @@ defmodule Routex.Processing do
 
   **Powerful but thin**
   Although Routex is able to influence the routes in Phoenix applications in profound
-  ways, the framework and it's extensions are a suprisingly lightweight piece
+  ways, the framework and its extensions are a surprisingly lightweight piece
   of compile-time middleware. This is made possible by the way router modules
   are pre-processed by `Phoenix.Router` itself.
 
@@ -29,7 +29,6 @@ defmodule Routex.Processing do
   """
 
   alias Routex.Attrs
-  alias Routex.Utils
 
   @type backend :: module
   @type extension_module :: module
@@ -42,71 +41,46 @@ defmodule Routex.Processing do
   @spec __before_compile__(Macro.Env.t()) :: :ok
   def __before_compile__(env) do
     IO.write(["Start: Processing routes with ", inspect(__MODULE__), "\n"])
-
-    # Enable to get more descriptive error messages during development.
-    # Causes compilation failure when enabled.
-    wrap_in_task = System.get_env("ROUTEX_DEBUG") == "true"
-
-    if wrap_in_task do
-      Utils.alert(
-        "Routex processing is wrapped in a task for debugging purposes. Compilation will fail"
-      )
-
-      task = Task.async(fn -> execute_callbacks(env) end)
-      Task.await(task, :infinity)
-    else
-      execute_callbacks(env)
-    end
+    execute_callbacks(env)
   end
+
+  @doc false
+  @spec helper_mod_name(Macro.Env.t()) :: module
+  def helper_mod_name(env), do: Module.concat([env.module, :RoutexHelpers])
 
   @doc """
   The main function of this module. Receives as only argument the environment of a
   Phoenix router module.
   """
   @spec execute_callbacks(Macro.Env.t()) :: :ok
-  def execute_callbacks(env) do
-    routes =
-      env.module
-      |> Module.get_attribute(:phoenix_routes)
+  def execute_callbacks(env),
+    do: execute_callbacks(env, Module.get_attribute(env.module, :phoenix_routes))
+
+  def execute_callbacks(env, routes) when is_list(routes) do
+    backend_routes_callbacks =
+      routes
       |> put_initial_attrs()
+      |> group_by_backend()
+      |> add_callbacks_map()
 
-    # grouping per config module allows extensions to use accumulated values.
-    routes_per_backend = Enum.group_by(routes, &Attrs.get(&1, :__backend__))
-
-    # phase 1: transform route structs
-    processed_routes_per_backend_p1 =
-      for {backend, routes} <- routes_per_backend do
-        {backend, transform_routes(routes, backend, env)}
-      end
-
-    # phase 2: post transform route structs
-    processed_routes_per_backend_p2 =
-      for {backend, routes} <- processed_routes_per_backend_p1 do
-        {backend, post_transform_routes(routes, backend, env)}
-      end
-
-    # phase 3: generate ast for helpers
-    helpers_ast =
-      for {backend, routes} <- processed_routes_per_backend_p2, backend != nil do
-        create_helper_functions(routes, backend, env)
-      end
-
-    # restore routes order
-    new_routes =
-      processed_routes_per_backend_p2
-      |> Enum.map(&elem(&1, 1))
-      |> List.flatten()
-      |> Enum.sort_by(&Attrs.get(&1, :__branch__))
+    {ast_per_extension, new_routes} =
+      execute(backend_routes_callbacks, env)
 
     new_routes
     |> remove_build_info()
     |> write_routes(env)
 
-    create_helper_module(helpers_ast, env)
+    module = helper_mod_name(env)
+
+    ast_per_extension
+    |> generate_helper_ast(module)
+    |> create_helper_module(module, env)
 
     IO.write(["End: ", inspect(__MODULE__), " completed route processing.", "\n"])
     :ok
   end
+
+  defp debug?, do: System.get_env("ROUTEX_DEBUG") == "true"
 
   @spec put_initial_attrs(routes :: [Phoenix.Router.Route.t()]) :: [Phoenix.Router.Route.t()]
   defp put_initial_attrs(routes) do
@@ -125,92 +99,92 @@ defmodule Routex.Processing do
     end)
   end
 
-  @spec helper_mod_name(Macro.Env.t()) :: module
-  @doc false
-  def helper_mod_name(env), do: Module.concat([env.module, :RoutexHelpers])
-
-  @spec transform_routes(routes, backend, Macro.Env.t()) :: routes
-  defp transform_routes(routes, nil, _env), do: routes
-
-  defp transform_routes(routes, backend, env) do
-    Utils.ensure_compiled!(backend)
-
-    for extension <- backend.extensions(), extension != [], reduce: routes do
-      acc ->
-        exec_when_defined(backend, extension, :transform, acc, [acc, backend, env])
-    end
+  defp group_by_backend(routes) do
+    routes |> Enum.group_by(&Attrs.get(&1, :__backend__)) |> Map.drop([nil])
   end
 
-  @spec post_transform_routes(routes, backend, Macro.Env.t()) :: routes
-  defp post_transform_routes(routes, nil, _env), do: routes
-
-  defp post_transform_routes(routes, backend, env) do
-    Utils.ensure_compiled!(backend)
-
-    for extension <- backend.extensions(), extension != [], reduce: routes do
-      acc ->
-        exec_when_defined(backend, extension, :post_transform, acc, [acc, backend, env])
-    end
+  def add_callbacks_map(routes_per_backend) do
+    Enum.map(routes_per_backend, fn {backend, routes} ->
+      {backend, backend.callbacks(), routes}
+    end)
   end
 
-  defp create_helper_functions(routes, backend, env) do
-    Utils.ensure_compiled!(backend)
-
-    for extension <- backend.extensions(), extension != [] do
-      exec_when_defined(backend, extension, :create_helpers, nil, [
-        routes,
-        backend,
-        env
-      ])
-    end
+  defp execute(backend_routes_callbacks, env) do
+    transformed_routes_per_backend = transform_routes_per_backend(backend_routes_callbacks, env)
+    helpers_ast = generate_helpers_ast(transformed_routes_per_backend, env)
+    new_routes = restore_routes_order(transformed_routes_per_backend)
+    {helpers_ast, new_routes}
   end
 
-  @spec create_helper_module(Macro.t(), Macro.Env.t()) ::
+  # Transformations
+
+  def transform_routes_per_backend(backend_routes_callbacks, env) do
+    Enum.map(backend_routes_callbacks, fn {backend, callbacks, routes} ->
+      transformed_routes = apply_transform_callbacks(callbacks, routes, backend, env)
+      {backend, callbacks, transformed_routes}
+    end)
+  end
+
+  defp apply_transform_callbacks(callbacks, routes, backend, env) do
+    Enum.reduce([:transform, :post_transform], routes, fn callback_name, acc ->
+      extensions = callbacks[callback_name]
+      apply_transform_callback(callback_name, extensions, acc, backend, env)
+    end)
+  end
+
+  defp apply_transform_callback(callback_name, extensions, routes, backend, env) do
+    Enum.reduce(extensions, routes, fn extension, inner_routes ->
+      execute_callback(callback_name, backend, extension, [inner_routes, backend, env])
+    end)
+  end
+
+  # AST Generation
+  defp generate_helpers_ast(callback_name \\ :create_helpers, transformed_routes_per_backend, env) do
+    Enum.flat_map(transformed_routes_per_backend, fn {backend, callbacks, routes} ->
+      extensions = callbacks[callback_name]
+      generate_helper_ast(callback_name, extensions, routes, backend, env)
+    end)
+  end
+
+  defp generate_helper_ast(callback_name, extensions, routes, backend, env) do
+    Enum.map(extensions, fn extension ->
+      ast =
+        callback_name
+        |> execute_callback(backend, extension, [routes, backend, env])
+        |> dedup_ast()
+
+      :ok = Macro.validate(ast)
+
+      {extension, ast}
+    end)
+  end
+
+  defp restore_routes_order(processed_routes_per_backend) do
+    processed_routes_per_backend
+    |> Enum.flat_map(fn {_backend, _callbacks, routes} -> routes end)
+    |> Enum.sort_by(&Attrs.get(&1, :__branch__))
+  end
+
+  @spec create_helper_module(Macro.t(), module(), Macro.Env.t()) ::
           {:module, module, binary, term}
-  defp create_helper_module(extensions_ast, env) do
-    module = helper_mod_name(env)
+  defp create_helper_module(ast, module, env) do
     IO.write(["Create or update helper module ", inspect(module), "\n"])
+    Module.create(module, ast, env)
+  end
 
-    stubs =
-      for {fun, arity} <- [attrs: 1, on_mount: 4, plug: 2] do
-        if not callback_exists?(extensions_ast, fun, arity) do
-          Routex.Utils.print([
-            inspect(module),
-            ".",
-            to_string(fun),
-            "/",
-            to_string(arity),
-            " not found. Using stub."
-          ])
-
-          case fun do
-            :attrs ->
-              quote do
-                @doc "Stub for attrs/1 returning an empty map."
-                def attr(url), do: %{}
-              end
-
-            :on_mount ->
-              quote do
-                @doc "Stub for on_mount returning `{:cont, socket}` with unmodified socket"
-                def on_mount(_key, _params, _session, socket), do: {:cont, socket}
-              end
-
-            :plug ->
-              quote do
-                @doc "Stub for plug/2 returning the conn unmodified"
-                def plug(conn, _opts), do: conn
-              end
-          end
-        end
-      end
-
+  defp generate_helper_ast(ast_per_extension, module) do
     prelude =
       quote do
         require Logger
+        use Routex.HelperFallbacks
       end
 
-    ast = [prelude, stubs | extensions_ast] |> List.flatten() |> Enum.uniq()
+    helpers_ast =
+      ast_per_extension
+      |> Enum.map(fn {_ext, ast} -> ast end)
+      |> dedup_ast()
+
+    ast = [prelude, helpers_ast]
 
     if Application.fetch_env(:routex, :helper_mod_dir) != :error do
       sub_path = (module |> to_string() |> String.trim_leading("Elixir.")) <> ".ex"
@@ -218,32 +192,41 @@ defmodule Routex.Processing do
     end
 
     :ok = Macro.validate(ast)
-    Module.create(module, ast, env)
+    ast
+  end
 
-    defp write_ast(ast, module, sub_path) do
-      dir = Application.fetch_env!(:routex, :helper_mod_dir)
-      path = Path.join(dir, sub_path)
+  defp write_ast(ast, module, sub_path) do
+    dir = Application.fetch_env!(:routex, :helper_mod_dir)
+    path = Path.join(dir, sub_path)
 
-      Routex.Utils.print(__MODULE__, "Wrote AST of #{module} to #{path}")
+    Routex.Utils.print(__MODULE__, "Wrote AST of #{module} to #{path}")
 
-      wrapped_ast =
-        quote do
-          defmodule unquote(module) do
-            @moduledoc """
-            This code is generated by Routex and is for inspection purpose only
-            """
+    wrapped_ast =
+      quote do
+        defmodule unquote(module) do
+          @moduledoc """
+          This code is generated by Routex and is for inspection purpose only
+          """
 
-            unquote_splicing(ast)
-          end
+          unquote_splicing(ast)
         end
+      end
 
-      formatted_binary =
-        wrapped_ast
-        |> Macro.to_string()
-        |> Code.format_string!()
+    formatted_binary =
+      wrapped_ast
+      |> Macro.to_string()
+      |> Code.format_string!()
 
-      :ok = File.write(path, formatted_binary)
-    end
+    :ok = File.write(path, formatted_binary)
+  end
+
+  # prevent duplication of attributes, functions etc
+  defp dedup_ast(ast) do
+    ast
+    |> List.wrap()
+    |> List.flatten()
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
   end
 
   defp remove_build_info(routes) do
@@ -257,43 +240,26 @@ defmodule Routex.Processing do
   end
 
   @doc """
-  Checks if the `callback` is defined. When defined it executes
-  the `callback` and returns the result , otherwise returns `default`.
+  Executes the specified callback for an extension and returns the result.
   """
-  def exec_when_defined(backend, extension_module, callback, default, args) do
-    if callback_exists?(extension_module, callback, Enum.count(args)) do
-      postprint = [
-        inspect(backend),
-        " ⇒ ",
-        inspect(extension_module),
-        ".",
-        callback |> Atom.to_string() |> String.trim_leading(":"),
-        "/",
-        to_string(Enum.count(args))
-      ]
+  def execute_callback(callback, backend, extension_module, args) do
+    postprint = [
+      inspect(backend),
+      " -> ",
+      inspect(extension_module),
+      ".",
+      callback |> Atom.to_string() |> String.trim_leading(":"),
+      "/",
+      to_string(Enum.count(args))
+    ]
 
-      processing_print = "Executing: "
-      complete_print = "Completed: "
+    processing_print = "Executing: "
+    complete_print = "Completed: "
 
-      IO.write([processing_print, postprint])
-      result = apply(extension_module, callback, args)
-      IO.write(["\r", complete_print, postprint, "\n"])
-      result
-    else
-      default
-    end
-  end
+    debug?() && IO.write([processing_print, postprint])
+    result = apply(extension_module, callback, args)
+    debug?() && IO.write(["\r", complete_print, postprint, "\n"])
 
-  defp callback_exists?(module, callback, arity) when is_atom(module) do
-    module.__info__(:functions)[callback] == arity
-  end
-
-  defp callback_exists?(ast, function, arity) do
-    ast
-    |> Macro.prewalker()
-    |> Enum.find_value(false, fn
-      {:def, _meta1, [{^function, _meta2, args} | _rest]} -> length(args) == arity
-      _other -> false
-    end)
+    result
   end
 end

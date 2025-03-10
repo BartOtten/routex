@@ -13,9 +13,9 @@ defmodule Routex.Extension.LiveViewHooks do
 
   @behaviour Routex.Extension
 
+  alias Routex.Route
   alias Routex.Types, as: T
 
-  @backends :backends
   @supported_lifecycle_stages [
     handle_params: [:params, :uri, :socket],
     handle_event: [:event, :params, :socket],
@@ -58,8 +58,8 @@ defmodule Routex.Extension.LiveViewHooks do
   """
   @impl Routex.Extension
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(_routes, _backend, env) do
-    backends = Module.get_attribute(env.module, @backends)
+  def create_helpers(routes, _backend, _env) do
+    backends = Route.get_backends(routes)
 
     rtx_hook = build_routex_hook()
     extension_hooks = create_liveview_hooks(backends, @supported_lifecycle_stages)

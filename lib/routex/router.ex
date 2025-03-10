@@ -12,7 +12,7 @@ defmodule Routex.Router do
   > Routex backend provided as first argument.
   """
 
-  alias Routex.Types
+  alias Routex.Types, as: T
 
   @supported_types [
     :get,
@@ -36,7 +36,7 @@ defmodule Routex.Router do
     :options
   ]
 
-  @spec __using__(opts :: list) :: Macro.output()
+  @spec __using__(T.opts()) :: T.ast()
   defmacro __using__(_options) do
     quote do
       @before_compile Routex.Processing

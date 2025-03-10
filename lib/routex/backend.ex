@@ -134,11 +134,15 @@ defmodule Routex.Backend do
 
   defp capture_io(fun, true) do
     {:group_leader, original_gl} = Process.info(self(), :group_leader)
-    {:ok, capture_gl} = StringIO.open("")
 
     try do
-      Process.group_leader(self(), capture_gl)
-      fun.()
+      {:ok, result} =
+        StringIO.open("", fn pid ->
+          Process.group_leader(self(), pid)
+          fun.()
+        end)
+
+      result
     after
       Process.group_leader(self(), original_gl)
     end

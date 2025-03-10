@@ -48,22 +48,23 @@ defmodule Routex.Extension.PutLocale do
   defp build_ast(backend) do
     config = backend.config() |> Map.from_struct()
 
-    for {module, config_key} <- @module_config_map,
-        module = Module.concat([module]),
-        Code.ensure_compiled(module),
-        function_exported?(module, :put_locale, 1),
-        !is_nil(config[config_key]) do
+    for {_module, config_key} <- @module_config_map,
+        !is_nil(config[config_key]),
+        module = config[config_key],
+        Code.ensure_compiled!(module),
+        function_exported?(module, :put_locale, 1) do
       build_put_locale_ast(module, config, config_key)
     end
   end
 
-  defp build_put_locale_ast(module, config, config_key) when module in [Cldr] do
+  defp build_put_locale_ast(module, config, config_key) when config_key == :cldr_backend do
     quote do
       unquote(module).put_locale(unquote(config[config_key]), attrs[:locale] || attrs[:language])
     end
   end
 
-  defp build_put_locale_ast(module, config, config_key) when module in [Gettext, Fluent] do
+  defp build_put_locale_ast(module, config, config_key)
+       when config_key == :translations_backend do
     quote do
       unquote(module).put_locale(unquote(config[config_key]), attrs[:language] || attrs[:locale])
       unquote(module).put_locale(attrs[:language] || attrs[:locale])

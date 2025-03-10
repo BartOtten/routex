@@ -369,3 +369,48 @@ defmodule Routex.RouteTest do
     assert expected == Route.group_by_method_and_origin(routes)
   end
 end
+
+defmodule Routex.RouteTest_ModuleMocking do
+  use ExUnit.Case, async: false
+
+  setup do
+    on_exit(fn -> Code.require_file("deps/phoenix/lib/phoenix/router/route.ex") end)
+  end
+
+  describe "exprs/2 fallback branch" do
+    test "calls exprs/1 when exprs/2 is not available" do
+      Code.compiler_options(ignore_module_conflict: true)
+      # Define a fake Phoenix.Router.Route that only exports exprs/1.
+      Code.compile_string("""
+      defmodule Phoenix.Router.Route do
+        def exprs(one), do: {:one, one}
+      end
+      """)
+
+      env = %{module: __MODULE__}
+      route = :test_route
+
+      assert Routex.Route.exprs(route, env) == {:one, route}
+
+      Code.require_file("deps/phoenix/lib/phoenix/router/route.ex")
+    end
+
+    test "calls exprs/2 when exprs/2 is available" do
+      Code.compiler_options(ignore_module_conflict: true)
+      # Define a fake Phoenix.Router.Route that only exports exprs/1.
+      Code.compile_string("""
+      defmodule Phoenix.Router.Route do
+        def exprs(route, _forwards), do: {:two, route}
+      end
+      """)
+
+      env = %{module: __MODULE__}
+      route = :test_route
+
+      # With no exprs/2 available, the fallback branch is taken.
+      assert Routex.Route.exprs(route, env) == {:two, :test_route}
+
+      Code.require_file("deps/phoenix/lib/phoenix/router/route.ex")
+    end
+  end
+end

@@ -15,7 +15,9 @@ defmodule Routex.Extension.CloakTest do
       %Phoenix.Router.Route{path: "/bar"},
       %Phoenix.Router.Route{path: "/bar/show/:id"},
       %Phoenix.Router.Route{path: "/bar/:id"},
-      %Phoenix.Router.Route{path: "/bar/:id/edit"}
+      %Phoenix.Router.Route{path: "/bar/:id/edit"},
+      # triggers duplicate check
+      %Phoenix.Router.Route{path: "/foo"}
     ]
 
     transformed_routes = Cloak.transform(routes, Conf1, nil)

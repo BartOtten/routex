@@ -12,6 +12,8 @@ defmodule Routex.Router do
   > Routex backend provided as first argument.
   """
 
+  alias Routex.Utils
+
   @backends :backends
 
   @supported_types [
@@ -78,7 +80,7 @@ defmodule Routex.Router do
 
     # instead of accumulating (possible causing duplicate values) we add the
     # backend to the current list and replace the attribute with the result.
-    current_backends = Module.get_attribute(router, @backends, [])
+    current_backends = Utils.get_attribute(router, @backends, [])
     new_backends = Enum.uniq([backend | current_backends])
     Module.put_attribute(router, @backends, new_backends)
 

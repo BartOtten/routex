@@ -30,7 +30,7 @@ defmodule Routex.Processing do
 
   alias Routex.Attrs
   alias Routex.Types, as: T
-
+  alias Routex.Utils
   @type extension_module :: module()
   @type helper_module :: module()
 
@@ -54,7 +54,7 @@ defmodule Routex.Processing do
   """
   @spec execute_callbacks(T.env()) :: :ok
   def execute_callbacks(env),
-    do: execute_callbacks(env, Module.get_attribute(env.module, :phoenix_routes))
+    do: execute_callbacks(env, Utils.get_attribute(env.module, :phoenix_routes))
 
   @spec execute_callbacks(T.env(), T.routes()) :: :ok
   def execute_callbacks(env, routes) when is_list(routes) do

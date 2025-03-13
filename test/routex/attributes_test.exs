@@ -82,6 +82,16 @@ defmodule Routex.AttributesTest do
       assert %{some: "bar", foo: "baz"} == get(route)
     end
 
+    test "without a key, attrs not available" do
+      route = %Route{private: %{}}
+      assert %{} == get(route)
+    end
+
+    test "without a key, uses fallback when attrs not available" do
+      route = %Route{private: %{}}
+      assert "fallback" == get(route, nil, "fallback")
+    end
+
     test "with a key" do
       route = %Route{private: %{routex: %{some: "bar", foo: "baz"}}}
       assert "bar" == get(route, :some)
@@ -96,12 +106,42 @@ defmodule Routex.AttributesTest do
       route = %Route{private: %{routex: %{some: "bar", foo: "baz"}}}
       assert "fallback" == get(route, :non_existing, "fallback")
     end
+
+    test "handles conn" do
+      route = %Plug.Conn{private: %{routex: %{some: "bar", foo: "baz"}}}
+      assert "bar" == get(route, :some)
+    end
+
+    test "handles socket" do
+      route = %Phoenix.Socket{private: %{routex: %{some: "bar", foo: "baz"}}}
+      assert "bar" == get(route, :some)
+    end
+
+    test "handles map" do
+      route = %{private: %{routex: %{some: "bar", foo: "baz"}}}
+      assert "bar" == get(route, :some)
+    end
   end
 
-  describe "test!" do
+  describe "get!" do
+    test "with a key" do
+      route = %Route{private: %{routex: %{some: "bar", foo: "baz"}}}
+      assert "bar" == get!(route, :some)
+    end
+
+    test "raises when no routex attrs are set" do
+      route = %Route{private: %{}}
+      assert_raise(RuntimeError, fn -> get!(route, :non_existing) end)
+    end
+
     test "raises when attr not found" do
       route = %Route{private: %{routex: %{some: "bar", foo: "baz"}}}
-      assert_raise RuntimeError, fn -> get!(route, :non_existing, "Key not found yaw!") end
+      assert_raise(RuntimeError, fn -> get!(route, :non_existing) end)
+    end
+
+    test "raises with custom message" do
+      route = %Route{private: %{routex: %{some: "bar", foo: "baz"}}}
+      assert_raise(RuntimeError, "my failure", fn -> get!(route, :non_existing, "my failure") end)
     end
   end
 end

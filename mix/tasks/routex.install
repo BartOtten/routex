@@ -1,0 +1,201 @@
+defmodule Mix.Tasks.Routex.Install do
+  use Mix.Task
+
+  @shortdoc "Installs Routex and configures a Routex backend with a dynamic list of extensions"
+
+  @moduledoc """
+  This task installs Routex into your Phoenix project. It updates your web interface entrypoint,
+  injects a helper function for Routex routes, and generates a default Routex backend module configured
+  with the available extensions.
+
+  The list of extensions is stored as a module attribute (`@extensions`) for easy maintenance.
+  The app’s web module name is derived dynamically from your Mix project configuration.
+  """
+
+  @extensions [
+    Routex.Extension.AlternativeGetters,
+    Routex.Extension.Alternatives,
+    Routex.Extension.Assigns,
+    Routex.Extension.AttrGetters,
+    Routex.Extension.Interpolation,
+    Routex.Extension.PhoenixLiveviewHooks,
+    Routex.Extension.Plugs,
+    Routex.Extension.RouteHelpers,
+    Routex.Extension.VerifiedRoutes
+  ]
+
+  @impl Mix.Task
+  def run(_args) do
+    Mix.shell().info("Starting Routex installation...")
+
+    add_dependency()
+    update_web_interface()
+    create_routex_backend_file()
+    preprocess_routes()
+
+    Mix.shell().info("Routex installation complete. Please review the changes and update your configuration as needed.")
+  end
+
+  defp web_module_name do
+    # Derive the web module name (e.g. MyAppWeb) from the :app config.
+    Mix.Project.config()[:app]
+    |> to_string()
+    |> Macro.camelize()
+    |> Kernel.<>("Web")
+  end
+
+  defp web_entrypoint_file do
+    # Typically, the web entrypoint is in "lib/my_app_web.ex"
+    "lib/#{Macro.underscore(web_module_name())}.ex"
+  end
+
+  defp web_directory do
+    # Typically, the web modules are inside a directory "lib/my_app_web"
+    "lib/#{Macro.underscore(web_module_name())}"
+  end
+
+  defp add_dependency do
+    Mix.shell().info("Adding Routex dependency to mix.exs")
+
+    file = "mix.exs"
+
+    content = File.read!(file)
+    updated_content =
+      content
+      |> String.replace(~r/defp deps do\s*\[.*?\]/s, """
+      defp deps do
+        [
+          {:routex, ">= 0.0.0"},
+          ...
+        ]
+      end
+      """)
+
+    File.write!(file, updated_content)
+  end
+
+  defp update_web_interface do
+    file = web_entrypoint_file()
+
+    if File.exists?(file) do
+      content = File.read!(file)
+
+      content =
+        content
+        |> inject_use_routex_router()
+        |> inject_on_mount()
+        |> inject_helpers()
+
+      File.write!(file, content)
+      Mix.shell().info("Updated #{file} with Routex integration.")
+    else
+      Mix.shell().error("Could not find #{file}. Please update your project manually to use Routex.")
+    end
+  end
+
+  defp inject_use_routex_router(content) do
+    # Insert "use Routex.Router" immediately before the "use Phoenix.Router" line.
+    regex = ~r/(use Phoenix.Router, helpers: false)/
+    String.replace(content, regex, "use Routex.Router\n\\1")
+  end
+
+  defp inject_on_mount(content) do
+    web_mod = web_module_name()
+
+    if String.contains?(content, "unquote(html_helpers())") do
+      String.replace(content, "unquote(html_helpers())", """
+      unquote(html_helpers())
+      on_mount(unquote(#{web_mod}).Router.RoutexHelpers)
+      """)
+    else
+      content
+    end
+  end
+
+  defp inject_helpers(content) do
+    # Dynamically use the computed web module name in the helper function.
+    web_mod = web_module_name()
+
+    helper_code = """
+    defp routex_helpers do
+      quote do
+        import #{inspect Module.concat([String.to_atom(web_mod), Router, RoutexHelpers])}, only: :macros
+        alias #{inspect Module.concat([String.to_atom(web_mod), Router, RoutexHelpers])}, as: Routes
+      end
+    end
+    """
+
+    if String.contains?(content, "defp routex_helpers") do
+      content
+    else
+      content <> "\n" <> helper_code
+    end
+  end
+
+  defp create_routex_backend_file do
+    # Dynamically generate the extensions list as a string.
+    extensions_code =
+      @extensions
+      |> Enum.map(&("    " <> inspect(&1)))
+      |> Enum.join(",\n")
+
+    # Use the dynamic web module name in the generated backend module.
+    web_mod = web_module_name()
+
+    backend_module = """
+    defmodule #{web_mod}.RoutexBackend do
+      @moduledoc \"\"\"
+      This backend for Routex includes the following extensions:
+    #{Enum.map_join(@extensions, "\n", fn ext -> "  - " <> inspect(ext) end)}
+      \"\"\"
+      use Routex.Backend,
+        extensions: [
+    #{extensions_code}
+        ]
+    end
+    """
+
+    backend_path = Path.join(web_directory(), "routex_backend.ex")
+    File.mkdir_p!(web_directory())
+    File.write!(backend_path, backend_module)
+    Mix.shell().info("Created #{backend_path} with default Routex backend configuration.")
+  end
+
+  defp preprocess_routes do
+    file = "lib/#{Macro.underscore(web_module_name())}/router.ex"
+
+    if File.exists?(file) do
+      content = File.read!(file)
+
+      content =
+        content
+        |> String.replace(~r/plug :fetch_current_user/, """
+        plug :fetch_current_user
+        plug :routex
+        """)
+        |> String.replace(~r/pipe_through :browser/, """
+        pipe_through :browser
+        preprocess_using #{web_module_name()}.RoutexBackend do
+          # ...routes...
+        end
+        """)
+        |> String.replace(~r/pipe_through \[:browser, :redirect_if_user_is_authenticated\]/, """
+        pipe_through [:browser, :redirect_if_user_is_authenticated]
+        preprocess_using #{web_module_name()}.RoutexBackend do
+          # ...routes...
+        end
+        """)
+        |> String.replace(~r/pipe_through \[:browser, :require_authenticated_user\]/, """
+        pipe_through [:browser, :require_authenticated_user]
+        preprocess_using #{web_module_name()}.RoutexBackend do
+          # ...routes...
+        end
+        """)
+
+      File.write!(file, content)
+      Mix.shell().info("Updated #{file} with Routex route preprocessing.")
+    else
+      Mix.shell().error("Could not find #{file}. Please update your project manually to use Routex.")
+    end
+  end
+end

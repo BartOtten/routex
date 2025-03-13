@@ -7,45 +7,65 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/routex)](https://hex.pm/packages/routex)
 ![Hex.pm](https://img.shields.io/hexpm/l/routex)
 
-# Routex: Supercharge your Phoenix Router
+# Routex: Phoenix localized routes and beyond...
 
-This powerful library works together with Phoenix Router to provide the ultimate
-routing solution. It simplifies route manipulation, giving you the control you
-need to handle even the most demanding routing requirements.
+Routex is a robust routing library that integrates seamlessly with Phoenix
+Router, providing a comprehensive solution for even the most complex routing
+requirements. It streamlines route manipulation so that you have complete
+control over your application's navigation logic.
 
-Routex comes with extensions for internationalization (i18n), localization
-(l10n), translated (multilingual) URLs, alternative routes generation and [many
-more](docs/EXTENSION_SUMMARIES.md). Its modern extensible architecture enables you to easily
-build custom solutions that work harmoniously with other extensions.
+Designed with extensibility in mind, Routex comes equipped with a suite of
+extensions—covering internationalization (i18n), localization (l10n),
+multilingual URL handling, alternative route generation, and more (see
+[Extension Summaries](docs/EXTENSION_SUMMARIES.md) for details). Its modern
+architecture makes it straightforward to craft custom routing solutions that
+integrate effortlessly with other extensions.
 
-<p class="hidden-at-hexdocs">
-This documentation reflects the main branch. For the latest
-stable release, refer to [Hexdocs](https://hexdocs.pm/routex/readme.html).
-</p>
+<p class="hidden-at-hexdocs"> This documentation reflects the main branch. For
+the latest stable release, refer to <a
+href="https://hexdocs.pm/routex/readme.html">HexDocs</a>. </p>
 
 ## Top Features and Benefits
 
-* **No dependencies, no state**: Routex is unique in not requiring any external dependency
-  and works *by default* without proces state.
+- **Zero Dependencies & Stateless Operation:** Routex is unique in not depending
+  on external dependencies and functions out-of-the-box without requiring
+  process state.
 
-* **Powerful transformations**: Routex supports advanced route transformations, including
-  everything needed for internationalization (i18n) and localization (l10n).
+- **Runtime Integrations:** Routex extensions can provide tailor made Plugs and
+  Phoenix LiveView Lifecycle Hooks; bridging the gap between server-side routing
+  and client-side interactivity.
 
-* **Extension driven**: Being extension driven, Routex can be adapted to your
-  specific needs. It's architecture allows you to write your own routing
-  features without having to worry about breaking existing functionality. Routex
-  ships with extensions covering a wide range of use cases.
-  Have a look at [a summary of extensions](docs/EXTENSION_SUMMARIES.md).
+- **Advanced Route Transformations:** It supports sophisticated route
+  transformations to not only to cover every aspect of internationalization (i18n)
+  and localization (l10n) and go beyond.
 
-* **Optimized for performance**: Built to fit between route configuration and
-  route compilation. Routex enhances Phoenix routing without adding runtime
-  overhead, ensuring that applications run as fast as ever.
+- **Extension-Centric Design:** The extension-driven architecture of Routex
+  allows you to tailor its behavior to meet your specific needs. Customize
+  routing features without worrying about breaking existing functionality—see
+  [Extension Summaries](docs/EXTENSION_SUMMARIES.md) for a full list.
 
-* **Detailed documentation**: Comprehensive, well-organized documentation
-  provides clear guidance on installation, configuration, and best practices,
-  making Routex approachable for developers at all levels. For example: If you
-  are interested in internationalization (i18n) or localization (l10n) have a
-  look at the [Localized Routes Guide](docs/guides/LOCALIZED_ROUTES.md).
+- **Optimized Performance:** Positioned between route configuration and
+  compilation, Routex enhances Phoenix routing without adding runtime overhead.
+
+- **Comprehensive Documentation:** Detailed and well-organized guides provide
+  clear instructions for installation, configuration, and best practices, making
+  Routex accessible to developers at every level. For specialized topics like
+  i18n or l10n, consult the [Localized Routes
+  Guide](docs/guides/LOCALIZED_ROUTES.md).
+
+
+## Articles
+
+To help you understand where Routex fits in.
+
+### [How Routex and Phoenix Router Work Together](docs/ROUTEX_AND_PHOENIX_ROUTER.md)
+Understanding how Routex, its extensions, and Phoenix Router work together can
+be tricky at first sight. To help you understand, we came up with an analogy.
+
+### [Routex compared to Phoenix Router and Cldr Routes](docs/COMPARISON.md)
+We published a comparison with the intended to help you understand
+the differences, strengths, and tradeoffs when deciding which routing solution
+best fits your needs.
 
 
 ## Installation and usage
@@ -61,15 +81,3 @@ instructions.
 [code](https://github.com/BartOtten/routex_example/).
 
 
-## Articles
-
-To help you understand where Routex fits in.
-
-### [How Routex and Phoenix Router Work Together](docs/ROUTEX_AND_PHOENIX_ROUTER.md)
-Understanding how Routex, its extensions, and Phoenix Router work together can
-be tricky at first sight. To help you understand, we came up with an analogy.
-
-### [Routex compared to Phoenix Router and Cldr Routes](docs/COMPARISON.md)
-We published a comparison with the intended to help you understand
-the differences, strengths, and tradeoffs when deciding which routing solution
-best fits your needs.

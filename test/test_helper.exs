@@ -61,10 +61,10 @@ defmodule ListAssertions do
             raise ArgumentError,
                   "#{inspect(item)} does not match any pattern: #{Macro.to_string(patterns)}"
 
-          index when is_map_key(acc, index) ->
-            raise ArgumentError,
-                  "both #{inspect(item)} and #{inspect(acc[index])} match pattern: " <>
-                    Macro.to_string(Enum.fetch!(patterns, index))
+          # index when is_map_key(acc, index) ->
+          #   raise ArgumentError,
+          #         "both #{inspect(item)} and #{inspect(acc[index])} match pattern: " <>
+          #           Macro.to_string(Enum.fetch!(patterns, index))
 
           index when is_integer(index) ->
             Map.put(acc, index, item)

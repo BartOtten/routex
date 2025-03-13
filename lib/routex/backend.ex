@@ -1,109 +1,155 @@
 defmodule Routex.Backend do
   @moduledoc """
-  > #### `use Routex.Backend` {: .info}
-  > When use'd this module generates a Routex backend module and
-  > a configuration struct using the `configure/2` callbacks of
-  > the extensions provided in `opts`.
+  > #### `use Routex.Backend`
+  > When used, this module generates a Routex backend module and a configuration struct
+  > by running the `configure/2` callbacks of the extensions provided in `opts`.
   >
   > See also: [Routex Extensions](EXTENSION_DEVELOPMENT.md).
-
-  **Example**
-
-       iex> defmodule MyApp.RtxBackend do
-       ...>  use Routex.Backend,
-       ...>   extensions: [
-       ...>    Routex.Extension.VerifiedRoutes,
-       ...>    Routex.Extension.AttrGetters,
-       ...>   ],
-       ...>   extension_x_config: [key: "value"]
-       ...> end
-       iex> IO.inspect(%MyApp.RtxBackend{})
-       %MyApp.RtxBackend{
-         extension_x_config: [key: "value"],
-         extensions: [Routex.Extension.VerifiedRoutes, Routex.Extension.AttrGetters],
-         verified_sigil_routex: "~l",
-         verified_sigil_original: "~o"
-       }
-
-  Values in the configuration can be overridden by providing an override map to the `:private` option of a scope or route.
-
-  **Example**
-
-      live /products, MyApp.Web.ProductIndexLive, :index, private: %{rtx: %{overridden_key: value}}
-  """
-
-  @typedoc """
-    A Routex backend module
   """
 
   alias Routex.Utils
 
+  @typedoc "A Routex backend module"
   @type t :: module
 
   @default_reduction_limit 10
   @default_callbacks Routex.Extension.behaviour_info(:callbacks)
 
-  @spec __using__(opts :: list) :: Macro.output()
+  @spec __using__(Keyword.t()) :: Macro.t()
   defmacro __using__(opts) do
-    # eval_quoted is inside a macro is considered bad practice as it will attempt
-    # to evaluate runtime values at compile time. However, that is exactly what
-    # we want to happen this time.
-    {new_opts, extensions_per_callback} =
-      opts
-      |> eval_opts(__CALLER__)
-      |> Keyword.put(:__backend__, __CALLER__.module)
-      |> Keyword.put(:__processed__, [])
-      |> prepare_unquoted()
-
-    extensions =
-      extensions_per_callback
-      |> Map.values()
-      |> List.flatten()
-      |> Enum.uniq()
-
-    kw_opts = Keyword.new(new_opts)
+    new_opts = prepare_unquoted(opts, __CALLER__)
+    struct = struct_from_opts(new_opts)
+    extensions_per_callback = group_extensions_per_callback(new_opts[:extensions])
+    extensions = extract_extensions(extensions_per_callback)
 
     quote do
-      defstruct unquote(Macro.escape(kw_opts))
-
-      @typedoc """
-        A Routex backend struct
+      @moduledoc """
+      A backend module for Routex
       """
+
+      unquote(struct)
+
+      @typedoc "Routex Backend struct"
       @type config :: struct()
 
-      @spec config :: config
+      @typedoc "List of extensions used in this backend"
+      @type extensions :: [module]
+
+      @typedoc "Map with extensions per callback."
+      @type callbacks :: %{atom() => [module]}
+
       @doc "Returns a compiled Routex Backend configuration"
+      @spec config :: config
       def config, do: %__MODULE__{}
 
-      @spec extensions :: [module]
       @doc "Returns the list of extensions used in this backend."
-      def extensions, do: unquote(Macro.escape(extensions))
+      @spec extensions :: extensions
+      def extensions,
+        do: unquote(Macro.escape(extensions))
 
-      @spec callbacks :: %{module() => list()}
       @doc "Returns a map with extensions per callback."
+      @spec callbacks :: callbacks
       def callbacks, do: unquote(Macro.escape(extensions_per_callback))
     end
   end
 
-  defp prepare_unquoted(opts, reduction \\ 1) do
-    backend = Keyword.get(opts, :__backend__)
-    enforce_reduction_limit!(reduction, backend)
+  defp struct_from_opts(opts) do
+    kw_opts = Keyword.new(opts)
 
-    extensions = Keyword.get(opts, :extensions, [])
-    Enum.each(extensions, &ensure_availability!/1)
-    extensions_per_callback = map_extensions_per_callback(extensions)
-    new_opts = apply_callback_per_extension(extensions_per_callback[:configure], :configure, opts)
-    new_extensions = Keyword.get(new_opts, :extensions, [])
-
-    if new_extensions == extensions do
-      new_extensions_per_callback = map_extensions_per_callback(extensions)
-      {new_opts, new_extensions_per_callback}
-    else
-      prepare_unquoted(new_opts, reduction + 1)
+    quote do
+      defstruct unquote(Macro.escape(kw_opts))
     end
   end
 
-  defp map_extensions_per_callback(extensions, callbacks \\ @default_callbacks) do
+  @doc false
+  @spec prepare_unquoted(Keyword.t(), Macro.Env.t() | module) :: Keyword.t()
+  def prepare_unquoted(opts, %Macro.Env{module: backend} = env) do
+    opts = eval_opts(opts, env)
+    prepare_unquoted(opts, backend)
+  end
+
+  def prepare_unquoted(opts, backend) do
+    opts
+    |> merge_private_opts(backend)
+    |> process_extensions(backend)
+  end
+
+  defp merge_private_opts(opts, backend) do
+    merge_opts(opts, __backend__: backend, __processed__: [], extensions: [])
+  end
+
+  defp merge_opts(a, b) do
+    Keyword.merge(a, b, fn
+      :extensions, a, b -> a ++ b
+      _key, a, _b -> a
+    end)
+  end
+
+  @doc false
+  def process_extensions(opts, backend, reduction \\ 1) do
+    extensions = opts[:extensions]
+
+    enforce_reduction_limit!(reduction, backend)
+    ensure_extensions_loaded(extensions)
+
+    extensions_per_callback =
+      group_extensions_per_callback(extensions)
+
+    new_opts =
+      apply_callback_for_extensions(:configure, extensions_per_callback[:configure], opts)
+
+    if new_opts[:extensions] == opts[:extensions] do
+      new_opts
+    else
+      process_extensions(new_opts, backend, reduction + 1)
+    end
+  end
+
+  defp ensure_extensions_loaded(extensions) do
+    Enum.each(extensions, &ensure_availability!/1)
+  end
+
+  @doc false
+  @spec apply_callback_for_extensions(atom, [module], Keyword.t()) :: Keyword.t()
+  def apply_callback_for_extensions(callback, extensions, opts) do
+    Enum.reduce(extensions, opts, fn ext, acc ->
+      process_extension_callback(acc, callback, ext)
+    end)
+  end
+
+  defp process_extension_callback(opts, callback, ext) do
+    processed? =
+      opts
+      |> Keyword.get(:__processed__, [])
+      |> Enum.member?({callback, ext})
+
+    new_opts =
+      capture_io(
+        fn ->
+          ext.configure(opts, opts[:__backend__])
+        end,
+        processed?
+      )
+
+    update_processed(new_opts, callback, ext)
+  end
+
+  defp update_processed(opts, callback, ext) do
+    Keyword.update(opts, :__processed__, [{callback, ext}], fn list ->
+      [{callback, ext} | list]
+    end)
+  end
+
+  @doc false
+  defp extract_extensions(extensions_per_callback) do
+    extensions_per_callback
+    |> Map.values()
+    |> List.flatten()
+    |> Enum.uniq()
+  end
+
+  @doc false
+  defp group_extensions_per_callback(extensions, callbacks \\ @default_callbacks) do
     callbacks
     |> Enum.map(fn {callback, arity} ->
       provided_by = Enum.filter(extensions, &function_exported?(&1, callback, arity))
@@ -112,22 +158,13 @@ defmodule Routex.Backend do
     |> Enum.into(%{})
   end
 
-  defp apply_callback_per_extension(extensions, callback, opts) do
-    Enum.reduce(extensions, opts, fn ext, acc ->
-      print? = Enum.member?(opts[:__processed__], {callback, ext})
-      new_opts = capture_io(fn -> ext.configure(acc, opts[:__backend__]) end, print?)
-      Keyword.update(new_opts, :__processed__, [], &[{callback, ext} | &1])
-    end)
-  end
-
   defp eval_opts(opts, caller) do
-    # eval_quoted is inside a macro is considered bad practice as it will attempt
-    # to evaluate runtime values at compile time. However, that is exactly what
-    # we want to happen this time.
-    {opts, _binding} = Code.eval_quoted(opts, [], caller)
-    opts
+    # Using Code.eval_quoted to force compile-time evaluation.
+    {evaluated, _} = Code.eval_quoted(opts, [], caller)
+    evaluated
   end
 
+  # The capture_io helper: conditionally redirect output.
   defp capture_io(fun, false), do: fun.()
 
   defp capture_io(fun, true) do
@@ -146,7 +183,7 @@ defmodule Routex.Backend do
     end
   end
 
-  defp enforce_reduction_limit!(reductions, limit \\ @default_reduction_limit, backend) do
+  defp enforce_reduction_limit!(reductions, backend, limit \\ @default_reduction_limit) do
     if reductions > limit do
       Utils.alert("Reduction limit exceeded", "#{limit} reductions")
 
@@ -159,15 +196,16 @@ defmodule Routex.Backend do
         """
       )
 
-      raise "#{backend}: Reduction limit exceeded: #{limit} reductions"
+      raise CompileError,
+        description: "#{backend}: Reduction limit exceeded (max. #{limit} reductions)."
     end
   end
 
   defp ensure_availability!(extension) do
-    if not Code.ensure_loaded?(extension) do
-      Routex.Utils.alert("Extension #{inspect(extension)} is missing")
-
-      raise CompileError
+    unless Code.ensure_loaded?(extension) do
+      description = "Extension #{inspect(extension)} is missing"
+      Utils.alert(description)
+      raise CompileError, description: description
     end
   end
 end

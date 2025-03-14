@@ -21,9 +21,10 @@ multilingual URL handling, alternative route generation, and more (see
 architecture makes it straightforward to craft custom routing solutions that
 integrate effortlessly with other extensions.
 
-<p class="hidden-at-hexdocs"> This documentation reflects the main branch. For
-the latest stable release, refer to <a
-href="https://hexdocs.pm/routex/readme.html">HexDocs</a>. </p>
+<p class="hidden-at-hexdocs">
+  This documentation reflects the main branch. For the latest stable release,
+  refer to <a href="https://hexdocs.pm/routex/readme.html">HexDocs</a>.
+</p>
 
 ## Top Features and Benefits
 

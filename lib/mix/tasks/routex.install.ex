@@ -44,7 +44,7 @@ if Code.ensure_loaded?(Igniter) do
       Routex.Extension.Assigns,
       Routex.Extension.AttrGetters,
       Routex.Extension.Interpolation,
-      Routex.Extension.PhoenixLiveviewHooks,
+      Routex.Extension.LiveViewHooks,
       Routex.Extension.Plugs,
       Routex.Extension.RouteHelpers,
       Routex.Extension.VerifiedRoutes
@@ -74,7 +74,9 @@ if Code.ensure_loaded?(Igniter) do
       preprocess_routes()
 
       igniter
-      |> Igniter.add_notice("Routex installation complete. Please review the changes and update your configuration as needed.")
+      |> Igniter.add_notice(
+        "Routex installation complete. Please review the changes and update your configuration as needed."
+      )
     end
 
     defp web_module_name do
@@ -107,7 +109,9 @@ if Code.ensure_loaded?(Igniter) do
         File.write!(file, content)
         Mix.shell().info("Updated #{file} with Routex integration.")
       else
-        Mix.shell().error("Could not find #{file}. Please update your project manually to use Routex.")
+        Mix.shell().error(
+          "Could not find #{file}. Please update your project manually to use Routex."
+        )
       end
     end
 
@@ -119,9 +123,22 @@ if Code.ensure_loaded?(Igniter) do
     defp inject_on_mount(content) do
       web_mod = web_module_name()
 
-      if String.contains?(content, "unquote(html_helpers())") do
-        String.replace(content, "unquote(html_helpers())", """
-        unquote(html_helpers())
+      content =
+        if String.contains?(content, "use Phoenix.LiveComponent") do
+          String.replace(content, "use Phoenix.LiveComponent", """
+           use Phoenix.LiveComponent
+          on_mount(unquote(#{web_mod}).Router.RoutexHelpers)
+          """)
+        else
+          content
+        end
+
+      if String.contains?(content, "use Phoenix.LiveView") do
+        regex = ~r/layout: {(.*), :app}/
+
+        String.replace(content, regex, """
+         layout: {\1, :app}
+
         on_mount(unquote(#{web_mod}).Router.RoutexHelpers)
         """)
       else
@@ -135,8 +152,11 @@ if Code.ensure_loaded?(Igniter) do
       helper_code = """
       defp routex_helpers do
         quote do
-          import #{inspect Module.concat([String.to_atom(web_mod), Router, RoutexHelpers])}, only: :macros
-          alias #{inspect Module.concat([String.to_atom(web_mod), Router, RoutexHelpers])}, as: Routes
+          import Phoenix.VerifiedRoutes,
+            except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
+
+          import #{inspect(Module.concat([String.to_atom(web_mod), Router, RoutexHelpers]))}, only: :macros
+          alias #{inspect(Module.concat([String.to_atom(web_mod), Router, RoutexHelpers]))}, as: Routes
         end
       end
       """
@@ -144,15 +164,18 @@ if Code.ensure_loaded?(Igniter) do
       if String.contains?(content, "defp routex_helpers") do
         content
       else
-        content <> "\n" <> helper_code
+        regex = ~r/(unquote\(verified_routes\(\)\))/
+        content = String.replace(content, regex, "\\1\nunquote(routex_helpers())\n")
+
+        regex = ~r/(def verified_routes do)/
+        String.replace(content, regex, "#{helper_code}\n\\1")
       end
     end
 
     defp create_routex_backend_file do
       extensions_code =
         @extensions
-        |> Enum.map(&("    " <> inspect(&1)))
-        |> Enum.join(",\n")
+        |> Enum.map_join(",\n", &("    " <> inspect(&1)))
 
       web_mod = web_module_name()
 
@@ -165,7 +188,26 @@ if Code.ensure_loaded?(Igniter) do
         use Routex.Backend,
           extensions: [
       #{extensions_code}
-          ]
+          ],
+         alternatives: %{
+          "/" => %{
+            attrs: %{locale: "en-150", display_name: "Global"},
+            branches: %{
+              "/branch_1" => %{
+                attrs: %{locale: "en-150", display_name: "Branch 1"},
+                branches: %{
+                  "/branch_1_1" => %{attrs: %{locale: "en-150", display_name: "Branch 1 sub 1"}},
+                  "/branch_1_2" => %{attrs: %{locale: "en-150", display_name: "Branch 1 sub 2"}}
+                }
+              },
+              "/branch_2" => %{attrs: %{locale: "en-150", display_name: "Branch 2"}}
+            }
+          }
+        },
+        verified_sigil_routex: "~p",
+        verified_sigil_phoenix: "~o",
+        verified_url_routex: :url,
+        verified_path_routex: :path
       end
       """
 
@@ -187,29 +229,36 @@ if Code.ensure_loaded?(Igniter) do
           plug :fetch_current_user
           plug :routex
           """)
-          |> String.replace(~r/pipe_through :browser/, """
-          pipe_through :browser
+          |> String.replace(~r/(scope "\/",.*\s*do)(.*?)(\n\s*end)/s, """
           preprocess_using #{web_module_name()}.RoutexBackend do
-            # ...routes...
+            \\1\\2\\3
           end
           """)
-          |> String.replace(~r/pipe_through \[:browser, :redirect_if_user_is_authenticated\]/, """
-          pipe_through [:browser, :redirect_if_user_is_authenticated]
-          preprocess_using #{web_module_name()}.RoutexBackend do
-            # ...routes...
-          end
-          """)
-          |> String.replace(~r/pipe_through \[:browser, :require_authenticated_user\]/, """
-          pipe_through [:browser, :require_authenticated_user]
-          preprocess_using #{web_module_name()}.RoutexBackend do
-            # ...routes...
-          end
-          """)
+          |> String.replace(
+            ~r/(pipe_through \[:browser, :redirect_if_user_is_authenticated\]\s*do\s*\n)(.*?)(\n\s*end)/s,
+            """
+            \\1\\2
+            preprocess_using #{web_module_name()}.RoutexBackend do
+              \\2
+            end\\3
+            """
+          )
+          |> String.replace(
+            ~r/(pipe_through \[:browser, :require_authenticated_user\]\s*do\s*\n)(.*?)(\n\s*end)/s,
+            """
+            \\1\\2
+            preprocess_using #{web_module_name()}.RoutexBackend do
+              \\2
+            end\\3
+            """
+          )
 
         File.write!(file, content)
         Mix.shell().info("Updated #{file} with Routex route preprocessing.")
       else
-        Mix.shell().error("Could not find #{file}. Please update your project manually to use Routex.")
+        Mix.shell().error(
+          "Could not find #{file}. Please update your project manually to use Routex."
+        )
       end
     end
   end

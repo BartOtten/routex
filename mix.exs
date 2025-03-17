@@ -71,7 +71,7 @@ defmodule Routex.MixProject do
       {:gettext, ">= 0.26.0", optional: true},
       {:phoenix_html_helpers, "~> 1.0"},
       {:jason, "~> 1.0", only: [:dev, :test], optional: true},
-      {:ex_doc, "~> 0.34", only: [:dev, :test]},
+      {:ex_doc, "~> 0.37", only: [:dev, :test]},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:floki, ">= 0.30.0", only: :test},
@@ -112,7 +112,8 @@ defmodule Routex.MixProject do
       extras: [
         "README.md": [title: "Overview"],
         "USAGE.md": [title: "Getting started"],
-        "docs/EXTENSION_SUMMARIES.md": [title: "Included extensions"],
+        "CONTRIBUTING.md": [title: "Contributing"],
+        "docs/EXTENSIONS.md": [title: "Included extensions"],
         "docs/ROUTEX_AND_PHOENIX_ROUTER.md": [title: "Routex and Phoenix Router"],
         "docs/EXTENSION_DEVELOPMENT.md": [title: "Extensions"],
         "docs/COMPARISON.md": [title: "Routing solutions compared"],
@@ -122,12 +123,13 @@ defmodule Routex.MixProject do
         "docs/guides/LOCALIZATION_VS_TRANSLATION.md": [title: "Localization vs Translation"]
       ],
       groups_for_extras: [
-        "The project": ["README.md", "docs/EXTENSION_SUMMARIES.md"],
+        "The project": ["README.md", "docs/EXTENSIONS.md"],
         Guides: ["USAGE.md"] ++ Path.wildcard("docs/guides/*.md"),
         Extra: [
           "docs/ROUTEX_AND_PHOENIX_ROUTER.md",
           "docs/COMPARISON.md",
           "CHANGELOG.md",
+          "CONTRIBUTING.md",
           "docs/TROUBLESHOOTING.md"
         ],
         Development: ["docs/EXTENSION_DEVELOPMENT.md"]

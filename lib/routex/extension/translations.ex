@@ -11,6 +11,8 @@ defmodule Routex.Extension.Translations do
   covers Alpha-2 and Alpha-3 codes (see:
   [ISO](https://datatracker.ietf.org/doc/html/rfc5646#section-2.2.1))
 
+  This extension requires Gettext >= 0.26.
+
   > #### In combination with... {: .neutral}
   > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZED_ROUTES.md)
 
@@ -58,6 +60,7 @@ defmodule Routex.Extension.Translations do
   alias Routex.Types, as: T
 
   require Logger
+  require Gettext.Macros
 
   @separator "/"
   @interpolate ":"
@@ -129,10 +132,25 @@ defmodule Routex.Extension.Translations do
 
     triggers_ast =
       Enum.map(uniq_segments, fn
-        @catch_all -> nil
-        @interpolate <> _rest -> nil
-        segment when not is_binary(segment) -> nil
-        segment -> quote do: Gettext.dgettext(unquote(backend), unquote(domain), unquote(segment))
+        @catch_all ->
+          nil
+
+        @interpolate <> _rest ->
+          nil
+
+        segment when not is_binary(segment) ->
+          nil
+
+        "/" ->
+          nil
+
+        segment ->
+          quote do:
+                  Gettext.Macros.dgettext_with_backend(
+                    unquote(backend),
+                    unquote(domain),
+                    unquote(segment)
+                  )
       end)
 
     [prelude | triggers_ast]

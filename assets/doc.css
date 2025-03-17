@@ -17,4 +17,12 @@
   margin-left: 0.5em;
 }
 
-.hidden-at-hexdocs {display: none;}
+.hidden-at-hexdocs {
+    display: none;
+}
+
+hr {
+    border-bottom: 0px;
+    border-color: #ddd7d7;
+    border-style: solid;
+}

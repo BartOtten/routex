@@ -10,6 +10,13 @@ which implements the `Routex.Extension` behaviour.
 Routex will call those callbacks at different stages before Routex handsoff the
 list with routes to `Phoenix.Router` for compilation.
 
+Each extension provides a single feature and should minimize hard dependencies
+on other extensions. Instead, Routex advises to make use of the `Routex.Attrs`
+system to share attributes; allowing extensions to work together without being
+coupled.
+
+The documentation of each extension lists any provided or required
+`Routex.Attrs`.
 
 ## Callbacks and stages
 

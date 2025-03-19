@@ -165,7 +165,7 @@ defmodule MatchableTest do
         result =
           uri
           |> Matchable.new()
-          |> Matchable.to_string()
+          |> to_string()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -199,7 +199,7 @@ defmodule MatchableTest do
           uri
           |> Matchable.new()
           |> Compiled.recompose("sp")
-          |> Matchable.to_string()
+          |> to_string()
           |> URI.parse()
 
         assert result.query == expected.query
@@ -210,7 +210,7 @@ defmodule MatchableTest do
           uri
           |> Matchable.new()
           |> Compiled.recompose("nl")
-          |> Matchable.to_string()
+          |> to_string()
           |> URI.parse()
 
         assert result.query == expected.query

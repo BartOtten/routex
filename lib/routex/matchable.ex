@@ -300,22 +300,12 @@ defmodule Routex.Matchable do
   end
 
   defp split_path(input) when is_nil(input), do: []
+  defp split_path([]), do: ["/"]
 
   defp split_path(input) when is_binary(input) do
     input
     |> String.split(~r"#{@path_separator}", include_captures: true)
     |> Enum.reject(&(&1 == ""))
-  end
-
-  @doc """
-   A non conflicting function mimicking `to_string/1`
-  """
-
-  def to_string(record) do
-    matchable(path: path, trailing_slash: trailing_slash, query: query, fragment: fragment) =
-      record
-
-    Enum.join([path, trailing_slash, query, fragment])
   end
 
   @doc """
@@ -375,5 +365,15 @@ defmodule Routex.Matchable do
       {equal, equal} -> true
       _not_equal -> false
     end)
+  end
+end
+
+defimpl String.Chars, for: Tuple do
+  import Routex.Matchable
+
+  def to_string(
+        matchable(path: path, trailing_slash: trailing_slash, query: query, fragment: fragment)
+      ) do
+    Enum.join([path, trailing_slash, query, fragment])
   end
 end

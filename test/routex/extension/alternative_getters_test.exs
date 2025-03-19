@@ -2,6 +2,7 @@ defmodule Routex.Extension.AlternativeGettersTest do
   use ExUnit.Case, async: true
 
   alias Routex.Extension.AlternativeGetters
+  alias Routex.Extension.AttrGetters
   import ListAssertions
 
   routes = [
@@ -42,8 +43,9 @@ defmodule Routex.Extension.AlternativeGettersTest do
     }
   ]
 
-  ast = AlternativeGetters.create_helpers(routes, __MODULE__, :ignored)
-  Module.create(__MODULE__.RoutexHelpers, ast, __ENV__)
+  ast_attrs = AttrGetters.create_helpers(routes, __MODULE__, :ignored)
+  ast_alt = AlternativeGetters.create_helpers(routes, __MODULE__, :ignored)
+  Module.create(__MODULE__.RoutexHelpers, [ast_attrs, ast_alt], __ENV__)
 
   @expected [
     %AlternativeGetters{

@@ -45,7 +45,6 @@ defmodule Routex.Extension.AttrGetters do
 
   ## Helpers
   - attrs(url :: binary) :: map()
-  - attrs(segments :: list) :: map()
   """
 
   @behaviour Routex.Extension
@@ -57,27 +56,43 @@ defmodule Routex.Extension.AttrGetters do
   @impl Routex.Extension
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, _backend, _env) do
-    prelude =
-      quote do
-        @doc """
-        Returns Routex attributes of given URL
-        """
-        def attrs(url) when is_binary(url) do
-          url
-          |> Matchable.new()
-          |> attrs()
+    quote do
+      @doc """
+      Returns Routex attributes of given URL
+      """
+      @spec attrs(url :: binary()) :: T.attrs()
+      def attrs(url) when is_binary(url) do
+        case pattern = Matchable.new(url) do
+          unquote(build_case_clauses(routes))
         end
       end
+    end
+  end
 
-    functions =
-      for route <- routes do
-        attributes = route |> Attrs.get() |> Macro.escape()
+  defp build_case_clauses(routes) do
+    routes
+    |> Enum.map(&to_pattern_body/1)
+    |> Enum.uniq_by(fn {p, _b} -> p end)
+    |> Enum.flat_map(&to_clause_ast/1)
+  end
 
-        route
-        |> Matchable.new()
-        |> Matchable.to_func(:attrs, attributes)
-      end
+  defp to_pattern_body(route) do
+    pattern =
+      route
+      |> Matchable.new()
+      |> Matchable.to_pattern()
 
-    [prelude, functions]
+    body =
+      route
+      |> Attrs.get()
+      |> Macro.escape()
+
+    {pattern, body}
+  end
+
+  defp to_clause_ast({pattern, body}) do
+    quote do
+      unquote(pattern) -> unquote(body)
+    end
   end
 end

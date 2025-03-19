@@ -40,7 +40,7 @@ defmodule Routex.Processing do
   """
   @spec __before_compile__(T.env()) :: :ok
   def __before_compile__(env) do
-    IO.write(["Start: Processing routes with ", inspect(__MODULE__), "\n"])
+    Utils.print(__MODULE__, ["Start processing routes"])
     execute_callbacks(env)
   end
 
@@ -69,19 +69,40 @@ defmodule Routex.Processing do
     {ast_per_extension, new_routes} =
       execute(backend_routes_callbacks, env)
 
-    new_routes
-    |> remove_build_info()
-    |> write_routes(env)
-
     ast_per_extension
     |> generate_helper_ast(helper_mod_name)
     |> create_helper_module(helper_mod_name, env)
 
-    IO.write(["End: ", inspect(__MODULE__), " completed route processing.", "\n"])
+    new_routes
+    |> print_summary()
+    |> remove_build_info()
+    |> write_routes(env)
+
+    Utils.print(__MODULE__, ["End: ", inspect(__MODULE__), " completed route processing."])
+
     :ok
   end
 
   defp debug?, do: System.get_env("ROUTEX_DEBUG") == "true"
+
+  defp print_summary(routes) do
+    original_amount =
+      Enum.count(routes, fn route -> Routex.Attrs.get(route, :__origin__) == route.path end)
+
+    current_amount = Enum.count(routes)
+    generated_amount = current_amount - original_amount
+
+    Routex.Utils.print(__MODULE__, [
+      "Routes >> Original: ",
+      to_string(original_amount),
+      " | Generated: ",
+      to_string(generated_amount),
+      " | Total: ",
+      to_string(current_amount)
+    ])
+
+    routes
+  end
 
   defp put_initial_attrs(routes, helper_mod_name) do
     routes
@@ -169,7 +190,7 @@ defmodule Routex.Processing do
   @spec create_helper_module(T.ast(), helper_module, T.env()) ::
           {:module, module, binary, term}
   defp create_helper_module(ast, module, env) do
-    IO.write(["Create or update helper module ", inspect(module), "\n"])
+    Utils.print(__MODULE__, ["Create or update helper module ", inspect(module)])
     Module.create(module, ast, env)
   end
 

@@ -9,4 +9,5 @@ defmodule Routex.Types do
   @type opts :: keyword()
   @type route :: Phoenix.Router.Route.t()
   @type routes :: [Phoenix.Router.Route.t()]
+  @type attrs :: map()
 end

@@ -75,7 +75,6 @@ defmodule Routex.Extension.AlternativeGetters do
   """
   @behaviour Routex.Extension
 
-  alias Routex.Attrs
   alias Routex.Matchable
   alias Routex.Route
   alias Routex.Types, as: T
@@ -85,40 +84,48 @@ defmodule Routex.Extension.AlternativeGetters do
   @impl Routex.Extension
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, _backend, _env) do
-    prelude =
-      quote do
-        def alternatives(url) when is_binary(url) do
-          uri = Matchable.new(url)
-          alternatives(uri)
+    quote do
+      def alternatives(url) when is_binary(url) do
+        case pattern = Matchable.new(url) do
+          unquote(build_case_clauses(routes))
         end
       end
-
-    functions =
-      for {_nesting, siblings} <- Route.group_by_nesting(routes) do
-        body_ast =
-          for sibling <- siblings do
-            map_ast(sibling)
-          end
-
-        _function_ast =
-          for route <- siblings do
-            route |> Matchable.new() |> Matchable.to_func(:alternatives, body_ast)
-          end
-      end
-
-    [prelude, functions]
+    end
   end
 
-  defp map_ast(route) do
+  def build_case_clauses(routes) do
+    routes
+    |> Route.group_by_nesting()
+    |> Enum.flat_map(&to_pattern_body/1)
+    |> Enum.uniq_by(fn {p, _b} -> p end)
+    |> Enum.flat_map(&to_clause_ast/1)
+  end
+
+  defp to_pattern_body({_, siblings}) do
+    clause_body_ast = Enum.map(siblings, &clause_body/1)
+    siblings |> Enum.map(&clause_pattern_body(&1, clause_body_ast))
+  end
+
+  defp clause_pattern_body(route, body_ast) do
     pattern = route |> Matchable.new() |> Matchable.to_pattern()
-    attrs = Attrs.get(route)
+    {pattern, body_ast}
+  end
+
+  defp clause_body(route) do
+    pattern = route |> Matchable.new() |> Matchable.to_pattern()
 
     quote do
       %Routex.Extension.AlternativeGetters{
-        match?: unquote(Macro.var(:pattern, Matchable)) == unquote(pattern),
-        slug: unquote(pattern) |> Matchable.to_string(),
-        attrs: unquote(Macro.escape(attrs))
+        match?: pattern == unquote(pattern),
+        slug: unquote(pattern) |> to_string(),
+        attrs: unquote(pattern) |> to_string() |> attrs()
       }
+    end
+  end
+
+  defp to_clause_ast({pattern, body}) do
+    quote do
+      unquote(pattern) -> unquote(body)
     end
   end
 end

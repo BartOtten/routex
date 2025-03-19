@@ -123,7 +123,9 @@ defmodule Routex.Extension.RouteHelpers do
 
     prelude =
       quote do
-        @routes_per_origin unquote(Macro.escape(mapped_routes_per_origin))
+        defp from_origin(origin),
+          do: Map.get(unquote(Macro.escape(mapped_routes_per_origin)), origin)
+
         defdelegate static_path(arg1, arg2), to: unquote(Module.concat(env.module, "Helpers"))
       end
 
@@ -208,7 +210,7 @@ defmodule Routex.Extension.RouteHelpers do
       defmacro unquote(fn_name)(unquote_splicing(fn_args)) do
         args = [
           __CALLER__,
-          @routes_per_origin[unquote(origin)],
+          from_origin(unquote(origin)),
           unquote(router),
           unquote(suffix),
           unquote(fn_args)

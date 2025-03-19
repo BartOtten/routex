@@ -70,6 +70,7 @@ defmodule Routex.Branching do
   For more examples, please see the test module `Routex.BranchingTest`.
   """
 
+  # credo:disable-for-next-line
   def branch_macro(
         patterns,
         match_binding,
@@ -103,7 +104,7 @@ defmodule Routex.Branching do
       quote do
         require Routex.Branching
 
-        @patterns unquote(patterns)
+        defp branch_patterns, do: unquote(patterns)
       end
 
     macros =
@@ -127,7 +128,7 @@ defmodule Routex.Branching do
 
           defmacro unquote(as)(unquote_splicing(args)) do
             Routex.Branching.build_case(
-              @patterns,
+              branch_patterns(),
               unquote(match_binding),
               unquote(module),
               unquote(macro),

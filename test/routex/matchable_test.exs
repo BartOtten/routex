@@ -187,6 +187,41 @@ defmodule MatchableTest do
                "#{inspect(uri, pretty: true)} does not match #{inspect(@route, pretty: true)} \n\n m1: #{inspect(m1, pretty: true)}\n m2: #{inspect(m2, pretty: true)}"
       end
     end
+
+    test "returns 'true' for the first argument matching a record" do
+      matching = @uri_matches ++ @sigil_matches
+
+      for uri <- matching do
+        m1 = @route.path
+        m2 = Matchable.new(uri)
+
+        assert Matchable.match?(m1, m2) == true,
+               "#{inspect(uri, pretty: true)} does not match #{inspect(@route, pretty: true)} \n\n m1: #{inspect(m1, pretty: true)}\n m2: #{inspect(m2, pretty: true)}"
+      end
+    end
+
+    test "returns 'true' for the second argument matching a record" do
+      matching = @uri_matches ++ @sigil_matches
+
+      for uri <- matching do
+        m1 = Matchable.new(@route)
+        m2 = uri
+
+        assert Matchable.match?(m1, m2) == true,
+               "#{inspect(uri, pretty: true)} does not match #{inspect(@route, pretty: true)} \n\n m1: #{inspect(m1, pretty: true)}\n m2: #{inspect(m2, pretty: true)}"
+      end
+    end
+
+    test "returns 'true' for wildcard routes" do
+      route = %{@route | path: "/path/*"}
+      uri = "https://foo.com/path/bar"
+
+      m1 = Matchable.new(route)
+      m2 = uri
+
+      assert Matchable.match?(m1, m2) == true,
+             "#{inspect(uri, pretty: true)} does not match #{inspect(route, pretty: true)} \n\n m1: #{inspect(m1, pretty: true)}\n m2: #{inspect(m2, pretty: true)}"
+    end
   end
 
   describe "to_pattern/1 and to_function/2" do
@@ -195,27 +230,27 @@ defmodule MatchableTest do
       for uri <- @uri_matches do
         expected = URI.parse(uri)
 
-        result =
+        result1 =
           uri
           |> Matchable.new()
           |> Compiled.recompose("sp")
           |> to_string()
           |> URI.parse()
 
-        assert result.query == expected.query
-        assert result.fragment == expected.fragment
-        assert result.path == "/12/games/producta/edito" || "/12/games/producta/edito/"
+        assert result1.query == expected.query
+        assert result1.fragment == expected.fragment
+        assert result1.path == "/12/games/producta/edito" || "/12/games/producta/edito/"
 
-        result =
+        result2 =
           uri
           |> Matchable.new()
           |> Compiled.recompose("nl")
           |> to_string()
           |> URI.parse()
 
-        assert result.query == expected.query
-        assert result.fragment == expected.fragment
-        assert result.path == "/games/producten/wijzigen/12" || "/games/producten/wijzigen/12/"
+        assert result2.query == expected.query
+        assert result2.fragment == expected.fragment
+        assert result2.path == "/games/producten/wijzigen/12" || "/games/producten/wijzigen/12/"
       end
     end
 

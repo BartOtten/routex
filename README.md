@@ -26,7 +26,7 @@ need to enhance your Phoenix applications.
 
 <p class="hidden-at-hexdocs">
 This documentation reflects the main branch. For the latest
-stable release, refer to [Hexdocs](https://hexdocs.pm/routex/readme.html).
+stable release, refer to <a href="https://hexdocs.pm/routex/readme.html">HexDocs</a>).
 </p>
 
 

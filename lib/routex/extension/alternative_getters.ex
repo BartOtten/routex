@@ -112,13 +112,16 @@ defmodule Routex.Extension.AlternativeGetters do
   end
 
   defp clause_body(route) do
-    pattern = route |> Matchable.new() |> Matchable.to_pattern()
+    dynamic_slash_pattern = route |> Matchable.new() |> Matchable.to_pattern()
+
+    static_slash_pattern =
+      route |> Matchable.new() |> Matchable.to_pattern(strict_trailing?: true)
 
     quote do
       %Routex.Extension.AlternativeGetters{
-        match?: pattern == unquote(pattern),
-        slug: unquote(pattern) |> to_string(),
-        attrs: unquote(pattern) |> to_string() |> attrs()
+        match?: unquote(dynamic_slash_pattern) == pattern,
+        slug: unquote(static_slash_pattern) |> to_string(),
+        attrs: unquote(dynamic_slash_pattern) |> to_string() |> attrs()
       }
     end
   end

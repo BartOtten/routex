@@ -107,17 +107,13 @@ defmodule Routex.Matchable do
     )
   end
 
-  def new(%Phoenix.Router.Route{} = route) do
-    matchable(
-      hosts: route.hosts || [],
-      path: split_path(route.path)
-    )
-  end
-
   def new(%{} = route) do
+    record = new(route.path)
+
     matchable(
       hosts: route.hosts || [],
-      path: split_path(route.path)
+      path: matchable(record, :path),
+      trailing_slash: matchable(record, :trailing_slash)
     )
   end
 
@@ -126,7 +122,11 @@ defmodule Routex.Matchable do
   def new(path_segments) when is_list(path_segments) do
     {binary_path_segments, dyns} = path_segments_to_binaries(path_segments)
 
-    uri = binary_path_segments |> Enum.join() |> URI.parse() |> Map.from_struct()
+    uri =
+      binary_path_segments
+      |> Enum.join()
+      |> URI.parse()
+      |> Map.from_struct()
 
     map =
       for type <- [:path, :query, :fragment], into: %{} do
@@ -276,10 +276,17 @@ defmodule Routex.Matchable do
   """
 
   @spec to_pattern(T.route() | t()) :: T.ast()
-  def to_pattern(%Phoenix.Router.Route{} = route),
-    do: route |> new() |> to_pattern()
+  def to_pattern(input, opts \\ [])
 
-  def to_pattern(record) when is_tuple(record) do
+  def to_pattern(%Phoenix.Router.Route{} = route, opts),
+    do: route |> new() |> to_pattern(opts)
+
+  def to_pattern(record, opts) when is_tuple(record) do
+    # the strict_trailing? opt is responsibe respecting the (absent) trailing
+    # slash of the route definition or (absent) trailing slash of the right side
+    # of the binding.
+    strict_trailing? = Keyword.get(opts, :strict_trailing?, false)
+
     path_ast =
       record
       |> matchable(:path)
@@ -291,7 +298,11 @@ defmodule Routex.Matchable do
     hosts_ast = Macro.var(:hosts, __MODULE__)
     query_ast = Macro.var(:query, __MODULE__)
     fragment_ast = Macro.var(:fragment, __MODULE__)
-    trailing_slash_ast = Macro.var(:trailing_slash, __MODULE__)
+
+    trailing_slash_ast =
+      if strict_trailing?,
+        do: matchable(record, :trailing_slash),
+        else: Macro.var(:trailing_slash, __MODULE__)
 
     quote do
       {:matchable, unquote(hosts_ast), unquote(path_ast), unquote(trailing_slash_ast),
@@ -314,10 +325,11 @@ defmodule Routex.Matchable do
   @spec to_ast_segments(t()) :: list(T.ast())
   def to_ast_segments(record) do
     s = matchable(record, :path) || []
+    ts = matchable(record, :trailing_slash) || []
     q = matchable(record, :query) || []
     f = matchable(record, :fragment) || []
 
-    (s ++ q ++ f)
+    (s ++ ts ++ q ++ f)
     |> Enum.reduce([], fn
       segment, [h | t] when is_binary(segment) and is_binary(h) -> [h <> segment | t]
       segment, acc -> [segment | acc]

@@ -303,9 +303,15 @@ defmodule Routex.Extension.VerifiedRoutes do
     def argument_segments_transformer(pattern, segments) do
       orig_record = pattern.__origin__ |> Matchable.new()
       orig_pattern = orig_record |> Matchable.to_pattern()
-      new_pattern = pattern |> Matchable.new() |> Matchable.to_pattern()
+
+      dynamic_pattern = pattern |> Matchable.new() |> Matchable.to_pattern()
+      forced_pattern = pattern |> Matchable.new() |> Matchable.to_pattern(strict_trailing?: true)
+      new_pattern = if dynamic_pattern == orig_pattern, do: dynamic_pattern, else: forced_pattern
+
       arg_record = segments |> Matchable.new()
 
+      # we both want to support keeping the trailing slash for untransformed routes (and Phoenix test)
+      # as well as forced transformations adhering to the route definition.
       if Matchable.match?(orig_record, arg_record) do
         ast =
           quote do

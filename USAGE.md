@@ -15,7 +15,7 @@ You can install this library by adding it to your list of dependencies in `mix.e
 def deps do
   [
      ...other deps
-+    {:routex, ">= 0.0.0"}
++    {:routex, "~> 1.0"}
   ]
 end
 ```

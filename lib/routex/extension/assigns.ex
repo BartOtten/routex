@@ -65,7 +65,7 @@ defmodule Routex.Extension.Assigns do
         |> maybe_namespace(namespace)
 
       route
-      |> Routex.Attrs.put(%{assigns: assigns})
+      |> Routex.Attrs.put(:assigns, assigns)
       |> update_assigns(assigns)
     end
   end

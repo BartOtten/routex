@@ -61,6 +61,17 @@ defmodule Routex.Extension.AssignsTest do
     assert assigns == %{rtx: %{rtx_1: "r1"}}
   end
 
+  test "other attributes are preserved" do
+    route =
+      %Phoenix.Router.Route{private: %{}}
+      |> Routex.Attrs.put(:rtx_1, "r1")
+      |> Routex.Attrs.put(:rtx_2, "r2")
+
+    new = Assigns.post_transform([route], Conf3, nil)
+
+    assert [%{private: %{routex: %{rtx_1: "r1", rtx_2: "r2"}}}] = new
+  end
+
   test "handle_params/4 assigns attributes to socket" do
     socket = %Phoenix.LiveView.Socket{assigns: %{__changed__: %{}}}
     attrs = %{assigns: %{key: "value"}}

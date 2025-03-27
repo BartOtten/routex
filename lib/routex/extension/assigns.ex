@@ -54,26 +54,36 @@ defmodule Routex.Extension.Assigns do
   def post_transform(routes, backend, _env) do
     config = backend.config()
     namespace = get_in(config, [Access.key(:assigns), :namespace])
-    attrs = get_in(config, [Access.key(:assigns), :attrs])
+    to_be_assigned = get_in(config, [Access.key(:assigns), :attrs])
 
     for route <- routes do
+      attributes = Routex.Attrs.get(route)
+
       assigns =
-        route
-        |> Routex.Attrs.get()
-        |> Enum.reduce([], fn el = {k, _v}, acc ->
-          if is_nil(attrs) or k in attrs, do: [el | acc], else: acc
-        end)
+        attributes
+        |> into_assigns(to_be_assigned)
+        |> maybe_namespace(namespace)
 
-      assigns_map =
-        if namespace == nil do
-          %{assigns: Map.new(assigns)}
-        else
-          %{assigns: Map.new([{namespace, Map.new(assigns)}])}
-        end
-
-      Routex.Attrs.merge(route, assigns_map)
+      route
+      |> Routex.Attrs.put(%{assigns: assigns})
+      |> update_assigns(assigns)
     end
   end
+
+  defp into_assigns(attrs, nil), do: attrs
+
+  defp into_assigns(attrs, to_be_assigned),
+    do: Map.take(attrs, to_be_assigned)
+
+  defp maybe_namespace(assigns, nil), do: assigns
+
+  defp maybe_namespace(assigns, namespace), do: Map.put(%{}, namespace, assigns)
+
+  defp update_assigns(%{assigns: nil} = route, new),
+    do: Map.put(route, :assigns, new)
+
+  defp update_assigns(%{assigns: old} = route, new),
+    do: Map.put(route, :assigns, Map.merge(old, new))
 
   @doc """
   Hook attached to the `handle_params` stage in the LiveView life cycle
@@ -83,13 +93,5 @@ defmodule Routex.Extension.Assigns do
     socket = Phoenix.Component.assign(socket, assigns)
 
     {:cont, socket}
-  end
-
-  @doc """
-  Plug added to the Plug pipeline
-  """
-  def plug(conn, _opts, attrs \\ %{}) do
-    assigns = Map.get(attrs, :assigns, [])
-    Plug.Conn.merge_assigns(conn, assigns)
   end
 end

@@ -69,15 +69,4 @@ defmodule Routex.Extension.AssignsTest do
 
     assert updated_socket.assigns[:key] == "value"
   end
-
-  use Plug.Test
-
-  test "plug/3 assigns attributes to conn" do
-    conn = conn(:get, "/")
-    attrs = %{assigns: %{key: "value"}}
-
-    conn = Assigns.plug(conn, [], attrs)
-
-    assert conn.assigns[:key] == "value"
-  end
 end

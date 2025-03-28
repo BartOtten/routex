@@ -195,13 +195,17 @@ defmodule Routex.Extension.LiveViewHooks do
     piped_hooks =
       Enum.reduce(
         hooks_ast,
-        quote do
-          socket
-        end,
-        fn hook, acc ->
-          quote do
-            unquote(acc) |> unquote(hook)
-          end
+        nil,
+        fn
+          hook, nil ->
+            quote do
+              unquote(hook)
+            end
+
+          hook, acc ->
+            quote do
+              unquote(acc) |> unquote(hook)
+            end
         end
       )
 
@@ -209,8 +213,12 @@ defmodule Routex.Extension.LiveViewHooks do
       @spec on_mount(term(), map(), map(), Phoenix.LiveView.Socket.t()) ::
               {:cont, Phoenix.LiveView.Socket.t()} | {:halt, Phoenix.LiveView.Socket.t()}
       @doc "Implements the on_mount"
-      def on_mount(_key, _params, _session, socket) do
-        socket = unquote(piped_hooks)
+      def on_mount(_key, params, session, socket) do
+        socket =
+          socket
+          |> Routex.Attrs.merge(%{session: session["rtx"]})
+          |> unquote(piped_hooks)
+
         {:cont, socket}
       end
     end

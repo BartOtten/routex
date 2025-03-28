@@ -2,7 +2,7 @@ defmodule MatchableTest.Constants do
   @moduledoc """
   A module to be use'd to import shared attributes
   """
-  defmacro __using__(_) do
+  defmacro __using__(_opts) do
     quote do
       @route %Phoenix.Router.Route{
         hosts: [],

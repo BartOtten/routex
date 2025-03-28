@@ -2,7 +2,7 @@ defmodule Routex.HelperFallbacks do
   @moduledoc """
   Provides fallback functions when `use`'d
   """
-  defmacro __using__(_) do
+  defmacro __using__(_opts) do
     quote generated: true do
       @doc "Fallback for attrs/1 returning an empty map."
       @spec attrs(url :: binary()) :: no_return()

@@ -50,10 +50,10 @@ defmodule Routex.MixProject do
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:dev), do: ["lib"]
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(_other), do: ["lib"]
 
   defp compilers(:test), do: Mix.compilers()
-  defp compilers(_), do: Mix.compilers()
+  defp compilers(_other), do: Mix.compilers()
 
   defp dialyzer, do: [plt_add_apps: [:mix, :gettext, :phoenix_live_view]]
 
@@ -158,7 +158,7 @@ defmodule Routex.MixProject do
     ]
   end
 
-  defp copy_assets(_) do
+  defp copy_assets(_opts) do
     File.cp_r("assets", "doc/assets")
   end
 
@@ -196,5 +196,5 @@ defmodule Routex.MixProject do
     |
   end
 
-  defp docs_before_closing_head_tag(_), do: ""
+  defp docs_before_closing_head_tag(_other), do: ""
 end

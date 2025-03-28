@@ -41,7 +41,7 @@ defmodule ListAssertions do
     clauses =
       clauses ++
         quote do
-          _ -> :not_found
+          _other -> :not_found
         end
 
     quote do

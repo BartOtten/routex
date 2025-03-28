@@ -49,7 +49,7 @@ end
 
 The experimental `Routex.Extension.SimpleLocale` is included as _tech preview_.
 It provides Liveview lifecycle hooks and a Plug to set the runtime language or
-runtime locale of all packages using `put_locale/{1,2}. For example: Gettext,
+runtime locale of all packages using `put_locale/{1,2}`. For example: Gettext,
 Fluent and Cldr.
 
 Additionaly it provides a simple registry module providing the `language/1` and
@@ -58,7 +58,7 @@ and language identifiers to display names.
 
 ```
 iex> Routex.Extension.SimpleLocale.Registry.language("nl-BE")
-%{descriptions: ["Belgium"], type: :region}
+%{descriptions: ["Dutch", "Flemish"], type: :language}
 
 iex> Routex.Extension.SimpleLocale.Registry.region("nl-BE")
 %{descriptions: ["Belgium"], type: :region}
@@ -81,7 +81,7 @@ highly welcome.
 
 Configuration issues now trigger clearer error messages. Instead of encountering
 a full stacktrace, you receive concise guidance to help pinpoint and resolve
-common mistakes.
+common mistakes. Such as:
 
 ```
 Routex Error: Missing required implementation of `attrs/1`.
@@ -194,7 +194,7 @@ end
 
 `Routex.Extension.Plugs` detects `plug/3` callbacks and
 inlines their bodies. The callback receives the standard `Plug.call` parameters
-plus `attrs` containing the current route's Routex attributes.
+plus `attrs` containing the current routes' Routex attributes.
 
 **Example**
 

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.37.3">
+    <meta name="project" content="Routex v1.1.0">
+
+
+    <title>Overview — Routex v1.1.0</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-6X3L5KMG.css" />
+
+    <script defer src="dist/sidebar_items-13128291.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-ALU6OERS.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
+    <script>
+      let initialized = false;
+
+      window.addEventListener("exdoc:loaded", () => {
+        if (!initialized) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: document.body.className.includes("dark") ? "dark" : "default"
+          });
+          initialized = true;
+        }
+
+        let id = 0;
+        for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
+          const preEl = codeEl.parentElement;
+          const graphDefinition = codeEl.textContent;
+          const graphEl = document.createElement("div");
+          const graphId = "mermaid-graph-" + id++;
+          mermaid.render(graphId, graphDefinition).then(({svg, bindFunctions}) => {
+            graphEl.innerHTML = svg;
+            bindFunctions?.(graphEl);
+            preEl.insertAdjacentElement("afterend", graphEl);
+            preEl.remove();
+          });
+        }
+      });
+    </script>
+    
+  </head>
+  <body>
+    <script>(()=>{var t="ex_doc:settings",e="dark";var o="dark",s="light";var E="sidebar_state",n="closed";var r="sidebar_width";var a="sidebar-open";var i=new URLSearchParams(window.location.search),S=i.get("theme")||JSON.parse(localStorage.getItem(t)||"{}").theme;(S===o||S!==s&&window.matchMedia("(prefers-color-scheme: dark)").matches)&&document.body.classList.add(e);var d=sessionStorage.getItem(E),A=d!==n&&!window.matchMedia(`screen and (max-width: ${768}px)`).matches;document.body.classList.toggle(a,A);var c=sessionStorage.getItem(r);c&&document.body.style.setProperty("--sidebarWidth",`${c}px`);var p=/(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);document.documentElement.classList.toggle("apple-os",p);})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.1.0
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras=""></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search" tabindex="-1">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1></h1>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.1.0/README.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+<p><img src="assets/logo_horizontal.png" alt="Logo of Routex" title="Routex Logo"/></p><p><img src="https://img.shields.io/coveralls/github/BartOtten/routex" alt="Coveralls"/>
+<a href="https://github.com/BartOtten/routex/actions/workflows/elixir.yml"><img src="https://github.com/BartOtten/routex/actions/workflows/elixir.yml/badge.svg?event=push" alt="Build Status"/></a>
+<a href="https://github.com/BartOtten/routex/commits/main"><img src="https://img.shields.io/github/last-commit/BartOtten/routex.svg" alt="Last Updated"/></a>
+<a href="https://hex.pm/packages/routex"><img src="https://img.shields.io/hexpm/v/routex" alt="Hex.pm"/></a>
+<img src="https://img.shields.io/hexpm/l/routex" alt="Hex.pm"/></p><h1>Routex: Phoenix route localization and beyond....</h1><p>Routex is a powerful library designed to work seamlessly with Phoenix Router,
+providing an unparalleled routing solution. It simplifies route manipulation,
+giving you the control you need to handle even the most demanding routing
+requirements.</p><p>Routex comes with a suite of extensions tailored for internationalization
+(i18n) and localization (l10n), including support for translated (multilingual)
+URLs and alternative route generation. Its modern, extensible architecture
+allows you to effortlessly build custom solutions that integrate smoothly with
+other extensions, extending its capabilities far beyond just localization.</p><p>Whether you need to create multilingual URLs, manage alternative routes, or
+build custom routing solutions, Routex offers the flexibility and power you
+need to enhance your Phoenix applications.</p><p class="hidden-at-hexdocs">This documentation reflects the main branch. For the latest
+stable release, refer to <a href="https://hexdocs.pm/routex/readme.html">HexDocs</a>).</p><h2 id="benefits-and-features" class="section-heading">
+  <a href="#benefits-and-features" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Benefits and Features:</span>
+</h2>
+<ul><li><p><strong>Comprehensive Internationalization:</strong> Built-in support for both
+internationalization (i18n) and localization (l10n) allows you to create fully
+translated, multilingual URLs effortlessly.</p></li><li><p><strong>Runtime Behavior</strong>:Seamlessly blend compile-time code generation with
+dynamic runtime behavior through hooks and plugs conveniently provided by
+extensions.</p></li><li><p><strong>Optimized Performance:</strong> Positioned between route configuration and
+compilation, Routex enhances Phoenix routing without incurring additional
+runtime costs.</p></li><li><p><strong>No dependencies, no state</strong>: Routex is unique in not relying on external
+dependency and works out-of-the-box without proces state.</p></li><li><p><strong>Detailed documentation</strong>: Comprehensive, well-organized documentation
+provides clear guidance on installation, configuration, and best practices,
+making Routex approachable for developers at all levels. For example: If you
+are interested in internationalization (i18n) or localization (l10n) have a
+look at the <a href="localized_routes.html">Localized Routes Guide</a>.</p></li></ul><h2 id="give-it-a-try" class="section-heading">
+  <a href="#give-it-a-try" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Give it a try!</span>
+</h2>
+<p><strong><a href="https://routex.fly.dev/">Online demo</a></strong> - have a look or get the
+<a href="https://github.com/BartOtten/routex_example/">code</a>.</p><h2 id="installation-and-usage" class="section-heading">
+  <a href="#installation-and-usage" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Installation and usage</span>
+</h2>
+<p><strong><a href="usage.html">Usage Guide</a></strong> - requirements and installation.
+instructions.</p><p><strong><a href="https://hexdocs.pm/routex">Documentation</a></strong> - from step-by-step guides till in-depth explanations.</p><h2 id="knowledge-base" class="section-heading">
+  <a href="#knowledge-base" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Knowledge Base</span>
+</h2>
+<p>To better understand how Routex integrates with Phoenix Router and where it fits
+into the broader ecosystem, take a look at our in-depth guides:</p><p><strong><a href="routex_and_phoenix_router.html">How Routex and Phoenix Router Work Together</a></strong> - 
+Discover the mechanics behind the integration and the benefits of a unified routing system.</p><p><strong><a href="comparison.html">Routex compared to Phoenix Router and Cldr Routes</a></strong> - 
+Understand the differences, strengths, and tradeoffs when deciding which
+routing solution best fits your needs.</p><h2 id="extensions" class="section-heading">
+  <a href="#extensions" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Extensions</span>
+</h2>
+<p>Routex comes equipped with a extensions that cater to common and advanced use
+cases in Phoenix applications. Each extension is designed to operate
+independently yet harmoniously with other extensions through the shared
+<a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> system. This flexibility allows you to tailor your routing system
+to your specific needs without resorting to extensive modifications or the
+burden of maintaining a fork.</p><h3 id="benefits" class="section-heading">
+  <a href="#benefits" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Benefits:</span>
+</h3>
+<ul><li><strong>Modularity</strong>: Each feature is encapsulated in its own extension, making
+it easier to manage and maintain.</li><li><strong>Flexibility</strong>: Extensions can be enabled or disabled as needed, allowing
+for a customizable and adaptable routing system.</li><li><strong>Interoperability</strong>: By using <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> to share attributes, extensions
+can work together seamlessly without being tightly coupled, promoting a
+decoupled and scalable architecture.</li><li><strong>Customizability</strong>: If you have a unique requirement, you can adapt an
+existing extension -or create your own- without the need to fork or reach
+upstream consensus on the need and purpose.</li></ul><h3 id="index" class="section-heading">
+  <a href="#index" class="hover-link">
+    <i class="ri-link-m" aria-hidden="true"></i>
+  </a>
+  <span class="text">Index</span>
+</h3>
+<ul><li><a href="extensions.html#alternatives">Alternatives</a>: Create (nested) alternative routes.</li><li><a href="extensions.html#alternative-getters">Alternative Getters</a>: Get alternatives for the current route.</li><li><a href="extensions.html#verified-routes">Verified Routes</a>: Branch aware variant of Phoenix.VerifiedRoutes.</li><li><a href="extensions.html#assigns">Assigns</a>: Use route attributes as assigns in templates.</li><li><a href="extensions.html#interpolation">Interpolation</a>: Use attributes in route definitions.</li><li><a href="extensions.html#translations">Translations</a>: Translate route segments / full localized URLs.</li><li><a href="extensions.html#attribute-getters">Attribute Getters</a>: Retrieve <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> for a route.</li><li><a href="extensions.html#cldr-adapter">Cldr Adapter</a>: Use an existing <code class="inline">:ex_cldr</code>configuration.</li><li><a href="extensions.html#plugs">Plugs</a>: Integrate plugs provided by extensions.</li><li><a href="extensions.html#liveview-hooks">LiveView Hooks</a>: Attach LiveView Lifecycle hooks provided by extensions.</li><li><a href="extensions.html#route-helpers">Route Helpers</a>: Create branch aware Phoenix Helpers.</li><li><a href="extensions.html#cloak-showcase">Cloak</a>: Showcase to demonsrate extreme route transformations.</li></ul>
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="api-reference.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+API Reference
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="extensions.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Included extensions
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+      <p>
+
+          <span class="line">
+            <a href="https://hex.pm/packages/routex/1.1.0" class="footer-hex-package">Hex Package</a>
+
+            <a href="https://preview.hex.pm/preview/routex/1.1.0">Hex Preview</a>
+
+              (<a href="https://preview.hex.pm/preview/routex/1.1.0/show/README.md">current file</a>)
+
+          </span>
+
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
+
+            <a href="Routex.epub" title="ePub version">
+              Download ePub version
+            </a>
+
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.37.3) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

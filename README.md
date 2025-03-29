@@ -103,16 +103,16 @@ burden of maintaining a fork.
   upstream consensus on the need and purpose.
 
 ### Index
-- [Alternatives](docs/guides/EXTENSIONS.md#alternatives): Create (nested) alternative routes.
-- [Alternative Getters](docs/guides/EXTENSIONS.md#alternative-getters): Get alternatives for the current route.
-- [Verified Routes](docs/guides/EXTENSIONS.md#verified-routes): Branch aware variant of Phoenix.VerifiedRoutes.
-- [Assigns](docs/guides/EXTENSIONS.md#assigns): Use route attributes as assigns in templates.
-- [Interpolation](docs/guides/EXTENSIONS.md#interpolation): Use attributes in route definitions.
-- [Translations](docs/guides/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
-- [Attribute Getters](docs/guides/EXTENSIONS.md#attribute-getters): Retrieve `Routex.Attrs` for a route.
-- [Cldr Adapter](docs/guides/EXTENSIONS.md#cldr-adapter): Use an existing `:ex_cldr`configuration.
-- [Plugs](docs/guides/EXTENSIONS.md#plugs): Integrate plugs provided by extensions.
-- [LiveView Hooks](docs/guides/EXTENSIONS.md#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
-- [Route Helpers](docs/guides/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
-- [Cloak](docs/guides/EXTENSIONS.md#cloak-showcase): Showcase to demonsrate extreme route transformations.
+- [Alternatives](docs/EXTENSIONS.md#alternatives): Create (nested) alternative routes.
+- [Alternative Getters](docs/EXTENSIONS.md#alternative-getters): Get alternatives for the current route.
+- [Verified Routes](docs/EXTENSIONS.md#verified-routes): Branch aware variant of Phoenix.VerifiedRoutes.
+- [Assigns](docs/EXTENSIONS.md#assigns): Use route attributes as assigns in templates.
+- [Interpolation](docs/EXTENSIONS.md#interpolation): Use attributes in route definitions.
+- [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
+- [Attribute Getters](docs/EXTENSIONS.md#attribute-getters): Retrieve `Routex.Attrs` for a route.
+- [Cldr Adapter](docs/EXTENSIONS.md#cldr-adapter): Use an existing `:ex_cldr`configuration.
+- [Plugs](docs/EXTENSIONS.md#plugs): Integrate plugs provided by extensions.
+- [LiveView Hooks](docs/EXTENSIONS.md#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
+- [Route Helpers](docs/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
+- [Cloak](docs/EXTENSIONS.md#cloak-showcase): Showcase to demonsrate extreme route transformations.
 

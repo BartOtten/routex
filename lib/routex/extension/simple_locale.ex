@@ -1,7 +1,7 @@
 defmodule Routex.Extension.SimpleLocale do
   @moduledoc """
-  Provides Liveview lifecycle hooks and Plug to set the runtime language or
-  runtime locale using a call to `put_locale/{1,2}`.
+  Provides Liveview lifecycle hooks and Plug to set the language, region and
+  locale attributes during runtime.
 
   Locales can be derived from the accept-language header, a query parameter, a
   url parameter, a body parameter, the route or the session for the current
@@ -19,17 +19,6 @@ defmodule Routex.Extension.SimpleLocale do
   - Cldr
 
   ## Options
-   - `:translation_backends` - A keyword list containing package-backend
-     pairs used to invoke put_locale/2 for setting the language. This function
-     accepts the attribute `:language` —falling back to :locale when necessary.
-     Specifying "*" for a backend applies the value to all available backends
-     (the default).
-
-   - `:locale_backends` - A keyword list containing package-backend pairs
-     used to invoke put_locale/2 for setting the locale. This function accepts
-     the attribute `:locale` —falling back to :language when necessary.
-     Specifying "*" for a backend applies the value to all available backends
-     (the default).
 
   ### Fields
   Multiple fields can be configured with suffixes `_sources` and `_params`.
@@ -55,19 +44,48 @@ defmodule Routex.Extension.SimpleLocale do
   ### Params
   List of keys in a source to examine. Defaults to the name of the field with
   fallback to `locale`.
+
+   ## Example configuration
+    ```diff
+    # file lib/example_web/routex_backend.ex
+    defmodule ExampleWeb.RoutexBackend do
+      use Routex.Backend,
+      extensions: [
+        Routex.Extension.Attrs,
+   +    Routex.Extension.SimpleLocale,
+    ],
+   +region_sources: [:accept_language, :attrs],
+   +region_params: ["region"],
+   +language_sources: [:query, :attrs],
+   +language_params: ["language"],
+   +locale_sources: [:query, :session, :accept_language, :attrs],
+   +locale_params: ["locale"],
+    ```
+
+    ## `Routex.Attrs`
+    **Requires**
+    - none
+
+    **Sets**
+    - none
+
+    ## Helpers
+    runtime_callbacks(attrs :: T.attrs) :: :ok
   """
 
   @behaviour Routex.Extension
 
   alias Routex.Attrs
   alias Routex.Extension.SimpleLocale
-  alias Routex.Types, as: T
   alias SimpleLocale.Parser
   alias SimpleLocale.Registry
 
   @session_key :rtx
 
   @impl Routex.Extension
+  @doc """
+  Expands the attributes to include: [:language, :region, :language_display_name, :region_display_name]
+  """
   def transform(routes, _backend, _env) do
     Enum.map(routes, fn route ->
       route
@@ -84,9 +102,7 @@ defmodule Routex.Extension.SimpleLocale do
     uri = URI.new!(url)
     conn_map = build_conn_map(params, uri, socket)
 
-    socket
-    |> update_socket_with_locales(conn_map, attrs)
-    |> then(&{:cont, &1})
+    {:cont, update_socket_with_locales(socket, conn_map, attrs)}
   end
 
   @doc """
@@ -94,22 +110,8 @@ defmodule Routex.Extension.SimpleLocale do
   """
   def plug(conn, opts, attrs \\ %{}) do
     conn
-    |> Routex.Attrs.merge(attrs)
-    |> detect_and_store_locales(opts, attrs)
+    |> update_conn_with_locales(opts, attrs)
     |> update_conn_session()
-    |> put_locale_from_attrs()
-  end
-
-  @impl Routex.Extension
-  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(_routes, backend, _env) do
-    ast = build_ast(backend)
-
-    quote do
-      def put_locale(attrs) do
-        (unquote_splicing(ast))
-      end
-    end
   end
 
   # Private functions
@@ -163,20 +165,20 @@ defmodule Routex.Extension.SimpleLocale do
 
   defp update_socket_with_locales(socket, conn_map, attrs) do
     result = __MODULE__.Detect.detect_locales(conn_map, [], attrs)
-    attrs = Map.merge(attrs, result)
-    attrs.__helper_mod__.put_locale(attrs)
+    socket = Attrs.merge(socket, result)
     Phoenix.Component.assign(socket, result)
   end
 
-  defp detect_and_store_locales(conn, opts, attrs) do
+  defp update_conn_with_locales(conn, opts, attrs) do
     result = __MODULE__.Detect.detect_locales(conn, opts, attrs)
 
-    result
-    |> Enum.reduce(conn, fn {key, value}, conn ->
-      conn
-      |> Attrs.put(key, value)
-      |> Plug.Conn.assign(key, value)
-    end)
+    conn =
+      result
+      |> Enum.reduce(conn, fn {key, value}, conn ->
+        Plug.Conn.assign(conn, key, value)
+      end)
+
+    Attrs.merge(conn, result)
   end
 
   defp update_conn_session(%{private: %{plug_session: _data}} = conn) do
@@ -187,47 +189,4 @@ defmodule Routex.Extension.SimpleLocale do
 
   defp update_conn_session(conn),
     do: conn |> Plug.Conn.fetch_session() |> update_conn_session()
-
-  defp put_locale_from_attrs(conn) do
-    attrs = Map.merge(%{}, Attrs.get(conn))
-    attrs.__helper_mod__.put_locale(attrs)
-    conn
-  end
-
-  defp build_ast(backend) do
-    config = backend.config() |> Map.from_struct()
-
-    for config_key <- [:translation_backends, :locale_backends],
-        !is_nil(config[config_key]),
-        {package, backend} <- config[config_key],
-        package = Module.concat([package]),
-        Code.ensure_loaded!(package) do
-      build_put_locale_ast(package, backend, config_key)
-    end
-  end
-
-  defp build_put_locale_ast(package, "*", :locale_backends) do
-    ensure_provided!(package, 1)
-    quote do: unquote(package).put_locale(attrs[:region] || attrs[:locale])
-  end
-
-  defp build_put_locale_ast(package, backend, :locale_backends) do
-    ensure_provided!(package, 2)
-    quote do: unquote(package).put_locale(unquote(backend), attrs[:locale])
-  end
-
-  defp build_put_locale_ast(package, "*", :translation_backends) do
-    ensure_provided!(package, 1)
-    quote do: unquote(package).put_locale(attrs[:language])
-  end
-
-  defp build_put_locale_ast(package, backend, :translation_backends) do
-    ensure_provided!(package, 2)
-    quote do: unquote(package).put_locale(unquote(backend), attrs[:language])
-  end
-
-  defp ensure_provided!(package, arity) do
-    function_exported?(package, :put_locale, arity) ||
-      raise "#{package} does not provide put_locale/#{arity}"
-  end
 end

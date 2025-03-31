@@ -30,6 +30,9 @@ to share attributes; allowing extensions to work together without being coupled.
 - [LiveView Hooks](#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
 - [Route Helpers](#route-helpers): Create branch aware Phoenix Helpers.
 - [Cloak](#cloak-showcase): Showcase to demonsrate extreme route transformations.
+- [Simple Locale](#simple-locale): Simple Phoenix localization.
+- [Runtime Callbacks](#runtime-callbacks): Call arbitrary functions with route attributes.
+
 
 ## Alternatives
 
@@ -228,3 +231,43 @@ experimentation.
 ```
 
 [Cloak Documentation](https://hexdocs.pm/routex/Routex.Extension.Cloak.html)
+
+
+## Simple Locale
+
+**Feature**: Localize Phoenix using Routex
+
+**Benefits**: Provides shorthand -> display name conversion for locales and
+automatically enables locale detection in StaticViews and LiveViews.
+
+**Example**: Set the `locale` attribute based on the [HTTP accept-language header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept-Language).
+
+```elixir
+locale_sources: [:query, :session, :accept_language, :attrs],
+locale_params: ["locale"]
+```
+
+[Simple Locale Documentation](https://hexdocs.pm/routex/Routex.Extension.SimpleLocale.html)
+
+
+## Runtime Callbacks
+
+**Feature**: Add runtime callbacks to navigation events.
+
+**Benefits**: This is particularly useful for integrating with internationalization libraries like:
+
+  * Gettext - Set language for translations
+  * Fluent - Set language for translations
+  * Cldr - Set locale for the Cldr suite
+
+
+**Example**: Call `Gettext.put_locale/1` using the `locale` attribute set by Simple Locale.
+
+```elixir
+ runtime_callbacks: [
+  # Set Gettext locale from :language attribute
+  {Gettext, :put_locale, [[:attrs, :locale]]},
+ ]
+```
+
+[Runtime Callbacks Documentation](https://hexdocs.pm/routex/Routex.Extension.RuntimeCallbacks.html)

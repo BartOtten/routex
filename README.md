@@ -115,4 +115,6 @@ burden of maintaining a fork.
 - [LiveView Hooks](docs/EXTENSIONS.md#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
 - [Route Helpers](docs/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
 - [Cloak](docs/EXTENSIONS.md#cloak-showcase): Showcase to demonsrate extreme route transformations.
+- [Simple Locale](docs/EXTENSIONS.md#simple-locale): Simple Phoenix localization.
+- [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes.
 

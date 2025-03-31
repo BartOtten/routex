@@ -60,12 +60,13 @@ defmodule Routex.Extension.SimpleLocale do
   +     Routex.Extension.SimpleLocale,
   +     Routex.Extension.RuntimeCallbacks  # when using callbacks to other libraries
   ],
-   +region_sources: [:accept_language, :attrs],
-   +region_params: ["region"],
-   +language_sources: [:query, :attrs],
-   +language_params: ["language"],
-   +locale_sources: [:query, :session, :accept_language, :attrs],
-   +locale_params: ["locale"]
+  + # Below is for demonstration only. Use sensible values (or keep commented)
+  + # region_sources: [:accept_language, :attrs],
+  + # region_params: ["region"],
+  + # language_sources: [:query, :attrs],
+  + # language_params: ["language"],
+  + # locale_sources: [:query, :session, :accept_language, :attrs],
+  + # locale_params: ["locale"]
 
   # using RuntimeCallbacks to call Gettext.put_locale
   +      runtime_callbacks: [

@@ -51,7 +51,7 @@ stable release, refer to <a href="https://hexdocs.pm/routex/readme.html">HexDocs
   provides clear guidance on installation, configuration, and best practices,
   making Routex approachable for developers at all levels. For example: If you
   are interested in internationalization (i18n) or localization (l10n) have a
-  look at the [Localized Routes Guide](docs/guides/LOCALIZED_ROUTES.md).
+  look at the [Localized Routes Guide](docs/guides/LOCALIZE_PHOENIX.md).
 
 
 ## Give it a try!

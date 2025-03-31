@@ -1,25 +1,56 @@
 defmodule Routex.Extension.RuntimeCallbacks do
   @moduledoc """
-  Call functions at runtime by providing them in the configuration. Can be used to set the state for packages such as:
+  The RuntimeCallbacks extension allows you to configure callback functions triggered on navigation.
+  This is particularly useful for integrating with internationalization libraries like:
 
-  - Gettext
-  - Fluent
-  - Cldr
+  * Gettext - Set language for translations
+  * Fluent - Set language for translations
+  * Cldr - Set locale for the Cldr suite
 
-   ## Options
-    - `runtime_callbacks` - list of {m,f,a} tuples. An argument being a list starting with `:attrs` is transformed to a call `get_in(attrs(), rest)`
+  > #### In combination with... {: .neutral}
+  > This extension calls other functions with values from `Routex.Attrs` during
+  > runtime. These attributes can be set by other extensions such as
+  > `Routex.Extension.Alternatives` (compile time) and
+  > `Routex.Extension.SimpleLocale` (run time)
 
-    ## Example configuration
-    ```diff
-    # file lib/example_web/routex_backend.ex
-    defmodule ExampleWeb.RoutexBackend do
-      use Routex.Backend,
-      extensions: [
-        Routex.Extension.Attrs,
-    +   Routex.Extension.RuntimeCallbacks,
+
+  ### Options
+
+  * `runtime_callbacks` - List of `{module, function, arguments}` tuples. Any argument being a list starting with `:attrs` is transformed to `get_in(attrs(), rest)`.
+
+  ### Example Configuration
+
+  ````elixir
+  defmodule MyApp.RoutexBackend do
+  use Routex.Backend,
+    extensions: [
+      Routex.Extension.Attrs,
+  +     Routex.Extension.RuntimeCallbacks
     ],
-    + runtime_callbacks: [{Gettext, :put_locale, [[:attrs, :language]]},{Cldr, :put_locale, [ExampleCldr, [:attrs, :locale]]}],
-    ```
+    runtime_callbacks: [
+  +      # Set Gettext locale from :language attribute
+  +      {Gettext, :put_locale, [[:attrs, :language]]},
+
+  +      # Set CLDR locale from :locale attribute
+  +      {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :locale]]}
+    ]
+  end
+  ````
+
+  ## Error Handling
+
+  The extension validates all callbacks during compilation to ensure the specified modules and functions exist:
+
+  * Checks if the module is loaded
+  * Verifies the function exists with correct arity
+  * Raises a compile-time error if validation fails
+
+  Example error:
+
+  ````elixir
+  ** (RuntimeError) Gettext does not provide set_locale/1.
+   Please check the value of :runtime_callbacks in the Routex backend module
+  ````
 
     ## `Routex.Attrs`
     **Requires**

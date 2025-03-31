@@ -1,7 +1,9 @@
 defmodule Routex.Extension.SimpleLocale do
   @moduledoc """
   Provides Liveview lifecycle hooks and Plug to set the language, region and
-  locale attributes during runtime.
+  locale attributes during runtime. Each field can be configured independently.
+
+  Expands the attributes to include: [:language, :region, :language_display_name, :region_display_name]
 
   Locales can be derived from the accept-language header, a query parameter, a
   url parameter, a body parameter, the route or the session for the current
@@ -13,10 +15,11 @@ defmodule Routex.Extension.SimpleLocale do
    > #### Experimental {: .warning}
    > This module is experimental and may be subject to change
 
-  Examples of supported packages:
-  - Gettext
-  - Fluent
-  - Cldr
+  > #### In combination with... {: .neutral}
+  > This extension sets `Routex.Attrs` during runtime. To use these attributes
+  > in other libraries / packages such as Gettext and Cldr, refer
+  > to `Routex.Extension.RuntimeCallbacks`
+
 
   ## Options
 
@@ -32,45 +35,54 @@ defmodule Routex.Extension.SimpleLocale do
   List of sources to examine for this field.
   The valid options are:
 
-  * `:accept_language` will parse the `accept-language` header
-  * `:attrs` will look in the route atributes.
-  * `:body` will look in `body_params`
-  * `:cookie` will look in the request cookie(s)
-  * `:path` will look in `path_params`
-  * `:query` will look in `query_params`
-  * `:session` will look in the session
-  * `:subdomain` will attempt to find the info in the subdomains.
+  * `:accept_language` examines the `accept-language` header.
+  * `:attrs` uses the (precompiled) route atributes.
+  * `:body` uses `body_params`; useful when using values in API bodies.
+  * `:cookie` uses the request cookie(s)
+  * `:host` examines the hostname e.g `en.example.com` and `example.nl`. Returns the first match..
+  * `:path` uses `path_params` such as `/:language/products/`
+  * `:query` uses `query_params` such as `/products?language=nl`
+  * `:session` uses the session
+
+  Default: `#{inspect(__MODULE__.Detect.__default_sources__())}`
 
   ### Params
-  List of keys in a source to examine. Defaults to the name of the field with
+  List of keys in a `source` to get. Defaults to the name of the `field` with
   fallback to `locale`.
 
    ## Example configuration
-    ```diff
-    # file lib/example_web/routex_backend.ex
-    defmodule ExampleWeb.RoutexBackend do
-      use Routex.Backend,
-      extensions: [
-        Routex.Extension.Attrs,
-   +    Routex.Extension.SimpleLocale,
-    ],
+  ```diff
+  # file lib/example_web/routex_backend.ex
+  defmodule ExampleWeb.RoutexBackend do
+  use Routex.Backend,
+  extensions: [
+    Routex.Extension.Attrs,
+  +     Routex.Extension.SimpleLocale,
+  +     Routex.Extension.RuntimeCallbacks  # when using callbacks to other libraries
+  ],
    +region_sources: [:accept_language, :attrs],
    +region_params: ["region"],
    +language_sources: [:query, :attrs],
    +language_params: ["language"],
    +locale_sources: [:query, :session, :accept_language, :attrs],
-   +locale_params: ["locale"],
-    ```
+   +locale_params: ["locale"]
 
-    ## `Routex.Attrs`
-    **Requires**
-    - none
+  # using RuntimeCallbacks to call Gettext.put_locale
+  +      runtime_callbacks: [
+  +        # Set Gettext locale from :language attribute
+  +        {Gettext, :put_locale, [[:attrs, :language]]},
+  +       ]
+  ```
 
-    **Sets**
-    - none
+  ## `Routex.Attrs`
+  **Requires**
+  - none
 
-    ## Helpers
-    runtime_callbacks(attrs :: T.attrs) :: :ok
+  **Sets**
+  - none
+
+  ## Helpers
+  runtime_callbacks(attrs :: T.attrs) :: :ok
   """
 
   @behaviour Routex.Extension

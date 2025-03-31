@@ -1,7 +1,27 @@
 defmodule Routex.Extension.SimpleLocale.Extractor do
   @moduledoc """
-  Extracts locale information from various sources.
-  Handles both Plug.Conn structs and map inputs.
+
+  Extracts locale information from various sources. Handles both `Plug.Conn`
+  structs and map inputs.
+
+  Supports languages and regions defined in the [IANA Language Subtag
+  Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
+
+  ### Sources
+  List of sources to examine for this field.
+
+  * `:accept_language` examines the `accept-language` header.
+  * `:attrs` uses the (precompiled) route atributes.
+  * `:body` uses `body_params`; useful when using values in API bodies.
+  * `:cookie` uses the request cookie(s)
+  * `:host` examines the hostname e.g `en.example.com` and `example.nl`. Returns the first match..
+  * `:path` uses `path_params` such as `/:locale/products/`
+  * `:query` uses `query_params` such as `/products?locale=en-US`
+  * `:session` uses the session
+
+  ### Params
+  List of keys in a source to examine. Defaults to the name of the field with
+  fallback to `locale`.
   """
 
   alias Routex.Extension.SimpleLocale
@@ -13,7 +33,7 @@ defmodule Routex.Extension.SimpleLocale.Extractor do
 
   @spec extract_from_source(Plug.Conn.t() | map(), atom(), String.t(), keyword()) ::
           String.t() | nil
-  def extract_from_source(source, type, param, attrs)
+  def extract_from_source(conn_like, source, param, attrs)
 
   # Handle Plug.Conn specific extractions
   def extract_from_source(%Plug.Conn{} = conn, :accept_language, param, _attrs) do

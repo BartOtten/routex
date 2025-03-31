@@ -78,56 +78,59 @@ have these routes _not_ be branch aware.
 
 defmodule ExampleWeb.RoutexBackend.AltAttrs do
  @moduledoc false
- defstruct [:contact, locale: "en"]
+ defstruct [locale: "en-001"]
 end
 
 defmodule ExampleWeb.RoutexBackend do
  alias ExampleWeb.RoutexBackend.AltAttrs
 
 defmodule ExampleWeb.RoutexBackend do
-use Routex.Backend,
-  extensions: [
-    # required
-    Routex.Extension.AttrGetters,
-    Routex.Extension.PhoenixLiveviewHooks,
-    Routex.Extension.Plugs,
+ use Routex.Backend,
+   extensions: [
+     # required
+     Routex.Extension.AttrGetters,
 
-    # adviced
-    Routex.Extension.VerifiedRoutes,
-    Routex.Extension.AlternativeGetters,
-    Routex.Extension.Alternatives,
-    Routex.Extension.Assigns,
+     # adviced
+     Routex.Extension.PhoenixLiveviewHooks,
+     Routex.Extension.Plugs,
+     Routex.Extension.RuntimeCallbacks,
+     Routex.Extension.VerifiedRoutes,
+     Routex.Extension.AlternativeGetters,
+     Routex.Extension.Alternatives,
+     Routex.Extension.Assigns,
+     Routex.Extension.SimpleLocale
 
-    # optional
-    # Routex.Extension.Translations,
-    # Routex.Extension.Interpolation,
-    # Routex.Extension.RouteHelpers,
-    # Routex.Extension.Cldr
-  ],
-  alternatives: %{
-   "/" => %{
-     attrs: %AltAttrs{contact: "sales@example.com"},
-     branches: %{
-       "/europe" => %{
-         attrs: %AltAttrs{contact: "sales.europe@example.com"},
-         branches: %{
-           "/nl" => %{attrs: %AltAttrs{locale: "nl", contact: "verkoop@example.nl"}},
-           "/fr" => %{attrs: %AltAttrs{locale: "fr", contact: "commerce@example.fr"}}
-         }
-       },
-     "/gb" => %{attrs: %AltAttrs{contact: "sales@example.com"}
-    },
-  },
-  alternatives_prefix: true,
-  assigns: %{namespace: :rtx, attrs: [:locale, :contact]},
-  translations_backend: MyApp.Gettext,
-  translations_domain: "routes",
-  verified_sigil_routex: "~p",
-  verified_sigil_phoenix: "~o",
-  verified_url_routex: :url,
-  verified_url_phoenix: :url_native,
-  verified_path_routex: :path,
-  verified_path_phoenix: :path_native
+     # optional
+     # Routex.Extension.Translations,  # when you want translated routes
+     # Routex.Extension.Interpolation,  # when path prefixes don't cut it
+     # Routex.Extension.RouteHelpers,  # when verified routes can't be used
+     # Routex.Extension.Cldr,  # when using Cldr
+   ],
+   alternatives: %{
+    "/" => %{
+      attrs: %AltAttrs{contact: "sales@example.com"},
+      branches: %{
+        "/europe" => %{
+          attrs: %AltAttrs{locale: "en-150", contact: "sales.europe@example.com"},
+          branches: %{
+            "/nl" => %{attrs: %AltAttrs{locale: "nl-NL", contact: "verkoop@example.nl"}},
+            "/fr" => %{attrs: %AltAttrs{locale: "fr-FR", contact: "commerce@example.fr"}}
+          }
+        },
+      "/gb" => %{attrs: %AltAttrs{locale: "en-GB", contact: "sales@example.com"}
+     },
+   },
+   alternatives_prefix: true,
+   assigns: %{namespace: :rtx, attrs: [:locale, :contact]},
+   # translations_backend: MyApp.Gettext,
+   translations_domain: "routes",
+   runtime_callbacks: [{Gettext, :put_locale, [[:attrs, :language]]}],
+   verified_sigil_routex: "~p",
+   verified_sigil_phoenix: "~o",
+   verified_url_routex: :url,
+   verified_url_phoenix: :url_native,
+   verified_path_routex: :path,
+   verified_path_phoenix: :path_native
 end
 ```
 

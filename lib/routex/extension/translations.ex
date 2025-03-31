@@ -14,7 +14,7 @@ defmodule Routex.Extension.Translations do
   This extension requires Gettext >= 0.26.
 
   > #### In combination with... {: .neutral}
-  > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZED_ROUTES.md)
+  > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZE_PHOENIX.md)
 
   ## Configuration
   ```diff

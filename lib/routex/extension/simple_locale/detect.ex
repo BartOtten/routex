@@ -8,7 +8,7 @@ defmodule Routex.Extension.SimpleLocale.Detect do
   alias SimpleLocale.Extractor
   alias SimpleLocale.Types
 
-  @default_sources [:session, :query, :path, :accept_language, :attrs]
+  @default_sources [:query, :session, :cookie, :accept_language, :path, :attrs]
 
   @default_params %{
     region: ["region", "locale"],
@@ -16,6 +16,9 @@ defmodule Routex.Extension.SimpleLocale.Detect do
     territory: ["territory", "locale"],
     locale: ["locale"]
   }
+
+  def __default_sources__, do: @default_sources
+  def __default_params__, do: @default_params
 
   @spec detect_locales(Plug.Conn.t() | map(), keyword(), T.attrs()) :: Types.locale_result()
   def detect_locales(conn_or_map, _options, attrs) do

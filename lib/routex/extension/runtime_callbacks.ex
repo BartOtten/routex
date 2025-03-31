@@ -20,19 +20,19 @@ defmodule Routex.Extension.RuntimeCallbacks do
 
   ### Example Configuration
 
-  ````elixir
+  ````diff
   defmodule MyApp.RoutexBackend do
   use Routex.Backend,
     extensions: [
       Routex.Extension.Attrs,
-  +     Routex.Extension.RuntimeCallbacks
+  +   Routex.Extension.RuntimeCallbacks
     ],
     runtime_callbacks: [
-  +      # Set Gettext locale from :language attribute
-  +      {Gettext, :put_locale, [[:attrs, :language]]},
+  +   # Set Gettext locale from :language attribute
+  +   {Gettext, :put_locale, [[:attrs, :language]]},
 
-  +      # Set CLDR locale from :locale attribute
-  +      {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :locale]]}
+  +   # Set CLDR locale from :locale attribute
+  +   {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :locale]]}
     ]
   end
   ````

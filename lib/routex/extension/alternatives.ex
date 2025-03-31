@@ -5,7 +5,7 @@ defmodule Routex.Extension.Alternatives do
   with other extensions.
 
   > #### In combination with... {: .neutral}
-  > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZED_ROUTES.md)
+  > How to combine this extension for localization is written in de [Localization Guide](guides/LOCALIZE_PHOENIX.md)
 
   ## Configuration
   ```diff

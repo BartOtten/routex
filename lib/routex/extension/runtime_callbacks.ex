@@ -1,7 +1,9 @@
 defmodule Routex.Extension.RuntimeCallbacks do
   @moduledoc """
-  The RuntimeCallbacks extension allows you to configure callback functions triggered on navigation.
-  This is particularly useful for integrating with internationalization libraries like:
+  The RuntimeCallbacks extension enable to configure callback functions
+  -triggered by the Plug pipeline and LiveViews handle_params- by providing a
+  list of `{module, function, arguments}` tuples. This is particularly useful
+  for integrating with internationalization libraries like:
 
   * Gettext - Set language for translations
   * Fluent - Set language for translations
@@ -16,7 +18,8 @@ defmodule Routex.Extension.RuntimeCallbacks do
 
   ### Options
 
-  * `runtime_callbacks` - List of `{module, function, arguments}` tuples. Any argument being a list starting with `:attrs` is transformed to `get_in(attrs(), rest)`.
+  * `runtime_callbacks` - List of `{module, function, arguments}` tuples. Any argument
+    being a list starting with `:attrs` is transformed into `get_in(attrs(), rest)`.
 
   ### Example Configuration
 

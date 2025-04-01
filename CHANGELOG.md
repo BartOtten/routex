@@ -6,21 +6,42 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 <!-- changelog -->
 ## Upcoming Release
 
-### Overview of Improvements
+This release is truly the result of community participation. Thanks to all
+opening tickets and contributing improvements!
 
-#### Simplified Integration
+### Simplified Integration
 Routex now streamlines integration with your Phoenix application by extending
 its functionality from compile time to runtime. This means that while route
 configurations are established during compilation, Routex now supports dynamic
-adjustments at runtime and influencing into runtime state.
+adjustments at runtime and influencing runtime state.
 
-**LiveView Hooks**
+**Call functions at runtime using (custom) Routex attributes**
+
+  `Routex.Extension.RuntimeCallbakcs` allows you to configure callback functions
+   -triggered by the Plug pipeline and LiveViews handle_params- by providing a
+   list of `{module, function, arguments}` tuples. Any argument being a list
+   starting with `:attrs` is transformed into `get_in(attrs(), rest)`.
+
+  This is particularly useful for integrating with internationalization libraries like:
+
+  * Gettext - Set language for translations
+  * Fluent - Set language for translations
+  * Cldr - Set locale for the Cldr suite
+
+```elixir
+runtime_callbacks: [
+  # Set Gettext locale from :language attribute
+  {Gettext, :put_locale, [[:attrs, :language]]},
+]
+```
+
+**Inline LiveView Hooks of extensions**
 
   `Routex.Extension.LiveViewHooks` detects custom hooks provided by other
   extensions and integrates them automatically into Phoenix LiveView’s
   lifecycle. This reduces manual setup and minimizes boilerplate code.
 
-**Plugs**
+**Inline Plugs of extensions**
 
   `Routex.Extension.Plugs` detects custom plugs provided by other extensions
   simplifying how extension-specific plugs are incorporated into the router’s
@@ -28,33 +49,49 @@ adjustments at runtime and influencing into runtime state.
   wire everything together. This approach cuts down on the need for extra
   configuration in your router.
 
+  To utilize the plugs detected by this extension, add the Routex plug to your
+  router module in a pipeline.
 
-```diff
-# In your Routex backend module
-extensions: [
-  Routex.Extension.AttrGetters,
-+  Routex.Extension.PhoenixLiveviewHooks,
-+  Routex.Extension.Plugs,
-]
+  ```diff
+  # In your router.ex
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+  +  plug :routex
+  end
+  ```
 
-# In your router.ex
-pipeline :browser do
-  plug :accepts, ["html"]
-  plug :fetch_session
-+  plug :routex
-end
-```
+**Localize your Phoenix app**
+`Routex.Extension.SimpleLocale` is included as _tech preview_.
 
-**Tech preview: SimpleLocale**
+All the aformentioned features are the result of a single issue raised:
 
-The experimental `Routex.Extension.SimpleLocale` is included as _tech preview_.
-It provides Liveview lifecycle hooks and a Plug to set the runtime language or
-runtime locale of all packages using `put_locale/{1,2}`. For example: Gettext,
-Fluent and Cldr.
+> Localization guide is missing step to content translation (using Gettext)
+> - KristerV
 
-Additionaly it provides a simple registry module providing the `language/1` and
-`region/1` functions. These functions can be used to translate locale, region
-and language identifiers to display names.
+So a journey began as it was this time we recognized users would like to:
+
+1. use configuration from Routex to influence the runtime behavour of their apps
+2. use a simple solution for common localization
+
+SimpleLocale was designed to provide just that: A solution for the most common
+cases of localization. Featuring automated integration, a small locales registry
+and very customizable locale detection at runtime.
+
+**Compile time** - During compilation this extension expands the `locale`
+attribute into `locale`, `language`, `region`, `language_display_name` and
+`region_display_name` using the included locale registry (see below).
+
+**Run time** - It provides a Liveview lifecycle hook and a Plug to set the
+`locale`, `language` and `region` attributes at runtime from a configurable
+source. Each fields source can be independently derived from the accept-language
+header, a query parameter, a url parameter, a body parameter, the route or the
+session for the current process.
+
+This extensions comes with a simple locale registry covering common needs. The
+`language/1` and `region/1` functions can be used to translate locale, region
+and language identifiers to display names. `language?` and `region?` validate
+input.
 
 ```
 iex> Routex.Extension.SimpleLocale.Registry.language("nl-BE")
@@ -71,11 +108,15 @@ iex> Routex.Extension.SimpleLocale.Registry.region("BE")
 %{descriptions: ["Belgium"], type: :region}
 ```
 
+
+Supports languages and regions defined in the [IANA Language Subtag
+  Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
+
 See it's documentation for the available configuration options. Feedback is
-highly welcome.
+highly appreciated.
 
 
-#### Improved Developer Experience
+### Improved Developer Experience
 
 **Clearer Error Messages**
 

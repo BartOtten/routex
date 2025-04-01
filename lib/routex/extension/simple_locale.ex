@@ -1,25 +1,30 @@
 defmodule Routex.Extension.SimpleLocale do
   @moduledoc """
-  Provides Liveview lifecycle hooks and Plug to set the language, region and
-  locale attributes during runtime. Each field can be configured independently.
+   > #### Experimental {: .warning}
+   > This module is experimental and may be subject to change
 
-  Expands the attributes to include: [:language, :region, :language_display_name, :region_display_name]
+  **Compile time** - During compilation this extension expands the `locale`
+  attribute into `locale`, `language`, `region`, `language_display_name` and
+  `region_display_name` using the included locale registry (see below).
 
-  Locales can be derived from the accept-language header, a query parameter, a
-  url parameter, a body parameter, the route or the session for the current
-  process.
+  **Run time** - It provides a Liveview lifecycle hook and a Plug to set the
+  `locale`, `language` and `region` attributes at runtime from a configurable
+  source. Each fields source can be independently derived from the accept-language
+  header, a query parameter, a url parameter, a body parameter, the route or the
+  session for the current process.
+
+  This extensions comes with a simple locale registry covering common needs. The
+  `language/1` and `region/1` functions can be used to translate locale, region
+  and language identifiers to display names. `language?` and `region?` validate
+  input.
 
   Supports languages and regions defined in the [IANA Language Subtag
   Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
-
-   > #### Experimental {: .warning}
-   > This module is experimental and may be subject to change
 
   > #### In combination with... {: .neutral}
   > This extension sets `Routex.Attrs` during runtime. To use these attributes
   > in other libraries / packages such as Gettext and Cldr, refer
   > to `Routex.Extension.RuntimeCallbacks`
-
 
   ## Options
 

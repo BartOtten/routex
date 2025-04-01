@@ -55,12 +55,13 @@ An explanation of the configuration is at the bottom of this guide.
 defmodule ExampleWeb.RoutexBackend do
   @moduledoc """
   Configures Routex to enable localized and translated routes.
+  """
 
   use Routex.Backend,
     extensions: [
       Routex.Extension.AttrGetters,           # Base attribute handling
       Routex.Extension.PhoenixLiveviewHooks,  # Inlines LiveView lifecycle callbacks of other extensions
-      Routex.Extension.Plugs                  # Inlines plug callbacks of other extensions
+      Routex.Extension.Plugs,                 # Inlines plug callbacks of other extensions
       Routex.Extension.Alternatives,          # Generates locale alternatives
       Routex.Extension.AlternativeGetters,    # Creates a helper function to get the alternatives for a route
       Routex.Extension.Translations,          # Enables route segment translations

@@ -9,49 +9,63 @@
 
 # Routex: Phoenix route localization and beyond....
 
-Routex is a powerful library designed to work seamlessly with Phoenix Router,
-providing an unparalleled routing solution. It simplifies route manipulation,
-giving you the control you need to handle even the most demanding routing
-requirements.
+Routex is a comprehensive, batteries included framework built on top of Phoenix,
+designed to streamline and empower your routing workflows. By simplifying route
+manipulation at compile time and enabling the use of custom route attributes
+during runtime, Routex provides the granular control needed to tackle the most
+complex routing challenges.
 
-Routex comes with a suite of extensions tailored for internationalization
-(i18n) and localization (l10n), including support for translated (multilingual)
-URLs and alternative route generation. Its modern, extensible architecture
-allows you to effortlessly build custom solutions that integrate smoothly with
-other extensions, extending its capabilities far beyond just localization.
+Its modern, extensible architecture allows for effortless creation of custom
+solutions, extending its functionality far beyond standard routing.
 
-Whether you need to create multilingual URLs, manage alternative routes, or
-build custom routing solutions, Routex offers the flexibility and power you
-need to enhance your Phoenix applications.
+## Localize Phoenix
+For developers seeking robust Phoenix localization solutions, Routex excels. It
+offers a suite of extensions enabling internationalization (i18n) and
+localization (l10n), including but not limited to seamless support for
+translated (multilingual) URLs, locale preference detection at run time and
+support for multiple backends. Included extension SimpleLocale simplifies common
+Phoenix localization by including a [IANA](https://www.iana.org/) based locale
+registry for robust locale validation and conversion to display names.
+
+Forget any notion of difficult setup – localizing your Phoenix application with
+Routex is a breeze. Just copy the example configuration from our [Localize
+Phoenix using Routex guide](docs/guides/LOCALIZE_PHOENIX.md) for an effortless
+start.
 
 <p class="hidden-at-hexdocs">
 This documentation reflects the main branch. For the latest
 stable release, refer to <a href="https://hexdocs.pm/routex/readme.html">HexDocs</a>).
 </p>
 
-
 ## Benefits and Features:
 
-* **Comprehensive Internationalization:** Built-in support for both
-  internationalization (i18n) and localization (l10n) allows you to create fully
-  translated, multilingual URLs effortlessly.
+* **Simplify development:** Routex combines compile-time code generation with
+  dynamic runtime behavior by seamlessly integrating LiveView lifecycle hooks
+  and pipeline Plugs. This enables extensions to provide powerful runtime
+  features such as automatically locale detection and synchronization between
+  the server, client, and LiveView processes- without requiring modifications
+  throughout your codebase.
 
-* **Runtime Behavior**:Seamlessly blend compile-time code generation with
-  dynamic runtime behavior through hooks and plugs conveniently provided by
-  extensions.
+* **Drop-in solution:** Extensions are highly configurable, allowing you to use
+  Routex features as drop-in solution. For example: Routex can be configured to
+  remain compatible with Phoenix' template generators. As such, it doesn't
+  disrupt standard Phoenix development practices lowering the learning curve. It
+  can also be configured to mimic Cldr-Routes with its tight integration wirth
+  Cldr and use of custom sigils.
 
 * **Optimized Performance:** Positioned between route configuration and
-  compilation, Routex enhances Phoenix routing without incurring additional
-  runtime costs.
+  compilation, Routex core enhances Phoenix routes without incurring additional
+  runtime costs. Extensions too are optimized for runtime performance, making
+  use of Elixirs superb pattern matching.
 
-* **No dependencies, no state**: Routex is unique in not relying on external
-  dependency and works out-of-the-box without proces state.
+* **No dependencies, no state**: Routex is unique in not depending on other
+  libraries and works out-of-the-box without proces state. An extension to
+  control third-party libraries that do rely on state such as Gettext is
+  included.
 
 * **Detailed documentation**: Comprehensive, well-organized documentation
   provides clear guidance on installation, configuration, and best practices,
-  making Routex approachable for developers at all levels. For example: If you
-  are interested in internationalization (i18n) or localization (l10n) have a
-  look at the [Localized Routes Guide](docs/guides/LOCALIZE_PHOENIX.md).
+  making Routex approachable for developers at all levels.
 
 
 ## Give it a try!
@@ -103,18 +117,19 @@ burden of maintaining a fork.
   upstream consensus on the need and purpose.
 
 ### Index
+- [Attribute Getters](docs/EXTENSIONS.md#attribute-getters): Fetch custom attributes for a route.
 - [Alternatives](docs/EXTENSIONS.md#alternatives): Create (nested) alternative routes.
 - [Alternative Getters](docs/EXTENSIONS.md#alternative-getters): Get alternatives for the current route.
-- [Verified Routes](docs/EXTENSIONS.md#verified-routes): Branch aware variant of Phoenix.VerifiedRoutes.
 - [Assigns](docs/EXTENSIONS.md#assigns): Use route attributes as assigns in templates.
-- [Interpolation](docs/EXTENSIONS.md#interpolation): Use attributes in route definitions.
-- [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
-- [Attribute Getters](docs/EXTENSIONS.md#attribute-getters): Retrieve `Routex.Attrs` for a route.
 - [Cldr Adapter](docs/EXTENSIONS.md#cldr-adapter): Use an existing `:ex_cldr`configuration.
-- [Plugs](docs/EXTENSIONS.md#plugs): Integrate plugs provided by extensions.
-- [LiveView Hooks](docs/EXTENSIONS.md#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
-- [Route Helpers](docs/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
 - [Cloak](docs/EXTENSIONS.md#cloak-showcase): Showcase to demonsrate extreme route transformations.
-- [Simple Locale](docs/EXTENSIONS.md#simple-locale): Simple Phoenix localization.
-- [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes.
+- [Interpolation](docs/EXTENSIONS.md#interpolation): Use attributes in route definitions.
+- [LiveView Hooks](docs/EXTENSIONS.md#liveview-hooks): Integrate LiveView Lifecycle hooks provided by other extensions.
+- [Plugs](docs/EXTENSIONS.md#plugs): Integrate plugs provided by other extensions.
+- [Route Helpers](docs/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
+- [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes at runtime.
+- [Simple Locale](docs/EXTENSIONS.md#simple-locale): Simplifies common Phoenix localization (based on[IANA](https://www.iana.org/) locale registry).
+- [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
+- [Verified Routes](docs/EXTENSIONS.md#verified-routes): Branch aware variant of Phoenix.VerifiedRoutes.
+
 

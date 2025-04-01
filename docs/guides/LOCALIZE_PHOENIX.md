@@ -59,15 +59,15 @@ defmodule ExampleWeb.RoutexBackend do
 
   use Routex.Backend,
     extensions: [
-      Routex.Extension.AttrGetters,           # Base attribute handling
-      Routex.Extension.PhoenixLiveviewHooks,  # Inlines LiveView lifecycle callbacks of other extensions
-      Routex.Extension.Plugs,                 # Inlines plug callbacks of other extensions
-      Routex.Extension.Alternatives,          # Generates locale alternatives
-      Routex.Extension.AlternativeGetters,    # Creates a helper function to get the alternatives for a route
-      Routex.Extension.Translations,          # Enables route segment translations
-      Routex.Extension.VerifiedRoutes,        # Make Phoenix VerifiedRoutes branch aware
-      Routex.Extension.SimpleLocale,          # Detects locale from various sources, adds :language and :region attributes to routes.
-      Routex.Extension.RuntimeCallbacks,      # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
+      Routex.Extension.AttrGetters,         # Base attribute handling
+      Routex.Extension.LiveViewHooks,       # Inlines LiveView lifecycle callbacks of other extensions
+      Routex.Extension.Plugs,               # Inlines plug callbacks of other extensions
+      Routex.Extension.Alternatives,        # Generates locale alternatives
+      Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
+      Routex.Extension.Translations,        # Enables route segment translations
+      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
+      Routex.Extension.SimpleLocale,        # Detects locale from various sources, adds :language and :region attributes to routes.
+      Routex.Extension.RuntimeCallbacks,    # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
     ],
 
     # Define hierarchical alternatives with associated locale attributes.
@@ -207,7 +207,7 @@ Happy coding and enjoy creating a multilingual Phoenix application!
 ---
 
 ## The Configuration Explained
-**AttrGetters, PhoenixLiveviewHooks, Plugs**:
+**AttrGetters, LiveViewHooks, Plugs**:
   - Extensions supporting other extensions.
 
 **Alternatives Structure**:

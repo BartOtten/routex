@@ -91,7 +91,7 @@ defmodule ExampleWeb.RoutexBackend do
      Routex.Extension.AttrGetters,
 
      # adviced
-     Routex.Extension.PhoenixLiveviewHooks,
+     Routex.Extension.LiveViewHooks,
      Routex.Extension.Plugs,
      Routex.Extension.RuntimeCallbacks,
      Routex.Extension.VerifiedRoutes,

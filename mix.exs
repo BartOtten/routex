@@ -98,7 +98,7 @@ defmodule Routex.MixProject do
   end
 
   defp description() do
-    "Extension driven superpowers for Phoenix Routes"
+    "Phoenix route localization and beyond..."
   end
 
   defp docs do

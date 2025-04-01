@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](Https://conventionalcommits.org) for commit guidelines.
 
 <!-- changelog -->
-## Upcoming Release
+## v1.2.0-rc.0
 
 This release is truly the result of community participation. Thanks to all
 opening tickets and contributing improvements!

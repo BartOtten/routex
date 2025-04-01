@@ -91,8 +91,8 @@ defmodule Routex.MixProject do
       links: %{
         Changelog: "https://hexdocs.pm/routex/changelog.html",
         GitHub: "https://github.com/BartOtten/routex",
-        Demo: "https://routex.fly.dev/",
-        Tutorial: "https://hexdocs.pm/routex/tutorial_localized_routes.html"
+        "Online Demo": "https://routex.fly.dev/",
+        "Guide: Localize Phoenix": "https://hexdocs.pm/routex/localize_phoenix.html"
       }
     ]
   end

@@ -42,22 +42,121 @@ if Code.ensure_loaded?(Igniter) do
 
     @impl Igniter.Mix.Task
     def igniter(igniter) do
-      web = Igniter.Libs.Phoenix.web_module(igniter)
-      routex_backend = Module.concat(web, "RoutexBackend")
+      web_module = Igniter.Libs.Phoenix.web_module(igniter)
 
       igniter
-      |> Igniter.Project.Deps.add_dep({:routex, "~> 1.1"})
-      |> then(fn
-        %{assigns: %{test_mode?: true}} = igniter ->
-          igniter
+      |> fetch_dep()
+      |> create_routex_backend(web_module)
+      |> configure_web(web_module)
+      |> configure_router(web_module)
+    end
 
-        igniter ->
-          Igniter.apply_and_fetch_dependencies(igniter,
-            error_on_abort?: true,
-            yes_to_deps: true
-          )
+    defp fetch_dep(igniter) do
+      if Igniter.Project.Deps.has_dep?(igniter, :routex) do
+        igniter
+      else
+        igniter
+        |> Igniter.Project.Deps.add_dep({:routex, "~> 1.1"})
+        |> then(fn
+          %{assigns: %{test_mode?: true}} = igniter ->
+            igniter
+
+          igniter ->
+            Igniter.apply_and_fetch_dependencies(igniter,
+              error_on_abort?: true,
+              yes_to_deps: true
+            )
+        end)
+      end
+    end
+
+    defp configure_web(igniter, module) do
+      Igniter.Project.Module.find_and_update_module!(igniter, module, fn zipper ->
+        with {:ok, zipper} <-
+               Igniter.Code.Common.within(zipper, fn zipper ->
+                 with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
+                      {:ok, zipper} <- Igniter.Code.Function.move_to_def(zipper, :router, 0),
+                      {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper) do
+                   line = "use Routex.Router"
+                   {:ok, Igniter.Code.Common.add_code(zipper, line, placement: :before)}
+                 end
+               end),
+             {:ok, zipper} <-
+               Igniter.Code.Common.within(zipper, fn zipper ->
+                 with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
+                      {:ok, zipper} <- Igniter.Code.Function.move_to_def(zipper, :controller, 0),
+                      {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper) do
+                   line = "unquote(routex_helpers())"
+                   {:ok, Igniter.Code.Common.add_code(zipper, line, placement: :after)}
+                 end
+               end),
+             {:ok, zipper} <-
+               Igniter.Code.Common.within(zipper, fn zipper ->
+                 with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
+                      {:ok, zipper} <- Igniter.Code.Function.move_to_def(zipper, :live_view, 0),
+                      {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper) do
+                   line = "on_mount(unquote(__MODULE__).Router.RoutexHelpers)"
+                   {:ok, Igniter.Code.Common.add_code(zipper, line, placement: :after)}
+                 end
+               end),
+             {:ok, zipper} <-
+               Igniter.Code.Common.within(zipper, fn zipper ->
+                 with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
+                      {:ok, zipper} <-
+                        Igniter.Code.Function.move_to_defp(zipper, :html_helpers, 0),
+                      {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper) do
+                   line = "unquote(routex_helpers())"
+                   {:ok, Igniter.Code.Common.add_code(zipper, line, placement: :after)}
+                 end
+               end),
+             {:ok, zipper} <-
+               Igniter.Code.Common.within(zipper, fn zipper ->
+                 block = """
+                 defp routex_helpers do
+                  quote do
+                    import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
+                    alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
+                  end
+                 end
+                 """
+
+                 {:ok, Igniter.Code.Common.add_code(zipper, block, placement: :after)}
+               end) do
+          {:ok, zipper}
+        end
       end)
-      |> Igniter.Project.Module.create_module(routex_backend, """
+    end
+
+    defp configure_router(igniter, web_module) do
+      module = Module.concat(web_module, "Router")
+
+      Igniter.Project.Module.find_and_update_module!(igniter, module, fn zipper ->
+        with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
+             {:ok, zipper} <-
+               Igniter.Code.Common.move_to(zipper, fn zipper ->
+                 Igniter.Code.Function.function_call?(zipper, :scope)
+               end) do
+          module =
+            web_module
+            |> Module.split()
+            |> List.insert_at(-1, "RoutexBackend")
+            |> Enum.join(".")
+
+          block = """
+          preprocess_using #{module} do
+            #{Igniter.Util.Debug.code_at_node(zipper)}
+          end
+          """
+
+          {:ok, Igniter.Code.Common.replace_code(zipper, block)}
+        end
+      end)
+    end
+
+    defp create_routex_backend(igniter, web_module) do
+      module = Module.concat(web_module, "RoutexBackend")
+
+      Igniter.Project.Module.create_module(igniter, module, """
       use Routex.Backend,
       extensions: [Routex.Extension.AttrGetters]
       """)

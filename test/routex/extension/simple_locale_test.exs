@@ -1,6 +1,22 @@
 defmodule Routex.Extension.SimpleLocaleTest do
   use ExUnit.Case
 
+  @opts [
+    extensions: [Dummy],
+    locales: [
+      "en",
+      "fr",
+      {"nl", %{contact: "dutch@example.com", language_display_name: "Custom"}}
+    ],
+    default_locale: "en",
+    region_sources: [:accept_language, :attrs],
+    region_params: ["locale"],
+    language_sources: [:query, :attrs],
+    language_params: ["locale"],
+    locale_sources: [:query, :session, :accept_language, :attrs],
+    locale_params: ["locale"]
+  ]
+
   # A dummy connection struct for testing plug/3.
   defmodule DummyConn do
     def conn,
@@ -14,16 +30,26 @@ defmodule Routex.Extension.SimpleLocaleTest do
 
   defmodule DummyBackend do
     defstruct [
+      :extensions,
       :region_sources,
       :region_params,
       :language_sources,
       :language_params,
       :locale_sources,
-      :locale_params
+      :locale_params,
+      :locales,
+      :default_locale
     ]
 
-    def config,
-      do: %DummyBackend{
+    def config do
+      %DummyBackend{
+        extensions: [Dummy],
+        locales: [
+          "en",
+          "fr",
+          {"nl", %{contact: "dutch@example.com", language_display_name: "Custom"}}
+        ],
+        default_locale: "en",
         region_sources: [:accept_language, :attrs],
         region_params: ["locale"],
         language_sources: [:query, :attrs],
@@ -31,9 +57,124 @@ defmodule Routex.Extension.SimpleLocaleTest do
         locale_sources: [:query, :session, :accept_language, :attrs],
         locale_params: ["locale"]
       }
+    end
   end
 
   alias Routex.Extension.SimpleLocale
+
+  describe "configure/2" do
+    test "adds alternative generating extension" do
+      result = SimpleLocale.configure(@opts, DummyBackend)
+      assert result[:extensions] == [Routex.Extension.Alternatives, Dummy]
+    end
+
+    test "creates alternatives when none available" do
+      result = SimpleLocale.configure(@opts, DummyBackend)
+
+      expected_alts =
+        %{
+          "/" => %{
+            branches: %{
+              "/fr" => %{
+                attrs: %{
+                  language: "fr",
+                  region: nil,
+                  language_display_name: "French",
+                  region_display_name: nil
+                }
+              },
+              "/nl" => %{
+                attrs: %{
+                  language: "nl",
+                  region: nil,
+                  language_display_name: "Custom",
+                  region_display_name: nil,
+                  contact: "dutch@example.com"
+                }
+              }
+            },
+            attrs: %{
+              language: "en",
+              region: nil,
+              language_display_name: "English",
+              region_display_name: nil
+            }
+          }
+        }
+
+      assert expected_alts == result[:alternatives]
+    end
+
+    test "branches existing alternatives" do
+      pre_alts = %{
+        "/" => %{
+          attrs: %{contact: "root@example.com"},
+          branches: %{
+            "/sports" => %{
+              attrs: %{contact: "sports@example.com"},
+              branches: %{
+                "/soccer" => %{attrs: %{contact: "soccer@example.com"}},
+                "/football" => %{attrs: %{contact: "footbal@example.com"}}
+              }
+            },
+            "/foods" => %{attrs: %{contact: "poison@example.com"}}
+          }
+        }
+      }
+
+      opts = [alternatives: pre_alts] ++ @opts
+      result = SimpleLocale.configure(opts, DummyBackend)
+
+      expected_alts =
+        %{
+          "/" => %{
+            attrs: %{contact: "root@example.com"},
+            branches: %{
+              "/fr" => %{
+                attrs: %{
+                  language: "fr",
+                  language_display_name: "French",
+                  region: nil,
+                  region_display_name: nil,
+                  contact: "root@example.com"
+                },
+                branches: %{
+                  "/foods" => %{attrs: %{contact: "poison@example.com"}},
+                  "/sports" => %{
+                    attrs: %{contact: "sports@example.com"},
+                    branches: %{
+                      "/football" => %{attrs: %{contact: "footbal@example.com"}},
+                      "/soccer" => %{attrs: %{contact: "soccer@example.com"}}
+                    }
+                  }
+                }
+              },
+              "/nl" => %{
+                attrs: %{
+                  language: "nl",
+                  language_display_name: "Custom",
+                  region: nil,
+                  region_display_name: nil,
+                  contact: "dutch@example.com"
+                },
+                branches: %{
+                  "/foods" => %{attrs: %{contact: "poison@example.com"}},
+                  "/sports" => %{
+                    attrs: %{contact: "sports@example.com"},
+                    branches: %{
+                      "/football" => %{attrs: %{contact: "footbal@example.com"}},
+                      "/soccer" => %{attrs: %{contact: "soccer@example.com"}}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      assert expected_alts == result[:alternatives]
+    end
+  end
 
   describe "handle_params/4" do
     test "expands the runtime attributes and returns {:cont, socket}" do

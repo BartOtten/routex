@@ -19,13 +19,13 @@ defmodule Routex.Extension.RouteHelpers do
   Route Helpers as a drop-in replacement, while keeping the original helper
   functions available under the alias `OriginalRoutes`:
 
-  ^^^diff
+  ```diff
   # file /lib/example_web.ex
   defp routex_helpers do
   + alias ExampleWeb.Router.Helpers, as: OriginalRoutes
   + alias ExampleWeb.Router.RoutexHelpers, as: Routes
   end
-  ^^^
+  ```
 
   ## Pseudo Result
 
@@ -34,20 +34,20 @@ defmodule Routex.Extension.RouteHelpers do
 
   ### Example in a (h)eex template:
 
-  ^^^html
+  ```heex
   <a href={Routes.product_index_path(@socket, :show, product)}>Product #1</a>
-  ^^^
+  ```
 
   ### Result after compilation:
 
-  ^^^elixir
+  ```elixir
   case alternative do
      nil ⇒  "/products/#{product}"
     "en" ⇒  "/products/#{product}"
     "nl" ⇒  "/europe/nl/products/#{product}"
     "be" ⇒  "/europe/be/products/#{product}"
   end
-  ^^^
+  ```
 
   ## `Routex.Attrs`
 

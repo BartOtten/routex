@@ -43,7 +43,7 @@ defmodule Routex.Extension.RuntimeCallbacksTest do
       ]
 
       assert_raise RuntimeError, ~r/does not provide/, fn ->
-        result = RuntimeCallbacks.configure(opts, MockBackend)
+        RuntimeCallbacks.configure(opts, MockBackend)
       end
     end
 

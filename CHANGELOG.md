@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](Https://conventionalcommits.org) for commit guidelines.
 
 <!-- changelog -->
+## Upcoming release
+
+- feat: support `locales` and `default_locale` for auto generated localized routes
+- feat: support attribute overrides for `locale` attributes
+- docs: improved documentation of SimpleLocale
+
 ## v1.2.0-rc.0
 
 This release is truly the result of community participation. Thanks to all

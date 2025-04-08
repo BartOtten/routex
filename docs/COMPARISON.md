@@ -1,184 +1,308 @@
-# Routing Solutions for Phoenix: A Comparison of Key Differences
+# Routing Solutions for Phoenix: A Developer-Centric Comparison
 
-When working with the Phoenix framework, developers often seek solutions to
-address their routing needs. These routing needs range from common requirements
-such as internationalization and localization to more specialized needs such as
-route obfuscation.
+When building applications with the Phoenix framework, you might need additional
+routing solutions. Requirements can range from the common internationalization
+and localization to more exotic such as route obfuscation. Selecting the right
+tool is essential. This article compares two libraries that extend the Phoenix
+Router: **Cldr Routes** and **Routex**.
 
-This comparison includes three notable routing solutions within the Phoenix
-ecosystem. Each solution has a different scope—ranging from basic to virtually
-endless—allowing you to select the one that best aligns with your application's
-requirements.
+We’ll examine differences in functionality, extensibility, integration, runtime
+capabilities, and customization. By the end, you’ll have a clearer picture of
+each solution’s strengths and limitations to help you decide which is best for
+your project.
 
-We will delve into several aspects which differ significantly, including
-functionality and extensibility, compatibility with existing codebases, runtime
-features, and customization options.
+## Summary
 
-By the end of this article, you will have a clear understanding of the strengths
-and limitations of each library, enabling you to make an informed decision for
-your Phoenix project.
+Both Cldr Routes and Routex extend Phoenix Router in meaningful ways.
 
+**Cldr Routes**  
+Cldr Routes provides route translation and generates localized path and URL
+helpers. While Cldr Routes streamlines the process of creating localized routes,
+it necessitates proper configuration of both Cldr and Gettext. This requirement
+is advantageous for projects already utilizing these libraries but may involve
+additional setup for others.
 
-## Phoenix Router, the basic buildin
+Cldr Routes is particularly well-suited for applications that are already part
+of the Cldr ecosystem and require straightforward URL translations.
 
-The Phoenix Router is the built‐in routing system of the Phoenix framework. It
-is the base other solutions build upon.
+**Routex**  
+​Routex is a comprehensive routing framework built on Phoenix Router, offering
+extensive internationalization and localization features that encompass all
+capabilities of Cldr Routes. Beyond these, Routex introduces a versatile set of
+functionalities, including runtime support through built-in Plug and LiveView
+lifecycle hooks, as well as customizable function callbacks for navigation
+events. ​
 
-Since version 1.8, it supports runtime path prefixing which automatically
-prefixes routes in templates with the result of one or multiple functions. This
-feature enables the most basic, and common, route localization known for it's
-language prefixes (e.g `/en/products` and `/fr/products`).
+A key strength of Routex lies in its seamless integration with existing
+codebases, preserving established patterns. Its modular architecture and
+extensive customization options enable developers to incorporate custom route
+attributes and alternative routing strategies with minimal disruption. This
+flexibility ensures that Routex can adapt to the specific needs of any project,
+enhancing routing capabilities without necessitating significant codebase
+modifications. ​
 
+Routex is recommended for new projects or projects needing to retrofit routing
+features into the existing code bases. Its focus on developer experience means
+you spend less time configuring and more time building innovative
+applications.For projects invested in Cldr it offers `Routex.Extension.Cldr` as
+a convenient adapter mimicing Cldr Routes.
 
-## Comparing Cldr Routes and Routex
+## Tabular comparison
 
- **Cldr Routes** and **Routex** aim to enhance the routing capabilities of
-Phoenix, but they differ significantly in their approach and feature set. This
-article will focus on their greatest differences to help developers make an
-informed decision.
+A quick overview before diving into a detailed explanation:
 
-
-### Functionality and Extensibility
-
-
-#### Features
-**Cldr Routes** focuses on localization enabling users to enter URLs using
-localized terms. Additionally, Cldr Routes generates localized path and URL
-helpers, making it easier for developers to work with localized routes.
-
-**Routex** is, in terms of features, a superset of Cldr Routes. It not only
-matches the internationalization and localization features of Cldr Routes, but
-adds support for a wider range of routing needs. It's open-ended design makes
-the feature set virtually limitless.
-
-*Both*
-- Localized routes
-- Translated route segments
-
-*Routex only*
-- Custom assigns per route
-- Automated Liveview livecycle hooks and Plugs
-- Alternative routes
-- Reordered route segments
-- Route obfuscation
-- etc.
-
-
-#### Architecture
-
-**Cldr Routes** is designed to seamless extend the [Cldr
-library](https://github.com/elixir-cldr/cldr). It therefor requires the
-integration and configuration of the `Cldr` and `Gettext` libraries. Depending
-on your project this might require the addition of the Cldr dependency and
-additional setup besides Cldr Routes itself.
-
-The monolitic approach, in contrast to Routex, in combination with being part of
-the Cldr-suite ensures a seamless integration and consistent API within the Cldr
-ecosystem.
-
-**Routex** is designed as an standalone, extensible framework. As a result
-Routex has no hard dependency on other libraries. However, some extensions
-may use other libraries such as Gettext or Cldr when enabled.
-
-This modular approach provides developers with the flexibility to incorporate
-only the features and dependencies necessary for their specific use case.
+| **Feature**             | **Routex**            | **Cldr Routes**            |
+| Localized routes        | Yes                   | Yes                        |
+| Translated routes       | Yes                   | Yes                        |
+| Verified Routes         | Yes                   | Yes                        |
+| Route interpolation     | Yes                   | Yes                        |
+| Alternatives routes     | Yes                   | Limited                    |
+| Custom attributes       | Yes                   | No                         |
+| Custom assigns          | Yes                   | No                         |
+| Plug & Hooks            | Yes                   | No                         |
+| Navigation callbacks    | Yes                   | No                         |
+| Buildin locale registry | Yes                   | No                         |
+| Route Obfuscation       | Yes                   | No                         |
+|                         |                       |                            |
+| **Integration**         | **Routex**            | **Cldr Routes**            |
+| Sigils                  | Customizable          | Fixed                      |
+| Functions               | Customizable          | Fixed                      |
+| Libs integration        | COnfigurable          | None                       |
+| Dependencies            | Configurable          | Cldr, Gettext              |
+| Runtime integration     | Automated             | None                       |
+|                         |                       |                            |
+| **Development**         | **Routex**            | **Cldr Routes**            |
+| Architecture            | Modular               | Monolithic                 |
+| Feature inclusion       | Upstream or extension | Upstream or own fork       |
+| Internal format         | Route structs         | Abstract Syntax Tree (AST) |
+| Tooling included        | Yes                   | No                         |
 
 
-#### Customization
+## Feature Set & Extensibility
 
-**Cldr Routes**' design may establish certain limitations when it comes to
-adding new features or modifying existing behavior in Cldr Routes. Due to its
-tight integration with the Cldr library new feature or change in behavior will
-likely need to align with the overall structure and functionality of Cldr. To
-implement a new feature or slightly different behavior downstream, developers
-typically need to fork the project.
+Both libraries were inspired by PhxAltRoutes—a pioneering localized
+routing effort by Routex’s creator—but have since taken distinct evolutionary
+paths.
 
-**Routex**, being a framework, tries to simplify the process of adding new
-features or modifying existing behavior.
+**Cldr Routes**  
+Reduced the feature set to localization features only. Aligning with the goals
+of Cldr.
 
-Developers can create custom extensions that integrate seamlessly with the core
-library and other extensions. If only a slight modification to an existing
-Routex extension is needed, developers can clone the relevant extension into
-their project and adapt it accordingly. Developers van leverage utilities and
-abstractions provided by Routex to simplify the process.
+- **Localization:** Translates URL path segments at compile time and generates
+  localized helper functions.
+- **Fixed Integration:** Relies on the Cldr and Gettext libraries for
+  localization.
 
-This approach ensures that developers can tailor Routex's functionality to their
-unique requirements without deep understanding of it's codebase.
+**Routex**  
+Designed to be modular; allowing to grow the feature set beyond localization
+without becoming a large monolithic lib and supporting extension orchestration through
+value passing.
+
+- **Comprehensive Feature Set:** Beyond matching the internationalization and
+  localization capabilities of Cldr Routes, Routex also offers advanced features
+  like custom assigns, alternative route generation, and support for route
+  segment reordering —providing unmatched flexibility
+- **Integrated Extensions:** Built-in support for Plugs and LiveView lifecycle
+  hooks automates integrations and speeds up development.
+- **Integrated locale registry:** Routex comes with a simplified -IANA subtag
+  registry based- locale registry . It covers common localisation use cases such as
+  translating locale, region and language identifiers to display names and
+  validating locale tags.
+- **Modular Architecture:** Its extension-driven architecture allows you to
+  include only the features you need and easily create custom extensions.
+- **Focus on Customization:** The mantra "Simple by default, powerful when
+  needed" drives the development of extensions. Extensions ship with sane
+  defaults yet are highly tweakable due to a sheer amount of configuration
+  options.
+- **Tailor-Made Customization:** Its modular architecture and the information
+  sharing system `Routex.Attrs` lets you extend functionality without having to
+  worry about the core of routing or breaking other extensions. Clone an
+  extension, tweak it to your needs, or build new ones from scratch.
+
+Below is a feature comparison summarizing key differences:
+
+### Localized Routes
+While both libraries feature localized routes, Routex offers customization
+options such a customized locale notation and display name overrides for
+languages and regions.
+
+### Translated Routes
+While both libraries feature translate routes by depending on Gettext, Routex
+only depends on Gettext when the Translations extension is enabled.
+
+### Route Manipulation
+Both libraries feature route manipulation in different degrees. Transformations
+by Cldr Routes are limited to localization. Routex, in contrast, allows for any
+kind of transformation including custom attributes, non-locale alternative
+routes, and route segment reordering.
+
+### Plug & LiveView Integration
+Only Routex provides native support for Plug and LiveView extensions
+
+### Dependencies
+Cldr Routes requires Cldr and Gettext. Although Routex core has no dependencies
+on itself extensions may require additional dependencies. At this moment only
+the Translations extension has a dependency: Gettext.
+
+### Integration with other packages
+Unlike Cldr Routes, Routex is designed to seamlessly integrate with any
+third-party package you choose. This flexibility allows you to combine Routex
+with your existing package stack or custom solutions, tailoring its
+functionality to meet the specific needs of your application.
+
+## Developer Experience & Integration
+
+**Cldr Routes**  
+Streamlines localized route generation. However, its tight integration with the
+Cldr suite and limited configuration options can limit flexibility and often
+necessitates adjustments in templates and code. Requiring the use of a custom
+sigil `~q` for verified routers and `q` prefixed helper macros, it necessitates
+adjustments in existing templates and newly generated ones. The impact depends
+on the size of the code base and the use of generators.
+
+```heex
+# Example in Cldr Routes:
+
+# Uses custom sigil ~q for localized routes
+<.link navigate=~q"/products/#{product}">My Link</.link>
+```
 
 
-### Compatibility with Existing Codebases
+**Routex**  
+In contrast, Routex offers extensive configurability -such as customizable
+sigils and function names. It can be configured to shim the default Phoenix
+sigil `~p` and helper macros `url` and `path` or mimic Cldr Routes for Cldr
+integration by using it's custom sigil and macros names. Meaning you can
+seamlessly incorporate Routex into your existing projects, preserving familiar
+patterns while enjoying cutting-edge features. Support for extensions with
+runtime features reduce manual wiring.
 
-**Cldr Routes** requires the use of the `~q` sigil and `url_q` functions in
-place of the standard URL functions for its version of Verified Routes.
-Consequently, when utilizing Phoenix generators, developers must modify the
-routes in their templates accordingly. The same goes for existing templates,
-which may require adjustments to integrate Cldr Routes.
+```heex
+# Example in Routex:
 
-**Routex**, in contrast, allows users to select their preferred sigil and
-function names, enabling configuration that maintains compatibility with
-generated templates and existing codebases. This flexibility ensures that Routex
-can be seamlessly integrated into existing projects without the need for
-extensive modifications.
+# Configurable to use standard Phoenix sigil ~p (as used in Phoenix' generators)
+<.link navigate=~p"/products/#{product}">My Link</.link>
 
+# or mimic Cldr Routes using sigil ~q
+<.link navigate=~q"/products/#{product}">My Link</.link>
+```
 
-### Runtime Features
+This flexibility is particularly useful when integrating with existing projects
+and code bases.
 
-**Cldr Routes** requires an additional dependency and configuration to manage
-locale settings, such as the excellent [Cldr Plugs](https://github.com/elixir-cldr/cldr_plugs)
+## Route processing
 
-**Routex** extensions can include callbacks for Plug and LiveView lifecycle
-hooks to, for example, manage locale settings by invoking `Gettext.put_locale`
-or `Cldr.put_locale`. These callbacks are automatically enabled upon adding the
-extension without modifications to the codebase. This design choice streamlines
-the integration process, reducing the need for extra dependencies and
-codebase modifications.
+Both projects generate routes during compile time. It's the way how they
+do this and their runtime capabilities that makes the difference.
 
+**Cldr Routes**  
+Cldr Routes takes your original route definition Abstract Syntaxt Tree (AST)
+within a localize block and transforms it into a new AST with localized paths.
+There are no points for interception or extension points in this proces.
 
-## Comparison Table
-
-| Feature                 | Routex                       | Cldr Routes                                              | Phoenix Router |
-|-------------------------|------------------------------|----------------------------------------------------------|----------------|
-| **Localized routes**    | Yes                          | Yes                                                      | Basic          |
-| **Translated routes**   | Yes                          | Yes                                                      | No             |
-| **Route modifications** | Yes                          | No                                                       | No             |
-| **Drop-in Replacement** | Yes                          | No                                                       | N/A            |
-| **Extensible**          | Yes                          | No                                                       | Basic          |
-| **Route Manipulation**  | Limitless                    | Tailored for localization needs                          | Basic          |
-| **Dependencies**        | None                         | Cldr, Gettext                                            | None           |
-| **Code modifications**  | Minimal                      | Neutral                                                  | Nihil          |
-
-| **Generated code:**  |                              |                                                  |     |
-|----------------------|------------------------------|--------------------------------------------------|-----|
-| **Helper functions** | Many, provided by extensions | - Link headers - Route helpers - Verified routes | N/A |
-| **Conn Plugs**       | Yes                          | No                                               | No  |
-| **Liveview Hooks**   | Yes                          | No                                               | No  |
+```elixir
+ localize do
+    get "/pages/:page", PageController, :show
+    resources "/users", UserController
+  end
+```
 
 
+**Routex**  
+Routex intercepts your route definitions after they have been converted into
+straightforward Route structs. It's extension processing system uses "value
+passing" so each extension in the pipeline receives the route structs including
+attributes and can modify or augment them before passing the updated routes on
+to the next extension. This approach makes it easier to trace and debug route
+transformations at compile time.
 
-<sub>
-Routex can be configured to shim original Phoenix functionality (for example: `~p` and `url/2`) or
-mimic Cldr Routes using the [Cldr adapter extension](https://hexdocs.pm/routex/Routex.Extension.Cldr.html).
-</sub>
+At the end of the processing Routex passes the route structs to Phoenix Router
+for native compilation.
 
+This approach leverages the simpler and more predictable structure of Route
+structs and route compilation by Phoenix Router itself, making the system more
+flexible, simpler to extend and easier to understand.
+
+```elixir
+# Routex supports the use of multiple configuration backends in one router. This means
+# that routes can have their own transformations, helper functions, or runtime features.
+
+# using configuration ExampleWeb.RoutexBackend
+preprocess_using ExampleWeb.RoutexBackend do
+   get "/pages/:page", PageController, :show
+   resources "/users", UserController
+end
+
+# using ExampleWeb.RoutexBackendAdmin
+preprocess_using ExampleWeb.RoutexBackendAdmin do
+   get "/admin/:page", PageController, :show
+end
+```
+
+
+
+## Runtime capabilities
+
+**Cldr Routes**
+Cldr Routes features only branching verified routes during runtime. It relies on
+external dependencies (like Cldr Plugs) to manage runtime locale detection,
+which necessitates adjustments in configuration and code for runtime
+localization.
+
+
+**Routex** Routex offers virtually unlimited runtime features and integration by
+integrating native extension `Routex.Extension.RuntimeCallbacks` for dynamic
+functionality. This can be combined with other extensions -such as
+`Routex.Extension.SimpleLocale` for highly customizable locale detection and
+behavior during runtime.
+
+```elixir
+defmodule ExampleWeb.RoutexBackend do
+use Routex.Backend,  # makes this a Routex configuration backend
+extensions: [
+  Routex.Extension.Attrs,
+     Routex.Extension.SimpleLocale,  # detects locale, and puts it in runtime attributes
+     Routex.Extension.RuntimeCallbacks  # call arbitrary functions during runtime using route attributes
+],
+# configuration of arbitrary functions to be called at navigation events.
+runtime_callbacks: [
+ # Set Gettext locale from :language attribute
+ {Gettext, :put_locale, [[:attrs, :language]]},
+ # Call arbitrary function using other runtime attribute
+ {MyApp, :my_function, ["my value", [:attrs, :runtime_attr_value], "other value"]}
+]
+end
+```
+
+
+Routex supports extension-provided plugs and hooks that are generated at compile
+time. By leveraging Elixir's powerful pattern matching, these plugs and hooks
+are optimized for performance, ensuring minimal runtime overhead even when
+multiple runtime callbacks are enabled.​
 
 ## Conclusion
 
-In summary, each routing solution brings valuable capabilities to the table.
+In summary, both Cldr Routes and Routex significantly enhance Phoenix’s routing
+capabilities, but they cater to different project needs. Cldr Routes offers a
+streamlined, localized routing solution ideal for applications already using the
+Cldr and Gettext ecosystems.
 
-**Phoenix Router** offers a reliable, built-in option for standard routing
-needs.
+On the other hand, Routex stands out with its modular and extensible
+architecture. It not only replicates the localization features of Cldr Routes
+but also introduces advanced functionalities—such as customizable route
+attributes, runtime callbacks, and seamless integration with Plug and LiveView.
+This flexibility makes Routex a powerful choice for both new projects and those
+looking to integrate dynamic routing features into an existing codebase.
 
-**Cldr Routes** is primarily designed to extend the capabilities of the `Cldr`
-library, focusing on localization and internationalization. It provides
-compile-time translations for route paths using `Gettext`, enabling users to
-navigate applications using localized terms. However, the tight integration with
-`Cldr` and `Gettext` libraries imposes certain limitations on customization and
-flexibility.
+Ultimately, the decision between these libraries will depend on your project’s
+requirements, existing dependencies, and desired level of customization. For
+developers seeking a robust and adaptive routing framework, Routex offers
+extensive configurability and a richer feature set, while Cldr Routes remains a
+compelling choice for straightforward localization needs.
 
-**Routex**, on the other hand, offers a more flexible and extensible
-architecture that not only matches the internationalization and localization
-features of Cldr Routes but goes beyond. Routex includes all the features
-provided by Cldr Routes and adds additional functionalities without the need for
-workarounds. Its modular approach allows developers to incorporate only the
-components necessary for their specific use case, making it a comprehensive
-solution for advanced routing needs.
+---
+
+<small>
+The `routex` -formerly known as `route_match`- as used by HandleCommerce
+is not related to the Routex as decribed in this document.
+</small>

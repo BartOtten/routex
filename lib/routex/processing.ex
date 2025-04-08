@@ -60,11 +60,13 @@ defmodule Routex.Processing do
   def execute_callbacks(env, routes) when is_list(routes) do
     helper_mod_name = helper_mod_name(env.module)
 
-    backend_routes_callbacks =
+    grouped_routes =
       routes
       |> put_initial_attrs(helper_mod_name)
       |> group_by_backend()
-      |> add_callbacks_map()
+
+    {routes, backend_routes} = Map.pop(grouped_routes, nil)
+    backend_routes_callbacks = add_callbacks_map(backend_routes)
 
     {ast_per_extension, new_routes} =
       execute(backend_routes_callbacks, env)
@@ -73,7 +75,7 @@ defmodule Routex.Processing do
     |> generate_helper_ast(helper_mod_name)
     |> create_helper_module(helper_mod_name, env)
 
-    new_routes
+    (new_routes ++ routes)
     |> print_summary()
     |> remove_build_info()
     |> write_routes(env)
@@ -122,7 +124,7 @@ defmodule Routex.Processing do
   end
 
   defp group_by_backend(routes) do
-    routes |> Enum.group_by(&Attrs.get(&1, :__backend__)) |> Map.drop([nil])
+    routes |> Enum.group_by(&Attrs.get(&1, :__backend__))
   end
 
   def add_callbacks_map(routes_per_backend) do

@@ -90,7 +90,9 @@ defmodule Routex.Extension.Assigns do
   """
   def handle_params(_params, _uri, socket, attrs \\ %{}) do
     assigns = Map.get(attrs, :assigns, %{})
-    socket = Phoenix.Component.assign(socket, assigns)
+    assign_module = Routex.Utils.assign_module()
+
+    socket = assign_module.assign(socket, assigns)
 
     {:cont, socket}
   end

@@ -70,7 +70,7 @@ defmodule Routex.MixProject do
       {:phoenix_live_view, "~> 0.18 or ~> 1.0", optional: true},
       {:gettext, ">= 0.26.0", optional: true},
       {:phoenix_html_helpers, "~> 1.0"},
-      {:jason, "~> 1.0", only: [:dev, :test], optional: true},
+      {:jason, "~> 1.0", optional: true},
       {:ex_doc, "~> 0.37", only: [:dev, :test]},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
@@ -78,7 +78,8 @@ defmodule Routex.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:makeup_diff, "~> 0.1.0", only: [:dev]},
       {:git_ops, "~> 2.6.3", only: [:dev]},
-      {:benchee, "~> 1.0", only: :dev}
+      {:benchee, "~> 1.0", only: :dev},
+      {:igniter, "~> 0.5", optional: true}
     ]
   end
 
@@ -91,8 +92,8 @@ defmodule Routex.MixProject do
       links: %{
         Changelog: "https://hexdocs.pm/routex/changelog.html",
         GitHub: "https://github.com/BartOtten/routex",
-        Demo: "https://routex.fly.dev/",
-        Tutorial: "https://hexdocs.pm/routex/tutorial_localized_routes.html"
+        "Online Demo": "https://routex.fly.dev/",
+        "Guide: Localize Phoenix": "https://hexdocs.pm/routex/localize_phoenix.html"
       }
     ]
   end

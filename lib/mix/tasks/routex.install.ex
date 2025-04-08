@@ -108,24 +108,22 @@ if Code.ensure_loaded?(Igniter) do
                    line = "unquote(routex_helpers())"
                    {:ok, Igniter.Code.Common.add_code(zipper, line, placement: :after)}
                  end
-               end),
-             {:ok, zipper} <-
-               Igniter.Code.Common.within(zipper, fn zipper ->
-                 block = """
-                 defp routex_helpers do
-                  quote do
-                    import Phoenix.VerifiedRoutes,
-                      except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
-
-                    import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
-                    alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
-                  end
-                 end
-                 """
-
-                 {:ok, Igniter.Code.Common.add_code(zipper, block, placement: :after)}
                end) do
-          {:ok, zipper}
+          Igniter.Code.Common.within(zipper, fn zipper ->
+            block = """
+            defp routex_helpers do
+             quote do
+               import Phoenix.VerifiedRoutes,
+                 except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
+
+               import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
+               alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
+             end
+            end
+            """
+
+            {:ok, Igniter.Code.Common.add_code(zipper, block, placement: :after)}
+          end)
         end
       end)
     end
@@ -140,30 +138,25 @@ if Code.ensure_loaded?(Igniter) do
                    line = "plug :routex"
                    {:ok, Igniter.Code.Common.add_code(zipper, line, placement: :after)}
                  end
-               end),
-             {:ok, zipper} <-
-               Igniter.Code.Common.within(zipper, fn zipper ->
-                 with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
-                      {:ok, zipper} <-
-                        Igniter.Code.Common.move_to(zipper, fn zipper ->
-                          Igniter.Code.Function.function_call?(zipper, :scope)
-                        end) do
-                   module =
-                     web_module
-                     |> Module.split()
-                     |> List.insert_at(-1, "RoutexBackend")
-                     |> Enum.join(".")
-
-                   block = """
-                   preprocess_using #{module} do
-                     #{Igniter.Util.Debug.code_at_node(zipper)}
-                   end
-                   """
-
-                   {:ok, Igniter.Code.Common.replace_code(zipper, block)}
-                 end
                end) do
-          {:ok, zipper}
+          Igniter.Code.Common.within(zipper, fn zipper ->
+            with {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
+                 {:ok, zipper} <- move_to_function(zipper, :scope) do
+              module =
+                web_module
+                |> Module.split()
+                |> List.insert_at(-1, "RoutexBackend")
+                |> Enum.join(".")
+
+              block = """
+              preprocess_using #{module} do
+                #{Igniter.Util.Debug.code_at_node(zipper)}
+              end
+              """
+
+              {:ok, Igniter.Code.Common.replace_code(zipper, block)}
+            end
+          end)
         end
       end)
     end
@@ -175,6 +168,12 @@ if Code.ensure_loaded?(Igniter) do
       use Routex.Backend,
       extensions: [Routex.Extension.AttrGetters]
       """)
+    end
+
+    defp move_to_function(zipper, function) do
+      Igniter.Code.Common.move_to(zipper, fn zipper ->
+        Igniter.Code.Function.function_call?(zipper, function)
+      end)
     end
   end
 else

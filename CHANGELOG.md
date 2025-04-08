@@ -6,8 +6,40 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 <!-- changelog -->
 ## Upcoming release
 
-- feat: support `locales` and `default_locale` for auto generated localized routes
-- feat: support attribute overrides for `locale` attributes
+### Improvements to Simple Locale
+#### Generate localized routes with ease
+- `locales`: A list of locale definitions. Each entry can be:
+    - A locale string (e.g., `"en"`, `"fr-CA"`).
+    - A tuple `{locale, attrs}` to override or add attributes for that specific locale branch.
+
+    **Example:**
+    ```elixir
+    locales: [
+      "en", # Standard English
+      {"en-GB", %{currency: "GBP"}}, # UK English with specific currency
+      "fr"
+    ]
+    ```
+
+  ...or synchronize locales with Gettext:
+
+   ```elixir
+   locales: Gettext.known_locales(MyAppWeb.Gettext),
+   default_locale: Gettext.default_locale(MyAppWeb.Gettext)
+   ```
+
+#### Choose which (sub)tag to use for localized routes
+- `locale_branch_sources`: List of locale (sub)tags to use for generating
+     localize routes. Will use the first (sub)tag which returns a non-nil value.
+     When no value is found the locale won't have localized routes.
+
+     Note: The `default_locale` is always top-level / is not prefixed.
+
+     Possible values: `:locale` (pass-through), `:region` and/or  `:language`.  
+     Default to: `[:language, :region, :locale]`.
+
+### Other
+
 - docs: improved documentation of SimpleLocale
 
 ## v1.2.0-rc.0

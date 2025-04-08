@@ -54,6 +54,20 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
     end
   end
 
+  describe "extract_from_source/4 with Plug.Conn - assigns" do
+    test "extracts from assigns", %{conn: conn} do
+      conn = Plug.Conn.assign(conn, :locale, "en-US")
+
+      result = Extractor.extract_from_source(conn, :assigns, "locale", [])
+      assert result == "en-US"
+    end
+
+    test "returns nil for missing assign", %{conn: conn} do
+      result = Extractor.extract_from_source(conn, :assigns, "locale", [])
+      assert is_nil(result)
+    end
+  end
+
   describe "extract_from_source/4 with Plug.Conn - cookie" do
     test "extracts from cookies", %{conn: conn} do
       conn = %{conn | cookies: %{"locale" => "en-US"}}
@@ -134,6 +148,13 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
       }
 
       result = Extractor.extract_from_source(source, :session, "locale", [])
+      assert result == "en-US"
+    end
+
+    test "extracts from map assigns" do
+      source = %{assigns: %{locale: "en-US"}}
+
+      result = Extractor.extract_from_source(source, :assigns, "locale", [])
       assert result == "en-US"
     end
 

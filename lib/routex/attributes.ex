@@ -16,11 +16,16 @@ defmodule Routex.Attrs do
   * Extensions should add any fallback/default they might use to the attributes.
   """
 
-  @type container :: Phoenix.Router.Route.t() | Phoenix.Socket.t() | Plug.Conn.t()
+  @type container ::
+          Phoenix.Router.Route.t()
+          | Phoenix.Socket.t()
+          | Phoenix.LiveView.Socket.t()
+          | Plug.Conn.t()
   @type key :: atom()
   @type value :: any()
   @type attrs_fun :: (map() -> Enumerable.t())
   @type update_fun :: (value() -> value())
+  @type t :: %{optional(key) => value}
 
   @doc """
   Returns true if the given key or attribute tuple represents a private attribute.

@@ -123,13 +123,13 @@ defmodule Routex.Extension.SimpleLocale do
       default_locale: "en"  # won't get a prefix as it's the locale of non-branched routes.
 
       # single source
-      locale_branch_sources: :locale => ["en-001", "fr", "nl-BE"],
-      locale_branch_sources: :language => ["fr", "nl"],
-      locale_branch_sources: :region => ["001", "BE"]
+      locale_branch_sources: :locale =>   ["/", "/en-001", "/fr", "/nl-be"],
+      locale_branch_sources: :language => ["/", "/fr", "/nl"],
+      locale_branch_sources: :region =>   ["/", "/001", "/be"]
 
       # with fallback
-      locale_branch_sources: [:language, :region] => ["fr", "nl"]
-      locale_branch_sources: [:region, :language] => ["001", "fr", "BE"]
+      locale_branch_sources: [:language, :region] => ["/", "/fr", "/nl"]
+      locale_branch_sources: [:region, :language] => ["/", "/001", "/fr", "/be"]
 
       ```
 
@@ -279,8 +279,9 @@ defmodule Routex.Extension.SimpleLocale do
   @type attrs :: %{optional(atom) => any()}
 
   @type locale :: String.t()
-  @type locale_keys :: :locale | :language | :region
-  @type locale_attr_key :: locale_keys | :language_display_name | :region_display_name | atom()
+  @type locale_keys ::
+          :locale | :language | :region | :language_display_name | :region_display_name
+  @type locale_attr_key :: locale_keys | atom()
   @type locale_attrs :: %{optional(locale_attr_key()) => any()}
   @type locale_def :: locale() | {locale(), locale_attrs()}
   @type locale_route_prefix :: :locale | :region | :language
@@ -392,7 +393,7 @@ defmodule Routex.Extension.SimpleLocale do
           locale_def()
   defp find_locale(locales, default, locale_branch_sources) do
     Enum.find(locales, default, fn locale_def ->
-      extract_locale_string(locale_def, locale_branch_sources) == default
+      extract_locale_string(locale_def, locale_branch_sources) == extract_locale_string(default, locale_branch_sources)
     end)
   end
 
@@ -406,17 +407,17 @@ defmodule Routex.Extension.SimpleLocale do
   defp create_localized_branches(nil, locales, default_locale, locale_branch_sources) do
     default_locale_def = find_locale(locales, default_locale, locale_branch_sources)
 
-    # Pass empty map as initial_attrs as there's no parent structure.
-    root_attrs = build_locale_attrs(default_locale_def, %{})
+    # explicitly set slug attribute in root to prevent Alternatives.Exceptions.AttrsMismatchError.
+    root_attrs = build_locale_attrs(default_locale_def, %{slug: "/"})
 
     localized_branches =
       for locale_def <- locales,
           locale_str = extract_locale_string(locale_def, locale_branch_sources),
           locale_str != nil,
-          locale_str != default_locale,
+          locale_str != extract_locale_string(default_locale_def, locale_branch_sources),
           into: %{} do
         locale_attrs = build_locale_attrs(locale_def, %{})
-        slug = "/" <> locale_str
+        slug = locale_attrs[:slug] || String.downcase("/" <> locale_str)
 
         {slug, %{attrs: locale_attrs}}
       end
@@ -464,13 +465,15 @@ defmodule Routex.Extension.SimpleLocale do
         for locale_def <- locales,
             locale_str = extract_locale_string(locale_def, locale_branch_sources),
             locale_str != nil,
-            locale_str != default_locale,
+            locale_str != extract_locale_string(default_locale_def, locale_branch_sources),
             into: %{} do
-          locale_slug = "/" <> locale_str
+
           # Apply the alternate locale recursively to the original config for this base_slug,
           # ensuring original attributes win. Result might or might not have :branches.
           localized_config_for_alt_locale =
             apply_locale_to_structure(original_branch_config, locale_def)
+
+          locale_slug = localized_config_for_alt_locale[:slug] || String.downcase("/" <> locale_str)
 
           {locale_slug, localized_config_for_alt_locale}
         end
@@ -676,12 +679,16 @@ defmodule Routex.Extension.SimpleLocale do
     Enum.find_value(locale_branch_sources, fn prefix -> extract_locale_string(locale, prefix) end)
   end
 
-  defp extract_locale_string({locale_str, _attrs}, :locale), do: locale_str
-
   defp extract_locale_string({locale_str, _attrs}, locale_route_prefix),
-    do: Parser.extract_part(locale_str, locale_route_prefix)
+    do: extract_locale_string(locale_str, locale_route_prefix)
 
   defp extract_locale_string(locale_str, :locale), do: locale_str
+  
+  defp extract_locale_string(locale_str, :language_display_name),
+    do: locale_str |> extract_locale_string(:language) |> lookup_language_name()
+
+  defp extract_locale_string(locale_str, :region_display_name),
+    do: locale_str |> extract_locale_string(:region) |> lookup_region_name()
 
   defp extract_locale_string(locale_str, locale_route_prefix) when is_binary(locale_str),
     do: Parser.extract_part(locale_str, locale_route_prefix)

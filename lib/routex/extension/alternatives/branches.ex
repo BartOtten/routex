@@ -129,7 +129,7 @@ defmodule Routex.Extension.Alternatives.Branches do
     %{
       key: key,
       path: path,
-      prefix: slug,
+      prefix: slug |> String.replace(" ", "_"),
       alias: String.to_atom(key),
       helper: Enum.join(path, "_")
     }

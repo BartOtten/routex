@@ -29,7 +29,7 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
    ```
 
 #### Choose which (sub)tag to use for localized routes
-- `locale_branch_sources`: List of locale (sub)tags to use for generating
+- `locale_prefix_sources`: List of locale (sub)tags to use for generating
      localize routes. Will use the first (sub)tag which returns a non-nil value.
      When no value is found the locale won't have localized routes.
 

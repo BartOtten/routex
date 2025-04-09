@@ -54,15 +54,17 @@ defmodule Routex.Extension.SimpleLocaleTest do
 
     test "locale_route_prefix with single tag" do
       kv = [
-        locale: ["/en-001", "/fr", "/nl-BE"],
+        locale: ["/en-001", "/fr", "/nl-be"],
         language: ["/fr", "/nl"],
-        region: ["/001", "/BE"]
+        region: ["/001", "/be"],
+        language_display_name: ["/dutch", "/french"],
+        region_display_name: ["/belgium", "/world"]
       ]
 
       for {primary_prefix, expected_prefixes} <- kv do
         opts =
           DummyOpts.opts()
-          |> Keyword.put(:locale_branch_sources, primary_prefix)
+          |> Keyword.put(:locale_prefix_sources, primary_prefix)
 
         result = SimpleLocale.configure(opts, DummyBackend)
 
@@ -72,9 +74,9 @@ defmodule Routex.Extension.SimpleLocaleTest do
 
     test "locale_route_prefix with multi tags (fallback mechanism)" do
       kv = [
-        locale: ["/en-001", "/fr", "/nl-BE"],
+        locale: ["/en-001", "/fr", "/nl-be"],
         language: ["/fr", "/nl"],
-        region: ["/001", "/BE", "/fr"]
+        region: ["/001", "/be", "/fr"]
       ]
 
       for {primary_prefix, expected_prefixes} <- kv do
@@ -82,7 +84,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
 
         opts =
           DummyOpts.opts()
-          |> Keyword.put(:locale_branch_sources, [primary_prefix | other_prefixes])
+          |> Keyword.put(:locale_prefix_sources, [primary_prefix | other_prefixes])
 
         result = SimpleLocale.configure(opts, DummyBackend)
 
@@ -97,17 +99,17 @@ defmodule Routex.Extension.SimpleLocaleTest do
 
       primary_prefix = [:region]
       other_prefixes = [:language]
-      opts = Keyword.put(base_opts, :locale_branch_sources, [primary_prefix | other_prefixes])
+      opts = Keyword.put(base_opts, :locale_prefix_sources, [primary_prefix | other_prefixes])
 
       result = SimpleLocale.configure(opts, DummyBackend)
-      expected = ["/001", "/BE", "/fr"]
+      expected = ["/001", "/be", "/fr"]
 
       assert Map.keys(result[:alternatives]["/"][:branches]) == expected
 
       # and the other way around
       primary_prefix2 = [:language]
       other_prefixes2 = [:region]
-      opts2 = Keyword.put(base_opts, :locale_branch_sources, [primary_prefix2 | other_prefixes2])
+      opts2 = Keyword.put(base_opts, :locale_prefix_sources, [primary_prefix2 | other_prefixes2])
 
       result2 = SimpleLocale.configure(opts2, DummyBackend)
       expected2 = ["/fr", "/nl"]
@@ -121,34 +123,37 @@ defmodule Routex.Extension.SimpleLocaleTest do
       expected_alts =
         %{
           "/" => %{
+            attrs: %{
+              contact: "english@example.com",
+              language: "en",
+              language_display_name: "Global",
+              locale: "en-001",
+              region: "001",
+              region_display_name: "World",
+              prefix: "/"
+            },
             branches: %{
               "/fr" => %{
                 attrs: %{
-                  locale: "fr",
                   language: "fr",
-                  region: nil,
                   language_display_name: "French",
-                  region_display_name: nil
+                  locale: "fr",
+                  region: nil,
+                  region_display_name: nil,
+                  prefix: "/fr"
                 }
               },
               "/nl" => %{
                 attrs: %{
+                  contact: "dutch@example.com",
                   language: "nl",
                   language_display_name: "Custom",
-                  contact: "dutch@example.com",
                   locale: "nl-BE",
                   region: "BE",
-                  region_display_name: "Belgium"
+                  region_display_name: "Belgium",
+                  prefix: "/nl"
                 }
               }
-            },
-            attrs: %{
-              locale: "en-001",
-              language: "en",
-              region: "001",
-              region_display_name: "World",
-              contact: "english@example.com",
-              language_display_name: "Global"
             }
           }
         }
@@ -186,17 +191,30 @@ defmodule Routex.Extension.SimpleLocaleTest do
               language_display_name: "Global",
               locale: "en-001",
               region: "001",
-              region_display_name: "World"
+              region_display_name: "World",
+              prefix: "/"
             },
             branches: %{
+              "/foods" => %{
+                attrs: %{
+                  contact: "poison@example.com",
+                  language: "en",
+                  language_display_name: "Global",
+                  locale: "en-001",
+                  region: "001",
+                  region_display_name: "World",
+                  prefix: "/foods"
+                }
+              },
               "/fr" => %{
                 attrs: %{
+                  contact: "root@example.com",
                   language: "fr",
                   language_display_name: "French",
                   locale: "fr",
                   region: nil,
                   region_display_name: nil,
-                  contact: "root@example.com"
+                  prefix: "/fr"
                 },
                 branches: %{
                   "/foods" => %{
@@ -206,7 +224,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                       language_display_name: "French",
                       locale: "fr",
                       region: nil,
-                      region_display_name: nil
+                      region_display_name: nil,
+                      prefix: "/foods"
                     }
                   },
                   "/sports" => %{
@@ -216,7 +235,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                       language_display_name: "French",
                       locale: "fr",
                       region: nil,
-                      region_display_name: nil
+                      region_display_name: nil,
+                      prefix: "/sports"
                     },
                     branches: %{
                       "/football" => %{
@@ -226,7 +246,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                           language_display_name: "French",
                           locale: "fr",
                           region: nil,
-                          region_display_name: nil
+                          region_display_name: nil,
+                          prefix: "/football"
                         }
                       },
                       "/soccer" => %{
@@ -236,7 +257,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                           language_display_name: "French",
                           locale: "fr",
                           region: nil,
-                          region_display_name: nil
+                          region_display_name: nil,
+                          prefix: "/soccer"
                         }
                       }
                     }
@@ -250,7 +272,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                   language_display_name: "Custom",
                   locale: "nl-BE",
                   region: "BE",
-                  region_display_name: "Belgium"
+                  region_display_name: "Belgium",
+                  prefix: "/nl"
                 },
                 branches: %{
                   "/foods" => %{
@@ -260,7 +283,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                       language_display_name: "Custom",
                       locale: "nl-BE",
                       region: "BE",
-                      region_display_name: "Belgium"
+                      region_display_name: "Belgium",
+                      prefix: "/foods"
                     }
                   },
                   "/sports" => %{
@@ -270,7 +294,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                       language_display_name: "Custom",
                       locale: "nl-BE",
                       region: "BE",
-                      region_display_name: "Belgium"
+                      region_display_name: "Belgium",
+                      prefix: "/sports"
                     },
                     branches: %{
                       "/football" => %{
@@ -280,7 +305,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                           language_display_name: "Custom",
                           locale: "nl-BE",
                           region: "BE",
-                          region_display_name: "Belgium"
+                          region_display_name: "Belgium",
+                          prefix: "/football"
                         }
                       },
                       "/soccer" => %{
@@ -290,51 +316,45 @@ defmodule Routex.Extension.SimpleLocaleTest do
                           language_display_name: "Custom",
                           locale: "nl-BE",
                           region: "BE",
-                          region_display_name: "Belgium"
+                          region_display_name: "Belgium",
+                          prefix: "/soccer"
                         }
                       }
                     }
                   }
                 }
               },
-              "/foods" => %{
-                attrs: %{
-                  locale: "en-001",
-                  region: "001",
-                  region_display_name: "World",
-                  language: "en",
-                  language_display_name: "Global",
-                  contact: "poison@example.com"
-                }
-              },
               "/sports" => %{
                 attrs: %{
+                  contact: "sports@example.com",
+                  language: "en",
+                  language_display_name: "Global",
                   locale: "en-001",
                   region: "001",
                   region_display_name: "World",
-                  language: "en",
-                  language_display_name: "Global",
-                  contact: "sports@example.com"
+                  prefix: "/sports"
                 },
                 branches: %{
                   "/football" => %{
                     attrs: %{
+                      contact: "footbal@example.com",
+                      language: "en",
+                      language_display_name: "Global",
                       locale: "en-001",
                       region: "001",
                       region_display_name: "World",
-                      language: "en",
-                      language_display_name: "Global",
-                      contact: "footbal@example.com"
+                      prefix: "/football"
                     }
                   },
                   "/soccer" => %{
                     attrs: %{
+                      contact: "soccer@example.com",
+                      language: "en",
+                      language_display_name: "Global",
                       locale: "en-001",
                       region: "001",
                       region_display_name: "World",
-                      language: "en",
-                      language_display_name: "Global",
-                      contact: "soccer@example.com"
+                      prefix: "/soccer"
                     }
                   }
                 }
@@ -344,21 +364,23 @@ defmodule Routex.Extension.SimpleLocaleTest do
           "/other_root" => %{
             attrs: %{
               contact: "other_root@example.com",
+              language: "en",
+              language_display_name: "Global",
               locale: "en-001",
               region: "001",
               region_display_name: "World",
-              language: "en",
-              language_display_name: "Global"
+              prefix: "/other_root"
             },
             branches: %{
               "/fr" => %{
                 attrs: %{
+                  contact: "other_root@example.com",
                   language: "fr",
                   language_display_name: "French",
+                  locale: "fr",
                   region: nil,
                   region_display_name: nil,
-                  contact: "other_root@example.com",
-                  locale: "fr"
+                  prefix: "/fr"
                 }
               },
               "/nl" => %{
@@ -368,7 +390,8 @@ defmodule Routex.Extension.SimpleLocaleTest do
                   language_display_name: "Custom",
                   locale: "nl-BE",
                   region: "BE",
-                  region_display_name: "Belgium"
+                  region_display_name: "Belgium",
+                  prefix: "/nl"
                 }
               }
             }

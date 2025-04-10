@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.ExtractorTest do
+defmodule Routex.Extension.Localize.ExtractorTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.SimpleLocale.Extractor
+  alias Routex.Extension.Localize.Extractor
   alias Plug.Conn
 
   # Mock the Registry module for testing purposes
@@ -16,7 +16,7 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
 
   Code.compiler_options(ignore_module_conflict: true)
 
-  defmodule SimpleLocale.Registry do
+  defmodule Localize.Registry do
     defdelegate region?(value), to: MockRegistry
     defdelegate language?(value), to: MockRegistry
   end

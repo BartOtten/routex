@@ -1,4 +1,4 @@
-defmodule Routex.Extension.SimpleLocale.Beta do
+defmodule Routex.Extension.Localize.Routes do
   @moduledoc """
   This extension adds locale handling both at compile time and at runtime.
 
@@ -28,40 +28,15 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   - `:language_display_name` (e.g., "English")
   - `:region_display_name` (e.g., "United States")
 
-
-  ## Locale Detection (Runtime)
-
-  This extension provides:
-
-  - A Plug (`plug/3`) to update the connection with locale attributes and store them
-    in the session. Enabled via `Routex.Extension.Plugs`.
-  - A LiveView lifecycle hook (`handle_params/4`) to update the socket with
-    locale-related attributes. Enabled via `Routex.Extension.LiveViewHooks`.
-
-  Both are optimized for performance.
-
-  Locale values can be sourced independently from locations like:
-
-  - Pre-compiled route attributes
-  - The `Accept-Language` header sent by the client (`fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7`)
-  - Query parameters (`?lang=fr`)
-  - Hostname (`fr.example.com`)
-  - Path parameters (`/fr/products`)
-  - Assigns (`assign(socket, [locale: "fr"])`)
-  - Body parameters
-  - Stored cookie
-  - Session data
-
-
   ## Build-in Locale Registry
 
-  The built-in locale registry (`Routex.Extension.SimpleLocale.Registry`) is suitable
+  The built-in locale registry (`Routex.Extension.Localize.Registry`) is suitable
   for projects without complex localization needs. It provides validation and
   display name lookups.
 
   **Examples:**
   ```iex
-  iex> alias Routex.Extension.SimpleLocale.Registry
+  iex> alias Routex.Extension.Localize.Registry
   iex> Registry.language("nl-BE")
   %{descriptions: ["Dutch", "Flemish"], type: :language}
 
@@ -74,7 +49,7 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   iex> Registry.region?("BE")
   true
   ```
-  See `Routex.Extension.SimpleLocale.Registry` for more details.
+  See `Routex.Extension.Localize.Registry` for more details.
 
 
   ## Options
@@ -101,7 +76,7 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     > 2. Explicit Locale Override (from attrs in tuple)
     > 3. Original Branch Attribute (already existing on the branch)
     >
-    > SimpleLocale plays well with already configured alternative branches.
+    > Localize plays well with already configured alternative branches.
 
 
   - `default_locale`: The locale for top-level routes (e.g., `/products`).
@@ -120,7 +95,7 @@ defmodule Routex.Extension.SimpleLocale.Beta do
       ```elixir
       # in configuration
       locales: ["en-001", "fr", "nl-BE"]
-      default_locale: "en"  # won't get a prefix as it's the locale of non-branched routes.
+      default_locale: "en"
 
       # single source
       locale_prefix_sources: :locale =>   ["/", "/en-001", "/fr", "/nl-be"],
@@ -142,58 +117,12 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   > default_locale: Gettext.default_locale(MyAppWeb.Gettext) || "en"
   > ```
 
-  ---
-
-  ### Locale Detection Options
-
-  Runtime detection is configured by specifying sources for locale attributes
-  (`:locale`, `:language`, `:region`).
-
-  #### Locale Attributes and Their Sources
-
-  Each attribute (`:locale`, `:language`, `:region`) can have its own list of
-  sources and parameter names, where the parameter name is the key to get from
-  the source. The parameter should be provided as a string.
-
-  ##### Supported Sources
-  - `:accept_language`: From the header sent by the client (e.g. `fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7`)
-  - `:assigns`: From conn and socket assigns.
-  - `:attrs`: From precompiled route attributes.
-  - `:body`: From request body parameters.
-  - `:cookie`: From request cookies.
-  - `:host`: From the hostname (e.g., `en.example.com`).
-  - `:path`: From path parameters (e.g., `/:lang/users`).
-  - `:query`: From query parameters (e.g., `?locale=de`).
-  - `:session`: From session data.
-
-  ##### Default Configuration
-
-  The default sources for each attribute are:
-  `#{inspect(Routex.Extension.SimpleLocale.Detect.__default_sources__())}`.
-
-  ##### Overriding Detection Behavior
-
-  You can customize sources and parameters per attribute:
-
-  **Examples:**
-  ```elixir
-  # In your Routex backend module
-  locale_sources: [:query, :session, :accept_language], # Order matters
-  locale_params: ["locale"], # Look for ?locale=... etc
-
-  language_sources: [:path, :host],
-  language_params: ["lang"], # Look for /:lang/... etc
-
-  region_sources: [:attrs] # Only use region from precompiled route attributes
-  # region_params defaults to ["region"]
-  ```
-
   ## Configuration examples
 
   > **Together with...**
   > This extension generates configuration for alternative route branches under the `:alternatives` key.
   > To convert these into routes, `Routex.Extension.Alternatives` must be enabled and run *after*
-  > `SimpleLocale` in the extension list.
+  > `Localize.Beta` in the extension list.
 
   > **Integration:**
   > This extension sets runtime attributes (`Routex.Attrs`).
@@ -210,18 +139,15 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     use Routex.Backend,
       extensions: [
         Routex.Extension.Attrs,
-        Routex.Extension.SimpleLocale,
-        Routex.Extension.Alternatives, # Needed to process generated branches
-        Routex.Extension.RuntimeCallbacks # Optional: for Gettext/Cldr integration
+        Routex.Extension.Localize.Routes,
+        Routex.Extension.RuntimeCallbacks # Optional: for state depending package integration
       ],
-      # SimpleLocale options (optional, using defaults)
+      # Localize options (optional, using defaults)
       # locales: Gettext.known_locales(ExampleWeb.Gettext),
       # default_locale: Gettext.default_locale(ExampleWeb.Gettext),
       # RuntimeCallbacks options
       runtime_callbacks: [
-        # Set Gettext locale based on detected language
         {Gettext, :put_locale, [[:attrs, :language]]},
-        # Set Cldr locale based on detected locale (if using Cldr)
         # {Cldr, :put_locale, [[:attrs, :locale]]}
       ]
   end
@@ -237,18 +163,18 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     use Routex.Backend,
       extensions: [
         Routex.Extension.Attrs,
-        # Enable SimpleLocale for routes and detection
-        Routex.Extension.SimpleLocale,
-        # Ensure Alternatives runs *after* SimpleLocale to process generated branches
+        # Enable Localize (Beta version) for routes and detection
+        Routex.Extension.Localize.Routes,
+        # Ensure Alternatives runs *after* Localize.Beta to process generated branches
         Routex.Extension.Alternatives,
         Routex.Extension.RuntimeCallbacks
       ],
-      # Compile-time options for SimpleLocale
+      # Compile-time options for Localize.Beta
       locales: ["en", "fr", {"nl", %{region_display_name: "Nederland"}}],
       default_locale: "en",
-      locale_prefix_sources: [:language], # Prefix with language code only
+      locale_prefix_sources: [:language],
 
-      # Runtime detection overrides for SimpleLocale
+      # Runtime detection overrides for Localize.Beta
       locale_sources: [:query, :session, :accept_language, :attrs],
       locale_params: ["locale", "lang"],
       language_sources: [:path, :attrs],
@@ -256,42 +182,31 @@ defmodule Routex.Extension.SimpleLocale.Beta do
 
       # Runtime callbacks configuration for RuntimeCallbacks
       runtime_callbacks: [
-        # Set Gettext locale based on detected language
         {Gettext, :put_locale, [[:attrs, :language]]},
-        # Set Cldr locale based on detected locale
         {Cldr, :put_locale, [[:attrs, :locale]]}
       ]
   end
   ```
   """
 
-  # credo:enable-for-this-file Credo.Check.Readability.ModuleDoc
-
   @behaviour Routex.Extension
 
   alias Routex.Attrs
-  alias Routex.Extension.SimpleLocale.Detect
-  alias Routex.Extension.SimpleLocale.Parser
-  alias Routex.Extension.SimpleLocale.Registry
+  alias Routex.Extension.Localize.Parser
+  alias Routex.Extension.Localize.Registry
 
-  # Alternatives extension is needed to process the generated branches.
-  alias Routex.Extension.Alternatives
+  # Used for type specs. Alternatives is used to generate the actual routes so
+  # we make sure we use it's types.
   alias Routex.Extension.Alternatives.Branches
 
   alias Routex.Types, as: T
-  alias Routex.Utils
 
-  # Key used for storing locale info in the session.
-  @session_key :rtx
   @fallback_locale "en"
-  # Fetch Gettext default at compile time, provide fallback
   @gettext_locale Application.compile_env(:gettext, :default_locale, @fallback_locale)
-  @locale_fields [:locale, :language, :region]
   @default_route_prefixes [:language, :region, :locale]
 
   # Typespecs
   @type attrs :: %{optional(atom()) => any()}
-
   @type locale :: String.t()
   @type locale_keys ::
           :locale | :language | :region | :language_display_name | :region_display_name
@@ -302,25 +217,17 @@ defmodule Routex.Extension.SimpleLocale.Beta do
           :locale | :region | :language | :language_display_name | :region_display_name
   @type locale_prefix_sources :: locale_prefix_source() | [locale_prefix_source()]
 
-  @type conn :: Plug.Conn.t()
-  @type socket :: Phoenix.LiveView.Socket.t()
-  @type url :: String.t()
-  @type params :: %{optional(String.t()) => any()}
-  @type plug_opts :: keyword()
+  @deps [Routex.Extension.Alternatives]
 
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(config, _backend) do
-    # Fetch options with defaults
     default_locale = Keyword.get(config, :default_locale, @gettext_locale)
     locales = Keyword.get(config, :locales, [])
-
     raw_prefix_sources = Keyword.get(config, :locale_prefix_sources, @default_route_prefixes)
     locale_prefix_sources = List.wrap(raw_prefix_sources)
-
     existing_alternatives = Keyword.get(config, :alternatives)
 
-    # Generate or augment alternative branches based on locales
     localized_alternatives =
       create_localized_branches(
         existing_alternatives,
@@ -331,84 +238,17 @@ defmodule Routex.Extension.SimpleLocale.Beta do
 
     config
     |> Keyword.put(:alternatives, localized_alternatives)
-    |> Keyword.update(:extensions, [Alternatives], fn existing_extensions ->
-      # Prepend Alternatives to generate routes
-      [Alternatives | existing_extensions] |> Enum.uniq()
-    end)
+    |> Keyword.update(:extensions, @deps, &Enum.uniq(@deps ++ &1))
   end
 
   @impl Routex.Extension
   @doc """
-  Transforms routes by expanding locale attributes at compile time.
-
   Ensures each route with a `:locale` attribute also has derived attributes like
   `:language`, `:region`, and their display names, unless already overridden.
   """
   @spec transform(T.routes(), T.backend(), T.env()) :: T.routes()
   def transform(routes, _backend, _env) do
     Enum.map(routes, &expand_route_attrs/1)
-  end
-
-  @doc """
-  LiveView `handle_params/4` callback hook.
-
-  Detects locale settings based on URL, params, and socket state, then updates
-  the socket assigns and Routex attributes.
-  """
-  @spec handle_params(
-          params :: map(),
-          url :: url(),
-          socket :: socket(),
-          extra_attrs :: T.attrs()
-        ) :: {:cont, socket()}
-  def handle_params(params, url, socket, extra_attrs \\ %{}) do
-    # Attempt to parse the URL, proceed even if it fails (uri will be nil)
-    uri =
-      try do
-        URI.new!(url)
-      rescue
-        # Handle cases where url might not be a valid URI string
-        _error -> nil
-      end
-
-    # Simulate parts of the Plug.Conn structure needed for detection
-    conn_map = %{
-      # Use path_params from handle_params input
-      path_params: params,
-      # Safely decode query params
-      query_params: (uri && uri.query && URI.decode_query(uri.query)) || %{},
-      host: uri && uri.host,
-      # No headers available directly, pass empty list
-      req_headers: [],
-      # Use socket.private and assigns, ensuring defaults
-      private: socket.private || %{routex: %{}},
-      assigns: socket.assigns || %{}
-    }
-
-    detected_attrs = Detect.detect_locales(conn_map, [], extra_attrs)
-    assign_module = Utils.assign_module()
-
-    socket =
-      socket
-      |> Attrs.merge(detected_attrs)
-      # Assign detected top-level keys (locale, language, region) to socket assigns
-      |> assign_module.assign(Map.take(detected_attrs, @locale_fields))
-
-    {:cont, socket}
-  end
-
-  @doc """
-  Plug callback to detect and assign locale attributes to the connection.
-
-  Examines configured sources (params, session, headers, etc.), updates
-  `conn.assigns`, merges attributes into `conn.private.routex.attrs`, and
-  persists relevant attributes in the session.
-  """
-  @spec plug(conn :: conn(), opts :: plug_opts(), extra_attrs :: T.attrs()) :: conn()
-  def plug(conn, opts, extra_attrs \\ %{}) do
-    conn
-    |> update_conn_locales(opts, extra_attrs)
-    |> persist_locales_to_session()
   end
 
   # ============================================================================
@@ -419,26 +259,17 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   @spec find_locale(locales :: [locale_def()], default :: locale(), locale_prefix_sources()) ::
           locale_def()
   defp find_locale(locales, default, locale_prefix_sources) do
-    # Normalize default locale string using the prefix source logic
     default_str_normalized = extract_locale_string(default, locale_prefix_sources)
 
     Enum.find(locales, default, fn locale_def ->
-      # Normalize candidate locale string using the same logic for comparison
       extract_locale_string(locale_def, locale_prefix_sources) == default_str_normalized
     end)
-
-    # If not found, Enum.find/3 returns the default (the `default` locale string),
-    # which is acceptable behavior.
   end
 
   # Calculates the locale prefix based on the locale_def and sources,
   # then puts it into the provided attribute map under the `:prefix` key.
-  #
-  # If no string representation is found via `extract_locale_string/2`,
-  # the original attributes are returned unmodified.
-  #
+  # If no string representation is found, the original attributes are returned unmodified.
   # Prefixes are generated as "/<normalized_string>" in lowercase.
-
   @spec put_locale_prefix(
           attrs :: locale_attrs(),
           locale_def :: locale_def(),
@@ -447,21 +278,17 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   defp put_locale_prefix(attrs, locale_def, locale_prefix_sources) do
     case extract_locale_string(locale_def, locale_prefix_sources) do
       nil ->
-        # No string representation found based on sources (e.g., could be default locale
-        # depending on config, or invalid input), return attrs unchanged. Caller handles defaults.
         attrs
 
       string_repr when is_binary(string_repr) ->
-        # Build prefix: lowercase, ensure leading "/"
         prefix = "/" <> String.downcase(string_repr)
-        # Add/overwrite :prefix in attrs
         Map.put(attrs, :prefix, prefix)
     end
   end
 
   # --- Branch Creation Logic ---
 
-  # Base case: No existing alternatives, create structure from scratch.
+  # Creates alternative branches structure from scratch when none exists.
   @spec create_localized_branches(
           nil,
           locales :: [locale_def()],
@@ -474,32 +301,21 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     default_locale_str_normalized =
       extract_locale_string(default_locale_def, locale_prefix_sources)
 
-    # Build attributes for the root ("/") based on the default locale def.
     initial_root_attrs = build_locale_attrs(default_locale_def, %{})
-    # Manually set the root prefix to "/" as it's the base.
-    # Explicitly set root prefix
+    # Root is always "/"
     root_attrs = Map.put(initial_root_attrs, :prefix, "/")
 
     localized_branches =
       for locale_def <- locales,
           locale_str_normalized = extract_locale_string(locale_def, locale_prefix_sources),
-          # Only create branches for valid, non-default locales
           locale_str_normalized != nil and locale_str_normalized != default_locale_str_normalized,
           into: %{} do
-        # Build base attributes for this locale
         initial_attrs = build_locale_attrs(locale_def, %{})
-
-        # Use the helper to calculate and add the :prefix attribute
         branch_attrs = put_locale_prefix(initial_attrs, locale_def, locale_prefix_sources)
-
-        # Get the prefix *from* the updated attributes to use as the branch key.
-        # The guard ensures locale_str_normalized is not nil, so put_locale_prefix added a prefix.
         prefix_key = Map.fetch!(branch_attrs, :prefix)
-
         {prefix_key, %{attrs: branch_attrs}}
       end
 
-    # Build the root node map
     root_node_base = %{attrs: root_attrs}
 
     root_node =
@@ -509,11 +325,10 @@ defmodule Routex.Extension.SimpleLocale.Beta do
         root_node_base
       end
 
-    # Return the final structure keyed by the root prefix "/"
     %{"/" => root_node}
   end
 
-  # Recursive case: Branch existing alternatives structure for each locale.
+  # Merges locale-specific branches into an existing alternatives structure.
   @spec create_localized_branches(
           existing_alternatives :: Branches.branches_nested(),
           locales :: [locale_def()],
@@ -531,15 +346,11 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     default_locale_str_normalized =
       extract_locale_string(default_locale_def, locale_prefix_sources)
 
-    # Process each top-level prefix (e.g., "/") from the original map
     for {base_prefix, original_branch_config} <- existing_alternatives, into: %{} do
-      # 1. Process the original structure for the DEFAULT locale
-      #    Applies default locale attrs merged with original attrs (original wins).
+      # 1. Process original structure for the DEFAULT locale
       initial_default_processed_config =
         apply_locale_to_structure(original_branch_config, default_locale_def)
 
-      # Ensure the original base_prefix is set correctly on the resulting attributes.
-      # Ensure base prefix is retained/set
       default_processed_config =
         put_in(initial_default_processed_config, [:attrs, :prefix], base_prefix)
 
@@ -547,39 +358,22 @@ defmodule Routex.Extension.SimpleLocale.Beta do
       alternate_locale_branches =
         for locale_def <- locales,
             locale_str_normalized = extract_locale_string(locale_def, locale_prefix_sources),
-            # Only process valid, non-default locales
             locale_str_normalized != nil and
               locale_str_normalized != default_locale_str_normalized,
             into: %{} do
-          # Apply the alternate locale recursively to the ORIGINAL config
           localized_config_for_alt_locale =
             apply_locale_to_structure(original_branch_config, locale_def)
 
-          # Get the attributes map possibly modified by apply_locale_to_structure
           current_attrs = Map.get(localized_config_for_alt_locale, :attrs, %{})
-
-          # Use the new helper to calculate and add the locale-specific :prefix attribute
           updated_attrs = put_locale_prefix(current_attrs, locale_def, locale_prefix_sources)
-
-          # Get the calculated prefix for the key.
-          # The guard `locale_str_normalized != nil` ensures put_locale_prefix added a prefix.
           prefix_key = Map.fetch!(updated_attrs, :prefix)
-
-          # Put the updated attributes back into the branch config struct
           branch_config = Map.put(localized_config_for_alt_locale, :attrs, updated_attrs)
-
           {prefix_key, branch_config}
         end
 
       # 3. Combine
-      #    Final structure for base_prefix = default processing + alternate branches
-
-      # Get sub-branches from default processing (if any)
       default_sub_branches = Map.get(default_processed_config, :branches, %{})
-      # Combine with the newly generated alternate locale branches
       combined_branches = Map.merge(default_sub_branches, alternate_locale_branches)
-
-      # Build the final config for this base_prefix node
       final_branch_config_base = %{attrs: default_processed_config.attrs}
 
       final_branch_config =
@@ -593,31 +387,22 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     end
   end
 
-  # Recursively applies locale attributes to a branch config structure.
-  # Merges attributes respecting precedence: Base Derived < Explicit Locale Override < Original.
+  # Recursively applies locale attributes to a branch config structure, respecting precedence.
   @spec apply_locale_to_structure(original_config :: map(), locale_def :: locale_def()) ::
           Branches.opts_branch()
   defp apply_locale_to_structure(original_config, locale_def) do
     original_attrs = Map.get(original_config, :attrs, %{})
     original_sub_branches = Map.get(original_config, :branches, %{})
-
-    # Calculate attributes derived from the locale_def (Base + Explicit Override)
     locale_specific_attrs = build_locale_attrs(locale_def)
-
-    # Merge: locale_specific_attrs < original_attrs (Original wins)
     attrs_at_this_level = merge_attrs(locale_specific_attrs, original_attrs)
 
-    # Recursively apply to original sub-branches
     localized_sub_branches =
       for {sub_prefix, sub_config} <- original_sub_branches, into: %{} do
         initial_processed_config = apply_locale_to_structure(sub_config, locale_def)
-        # Ensure sub-prefix is retained/set
         processed_sub_config = put_in(initial_processed_config, [:attrs, :prefix], sub_prefix)
-
         {sub_prefix, processed_sub_config}
       end
 
-    # Build the result map for this level
     result_base = %{attrs: attrs_at_this_level}
 
     if map_size(localized_sub_branches) > 0 do
@@ -630,30 +415,25 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   # --- Attribute Building & Merging ---
 
   # Builds locale attributes from a locale_def, merging base derived and explicit overrides.
-  # Precedence within this function: initial_attrs < base_derived < explicit_overrides.
-  # The caller (`apply_locale_to_structure`) handles merging this with original branch attributes.
   @spec build_locale_attrs(locale_def :: locale_def(), initial_attrs :: locale_attrs()) ::
           locale_attrs()
   defp build_locale_attrs(locale_def, initial_attrs \\ %{})
 
-  # Handle {locale, overrides} tuple
   defp build_locale_attrs({locale_str, overrides}, initial_attrs)
        when is_binary(locale_str) and is_map(overrides) do
     derived_attrs = build_derived_locale_attrs(locale_str)
-    # Merge order: initial < base < overrides
+
     initial_attrs
     |> merge_attrs(derived_attrs)
     |> merge_attrs(overrides)
   end
 
-  # Handle simple locale string
   defp build_locale_attrs(locale_str, initial_attrs) when is_binary(locale_str) do
     derived_attrs = build_derived_locale_attrs(locale_str)
-    # Merge order: initial < base
     merge_attrs(initial_attrs, derived_attrs)
   end
 
-  # Helper to get derived attributes (:language, :region, display names) from a locale string.
+  # Gets derived attributes (:language, :region, display names) from a locale string.
   @spec build_derived_locale_attrs(locale :: locale()) :: locale_attrs()
   defp build_derived_locale_attrs(locale_str) when is_binary(locale_str) do
     language = Parser.extract_part(locale_str, :language)
@@ -677,130 +457,56 @@ defmodule Routex.Extension.SimpleLocale.Beta do
 
     case Map.get(attrs, :locale) do
       nil ->
-        # No :locale attribute, return route unchanged
         route
 
       locale_str when is_binary(locale_str) ->
-        # Derive base attributes from the :locale string
         base_derived = build_derived_locale_attrs(locale_str)
-
-        # Merge base derived attributes into existing attrs.
-        # Existing explicit values (:language, :region, etc.) in `attrs` will take precedence
-        # over the `base_derived` ones because `attrs` is the second argument to `merge_attrs`.
         updated_attrs = merge_attrs(base_derived, attrs)
-
         Attrs.put(route, updated_attrs)
 
       _invalid_locale ->
-        # Locale attribute exists but is not a string? Keep route as is.
-        # Optionally log a warning here.
         route
     end
   end
 
   # --- Registry Lookups ---
 
+  # Looks up the primary display name for a language code.
   @spec lookup_language_name(language :: String.t() | nil) :: String.t() | nil
   defp lookup_language_name(nil), do: nil
 
   defp lookup_language_name(language) do
     case Registry.language(language) do
       %{descriptions: [desc | _]} -> desc
-      # Language not found or no description
       _miss -> nil
     end
   end
 
+  # Looks up the primary display name for a region code.
   @spec lookup_region_name(region :: String.t() | nil) :: String.t() | nil
   defp lookup_region_name(nil), do: nil
 
   defp lookup_region_name(region) do
     case Registry.region(region) do
       %{descriptions: [desc | _]} -> desc
-      # Region not found or no description
       _miss -> nil
     end
-  end
-
-  # ============================================================================
-  # Private Helper Functions - Runtime (Conn/Socket Update & Session)
-  # ============================================================================
-
-  # Detects locales and updates connection assigns and Routex private attributes.
-  @spec update_conn_locales(conn :: conn(), opts :: plug_opts(), extra_attrs :: T.attrs()) ::
-          conn()
-  defp update_conn_locales(conn, opts, extra_attrs) do
-    # Detect locales using the Detect module
-    detected_attrs = Detect.detect_locales(conn, opts, extra_attrs)
-
-    # Update conn.assigns with top-level locale keys (:locale, :language, :region)
-    conn_with_assigns =
-      detected_attrs
-      |> Map.take(@locale_fields)
-      # Assign only non-nil detected values to conn.assigns
-      |> Enum.reduce(conn, fn {key, value}, acc_conn ->
-        # Avoid negated condition
-        if is_nil(value) do
-          # Don't assign nil
-          acc_conn
-        else
-          Plug.Conn.assign(acc_conn, key, value)
-        end
-      end)
-
-    # Merge all detected attributes (including display names etc.) into Routex private attrs
-    Attrs.merge(conn_with_assigns, detected_attrs)
-  end
-
-  # Persists detected locale fields (:locale, :language, :region) to the session.
-  @spec persist_locales_to_session(conn :: conn()) :: conn()
-  # If session is already fetched
-  defp persist_locales_to_session(%Plug.Conn{private: %{plug_session: fetched_session}} = conn)
-       when is_map(fetched_session) do
-    attrs_to_persist =
-      conn
-      # Get current Routex attributes
-      |> Attrs.get()
-      # Select only locale, language, region
-      |> Map.take(@locale_fields)
-      # Remove keys with nil values
-      |> Enum.reject(fn {_k, v} -> is_nil(v) end)
-      |> Map.new()
-
-    if map_size(attrs_to_persist) > 0 do
-      # Merge detected attrs into existing session data under @session_key
-      session_data = Plug.Conn.get_session(conn, @session_key) || %{}
-      updated_session_data = Map.merge(session_data, attrs_to_persist)
-      Plug.Conn.put_session(conn, @session_key, updated_session_data)
-    else
-      # Nothing to persist
-      conn
-    end
-  end
-
-  # If session needs fetching
-  defp persist_locales_to_session(conn) do
-    # Fetch session first, then call the function clause above
-    conn |> Plug.Conn.fetch_session() |> persist_locales_to_session()
   end
 
   # ============================================================================
   # Private Helper Functions - General Utilities
   # ============================================================================
 
-  # Extracts a specific part (locale, language, region, display names) from a locale_def
-  # based on the provided source(s). Used for determining prefix strings.
+  # Extracts a string representation from a locale_def based on the provided source(s).
   @spec extract_locale_string(locale_def(), locale_prefix_sources()) :: locale() | nil
   defp extract_locale_string(locale_def, locale_prefix_sources)
        when is_list(locale_prefix_sources) do
-    # Find the first source that yields a non-nil value
     Enum.find_value(locale_prefix_sources, fn source ->
       extract_locale_string(locale_def, source)
     end)
   end
 
   defp extract_locale_string(locale_def, source) when is_atom(source) do
-    # Delegate to specific clauses based on the source atom
     case locale_def do
       {locale_str, _attrs} when is_binary(locale_str) ->
         extract_locale_string_from_string(locale_str, source)
@@ -809,13 +515,13 @@ defmodule Routex.Extension.SimpleLocale.Beta do
         extract_locale_string_from_string(locale_str, source)
 
       _invalid_def ->
-        # Invalid locale_def format
         nil
     end
   end
 
   # --- Helper clauses for extract_locale_string based on source atom ---
 
+  # Extracts a specific part string based on the source type (:locale, :language, etc.)
   @spec extract_locale_string_from_string(locale :: locale(), locale_prefix_source()) ::
           locale() | nil
   defp extract_locale_string_from_string(locale_str, :locale), do: locale_str
@@ -840,7 +546,6 @@ defmodule Routex.Extension.SimpleLocale.Beta do
     |> lookup_region_name()
   end
 
-  # Fallback for unknown source types
   defp extract_locale_string_from_string(_locale_str, _other_source), do: nil
 
   # Merges two attribute maps. Values from `override_attrs` take precedence,
@@ -851,7 +556,6 @@ defmodule Routex.Extension.SimpleLocale.Beta do
   defp merge_attrs(existing_attrs, override_attrs)
        when is_map(existing_attrs) and is_map(override_attrs) do
     Map.merge(existing_attrs, override_attrs, fn _key, existing_val, override_val ->
-      # If the overriding value is nil, keep the existing value, otherwise take the override.
       if is_nil(override_val), do: existing_val, else: override_val
     end)
   end

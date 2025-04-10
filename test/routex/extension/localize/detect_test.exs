@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.DetectTest do
+defmodule Routex.Extension.Localize.DetectTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.SimpleLocale.Detect
+  alias Routex.Extension.Localize.Detect
   alias Plug.Conn
 
   # Mock backend module for testing

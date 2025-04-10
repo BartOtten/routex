@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.Registry do
+defmodule Routex.Extension.Localize.Registry do
   @moduledoc "Pre-generated locale registry shipped with Routex.\nGenerated from IANA Language Subtag Registry.\n"
-  alias Routex.Extension.SimpleLocale.Detect
+  alias Routex.Extension.Localize.Detect
 
   def language do
     %{

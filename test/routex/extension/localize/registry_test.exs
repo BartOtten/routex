@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.RegistryTest do
+defmodule Routex.Extension.Localize.RegistryTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.SimpleLocale.Registry
+  alias Routex.Extension.Localize.Registry
 
   describe "language/2" do
     test "returns language info for valid 2-letter code" do

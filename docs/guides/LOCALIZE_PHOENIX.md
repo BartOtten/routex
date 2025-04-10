@@ -66,7 +66,8 @@ defmodule ExampleWeb.RoutexBackend do
       Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
       Routex.Extension.Translations,        # Enables route segment translations
       Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
-      Routex.Extension.SimpleLocale,        # Detects locale from various sources, adds :language and :region attributes to routes.
+      Routex.Extension.Localize.Routes,     # Localize routes at compile time
+      Routex.Extension.Localize.Runtime,    # Detects locale from various sources at runtime
       Routex.Extension.RuntimeCallbacks,    # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
     ],
 
@@ -144,7 +145,7 @@ and accessibility features:
 
 ### Component Highlights:
 - **Looping over Alternatives:** Fetches all localized route variants for the current URL.
-- **User Friendly Language Names:** Uses the `:language_display_name` as set by SimpleLocale.
+- **User Friendly Language Names:** Uses the `:language_display_name` as set by Localize.
 - **Dynamic Styling:** Highlights the current language (using a conditional CSS class).
 - **Accessible Markup:** Uses proper `rel` and `hreflang` attributes.
 
@@ -203,7 +204,7 @@ Happy coding and enjoy creating a multilingual Phoenix application!
   - Associates locales with URL paths
   - Supports `[language|region]_display_name` overrides
 
-**SimpleLocale with custom language sources**:
+**Localize with custom language sources**:
   - Expands route attribute `:locale` into route attributes `:locale, :region, :language, :region_display_name, :language_display_name`
   - Handles locale detection using a variery of sources including `Accept-Language`
   - Sets attributes `:locale`, `:region` and `:language` at runtime
@@ -226,4 +227,4 @@ Happy coding and enjoy creating a multilingual Phoenix application!
 
 **RuntimeCallbacks**:
  - Configured to call `Gettext.put_locale`
- - Uses the runtime detected attribute `:language` which is set by SimpleLocale.
+ - Uses the runtime detected attribute `:language` which is set by Localize.

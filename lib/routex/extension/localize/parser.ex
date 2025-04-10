@@ -1,10 +1,10 @@
-defmodule Routex.Extension.SimpleLocale.Parser do
+defmodule Routex.Extension.Localize.Parser do
   @moduledoc """
   Handles parsing of locale strings and accept-language headers.
   Uses efficient binary pattern matching and follows RFC 5646 BCP 47 language tag format.
   """
 
-  alias Routex.Extension.SimpleLocale.Types
+  alias Routex.Extension.Localize.Types
 
   @default_quality 1.0
   @separator_chars [?-, ?_]

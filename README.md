@@ -23,7 +23,7 @@ For developers seeking robust Phoenix localization solutions, Routex excels. It
 offers a suite of extensions enabling internationalization (i18n) and
 localization (l10n), including but not limited to seamless support for
 translated (multilingual) URLs, locale preference detection at run time and
-support for multiple backends. Included extension SimpleLocale simplifies common
+support for multiple backends. Included extension Localize simplifies common
 Phoenix localization by including a [IANA](https://www.iana.org/) based locale
 registry for robust locale validation and conversion to display names.
 

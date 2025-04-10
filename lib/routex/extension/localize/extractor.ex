@@ -1,4 +1,4 @@
-defmodule Routex.Extension.SimpleLocale.Extractor do
+defmodule Routex.Extension.Localize.Extractor do
   @moduledoc """
 
   Extracts locale information from various sources. Handles both `Plug.Conn`
@@ -25,9 +25,8 @@ defmodule Routex.Extension.SimpleLocale.Extractor do
   fallback to `locale`.
   """
 
-  alias Routex.Extension.SimpleLocale
-  alias SimpleLocale.Parser
-  alias SimpleLocale.Registry
+  alias Routex.Extension.Localize.Parser
+  alias Routex.Extension.Localize.Registry
 
   @private_key :routex
   @session_key :routex

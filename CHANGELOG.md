@@ -6,8 +6,8 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 <!-- changelog -->
 ## Upcoming release
 
-### Improvements to Simple Locale
-#### Generate localized routes with ease
+### SimpleLocale has split: Localize.Routes and Localize.Runtime
+#### Localize.Routes: Generate localized routes with ease
 - `locales`: A list of locale definitions. Each entry can be:
     - A locale string (e.g., `"en"`, `"fr-CA"`).
     - A tuple `{locale, attrs}` to override or add attributes for that specific locale branch.
@@ -28,7 +28,6 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
    default_locale: Gettext.default_locale(MyAppWeb.Gettext)
    ```
 
-#### Choose which (sub)tag to use for localized routes
 - `locale_prefix_sources`: List of locale (sub)tags to use for generating
      localize routes. Will use the first (sub)tag which returns a non-nil value.
      When no value is found the locale won't have localized routes.
@@ -38,12 +37,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
      Possible values: `:locale` (pass-through), `:region` and/or  `:language`.  
      Default to: `[:language, :region, :locale]`.
 
+####  Localize.Runtime: Plug and Hook
+We might as well extract it to a separate package....
+
 ### Other
 
 - docs: improved documentation of SimpleLocale
 - feat: support `locales` and `default_locale` for auto generated localized routes
 - feat: support attribute overrides for `locale` attributes
-- docs: improved documentation of SimpleLocale
+- docs: improved documentation of the Localize modules
 
 ## v1.2.0-rc.0
 

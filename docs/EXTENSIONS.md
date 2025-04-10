@@ -30,7 +30,8 @@ to share attributes; allowing extensions to work together without being coupled.
 - [LiveView Hooks](#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
 - [Route Helpers](#route-helpers): Create branch aware Phoenix Helpers.
 - [Cloak](#cloak-showcase): Showcase to demonsrate extreme route transformations.
-- [Simple Locale](#simple-locale): Simple Phoenix localization.
+- [Localize Phoenix Routes](#localize-phoenix-routes): Generate localized routes.
+- [Localize Phoenix Runtime](#localize-phoenix-runtime): Plug and play locale detection (StaticView and LiveView).
 - [Runtime Callbacks](#runtime-callbacks): Call arbitrary functions with route attributes.
 
 
@@ -233,21 +234,40 @@ experimentation.
 [Cloak Documentation](https://hexdocs.pm/routex/Routex.Extension.Cloak.html)
 
 
-## Simple Locale
+## Localize Phoenix Runtime
 
-**Feature**: Localize Phoenix using Routex
+**Feature**: Plug and play locale detection in StaticViews and LiveViews.
 
-**Benefits**: Provides shorthand -> display name conversion for locales and
-automatically enables locale detection in StaticViews and LiveViews.
+**Benefits**: The most customizable locale detection with the simplest setup
 
 **Example**: Set the `locale` attribute based on the [HTTP accept-language header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept-Language).
 
 ```elixir
 locale_sources: [:query, :session, :accept_language, :attrs],
 locale_params: ["locale"]
+language_sources: [:query, :attrs],
+language_params: ["custom_lang"]
 ```
 
-[Simple Locale Documentation](https://hexdocs.pm/routex/Routex.Extension.Localize.html)
+[Localize Phoenix Runtime Documentation](https://hexdocs.pm/routex/Routex.Extension.Localize.Runtime.html)
+
+
+## Localize Phoenix Routes
+
+**Feature**: Generate localize routes based on simple declarative configuration.
+
+**Benefits**: Improves SEO, content relevance and user convenience
+
+**Example**: 
+
+```elixir
+Router              Generated                         Attributes
+                      ⇒ /products/:id/edit              locale: "en", contact: "rootexample.com"
+  /products/:id/edit  ⇒ /europe/nl/products/:id/edit    locale: "nl", contact: "verkoop@example.nl"
+                      ⇒ /europe/be/products/:id/edit    locale: "nl", contact: "handel@example.be"
+                      ⇒ /gb/products/:id/edit           locale: "en", contact: "sales@example.com"
+```
+[Localize Phoenix Routes Documentation](https://hexdocs.pm/routex/Routex.Extension.Localize.Routes.html)
 
 
 ## Runtime Callbacks

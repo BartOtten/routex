@@ -129,6 +129,8 @@ burden of maintaining a fork.
 - [Route Helpers](docs/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
 - [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes at runtime.
 - [Simple Locale](docs/EXTENSIONS.md#simple-locale): Simplifies common Phoenix localization (based on[IANA](https://www.iana.org/) locale registry).
+- [Localize Phoenix Routes](docs/EXTENSIONS.md#localize-phoenix-routes): Simplifies common Phoenix localization (based on[IANA](https://www.iana.org/) locale registry).
+- [Localize Phoenix Runtime](docs/EXTENSIONS.md#localize-phoenix-runtime): Highly configurable locale detection using multiple sources (StaticView and LiveView).
 - [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
 - [Verified Routes](docs/EXTENSIONS.md#verified-routes): Branch aware variant of Phoenix.VerifiedRoutes.
 

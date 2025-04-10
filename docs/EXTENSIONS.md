@@ -247,7 +247,7 @@ locale_sources: [:query, :session, :accept_language, :attrs],
 locale_params: ["locale"]
 ```
 
-[Simple Locale Documentation](https://hexdocs.pm/routex/Routex.Extension.SimpleLocale.html)
+[Simple Locale Documentation](https://hexdocs.pm/routex/Routex.Extension.Localize.html)
 
 
 ## Runtime Callbacks

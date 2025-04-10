@@ -1,12 +1,11 @@
-defmodule Routex.Extension.SimpleLocale.Detect do
+defmodule Routex.Extension.Localize.Detect do
   @moduledoc """
   Main module for locale detection logic.
   """
 
-  alias Routex.Extension.SimpleLocale
+  alias Routex.Extension.Localize.Extractor
+  alias Routex.Extension.Localize.Types
   alias Routex.Types, as: T
-  alias SimpleLocale.Extractor
-  alias SimpleLocale.Types
 
   @default_sources [:query, :session, :cookie, :accept_language, :path, :assigns, :attrs]
 

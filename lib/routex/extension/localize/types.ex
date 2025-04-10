@@ -1,4 +1,4 @@
-defmodule Routex.Extension.SimpleLocale.Types do
+defmodule Routex.Extension.Localize.Types do
   @moduledoc """
   Type definitions for locale detection.
   """

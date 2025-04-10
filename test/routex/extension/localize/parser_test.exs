@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.ParserTest do
+defmodule Routex.Extension.Localize.ParserTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.SimpleLocale.Parser
+  alias Routex.Extension.Localize.Parser
 
   describe "parse_accept_language/1" do
     test "parses accept-language header with multiple locales and qualities" do

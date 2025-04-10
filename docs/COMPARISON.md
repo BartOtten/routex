@@ -253,7 +253,7 @@ localization.
 **Routex** Routex offers virtually unlimited runtime features and integration by
 integrating native extension `Routex.Extension.RuntimeCallbacks` for dynamic
 functionality. This can be combined with other extensions -such as
-`Routex.Extension.SimpleLocale` for highly customizable locale detection and
+`Routex.Extension.Localize.Runtime` for highly customizable locale detection and
 behavior during runtime.
 
 ```elixir
@@ -261,7 +261,7 @@ defmodule ExampleWeb.RoutexBackend do
 use Routex.Backend,  # makes this a Routex configuration backend
 extensions: [
   Routex.Extension.Attrs,
-     Routex.Extension.SimpleLocale,  # detects locale, and puts it in runtime attributes
+     Routex.Extension.Localize,  # detects locale, and puts it in runtime attributes
      Routex.Extension.RuntimeCallbacks  # call arbitrary functions during runtime using route attributes
 ],
 # configuration of arbitrary functions to be called at navigation events.

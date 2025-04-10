@@ -98,7 +98,7 @@ defmodule ExampleWeb.RoutexBackend do
      Routex.Extension.AlternativeGetters,
      Routex.Extension.Alternatives,
      Routex.Extension.Assigns,
-     Routex.Extension.SimpleLocale
+     Routex.Extension.Localize
 
      # optional
      # Routex.Extension.Translations,  # when you want translated routes

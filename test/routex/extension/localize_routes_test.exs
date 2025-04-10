@@ -1,4 +1,4 @@
-defmodule Routex.Extension.SimpleLocaleTest do
+defmodule Routex.Extension.Localize.RoutesTest do
   use ExUnit.Case
 
   defmodule DummyOpts do
@@ -48,11 +48,11 @@ defmodule Routex.Extension.SimpleLocaleTest do
     end
   end
 
-  alias Routex.Extension.SimpleLocale.Beta, as: SimpleLocale
+  alias Routex.Extension.Localize.Routes, as: Localize
 
   describe "configure/2" do
     test "adds alternative generating extension" do
-      result = SimpleLocale.configure(DummyOpts.opts(), DummyBackend)
+      result = Localize.configure(DummyOpts.opts(), DummyBackend)
       assert result[:extensions] == [Routex.Extension.Alternatives, Dummy]
     end
 
@@ -70,7 +70,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
           DummyOpts.opts()
           |> Keyword.put(:locale_prefix_sources, primary_prefix)
 
-        result = SimpleLocale.configure(opts, DummyBackend)
+        result = Localize.configure(opts, DummyBackend)
 
         assert Map.keys(result[:alternatives]["/"][:branches]) == expected_prefixes
       end
@@ -90,7 +90,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
           DummyOpts.opts()
           |> Keyword.put(:locale_prefix_sources, [primary_prefix | other_prefixes])
 
-        result = SimpleLocale.configure(opts, DummyBackend)
+        result = Localize.configure(opts, DummyBackend)
 
         assert Map.keys(result[:alternatives]["/"][:branches]) == expected_prefixes
       end
@@ -105,7 +105,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
       other_prefixes = [:language]
       opts = Keyword.put(base_opts, :locale_prefix_sources, [primary_prefix | other_prefixes])
 
-      result = SimpleLocale.configure(opts, DummyBackend)
+      result = Localize.configure(opts, DummyBackend)
       expected = ["/001", "/be", "/fr"]
 
       assert Map.keys(result[:alternatives]["/"][:branches]) == expected
@@ -115,14 +115,14 @@ defmodule Routex.Extension.SimpleLocaleTest do
       other_prefixes2 = [:region]
       opts2 = Keyword.put(base_opts, :locale_prefix_sources, [primary_prefix2 | other_prefixes2])
 
-      result2 = SimpleLocale.configure(opts2, DummyBackend)
+      result2 = Localize.configure(opts2, DummyBackend)
       expected2 = ["/fr", "/nl"]
 
       assert Map.keys(result2[:alternatives]["/"][:branches]) == expected2
     end
 
     test "creates alternatives when none available" do
-      result = SimpleLocale.configure(DummyOpts.opts(), DummyBackend)
+      result = Localize.configure(DummyOpts.opts(), DummyBackend)
 
       expected_alts =
         %{
@@ -184,7 +184,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
       }
 
       opts = [alternatives: pre_alts] ++ DummyOpts.opts()
-      result = SimpleLocale.configure(opts, DummyBackend)
+      result = Localize.configure(opts, DummyBackend)
 
       expected_alts =
         %{
@@ -403,29 +403,6 @@ defmodule Routex.Extension.SimpleLocaleTest do
         }
 
       assert expected_alts == result[:alternatives]
-    end
-  end
-
-  describe "handle_params/4" do
-    test "expands the runtime attributes and returns {:cont, socket}" do
-      socket = %Phoenix.LiveView.Socket{private: %{routex: %{}}}
-      attrs = %{__backend__: DummyBackend, locale: "en-US"}
-
-      {:cont, returned_socket} = SimpleLocale.handle_params(%{}, "/some_url", socket, attrs)
-      expected = %{language: "en", region: "US", territory: "US", locale: "en-US"}
-
-      assert returned_socket.private.routex == expected
-    end
-  end
-
-  describe "plug/3" do
-    test "expands the runtime attributes and returns a conn" do
-      conn = DummyConn.conn() |> Phoenix.ConnTest.init_test_session(%{token: "some-token"})
-      attrs = %{__backend__: DummyBackend, locale: "en-US"}
-      expected = %{language: "en", region: "US", territory: "US", locale: "en-US"}
-
-      %Plug.Conn{} = returned_conn = SimpleLocale.plug(conn, [], attrs)
-      assert returned_conn.private.routex == expected
     end
   end
 end

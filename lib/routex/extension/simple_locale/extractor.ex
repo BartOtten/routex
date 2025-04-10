@@ -18,6 +18,7 @@ defmodule Routex.Extension.SimpleLocale.Extractor do
   * `:path` uses `path_params` such as `/:locale/products/`
   * `:query` uses `query_params` such as `/products?locale=en-US`
   * `:session` uses the session
+  * `:assigns` uses the assigns stored in connection of socket
 
   ### Params
   List of keys in a source to examine. Defaults to the name of the field with
@@ -76,11 +77,18 @@ defmodule Routex.Extension.SimpleLocale.Extractor do
     Map.get(conn.path_params || %{}, param)
   end
 
-  # Handle Map inputs
+  # Handle Map/Struct inputs
   def extract_from_source(%{} = source, :accept_language, param, _attrs) do
     case Map.get(source, :private) do
       %{@private_key => %{session: session}} -> Map.get(session || %{}, param)
       _none -> nil
+    end
+  end
+
+  def extract_from_source(%{} = source, :assigns, param, _attrs) do
+    case Map.get(source, :assigns) do
+      nil -> nil
+      assigns -> Map.get(assigns, String.to_existing_atom(param))
     end
   end
 

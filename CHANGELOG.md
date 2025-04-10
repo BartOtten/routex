@@ -41,7 +41,9 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 ### Other
 
 - docs: improved documentation of SimpleLocale
-
+- feat: support `locales` and `default_locale` for auto generated localized routes
+- feat: support attribute overrides for `locale` attributes
+- docs: improved documentation of SimpleLocale
 
 ## v1.2.0-rc.0
 

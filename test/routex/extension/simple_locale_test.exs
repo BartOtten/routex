@@ -2,6 +2,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
   use ExUnit.Case
 
   defmodule DummyOpts do
+    @moduledoc false
     def opts(),
       do: [
         extensions: [Dummy],
@@ -22,11 +23,13 @@ defmodule Routex.Extension.SimpleLocaleTest do
   end
 
   defmodule DummyAttrs do
+    @moduledoc false
     defstruct contact: "default@example.com"
   end
 
   # A dummy connection struct for testing plug/3.
   defmodule DummyConn do
+    @moduledoc false
     def conn,
       do: %Plug.Conn{
         req_headers: [{"accept-language", ["en-US,en;q=0.8,fr;q=0.6"]}],
@@ -37,6 +40,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
   end
 
   defmodule DummyBackend do
+    @moduledoc false
     defstruct Keyword.keys(DummyOpts.opts())
 
     def config do
@@ -44,7 +48,7 @@ defmodule Routex.Extension.SimpleLocaleTest do
     end
   end
 
-  alias Routex.Extension.SimpleLocale
+  alias Routex.Extension.SimpleLocale.Beta, as: SimpleLocale
 
   describe "configure/2" do
     test "adds alternative generating extension" do
@@ -422,37 +426,6 @@ defmodule Routex.Extension.SimpleLocaleTest do
 
       %Plug.Conn{} = returned_conn = SimpleLocale.plug(conn, [], attrs)
       assert returned_conn.private.routex == expected
-    end
-  end
-
-  describe "parse accept language" do
-    test "with language only fallbacks" do
-      value = "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7"
-
-      expected = [
-        %{language: "en", locale: "en-US", quality: 1.0, territory: "US", region: "US"},
-        %{language: "en", locale: "en", quality: 0.9, territory: nil, region: nil},
-        %{language: "zh", locale: "zh-CN", quality: 0.8, territory: "CN", region: "CN"},
-        %{language: "zh", locale: "zh", quality: 0.7, territory: nil, region: nil}
-      ]
-
-      assert expected == SimpleLocale.Parser.parse_accept_language(value)
-
-      value1 = "*"
-      expected1 = []
-      assert expected1 == SimpleLocale.Parser.parse_accept_language(value1)
-
-      value2 = "en"
-      expected2 = [%{language: "en", locale: "en", quality: 1.0, territory: nil, region: nil}]
-      assert expected2 == SimpleLocale.Parser.parse_accept_language(value2)
-
-      value3 = "en-US"
-
-      expected3 = [
-        %{language: "en", locale: "en-US", quality: 1.0, territory: "US", region: "US"}
-      ]
-
-      assert expected3 == SimpleLocale.Parser.parse_accept_language(value3)
     end
   end
 end

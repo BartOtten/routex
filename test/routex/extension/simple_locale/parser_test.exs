@@ -39,6 +39,11 @@ defmodule Routex.Extension.SimpleLocale.ParserTest do
       assert Parser.parse_accept_language([]) == []
     end
 
+    test "handles list with single any header" do
+      result = Parser.parse_accept_language(["*"])
+      assert result == []
+    end
+
     test "handles list with single header" do
       result = Parser.parse_accept_language(["en-US;q=0.8"])
       assert length(result) == 1
@@ -63,6 +68,35 @@ defmodule Routex.Extension.SimpleLocale.ParserTest do
       assert en.locale == "en-US"
       assert fr.locale == "fr-FR"
       assert fr.quality == 0.8
+    end
+
+    test "with language only fallbacks" do
+      value = "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7"
+
+      expected = [
+        %{language: "en", locale: "en-US", quality: 1.0, territory: "US", region: "US"},
+        %{language: "en", locale: "en", quality: 0.9, territory: nil, region: nil},
+        %{language: "zh", locale: "zh-CN", quality: 0.8, territory: "CN", region: "CN"},
+        %{language: "zh", locale: "zh", quality: 0.7, territory: nil, region: nil}
+      ]
+
+      assert expected == Parser.parse_accept_language(value)
+
+      value1 = "*"
+      expected1 = []
+      assert expected1 == Parser.parse_accept_language(value1)
+
+      value2 = "en"
+      expected2 = [%{language: "en", locale: "en", quality: 1.0, territory: nil, region: nil}]
+      assert expected2 == Parser.parse_accept_language(value2)
+
+      value3 = "en-US"
+
+      expected3 = [
+        %{language: "en", locale: "en-US", quality: 1.0, territory: "US", region: "US"}
+      ]
+
+      assert expected3 == Parser.parse_accept_language(value3)
     end
   end
 

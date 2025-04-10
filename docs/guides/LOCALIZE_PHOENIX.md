@@ -70,23 +70,6 @@ defmodule ExampleWeb.RoutexBackend do
       Routex.Extension.RuntimeCallbacks,    # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
     ],
 
-    # Define hierarchical alternatives with associated locale attributes.
-    alternatives: %{
-      "/" => %{
-        attrs: %{locale: "en-001", region_display_name: "Global"},          # Worldwide English, region display name overrides "World".
-        branches: %{
-          "/europe" => %{
-            attrs: %{locale: "en-150"},      # European English
-            branches: %{
-              "/nl" => %{attrs: %{locale: "nl-NL"}},  # Dutch (Netherlands)
-              "/fr" => %{attrs: %{locale: "fr-FR"}}   # French (France)
-            }
-          },
-          "/gb" => %{attrs: %{locale: "en-GB"}}       # British English
-        }
-      }
-    },
-
     # Integration with Gettext for route segment translation.
     translations_backend: ExampleWeb.Gettext,
 
@@ -95,6 +78,10 @@ defmodule ExampleWeb.RoutexBackend do
     verified_sigil_phoenix: "~o",
     verified_url_routex: :url,
     verified_path_routex: :path,
+
+    # Locales to generate routes for: English (Global), Dutch, French, English (Great Brittain) and English (European)
+    locales: [{"en-001", %{region_display_name: "Worldwide"}}, "nl-NL", "fr-FR", "en-GB", "en-150"],
+    default_locale: "en-100",
 
     # Language detection with custom source priority
     language_sources: [:query, :session, :cookie, :attrs, :accept_language],

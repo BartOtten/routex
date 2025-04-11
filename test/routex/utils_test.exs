@@ -16,7 +16,7 @@ defmodule Routex.UtilsTest do
           Utils.print("no module")
         end)
 
-      assert output =~ ">> no module"
+      assert output =~ ":: no module"
     end
 
     test "sanitizes atom input" do
@@ -25,7 +25,7 @@ defmodule Routex.UtilsTest do
           Utils.print(:an_atom)
         end)
 
-      assert output =~ ">> an_atom"
+      assert output =~ ":: an_atom"
     end
 
     test "sanitizes list input by rejecting nils" do
@@ -35,7 +35,7 @@ defmodule Routex.UtilsTest do
         end)
 
       # The nil is removed so we should see the two lines concatenated.
-      assert output =~ ">> line1line2\e[0m\n"
+      assert output =~ ":: line1line2\e[0m\n"
     end
   end
 
@@ -52,7 +52,7 @@ defmodule Routex.UtilsTest do
 
       # The printed output should include the inspected module and the message.
       assert output =~ inspect(__MODULE__)
-      assert output =~ ">> test message"
+      assert output =~ ":: test message"
     end
 
     test "prints a message without module prefix when module is nil" do
@@ -61,7 +61,7 @@ defmodule Routex.UtilsTest do
           Utils.print(nil, "no module")
         end)
 
-      assert output =~ ">> no module"
+      assert output =~ ":: no module"
     end
 
     test "sanitizes atom input" do
@@ -70,7 +70,7 @@ defmodule Routex.UtilsTest do
           Utils.print(nil, :an_atom)
         end)
 
-      assert output =~ ">> an_atom"
+      assert output =~ ":: an_atom"
     end
 
     test "sanitizes list input by rejecting nils" do
@@ -80,7 +80,7 @@ defmodule Routex.UtilsTest do
         end)
 
       # The nil is removed so we should see the two lines concatenated.
-      assert output =~ ">> line1line2\e[0m\n"
+      assert output =~ ":: line1line2\e[0m\n"
     end
   end
 

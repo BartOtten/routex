@@ -1,3 +1,51 @@
+defmodule Routex.Extension.Localize.Routes.Macros do
+  @moduledoc false
+
+  @fallback_locale "en"
+
+  # Macro to prevent warnings about unknown / unloaded modules.
+  defmacro auto_detect(locale_backend) do
+    app_mod = lookup_app_module()
+
+    quote generated: true do
+      cond do
+        Code.ensure_loaded?(Cldr) and unquote(locale_backend) ->
+          {Cldr, Cldr.known_locale_names(unquote(locale_backend)),
+           Cldr.default_locale(unquote(locale_backend))}
+
+        Code.ensure_loaded?(Cldr) ->
+          {Cldr, Cldr.known_locale_names(), Cldr.default_locale()}
+
+        Code.ensure_loaded?(Gettext) ->
+          backend =
+            unquote(locale_backend) ||
+              (unquote(app_mod) <> "Web.Gettext") |> String.to_existing_atom()
+
+          {Gettext, Gettext.known_locales(backend), backend.__gettext__(:default_locale)}
+
+        Code.ensure_loaded?(Fluent) ->
+          backend =
+            unquote(locale_backend) ||
+              (unquote(app_mod) <> ".Fluent") |> String.to_existing_atom()
+
+          {Fluent, Fluent.known_locales(backend), "en"}
+
+        true ->
+          {__MODULE__, [unquote(@fallback_locale)], unquote(@fallback_locale)}
+      end
+    end
+  end
+
+  defp lookup_app_module do
+    suffix =
+      Mix.Project.config()[:app]
+      |> to_string()
+      |> Macro.camelize()
+
+    "Elixir." <> suffix
+  end
+end
+
 defmodule Routex.Extension.Localize.Routes do
   @moduledoc """
   Localize Phoenix routes using simple configuration.
@@ -153,7 +201,6 @@ defmodule Routex.Extension.Localize.Routes do
   end
   ```
   """
-
   @behaviour Routex.Extension
 
   alias Routex.Attrs
@@ -164,7 +211,10 @@ defmodule Routex.Extension.Localize.Routes do
   # we make sure we use it's types.
   alias Routex.Extension.Alternatives.Branches
 
+  # Shared types
   alias Routex.Types, as: T
+
+  require Routex.Extension.Localize.Routes.Macros, as: LocalizeMacros
 
   @default_route_prefix_sources [:language, :region, :locale]
 
@@ -199,11 +249,14 @@ defmodule Routex.Extension.Localize.Routes do
       |> List.wrap()
 
     # calculated
-    {detected_lib, detected_known_locales, detected_default_locale} = auto_detect(locale_backend)
+
+    {detected_lib, detected_known_locales, detected_default_locale} =
+      LocalizeMacros.auto_detect(locale_backend)
+
     detected_locales = [detected_default_locale | detected_known_locales]
 
-    used_locales = locales || detected_locales
-    used_default_locale = default_locale || detected_default_locale
+    used_locales = (locales || detected_locales) |> stringify_locales()
+    used_default_locale = (default_locale || detected_default_locale) |> stringify_locales()
 
     # credo:disable-for-next-line
     # TODO: better print
@@ -232,47 +285,6 @@ defmodule Routex.Extension.Localize.Routes do
     |> Keyword.update(:extensions, @deps, &Enum.uniq(@deps ++ &1))
   end
 
-  cond do
-    Code.ensure_loaded?(Cldr) ->
-      def auto_detect(nil) do
-        {Cldr, Cldr.known_locale_names(), Cldr.default_locale()}
-      end
-
-      def auto_detect(locale_backend) do
-        {Cldr.known_locale_names(locale_backend), Cldr.default_locale(locale_backend)}
-      end
-
-    Code.ensure_loaded?(Gettext) ->
-      def auto_detect(locale_backend) do
-        backend =
-          locale_backend || (lookup_app_module() <> "Web.Gettext") |> String.to_existing_atom()
-
-        {Gettext, Gettext.known_locales(backend), backend.__gettext__(:default_locale)}
-      end
-
-    Code.ensure_loaded?(Fluent) ->
-      def auto_detect(locale_backend) do
-        backend =
-          locale_backend || (lookup_app_module() <> ".Fluent") |> String.to_existing_atom()
-
-        {Fluent, Fluent.known_locales(backend), "en"}
-      end
-
-    true ->
-      def auto_detect(locale_backend) do
-        {__MODULE__, ["en"], "en"}
-      end
-  end
-
-  defp lookup_app_module do
-    suffix =
-      Mix.Project.config()[:app]
-      |> to_string()
-      |> Macro.camelize()
-
-    "Elixir." <> suffix
-  end
-
   @impl Routex.Extension
   @doc """
   Ensures each route with a `:locale` attribute also has derived attributes like
@@ -296,6 +308,29 @@ defmodule Routex.Extension.Localize.Routes do
     Enum.find(locales, default, fn locale_def ->
       extract_locale_string(locale_def, locale_prefix_sources) == default_str_normalized
     end)
+  end
+
+  defp stringify_locales(locales) when is_list(locales) do
+    Enum.map(locales, fn
+      locale when is_binary(locale) ->
+        locale
+
+      locale when is_atom(locale) ->
+        to_string(locale)
+
+      {locale, %{} = attrs} ->
+        {to_string(locale), attrs}
+
+      %{} = language_tag ->
+        [language_tag.language, "-", language_tag.territory] |> Enum.join()
+        # credo:disable-for-next-line
+        # TODO: properly use the expression below without depending on Cldr
+        # Cldr.LanguageTag.to_string(locale)
+    end)
+  end
+
+  defp stringify_locales(locale) do
+    to_string(locale)
   end
 
   # Calculates the locale prefix based on the locale_def and sources,

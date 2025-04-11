@@ -1,26 +1,20 @@
 defmodule Routex.Extension.Localize.Routes do
   @moduledoc """
-  This extension adds locale handling both at compile time and at runtime.
+  Localize Phoenix routes using simple configuration.
 
-  > #### Simple by default, powerful when needed.
-  > For easy setup this extension works by default without additional configuration.
-  > Yet, it has many powerful options to support the most exotic use cases. Feel free
-  > to skip to the [simple configuration example](#module-configuration-examples)
-  > and come back when you need custom behaviour.
+  At compile time, this extension generates localized routes based on locale
+  tags. These locale tags are automatically derived from your Cldr, Gettext or
+  Fluent setup and can be overriden using the extensions options.
 
+  When using a custom configuration, tags are validated using a
+  [build-in locale registry](Routex.Extension.Localize.Registry)
+  based on the authoritive
+  [IANA Language Subtag Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
-  At compile time, this extension generates localized routes based on provided locales (or
-  derived from Gettext). At runtime, it detects the locale from various sources.
+  ## Automated locale expansion
 
-  Includes a simple locale registry based on the
-  [IANA Language Subtag Registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
-  for common tasks like locale tag verification and display name conversion.
-
-
-  ## Route Generation (Compile Time)
-
-  The `:locales`, `:default_locale` and `locale_prefix_sources` options generate localized routes
-  with the `:locale` attribute set. This attribute is expanded into:
+  At compile time this extension will expand a routes `:locale` attribute into
+  multiple locale attributes using the build-in registry:
 
   - `:locale` (e.g., "en-US")
   - `:language` (e.g., "en")
@@ -28,65 +22,47 @@ defmodule Routex.Extension.Localize.Routes do
   - `:language_display_name` (e.g., "English")
   - `:region_display_name` (e.g., "United States")
 
-  ## Build-in Locale Registry
-
-  The built-in locale registry (`Routex.Extension.Localize.Registry`) is suitable
-  for projects without complex localization needs. It provides validation and
-  display name lookups.
-
-  **Examples:**
-  ```iex
-  iex> alias Routex.Extension.Localize.Registry
-  iex> Registry.language("nl-BE")
-  %{descriptions: ["Dutch", "Flemish"], type: :language}
-
-  iex> Registry.region("nl-BE")
-  %{descriptions: ["Belgium"], type: :region}
-
-  iex> Registry.language?("zz")
-  false
-
-  iex> Registry.region?("BE")
-  true
-  ```
-  See `Routex.Extension.Localize.Registry` for more details.
-
-
   ## Options
 
-  Options control compile-time route generation and runtime locale detection.
+  - `locales`: A list of locale definitions. Defaults to known locales
+     by Cldr, Gettext or Fluent (in that order).
 
-  ### Route Generation Options
-
-  - `locales`: A list of locale definitions. Each entry can be:
-    - A locale string (e.g., `"en"`, `"fr-CA"`).
-    - A tuple `{locale, attrs}` to override or add attributes for that specific locale branch.
+    Each entry can be:
+    - A locale tag (e.g., `"en"`, `"fr-CA"`).
+    - A tuple `{locale, attrs}` with attributes map for that specific locale branch.
 
     **Example:**
     ```elixir
     locales: [
-      "en", # Standard English
-      {"en-GB", %{currency: "GBP"}}, # UK English with specific currency
+      # Standard English
+      "en",
+      # Language: "English", Region: "Global" displayed as "Worldwide"
+      {"en-001", %{region_display_name: "Worldwide"}
+      # Language: "English", Region: "Great Brittain", Compile time route attributes: %{currency: "GBP"}
+      {"en-GB", %{currency: "GBP"}},
+      # Standard French
       "fr"
     ]
     ```
 
     > #### Attribute Merging Precedence (Compile Time, low to high):
-    > 1. Base Derived (from locale string)
+    > 1. Derived from locale string
     > 2. Explicit Locale Override (from attrs in tuple)
     > 3. Original Branch Attribute (already existing on the branch)
     >
-    > Localize plays well with already configured alternative branches.
-
+    > Point 3 ensures this extension plays well with
+    > pre-configured alternative branches.
 
   - `default_locale`: The locale for top-level routes (e.g., `/products`).
-    Defaults to Gettext's default locale, falling back to `"en"`.
+     Default to the default locale of Cldr, Gettext or Fluent (in that order) with
+     fallback to "en".
 
-  - `locale_prefix_sources`: List of locale (sub)tags to use for generating
-     localize routes. Will use the first (sub)tag which returns a non-nil value.
+  - `locale_backend`: Backend to use for Cldr, Gettext or Fluent. Defaults to their
+     own backend module name convensions.
+
+  - `locale_prefix_sources`: Single atom or list of locale attributes to prefix
+     routes with. Will use the first (sub)tag which returns a non-nil value.
      When no value is found the locale won't have localized routes.
-
-     Note: The `default_locale` is always top-level / is not prefixed relative to its base.
 
      Possible values: `:locale`, `:region`, `:language`, `:language_display_name`, `:region_display_name`.
      Default to: `[:language, :region, :locale]`.
@@ -94,35 +70,27 @@ defmodule Routex.Extension.Localize.Routes do
      **Examples:**
       ```elixir
       # in configuration
-      locales: ["en-001", "fr", "nl-BE"]
+      locales: ["en-001", "fr", "nl-NL", "nl-BE"]
       default_locale: "en"
 
       # single source
-      locale_prefix_sources: :locale =>   ["/", "/en-001", "/fr", "/nl-be"],
+      locale_prefix_sources: :locale =>   ["/", "/en-001", "/fr", "/nl/nl", "/nl-be"],
       locale_prefix_sources: :language => ["/", "/fr", "/nl"],
-      locale_prefix_sources: :region =>   ["/", "/001", "/be"]
+      locale_prefix_sources: :region =>   ["/", "/001", "/nl", "/be"]
       locale_prefix_sources: :language_display_name =>   ["/", "/english", "/french", "/dutch"]
-      locale_prefix_sources: :region_display_name =>   ["/", "/world", "/france", "/belgium"]
+      locale_prefix_sources: :region_display_name =>   ["/", "/world", "/france", "/netherlands", "/belgium"]
 
       # with fallback
       locale_prefix_sources: [:language, :region] => ["/", "/fr", "/nl"]
-      locale_prefix_sources: [:region, :language] => ["/", "/001", "/fr", "/be"]
+      locale_prefix_sources: [:region, :language] => ["/", "/001", "/fr", "/nl", "/be"]
 
       ```
-
-  > #### Tip: Integration with Gettext
-  > Synchronize locales with Gettext:
-  > ```elixir
-  > locales: Gettext.known_locales(MyAppWeb.Gettext),
-  > default_locale: Gettext.default_locale(MyAppWeb.Gettext) || "en"
-  > ```
 
   ## Configuration examples
 
   > **Together with...**
   > This extension generates configuration for alternative route branches under the `:alternatives` key.
-  > To convert these into routes, `Routex.Extension.Alternatives` must be enabled and run *after*
-  > `Localize.Beta` in the extension list.
+  > To convert these into routes, `Routex.Extension.Alternatives` is automatically enabled.
 
   > **Integration:**
   > This extension sets runtime attributes (`Routex.Attrs`).
@@ -142,9 +110,8 @@ defmodule Routex.Extension.Localize.Routes do
         Routex.Extension.Localize.Routes,
         Routex.Extension.RuntimeCallbacks # Optional: for state depending package integration
       ],
-      # Localize options (optional, using defaults)
-      # locales: Gettext.known_locales(ExampleWeb.Gettext),
-      # default_locale: Gettext.default_locale(ExampleWeb.Gettext),
+      # This option is shared with the Translations extension
+       :translations_backend: ExampleWeb.Gettext,
       # RuntimeCallbacks options
       runtime_callbacks: [
         {Gettext, :put_locale, [[:attrs, :language]]},
@@ -163,10 +130,8 @@ defmodule Routex.Extension.Localize.Routes do
     use Routex.Backend,
       extensions: [
         Routex.Extension.Attrs,
-        # Enable Localize (Beta version) for routes and detection
+        # Enable Localize for localized routes
         Routex.Extension.Localize.Routes,
-        # Ensure Alternatives runs *after* Localize.Beta to process generated branches
-        Routex.Extension.Alternatives,
         Routex.Extension.RuntimeCallbacks
       ],
       # Compile-time options for Localize.Beta
@@ -201,9 +166,7 @@ defmodule Routex.Extension.Localize.Routes do
 
   alias Routex.Types, as: T
 
-  @fallback_locale "en"
-  @gettext_locale Application.compile_env(:gettext, :default_locale, @fallback_locale)
-  @default_route_prefixes [:language, :region, :locale]
+  @default_route_prefix_sources [:language, :region, :locale]
 
   # Typespecs
   @type attrs :: %{optional(atom()) => any()}
@@ -221,24 +184,93 @@ defmodule Routex.Extension.Localize.Routes do
 
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
-  def configure(config, _backend) do
-    default_locale = Keyword.get(config, :default_locale, @gettext_locale)
-    locales = Keyword.get(config, :locales, [])
-    raw_prefix_sources = Keyword.get(config, :locale_prefix_sources, @default_route_prefixes)
-    locale_prefix_sources = List.wrap(raw_prefix_sources)
+  def configure(config, backend) do
+    # shared options
     existing_alternatives = Keyword.get(config, :alternatives)
+
+    # own options
+    locale_backend = Keyword.get(config, :locale_backend)
+    default_locale = Keyword.get(config, :default_locale)
+    locales = Keyword.get(config, :locales)
+
+    locale_prefix_sources =
+      config
+      |> Keyword.get(:locale_prefix_sources, @default_route_prefix_sources)
+      |> List.wrap()
+
+    # calculated
+    {detected_lib, detected_known_locales, detected_default_locale} = auto_detect(locale_backend)
+    detected_locales = [detected_default_locale | detected_known_locales]
+
+    used_locales = locales || detected_locales
+    used_default_locale = default_locale || detected_default_locale
+
+    # credo:disable-for-next-line
+    # TODO: better print
+    Routex.Utils.print(__MODULE__, [
+      "locales ",
+      (locales && "from :locale in #{to_string(backend)}") ||
+        "detected using: #{to_string(detected_lib)}"
+    ])
+
+    Routex.Utils.print(__MODULE__, [
+      "default_locale ",
+      (default_locale && "from :locale in #{to_string(backend)}") ||
+        "detected using: #{to_string(detected_lib)}"
+    ])
 
     localized_alternatives =
       create_localized_branches(
         existing_alternatives,
-        locales,
-        default_locale,
+        used_locales,
+        used_default_locale,
         locale_prefix_sources
       )
 
     config
     |> Keyword.put(:alternatives, localized_alternatives)
     |> Keyword.update(:extensions, @deps, &Enum.uniq(@deps ++ &1))
+  end
+
+  cond do
+    Code.ensure_loaded?(Cldr) ->
+      def auto_detect(nil) do
+        {Cldr, Cldr.known_locale_names(), Cldr.default_locale()}
+      end
+
+      def auto_detect(locale_backend) do
+        {Cldr.known_locale_names(locale_backend), Cldr.default_locale(locale_backend)}
+      end
+
+    Code.ensure_loaded?(Gettext) ->
+      def auto_detect(locale_backend) do
+        backend =
+          locale_backend || (lookup_app_module() <> "Web.Gettext") |> String.to_existing_atom()
+
+        {Gettext, Gettext.known_locales(backend), backend.__gettext__(:default_locale)}
+      end
+
+    Code.ensure_loaded?(Fluent) ->
+      def auto_detect(locale_backend) do
+        backend =
+          locale_backend || (lookup_app_module() <> ".Fluent") |> String.to_existing_atom()
+
+        {Fluent, Fluent.known_locales(backend), "en"}
+      end
+
+    true ->
+      def auto_detect(locale_backend) do
+        {__MODULE__, ["en"], "en"}
+      end
+  end
+
+  defp lookup_app_module do
+    suffix =
+      Mix.Project.config()[:app]
+      |> to_string()
+      |> Macro.camelize()
+
+    "Elixir." <> suffix
   end
 
   @impl Routex.Extension

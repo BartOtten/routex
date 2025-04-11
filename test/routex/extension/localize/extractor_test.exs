@@ -200,12 +200,12 @@ defmodule Routex.Extension.Localize.ExtractorTest do
     test "extracts from attrs" do
       attrs = %{locale: "en-US"}
 
-      result = Extractor.extract_from_source(%{}, :attrs, "locale", attrs)
+      result = Extractor.extract_from_source(%{}, :route, "locale", attrs)
       assert result == "en-US"
     end
 
     test "returns nil for missing attrs" do
-      result = Extractor.extract_from_source(%{}, :attrs, "locale", %{})
+      result = Extractor.extract_from_source(%{}, :route, "locale", %{})
       assert is_nil(result)
     end
 
@@ -213,7 +213,7 @@ defmodule Routex.Extension.Localize.ExtractorTest do
       attrs = %{locale: "en-US"}
 
       assert_raise ArgumentError, fn ->
-        Extractor.extract_from_source(%{}, :attrs, "nonexistent", attrs)
+        Extractor.extract_from_source(%{}, :route, "nonexistent", attrs)
       end
     end
   end

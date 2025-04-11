@@ -11,12 +11,12 @@ defmodule Routex.Extension.Localize.Extractor do
   List of sources to examine for this field.
 
   * `:accept_language` examines the `accept-language` header.
-  * `:attrs` uses the (precompiled) route atributes.
   * `:body` uses `body_params`; useful when using values in API bodies.
   * `:cookie` uses the request cookie(s)
   * `:host` examines the hostname e.g `en.example.com` and `example.nl`. Returns the first match..
   * `:path` uses `path_params` such as `/:locale/products/`
   * `:query` uses `query_params` such as `/products?locale=en-US`
+  * `:route` uses the (precompiled) route attributes.
   * `:session` uses the session
   * `:assigns` uses the assigns stored in connection of socket
 
@@ -137,7 +137,7 @@ defmodule Routex.Extension.Localize.Extractor do
   end
 
   # Handle attrs extraction for both types
-  def extract_from_source(_source, :attrs, param, attrs) do
+  def extract_from_source(_source, :route, param, attrs) do
     Map.get(attrs || %{}, String.to_existing_atom(param))
   end
 

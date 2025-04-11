@@ -66,8 +66,7 @@ defmodule ExampleWeb.RoutexBackend do
       Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
       Routex.Extension.Translations,        # Enables route segment translations
       Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
-      Routex.Extension.Localize.Routes,     # Localize routes at compile time
-      Routex.Extension.Localize.Runtime,    # Detects locale from various sources at runtime
+      Routex.Extension.Localize             # Localize routes at compile time and detects locale from various sources at runtime
       Routex.Extension.RuntimeCallbacks,    # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
     ],
 
@@ -81,11 +80,12 @@ defmodule ExampleWeb.RoutexBackend do
     verified_path_routex: :path,
 
     # Locales to generate routes for: English (Global), Dutch, French, English (Great Brittain) and English (European)
-    locales: [{"en-001", %{region_display_name: "Worldwide"}}, "nl-NL", "fr-FR", "en-GB", "en-150"],
-    default_locale: "en-100",
+    # All optional. `locales` and `default_locale` will be detected using Cldr, Gettext or Fluent when available.
+    # locales: [{"en-001", %{region_display_name: "Worldwide"}}, "nl-NL", "fr-FR", "en-GB", "en-150"],
+    # default_locale: "en-100",
 
     # Language detection with custom source priority
-    language_sources: [:query, :session, :cookie, :attrs, :accept_language],
+    # language_sources: [:query, :session, :cookie, :attrs, :accept_language],
 
     # Runtime callbacks to set Gettext locale from route attribute :language.
     runtime_callbacks: [{Gettext, :put_locale, [[:attrs, :language]]}]
@@ -208,8 +208,8 @@ Happy coding and enjoy creating a multilingual Phoenix application!
   - Expands route attribute `:locale` into route attributes `:locale, :region, :language, :region_display_name, :language_display_name`
   - Handles locale detection using a variery of sources including `Accept-Language`
   - Sets attributes `:locale`, `:region` and `:language` at runtime
-  - Comes with an reduced IANA registry to validate locale-, region- and language and to convert these to display names
-  - Custom detection source priority to favor the routes' language over the `Accept-Language` browser language.
+  - Comes with an IANA-based locale registry to validate locale-, region- and language and to convert these to display names
+  - Custom detection source priority to favor the routes' language over the `Accept-Language` browser language
 
 **Translation Setup**:
   - Enables path segment translation

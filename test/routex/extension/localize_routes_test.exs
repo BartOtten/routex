@@ -12,6 +12,7 @@ defmodule Routex.Extension.Localize.RoutesTest do
           {"nl-BE", %{contact: "dutch@example.com", language_display_name: "Custom"}}
         ],
         default_locale: "en",
+        locale_backend: Routex.Test.Support.Gettext,
         locale_route_prefix: :language,
         region_sources: [:accept_language, :attrs],
         region_params: ["locale"],

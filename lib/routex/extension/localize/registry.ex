@@ -1,5 +1,26 @@
 defmodule Routex.Extension.Localize.Registry do
-  @moduledoc "Pre-generated locale registry shipped with Routex.\nGenerated from IANA Language Subtag Registry.\n"
+  @moduledoc """
+  Pre-generated locale registry shipped with Routex.\nGenerated from IANA Language Subtag Registry.
+
+  It provides validation and  display name lookups.
+
+  **Examples:**
+  ```iex
+  iex> alias Routex.Extension.Localize.Registry
+  iex> Registry.language("nl-BE")
+  %{descriptions: ["Dutch", "Flemish"], type: :language}
+
+  iex> Registry.region("nl-BE")
+  %{descriptions: ["Belgium"], type: :region}
+
+  iex> Registry.language?("zz")
+  false
+
+  iex> Registry.region?("BE")
+  true
+  ```
+  """
+
   alias Routex.Extension.Localize.Detect
 
   def language do

@@ -8,11 +8,11 @@ defmodule Routex.Extension.Localize.RuntimeTest do
       do: [
         extensions: [Dummy],
         default_locale: "en",
-        region_sources: [:accept_language, :attrs],
+        region_sources: [:accept_language, :route],
         region_params: ["locale"],
-        language_sources: [:query, :attrs],
+        language_sources: [:query, :route],
         language_params: ["locale"],
-        locale_sources: [:query, :session, :accept_language, :attrs],
+        locale_sources: [:query, :session, :accept_language, :route],
         locale_params: ["locale"]
       ]
   end

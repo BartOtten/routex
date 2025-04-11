@@ -34,7 +34,7 @@ defmodule Routex.Extension.Localize.Runtime do
   ##### Supported Sources
   - `:accept_language`: From the header sent by the client (e.g. `fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7`)
   - `:assigns`: From conn and socket assigns.
-  - `:attrs`: From precompiled route attributes.
+  - `:route`: From precompiled route attributes.
   - `:body`: From request body parameters.
   - `:cookie`: From request cookies.
   - `:host`: From the hostname (e.g., `en.example.com`).
@@ -60,7 +60,7 @@ defmodule Routex.Extension.Localize.Runtime do
   language_sources: [:path, :host],
   language_params: ["lang"], # Look for /:lang/... etc
 
-  region_sources: [:attrs] # Only use region from precompiled route attributes
+  region_sources: [:route] # Only use region from precompiled route attributes
   # region_params defaults to ["region"]
   ```
   """

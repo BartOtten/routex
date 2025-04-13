@@ -154,7 +154,7 @@ defmodule Routex.BackendTest do
           )
         end)
 
-      assert output == ">> Do not print me twice\e[0m\n"
+      assert output == ":: Do not print me twice\e[0m\n"
     end
   end
 end

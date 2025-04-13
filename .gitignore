@@ -28,3 +28,6 @@ alt-*.tar
 
 /.vscode
 /.idea
+
+# environment specification
+mise.toml

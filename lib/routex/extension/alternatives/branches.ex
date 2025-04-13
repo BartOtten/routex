@@ -72,7 +72,7 @@ defmodule Routex.Extension.Alternatives.Branches do
           list(branches)
   def do_flatten_branches(branches, parent \\ {nil, nil}) do
     Enum.reduce(branches, [], fn
-      {_, branch_opts} = full_branch, acc ->
+      {_branch, branch_opts} = full_branch, acc ->
         new_branch = flatten_branch(full_branch, parent)
         flattened_subtree = do_flatten_branches(branch_opts.branches, new_branch)
 
@@ -129,7 +129,7 @@ defmodule Routex.Extension.Alternatives.Branches do
     %{
       key: key,
       path: path,
-      prefix: key,
+      prefix: slug |> String.replace(" ", "_"),
       alias: String.to_atom(key),
       helper: Enum.join(path, "_")
     }

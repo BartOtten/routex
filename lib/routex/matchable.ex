@@ -372,8 +372,8 @@ defmodule Routex.Matchable do
     combined = Enum.zip(s1, s2)
 
     Enum.all?(combined, fn
-      {":" <> _, _} -> true
-      {"*", _} -> true
+      {":" <> _rest, _other_seg} -> true
+      {"*", _other_seg} -> true
       {equal, equal} -> true
       _not_equal -> false
     end)

@@ -160,7 +160,7 @@ defmodule Routex.Backend do
 
   defp eval_opts(opts, caller) do
     # Using Code.eval_quoted to force compile-time evaluation.
-    {evaluated, _} = Code.eval_quoted(opts, [], caller)
+    {evaluated, _binding} = Code.eval_quoted(opts, [], caller)
     evaluated
   end
 

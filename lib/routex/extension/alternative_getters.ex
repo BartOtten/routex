@@ -101,7 +101,7 @@ defmodule Routex.Extension.AlternativeGetters do
     |> Enum.flat_map(&to_clause_ast/1)
   end
 
-  defp to_pattern_body({_, siblings}) do
+  defp to_pattern_body({_nesting, siblings}) do
     clause_body_ast = Enum.map(siblings, &clause_body/1)
     siblings |> Enum.map(&clause_pattern_body(&1, clause_body_ast))
   end

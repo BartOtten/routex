@@ -1,8 +1,8 @@
 defmodule Routex.Extension.AttrGetters do
   @moduledoc """
-  Creates helper functions to get the `Routex.Attrs` given a binary url or a
-  list of path segments. Use this to lazy load attributes instead of adding them
-  upfront to assigns.
+  Access route attributes at runtime within your controllers, plugs, or LiveViews
+  based on the matched route's properties. Uses pattern matching for optimal
+  performance during runtime.
 
   This extension provides the required `attrs/1` helper function, used by
   Routex to assign helper attributes in the generated `on_mount/4` callback.

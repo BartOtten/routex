@@ -132,6 +132,24 @@ defmodule Routex.Utils do
     defdelegate get_attribute(module, key, default \\ nil), to: Module
   end
 
+  defp list_available_module_vars(caller) do
+    caller.versioned_vars
+    |> Enum.filter(fn
+      {{var, _module}, _version} when var in [:socket, :conn, :assigns] ->
+        true
+
+      _other ->
+        false
+    end)
+    |> Enum.map(fn {{var, _module}, _version} -> var end)
+  end
+
+  # =====================
+  # Compatilility Helpers
+  # =====================
+  # credo:disable-for-next-line
+  # TODO: Extract to own module for discoverability?
+
   # credo:disable-for-next-line
   # TODO: remove when we depend on Elixir 1.12+
   @doc """
@@ -153,15 +171,15 @@ defmodule Routex.Utils do
     end
   end
 
-  defp list_available_module_vars(caller) do
-    caller.versioned_vars
-    |> Enum.filter(fn
-      {{var, _}, _} when var in [:socket, :conn, :assigns] ->
-        true
+  @doc """
+  Returns the module to use for LiveView assignments
+  """
+  @spec assign_module :: module()
+  {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
 
-      _other ->
-        false
-    end)
-    |> Enum.map(fn {{var, _}, _} -> var end)
+  if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
+    def assign_module, do: Phoenix.LiveView
+  else
+    def assign_module, do: Phoenix.Component
   end
 end

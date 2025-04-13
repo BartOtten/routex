@@ -10,19 +10,25 @@ defmodule Routex.Utils do
 
   alias Routex.Types, as: T
 
+  @line_indicator ":: "
+
   # credo:disable-for-lines:2
   @spec print(module(), input :: iodata) :: :ok
   def print(module \\ nil, input)
   def print(nil, nil), do: :noop
 
   def print(module, input) do
-    prefix = (module && [inspect(module), " "]) || ""
-    IO.write([prefix, ">> ", sanitize(input), IO.ANSI.reset(), "\n"])
+    prefix = (module && [@line_indicator, inspect(module), " "]) || ""
+    IO.write([prefix, @line_indicator, sanitize(input), IO.ANSI.reset(), "\n"])
   end
 
   defp sanitize(input) when is_atom(input), do: to_string(input)
-  defp sanitize(input) when is_list(input), do: Enum.reject(input, &is_nil/1)
-  defp sanitize(input) when is_binary(input), do: input
+
+  defp sanitize(input) when is_list(input),
+    do: input |> Enum.reject(&is_nil/1) |> Enum.map(&sanitize/1)
+
+  defp sanitize(input) when is_binary(input),
+    do: String.replace(input, "\n", "\n#{@line_indicator}")
 
   @doc """
   Prints an alert. Should be used when printing critical alerts in

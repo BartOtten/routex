@@ -4,6 +4,90 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](Https://conventionalcommits.org) for commit guidelines.
 
 <!-- changelog -->
+## v1.2.0-rc.1
+
+### SimpleLocale has split: Localize.Phoenix.Routes and Localize.Phoenix.Runtime
+
+#### Localize.Phoenix.Routes: Generate localized routes with ease
+Localize Phoenix routes using simple configuration.
+
+At compile time, this extension generates localized routes based on locale tags.
+These locale tags are automatically derived from your Cldr, Gettext or Fluent
+setup and can be overriden using the extensions options.
+
+When using a custom configuration, tags are validated using a build-in locale
+registry based on the authoritive IANA Language Subtag Registry.
+
+
+- `locales`: A list of locale definitions. Defaults to known locales by Cldr,
+  Gettext or Fluent (in that order). Each entry can be:
+    - A locale string (e.g., `"en"`, `"fr-CA"`).
+    - A tuple `{locale, attrs}` to override or add attributes for that specific locale branch.
+
+    **Example:**
+    ```elixir
+    locales: [
+      "en", # Standard English
+      {"en-GB", %{currency: "GBP"}}, # UK English with specific currency
+      "fr"
+    ]
+    ```
+
+  ...or synchronize locales with Gettext:
+
+   ```elixir
+   locales: Gettext.known_locales(MyAppWeb.Gettext),
+   default_locale: Gettext.default_locale(MyAppWeb.Gettext)
+   ```
+
+  When not defined, the setup will be derived from Cldr, Gettext of FLuent (in that order) when installed.
+
+- `default_locale`: The locale for top-level routes (e.g., /products). Default
+  to the default locale of Cldr, Gettext or Fluent (in that order) with fallback
+  to "en".
+
+- `locale_prefix_sources`: List of locale (sub)tags to use for generating
+     localize routes. Will use the first (sub)tag which returns a non-nil value.
+     When no value is found the locale won't have localized routes.
+
+     Note: The `default_locale` is always top-level / is not prefixed.
+
+     Possible values: `:locale` (pass-through), `:region`, `:language`, `:region_display_name` and `language_display_name`.
+     Default to: `[:language, :region, :locale]`.
+
+     **Examples:**
+      ```elixir
+      # in configuration
+      locales: ["en-001", "fr", "nl-NL", "nl-BE"]
+      default_locale: "en"
+
+      # single source
+      locale_prefix_sources: :locale =>     ["/", "/en-001", "/fr", "/nl/nl", "/nl-be"],
+      locale_prefix_sources: :language => ["/", "/fr", "/nl"],
+      locale_prefix_sources: :region =>     ["/", "/001", "/nl", "/be"]
+      locale_prefix_sources: :language_display_name =>     ["/", "/english", "/french", "/dutch"]
+      locale_prefix_sources: :region_display_name =>     ["/", "/world", "/france", "/netherlands", "/belgium"]
+
+      # with fallback
+      locale_prefix_sources: [:language, :region] => ["/", "/fr", "/nl"]
+      locale_prefix_sources: [:region, :language] => ["/", "/001", "/fr", "/nl", "/be"]
+
+      ```
+
+####  Localize.Phoenix.Runtime: Plug and Hook
+Plug and play locale detection in StaticViews and LiveViews. Being highly
+customizable this locale detection adapts to your project instead of the other
+way around.
+
+### Other
+
+- feat: auto detection and usage of existing Cldr, Gettext or Fluent setup.
+- feat: support `locales` and `default_locale` for auto generated localized routes
+- feat: support attribute overrides for `locale` attributes
+- feat: support attribute overrides for `locale` attributes
+- docs: improved documentation of Localization guides
+- docs: improved documentation of the Localize modules
+
 ## v1.2.0-rc.0
 
 This release is truly the result of community participation. Thanks to all

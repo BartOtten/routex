@@ -23,9 +23,16 @@ For developers seeking robust Phoenix localization solutions, Routex excels. It
 offers a suite of extensions enabling internationalization (i18n) and
 localization (l10n), including but not limited to seamless support for
 translated (multilingual) URLs, locale preference detection at run time and
-support for multiple backends. Included extension SimpleLocale simplifies common
-Phoenix localization by including a [IANA](https://www.iana.org/) based locale
-registry for robust locale validation and conversion to display names.
+support for multiple backends.
+
+The included extension `Localize Phoenix` simplifies Phoenix localization by
+detecting already used localization packages (Cldr, Gettext or Fluent) and
+automatically generate routes based on their existing configuration for a
+seamless experience or using your manual configuration for powerful
+customization.
+
+The extension includes an `IANA` based locale registry
+for robust locale validation and conversion to display names.
 
 Forget any notion of difficult setup – localizing your Phoenix application with
 Routex is a breeze. Just copy the example configuration from our [Localize
@@ -117,21 +124,33 @@ burden of maintaining a fork.
   upstream consensus on the need and purpose.
 
 ### Index
-- [Attribute Getters](docs/EXTENSIONS.md#attribute-getters): Fetch custom attributes for a route.
-- [Alternatives](docs/EXTENSIONS.md#alternatives): Create (nested) alternative routes.
-- [Alternative Getters](docs/EXTENSIONS.md#alternative-getters): Get alternatives for the current route.
-- [Assigns](docs/EXTENSIONS.md#assigns): Use route attributes as assigns in templates.
-- [Cldr Adapter](docs/EXTENSIONS.md#cldr-adapter): Use an existing `:ex_cldr`configuration.
-- [Cloak](docs/EXTENSIONS.md#cloak-showcase): Showcase to demonsrate extreme route transformations.
-- [Interpolation](docs/EXTENSIONS.md#interpolation): Use attributes in route definitions.
-- [LiveView Hooks](docs/EXTENSIONS.md#liveview-hooks): Integrate LiveView Lifecycle hooks provided by other extensions.
-- [Plugs](docs/EXTENSIONS.md#plugs): Integrate plugs provided by other extensions.
-- [Route Helpers](docs/EXTENSIONS.md#route-helpers): Create branch aware Phoenix Helpers.
-- [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes at runtime.
-- [Simple Locale](docs/EXTENSIONS.md#simple-locale): Simplifies common Phoenix localization (based on[IANA](https://www.iana.org/) locale registry).
-- [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
-- [Verified Routes](docs/EXTENSIONS.md#verified-routes): Branch aware variant of Phoenix.VerifiedRoutes.
+#### Specialized suites
+- [Localize Phoenix](docs/EXTENSIONS.md#localize-phoenix): Simple localization of Phoenix using auto-detection of 
+  localization libs. Combines [Localize Phoenix Routes](docs/EXTENSIONS.md#localize-phoenix-routes) and
+  [Localize Phoenix Runtime](docs/EXTENSIONS.md#localize-phoenix-runtime).
 
+#### Adapters for third-parties
+- [Cldr Adapter](docs/EXTENSIONS.md#cldr-adapter): tight integration with `:ex_cldr` (mimics `cldr-routes` and `cldr-plugs`).
+
+#### Phoenix shims
+- [Verified Routes](docs/EXTENSIONS.md#verified-routes): (Locale) Branch aware variant of Phoenix.VerifiedRoutes.
+- [Route Helpers](docs/EXTENSIONS.md#route-helpers): (Locale) Branch aware Phoenix Helpers.
+
+#### Feature extensions
+- [Alternatives](docs/EXTENSIONS.md#alternatives): Create (nested) alternative routes.
+- [Alternative Getters](docs/EXTENSIONS.md#alternative-getters): List all alternative routes for the current route.
+- [Assigns](docs/EXTENSIONS.md#assigns): Use route attributes as assigns in templates (e.g. `@custom_attribute`).
+- [Attribute Getters](docs/EXTENSIONS.md#attribute-getters): Fetch all custom attributes of any route.
+- [Interpolation](docs/EXTENSIONS.md#interpolation): Use route attributes in route definitions at any place (e.g. `live /page/products/#{language}/:id`.
+- [LiveView Hooks](docs/EXTENSIONS.md#liveview-hooks): Integrate LiveView Lifecycle hooks provided by other extensions.
+- [Localize Phoenix Routes](docs/EXTENSIONS.md#localize-phoenix-routes): Localize Phoenix routes with the help of an [IANA](https://www.iana.org/) based locale registry).
+- [Localize Phoenix Runtime](docs/EXTENSIONS.md#localize-phoenix-runtime): Highly configurable locale detection using multiple sources (StaticView and LiveView).
+- [Plugs](docs/EXTENSIONS.md#plugs): Integrate plugs provided by other extensions.
+- [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes at runtime.
+- [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
+
+#### Showcases
+- [Cloak](docs/EXTENSIONS.md#cloak-showcase):  Demonstrates Routex' support for extreme route transformations.
 
 ## Development
 Contributions to Routex are highly appreciated! Whether it's a simple typo fix,

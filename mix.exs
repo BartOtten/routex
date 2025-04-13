@@ -55,7 +55,11 @@ defmodule Routex.MixProject do
   defp compilers(:test), do: Mix.compilers()
   defp compilers(_other), do: Mix.compilers()
 
-  defp dialyzer, do: [plt_add_apps: [:mix, :gettext, :phoenix_live_view]]
+  defp dialyzer,
+    do: [
+      plt_add_apps: [:mix, :gettext, :phoenix_live_view],
+      ignore_warnings: ".dialyzer_ignore.exs"
+    ]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do

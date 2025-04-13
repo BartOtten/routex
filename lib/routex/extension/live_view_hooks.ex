@@ -148,14 +148,7 @@ defmodule Routex.Extension.LiveViewHooks do
   # Returns a quoted definition for `handle_params/3` that assigns Routex attributes to the socket.
   @spec build_handle_params :: Macro.output()
   defp build_handle_params do
-    {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
-
-    module =
-      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
-        Phoenix.LiveView
-      else
-        Phoenix.Component
-      end
+    assign_module = Routex.Utils.assign_module()
 
     quote do
       @spec handle_params(map(), binary(), Phoenix.LiveView.Socket.t()) ::
@@ -174,7 +167,7 @@ defmodule Routex.Extension.LiveViewHooks do
         socket =
           socket
           |> merge_rtx_attrs.()
-          |> unquote(module).assign(url: uri, __branch__: attrs.__branch__)
+          |> unquote(assign_module).assign(url: uri, __branch__: attrs.__branch__)
 
         {:cont, socket}
       end

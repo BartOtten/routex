@@ -1,12 +1,12 @@
 defmodule Routex.Extension.Cldr do
   @moduledoc ~S"""
-  Adapter for projects using :ex_cldr. It generates the configuration
-  for `Routex.Extension.Alternatives`.
+  Adapter for projects using :ex_cldr. It generates configuration for locale routes
+  based on your existing Cldr setup for a seamless experience.
 
-  > #### Ejecting the CLDR extension {: .neutral}
-  > Using the Cldr adapter provides the advantage of keeping your localized routes
-  > in sync with the configuration of Cldr. The disadvantage is a lack of flexibility.
-  > If you ever need more flexibility, you can [eject the Cldr extension](#module-eject-the-cldr-adapter).
+   > #### Have a look at.... {: .neutral}
+  > This adapter was developed before `Routex.Extension.Localize.Phoenix` -a
+  > powerful localization extension which automatically integrates with your existing Cldr-setup.
+  > You might also be interested in our guide [Localize Phoenix](/docs/guides/LOCALIZE_PHOENIX.md).
 
   ## Interpolating Locale Data
 
@@ -33,22 +33,51 @@ defmodule Routex.Extension.Cldr do
   ```
 
   ## Configuration
+
+  > #### Ejecting the CLDR extension {: .neutral}
+  > Using the Cldr adapter provides the advantage of keeping your localized routes
+  > in sync with the configuration of Cldr. The disadvantage is a lack of flexibility.
+  > If you ever need more flexibility, you can [eject the Cldr extension](#module-eject-the-cldr-adapter).
+
+
   ```diff
   defmodule ExampleWeb.RoutexBackend do
   use Routex.Backend,
   extensions: [
-    Routex.Extension.AttrGetters, # required
-  + Routex.Extension.Cldr,
-  + Routex.Extension.Alternatives,
-  + Routex.Extension.Interpolation, #  when using routes with interpolation
-  + Routex.Extension.Translations,  # when using translated routes
-  + Routex.Extension.VerifiedRoutes
+    # required
+     Routex.Extension.AttrGetters,
+
+    # adviced
+    Routex.Extension.AlternativeGetters,
+    Routex.Extension.Assigns,
+
+    # the adapter with dependency
+    Routex.Extension.Cldr,
+    Routex.Extension.Alternatives,
+
+    # replacements for cldr-routes
+    Routex.Extension.VerifiedRoutes,
+    Routex.Extension.Interpolation, #  when using routes with interpolation
+    Routex.Extension.Translations,  # when using translated routes
+
+    # replacements for cldr-plugs
+    Routex.Extension.LiveViewHooks,
+    Routex.Extension.Plugs,
+    Routex.Extension.Localize.Phoenix.Runtime,
+
+    # control Cldr locale at runtime
+    Routex.Extension.RuntimeCallbacks,
   ],
   + cldr_backend: MyApp.Cldr,
   + translations_backend: MyApp.Gettext,  #  when using translated routes
   + translations_domain: "routes",  #  when using translated routes
   + alternatives_prefix: false,  #  when using routes with interpolation
   + verified_sigil_routex: "~q", #  consider using ~p, see `Routex.Extension.VerifiedRoutes`
+  + runtime_callbacks: [
+  +   # Set CLDR locale from :locale attribute
+  +   {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :locale]]}
+  + ]
+  end
   ```
 
   ```diff

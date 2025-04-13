@@ -13,9 +13,9 @@ defmodule Routex.Extension.RuntimeCallbacks do
   > This extension calls other functions with values from `Routex.Attrs` during
   > runtime. These attributes can be set by other extensions such as
   > `Routex.Extension.Alternatives` (compile time),
-  > `Routex.Extension.Localize` (compile time and runtime),
-  > `Routex.Extension.Localize.Routes` (compile time)
-  > and `Routex.Extension.Localize.Runtime` (run time)
+  > `Routex.Extension.Localize.Phoenix` (compile time and runtime),
+  > `Routex.Extension.Localize.Phoenix.Routes` (compile time)
+  > and `Routex.Extension.Localize.Phoenix.Runtime` (run time)
 
 
   ### Options

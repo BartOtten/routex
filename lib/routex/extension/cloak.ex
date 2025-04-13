@@ -66,7 +66,7 @@ defmodule Routex.Extension.Cloak do
   @impl Routex.Extension
   @spec transform(T.routes(), T.backend(), T.env()) :: T.routes()
   def transform(routes, _backend, _env) do
-    {routes, _} =
+    {routes, _cloak_map} =
       routes
       |> Enum.with_index()
       |> Enum.reduce({[], %{}}, fn {route, idx}, {routes, cloak_map} ->

@@ -207,7 +207,7 @@ defmodule Routex.Branching do
       |> Enum.uniq_by(fn {:->, [],
                           [
                             [clause],
-                            _
+                            _extra
                           ]} ->
         clause
       end)

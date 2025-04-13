@@ -3,6 +3,7 @@ set -e
 
 [ "$GITHUB_ACTIONS" != "true" ] && mix format
 
+mix deps.unlock --unused
 mix compile --warnings-as-errors --force
 mix compile --warnings-as-errors
 mix format --check-formatted

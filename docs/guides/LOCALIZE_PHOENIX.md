@@ -67,7 +67,7 @@ defmodule ExampleWeb.RoutexBackend do
       Routex.Extension.Translations,        # Enables route segment translations
       Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
       Routex.Extension.Localize.Phoenix     # Localize routes at compile time and detects locale from various sources at runtime
-      Routex.Extension.RuntimeCallbacks,    # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
+      Routex.Extension.RuntimeDispatcher,   # Dispatches during runtime (e.g Gettext.put_locale/{1.2})
     ],
 
     # Integration with Gettext for route segment translation.
@@ -87,8 +87,8 @@ defmodule ExampleWeb.RoutexBackend do
     # Language detection with custom source priority
     # language_sources: [:query, :session, :cookie, :attrs, :accept_language],
 
-    # Runtime callbacks to set Gettext locale from route attribute :language.
-    runtime_callbacks: [{Gettext, :put_locale, [[:attrs, :language]]}]
+    # Runtime dispatch targets to set Gettext locale from route attribute :language.
+    dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}]
 end
 ```
 
@@ -225,6 +225,6 @@ Happy coding and enjoy creating a multilingual Phoenix application!
   - Fetch alternative locale routes using `alternatives(@url)`
   - Use to generate buttons to switch language
 
-**RuntimeCallbacks**:
+**RuntimeDispatcher**:
  - Configured to call `Gettext.put_locale`
  - Uses the runtime detected attribute `:language` which is set by Localize.

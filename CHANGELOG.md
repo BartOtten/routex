@@ -113,7 +113,7 @@ adjustments at runtime and influencing runtime state.
   * Cldr - Set locale for the Cldr suite
 
 ```elixir
-runtime_callbacks: [
+dispatch_targets: [
   # Set Gettext locale from :language attribute
   {Gettext, :put_locale, [[:attrs, :language]]},
 ]

@@ -66,14 +66,14 @@ defmodule Routex.Extension.Cldr do
     Routex.Extension.Localize.Phoenix.Runtime,
 
     # control Cldr locale at runtime
-    Routex.Extension.RuntimeCallbacks,
+    Routex.Extension.RuntimeDispatcher,
   ],
   + cldr_backend: MyApp.Cldr,
   + translations_backend: MyApp.Gettext,  #  when using translated routes
   + translations_domain: "routes",  #  when using translated routes
   + alternatives_prefix: false,  #  when using routes with interpolation
   + verified_sigil_routex: "~q", #  consider using ~p, see `Routex.Extension.VerifiedRoutes`
-  + runtime_callbacks: [
+  + dispatch_targets: [
   +   # Set CLDR locale from :locale attribute
   +   {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :locale]]}
   + ]

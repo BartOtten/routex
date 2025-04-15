@@ -146,7 +146,7 @@ burden of maintaining a fork.
 - [Localize Phoenix Routes](docs/EXTENSIONS.md#localize-phoenix-routes): Localize Phoenix routes with the help of an [IANA](https://www.iana.org/) based locale registry).
 - [Localize Phoenix Runtime](docs/EXTENSIONS.md#localize-phoenix-runtime): Highly configurable locale detection using multiple sources (StaticView and LiveView).
 - [Plugs](docs/EXTENSIONS.md#plugs): Integrate plugs provided by other extensions.
-- [Runtime Callbacks](docs/EXTENSIONS.md#runtime-callbacks): Call arbitrary functions with route attributes at runtime.
+- [Runtime Dispatcher](docs/EXTENSIONS.md#runtime-dispatcher): Dispatch to arbitrary functions at runtime using route attributes as arguments.
 - [Translations](docs/EXTENSIONS.md#translations): Translate route segments / full localized URLs.
 
 #### Showcases

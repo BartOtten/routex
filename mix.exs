@@ -2,7 +2,7 @@ defmodule Routex.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/BartOtten/routex"
-  @version "1.2.0-rc.0"
+  @version "1.2.0-rc.1"
   @name "Routex"
 
   def project do
@@ -102,7 +102,7 @@ defmodule Routex.MixProject do
   end
 
   defp description() do
-    "Phoenix route localization and beyond..."
+    "Powerful Phoenix extensions: localize, customize, and innovate"
   end
 
   defp docs do

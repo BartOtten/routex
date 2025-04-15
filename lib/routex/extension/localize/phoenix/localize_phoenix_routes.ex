@@ -95,7 +95,7 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
   > **Integration:**
   > This extension sets runtime attributes (`Routex.Attrs`).
   > To use these attributes in libraries such as Gettext and Cldr, see
-  > `Routex.Extension.RuntimeCallbacks`.
+  > `Routex.Extension.RuntimeDispatcher`.
 
   #### Simple Backend Configuration
   This extensions ships with sane default for the most common
@@ -108,12 +108,12 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
       extensions: [
         Routex.Extension.Attrs,
         Routex.Extension.Localize.Phoenix.Routes,
-        Routex.Extension.RuntimeCallbacks # Optional: for state depending package integration
+        Routex.Extension.RuntimeDispatcher # Optional: for state depending package integration
       ],
       # This option is shared with the Translations extension
        :translations_backend: ExampleWeb.Gettext,
-      # RuntimeCallbacks options
-      runtime_callbacks: [
+      # RuntimeDispatcher options
+      dispatch_targets: [
         {Gettext, :put_locale, [[:attrs, :language]]},
         # {Cldr, :put_locale, [[:attrs, :locale]]}
       ]
@@ -132,7 +132,7 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
         Routex.Extension.Attrs,
         # Enable Localize for localized routes
         Routex.Extension.Localize.Phoenix.Routes,
-        Routex.Extension.RuntimeCallbacks
+        Routex.Extension.RuntimeDispatcher
       ],
       # Compile-time options for Localize.Beta
       locales: ["en", "fr", {"nl", %{region_display_name: "Nederland"}}],
@@ -145,8 +145,8 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
       language_sources: [:path, :attrs],
       language_params: ["lang"],
 
-      # Runtime callbacks configuration for RuntimeCallbacks
-      runtime_callbacks: [
+      # Runtime dispatch targets used by RuntimeDispatcher
+      dispatch_targets: [
         {Gettext, :put_locale, [[:attrs, :language]]},
         {Cldr, :put_locale, [[:attrs, :locale]]}
       ]

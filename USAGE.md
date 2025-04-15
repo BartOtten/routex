@@ -93,7 +93,7 @@ defmodule ExampleWeb.RoutexBackend do
      # adviced
      Routex.Extension.LiveViewHooks,
      Routex.Extension.Plugs,
-     Routex.Extension.RuntimeCallbacks,
+     Routex.Extension.RuntimeDispatcher,
      Routex.Extension.VerifiedRoutes,
      Routex.Extension.AlternativeGetters,
      Routex.Extension.Alternatives,
@@ -124,7 +124,7 @@ defmodule ExampleWeb.RoutexBackend do
    assigns: %{namespace: :rtx, attrs: [:locale, :contact]},
    # translations_backend: MyApp.Gettext,
    translations_domain: "routes",
-   runtime_callbacks: [{Gettext, :put_locale, [[:attrs, :language]]}],
+   dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}],
    verified_sigil_routex: "~p",
    verified_sigil_phoenix: "~o",
    verified_url_routex: :url,

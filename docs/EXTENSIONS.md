@@ -33,7 +33,7 @@ to share attributes; allowing extensions to work together without being coupled.
 - [LiveView Hooks](#liveview-hooks): Attach LiveView Lifecycle hooks provided by extensions.
 - [Route Helpers](#route-helpers): Create branch aware Phoenix Helpers.
 - [Cloak](#cloak-showcase): Showcase to demonsrate extreme route transformations.
-- [Runtime Callbacks](#runtime-callbacks): Call arbitrary functions with route attributes.
+- [Runtime Dispatcher](#runtime-dispatcher): Dispatch to arbitrary functions using route attributes as argument.
 
 
 ## Localize Phoenix
@@ -79,9 +79,9 @@ Router              Generated                         Attributes
 [Localize Phoenix Routes Documentation](https://hexdocs.pm/routex/Routex.Extension.Localize.Phoenix.Routes.html)
 
 
-## Runtime Callbacks
+## Runtime Dispatcher
 
-**Feature**: Add runtime callbacks to navigation events.
+**Feature**: Dispatch to arbitrary functions using route attributes as argument.
 
 **Benefits**: This is particularly useful for integrating with internationalization libraries like:
 
@@ -93,13 +93,13 @@ Router              Generated                         Attributes
 **Example**: Call `Gettext.put_locale/1` using the `locale` attribute set by Simple Locale.
 
 ```elixir
- runtime_callbacks: [
+ dispatch_targets: [
   # Set Gettext locale from :language attribute
   {Gettext, :put_locale, [[:attrs, :locale]]},
  ]
 ```
 
-[Runtime Callbacks Documentation](https://hexdocs.pm/routex/Routex.Extension.RuntimeCallbacks.html)
+[Runtime Dispatcher Documentation](https://hexdocs.pm/routex/Routex.Extension.RuntimeDispatcher.html)
 
 
 ## Alternatives

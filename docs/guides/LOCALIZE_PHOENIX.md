@@ -59,21 +59,23 @@ defmodule ExampleWeb.RoutexBackend do
 
   use Routex.Backend,
     extensions: [
+      # == Base extensions ==
       Routex.Extension.AttrGetters,         # Base attribute handling
       Routex.Extension.LiveViewHooks,       # Inlines LiveView lifecycle callbacks of other extensions
       Routex.Extension.Plugs,               # Inlines plug callbacks of other extensions
+      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
+      # == Used for Localization ==
+      Routex.Extension.Localize.Phoenix     # Localize routes at compile time and detects locale from various sources at runtime
+      Routex.Extension.Translations,        # Enables route segment translations
       Routex.Extension.Alternatives,        # Generates locale alternatives set by Localize.Phoenix
       Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
-      Routex.Extension.Translations,        # Enables route segment translations
-      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
-      Routex.Extension.Localize.Phoenix     # Localize routes at compile time and detects locale from various sources at runtime
-      Routex.Extension.RuntimeDispatcher,   # Dispatches during runtime (e.g Gettext.put_locale/{1.2})
+      Routex.Extension.RuntimeDispatcher,   # Dispatches during runtime (e.g `Gettext.put_locale/{1,2}`)
     ],
 
     # Integration with Gettext for route segment translation.
     translations_backend: ExampleWeb.Gettext,
 
-    # Override Phoenix VerifiedRoutes sigils with Routex variants.
+    # Drop-ip replacements: Override Phoenix VerifiedRoutes macros with Routex variants.
     verified_sigil_routex: "~p",
     verified_sigil_phoenix: "~o",
     verified_url_routex: :url,
@@ -84,7 +86,7 @@ defmodule ExampleWeb.RoutexBackend do
     # locales: [{"en-001", %{region_display_name: "Worldwide"}}, "nl-NL", "fr-FR", "en-GB", "en-150"],
     # default_locale: "en-100",
 
-    # Language detection with custom source priority
+    # Custom language detection source priority
     # language_sources: [:query, :session, :cookie, :attrs, :accept_language],
 
     # Runtime dispatch targets to set Gettext locale from route attribute :language.

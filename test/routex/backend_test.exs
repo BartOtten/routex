@@ -101,7 +101,7 @@ defmodule Routex.BackendTest do
     test "raise when an extension is missing" do
       opts = [extensions: [NonExisting.Extension]]
 
-      assert_raise(CompileError, "Extension NonExisting.Extension is missing", fn ->
+      assert_raise(CompileError, "Extension NonExisting.Extension not found.", fn ->
         Backend.prepare_unquoted(opts, FakeBackend)
       end)
     end

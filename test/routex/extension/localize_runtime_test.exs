@@ -40,11 +40,16 @@ defmodule Routex.Extension.Localize.Phoenix.RuntimeTest do
 
   describe "handle_params/4" do
     test "expands the runtime attributes and returns {:cont, socket}" do
-      socket = %Phoenix.LiveView.Socket{private: %{routex: %{}}}
       attrs = %{__backend__: DummyBackend, locale: "en-US"}
+      socket = %Phoenix.LiveView.Socket{private: %{routex: %{}}} |> Routex.Attrs.merge(attrs)
 
-      {:cont, returned_socket} = Runtime.handle_params(%{}, "/some_url", socket, attrs)
-      expected = %{language: "en", region: "US", territory: "US", locale: "en-US"}
+      {:cont, returned_socket} = Runtime.handle_params(%{}, "/some_url", socket)
+
+      expected = %{
+        __backend__: DummyBackend,
+        locale: "en-US",
+        runtime: %{language: "en", region: "US", territory: "US", locale: "en-US"}
+      }
 
       assert returned_socket.private.routex == expected
     end
@@ -52,11 +57,25 @@ defmodule Routex.Extension.Localize.Phoenix.RuntimeTest do
 
   describe "plug/3" do
     test "expands the runtime attributes and returns a conn" do
-      conn = DummyConn.conn() |> Phoenix.ConnTest.init_test_session(%{token: "some-token"})
       attrs = %{__backend__: DummyBackend, locale: "en-US"}
-      expected = %{language: "en", region: "US", territory: "US", locale: "en-US"}
 
-      %Plug.Conn{} = returned_conn = Runtime.plug(conn, [], attrs)
+      conn =
+        DummyConn.conn()
+        |> Phoenix.ConnTest.init_test_session(%{token: "some-token"})
+        |> Routex.Attrs.merge(attrs)
+
+      expected = %{
+        __backend__: DummyBackend,
+        locale: "en-US",
+        runtime: %{
+          language: "en",
+          region: "US",
+          territory: "US",
+          locale: "en-US"
+        }
+      }
+
+      %Plug.Conn{} = returned_conn = Runtime.call(conn, [])
       assert returned_conn.private.routex == expected
     end
   end

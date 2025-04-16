@@ -15,7 +15,7 @@ defmodule Routex.Extension.Plugs do
   alias Routex.Types, as: T
 
   @supported_callbacks [
-    plug: [:conn, :opts]
+    call: [:conn, :opts]
   ]
 
   @doc """
@@ -24,7 +24,7 @@ defmodule Routex.Extension.Plugs do
   under the `:plugs` key.
 
   **Supported callbacks:**
-  - `plug/3`: `Plug.Conn.call/2` with additional attributes argument
+  - `call/2`: `Plug.Conn.call/2`
   """
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
@@ -35,11 +35,11 @@ defmodule Routex.Extension.Plugs do
     Enum.reduce(extensions, opts, fn extension, acc ->
       valid_callbacks =
         Enum.filter(@supported_callbacks, fn {callback, params} ->
-          function_exported?(extension, callback, length(params) + 1)
+          function_exported?(extension, callback, length(params))
         end)
 
       Enum.reduce(valid_callbacks, acc, fn {callback, _params}, inner_acc ->
-        update_in(inner_acc, [:plugs, callback], &[extension | List.wrap(&1)])
+        update_in(inner_acc, [:plugs, callback], &([extension | List.wrap(&1)] |> Enum.uniq()))
       end)
     end)
   end
@@ -57,12 +57,12 @@ defmodule Routex.Extension.Plugs do
 
     Enum.map(backends, fn backend ->
       plugs = Map.get(backend.config(), :plugs, [])
-      extensions = Keyword.get(plugs, :plug, [])
+      call_extensions = Keyword.get(plugs, :call, [])
 
       quote do
         @doc "Plug of Routex encapsulating extension plugs for #{unquote(backend)}"
-        @spec plug(Plug.Conn.t(), list()) :: Plug.Conn.t()
-        def plug(%{private: %{routex: %{__backend__: unquote(backend)}}} = conn, opts) do
+        @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
+        def call(%{private: %{routex: %{__backend__: unquote(backend)}}} = conn, opts) do
           url =
             case {conn.request_path, conn.query_string} do
               {path, ""} -> path
@@ -70,11 +70,11 @@ defmodule Routex.Extension.Plugs do
             end
 
           attrs = attrs(url)
-          conn = assign(conn, :url, url)
+          conn = conn |> Routex.Attrs.merge(attrs) |> assign(:url, url)
 
-          Enum.reduce(unquote(extensions), conn, fn ext, conn ->
+          Enum.reduce(unquote(call_extensions), conn, fn ext, conn ->
             # credo:disable-for-next-line
-            apply(ext, :plug, [conn, opts, attrs])
+            apply(ext, :call, [conn, opts])
           end)
         end
       end

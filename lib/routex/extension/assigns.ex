@@ -88,8 +88,8 @@ defmodule Routex.Extension.Assigns do
   @doc """
   Hook attached to the `handle_params` stage in the LiveView life cycle
   """
-  def handle_params(_params, _uri, socket, attrs \\ %{}) do
-    assigns = Map.get(attrs, :assigns, %{})
+  def handle_params(_params, _uri, socket) do
+    assigns = Routex.Attrs.get(socket, :assigns, %{})
     assign_module = Routex.Utils.assign_module()
 
     socket = assign_module.assign(socket, assigns)

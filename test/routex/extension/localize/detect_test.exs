@@ -64,17 +64,27 @@ defmodule Routex.Extension.Localize.Phoenix.DetectTest do
     end
 
     test "handles three-letter language codes", %{conn: conn, attrs: attrs} do
-      conn = %{conn | query_params: %{"language" => "spa", "region" => "MX"}}
+      conn = %{conn | query_params: %{"language" => "ssp", "region" => "MX"}}
 
       result = Detect.detect_locales(conn, [], attrs)
 
-      assert result.language == "spa"
+      assert result.language == "ssp"
       assert result.region == "MX"
       assert result.territory == "MX"
     end
 
     test "returns nil for invalid format", %{conn: conn, attrs: attrs} do
       conn = %{conn | query_params: %{"locale" => "invalid"}}
+
+      result = Detect.detect_locales(conn, [], attrs)
+
+      assert result.language == nil
+      assert result.region == nil
+      assert result.territory == nil
+    end
+
+    test "returns nil for invalid language", %{conn: conn, attrs: attrs} do
+      conn = %{conn | query_params: %{"language" => "foo"}}
 
       result = Detect.detect_locales(conn, [], attrs)
 

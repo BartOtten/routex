@@ -115,26 +115,25 @@ defmodule Routex.MixProject do
       before_closing_head_tag: &docs_before_closing_head_tag/1,
       extras: [
         "README.md": [title: "Overview"],
-        "USAGE.md": [title: "Getting started"],
-        "CONTRIBUTING.md": [title: "Contributing"],
         "docs/EXTENSIONS.md": [title: "Included extensions"],
+        "RELEASE_NOTES.md": [title: "Release Notes"],
+        "USAGE.md": [title: "Getting started"],
         "docs/ROUTEX_AND_PHOENIX_ROUTER.md": [title: "Routex and Phoenix Router"],
         "docs/EXTENSION_DEVELOPMENT.md": [title: "Extensions"],
         "docs/COMPARISON.md": [title: "Routing solutions compared"],
-        "docs/TROUBLESHOOTING.md": [title: "Troubleshooting"],
         "CHANGELOG.md": [title: "Changelog"],
+        "CONTRIBUTING.md": [title: "Contributing"],
+        "docs/TROUBLESHOOTING.md": [title: "Troubleshooting"],
         "docs/guides/LOCALIZE_PHOENIX.md": [title: "Localize Phoenix"],
         "docs/guides/LOCALIZATION_VS_TRANSLATION.md": [title: "Localization vs Translation"]
       ],
       groups_for_extras: [
-        "The project": ["README.md", "docs/EXTENSIONS.md"],
+        "The project": ["README.md", "docs/EXTENSIONS.md", "RELEASE_NOTES.md"],
         Guides: ["USAGE.md"] ++ Path.wildcard("docs/guides/*.md"),
+        Development: ["CHANGELOG.md", "CONTRIBUTING.md", "docs/TROUBLESHOOTING.md"],
         Extra: [
           "docs/ROUTEX_AND_PHOENIX_ROUTER.md",
-          "docs/COMPARISON.md",
-          "CHANGELOG.md",
-          "CONTRIBUTING.md",
-          "docs/TROUBLESHOOTING.md"
+          "docs/COMPARISON.md"
         ],
         Development: ["docs/EXTENSION_DEVELOPMENT.md"]
       ],

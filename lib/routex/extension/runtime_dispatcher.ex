@@ -26,6 +26,8 @@ defmodule Routex.Extension.RuntimeDispatcher do
 
   * `dispatch_targets` - A list of `{module, function, arguments}` tuples. Any argument
     that is a list starting with `:attrs` is transformed into `get_in(attrs(), rest)`.
+    Defaults to `[{Gettext, :put_locale, [[:attrs, :runtime, :language]]}]` for zero-config
+    integration with a default Phoenix app.
 
   ### Example Configuration
 
@@ -37,11 +39,11 @@ defmodule Routex.Extension.RuntimeDispatcher do
         Routex.Extension.RuntimeDispatcher
       ],
       dispatch_targets: [
-        # Dispatch Gettext locale from :language attribute
-        {Gettext, :put_locale, [[:attrs, :language]]},
+        # Dispatch Gettext locale from detected :language attribute
+        {Gettext, :put_locale, [[:attrs, :runtime, :language]]},
 
-        # Dispatch CLDR locale from :locale attribute
-        {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :locale]]}
+        # Dispatch CLDR locale from detected :locale attribute
+        {Cldr, :put_locale, [MyApp.Cldr, [:attrs, :runtime, :locale]]}
       ]
   end
   ````
@@ -77,9 +79,16 @@ defmodule Routex.Extension.RuntimeDispatcher do
 
   alias Routex.Types, as: T
 
+  @default_targets [
+    {Gettext, :put_locale, [[:attrs, :runtime, :language]]}
+  ]
+
   @impl Routex.Extension
   def configure(opts, _backend) do
-    Enum.each(opts[:dispatch_targets], fn {m, f, a} ->
+    opts = Keyword.put_new(opts, :dispatch_targets, @default_targets)
+    dispatch_targets = Keyword.get(opts, :dispatch_targets)
+
+    Enum.each(dispatch_targets, fn {m, f, a} ->
       arity = length(a)
       ensure_provided!(m, f, arity)
     end)
@@ -93,7 +102,7 @@ defmodule Routex.Extension.RuntimeDispatcher do
     ast = build_ast(backend)
 
     quote do
-      def dispatch_targets(attrs) do
+      def dispatch(attrs) do
         (unquote_splicing(ast))
         :ok
       end
@@ -105,7 +114,7 @@ defmodule Routex.Extension.RuntimeDispatcher do
   """
   def call(conn, _opts) do
     attrs = conn |> Routex.Attrs.get()
-    attrs.__helper_mod__.dispatch_targets(attrs)
+    attrs.__helper_mod__.dispatch(attrs)
     conn
   end
 
@@ -114,14 +123,14 @@ defmodule Routex.Extension.RuntimeDispatcher do
   """
   def handle_params(_params, _session, socket) do
     attrs = Routex.Attrs.get(socket)
-    attrs.__helper_mod__.dispatch_targets(attrs)
+    attrs.__helper_mod__.dispatch(attrs)
     {:cont, socket}
   end
 
   defp build_ast(backend) do
     config = backend.config() |> Map.from_struct()
 
-    for {m, f, a} <- config[:dispatch_targets] || [] do
+    for {m, f, a} <- config.dispatch_targets do
       a = Enum.map(a, &map_argument/1)
       build_callback_ast(m, f, a)
     end

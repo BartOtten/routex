@@ -203,7 +203,7 @@ defmodule Routex.Backend do
 
   defp ensure_availability!(extension) do
     unless Code.ensure_loaded?(extension) do
-      description = "Extension #{inspect(extension)} is missing"
+      description = "Extension #{inspect(extension)} not found."
       Utils.alert(description)
       raise CompileError, description: description
     end

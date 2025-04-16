@@ -61,11 +61,10 @@ defmodule Routex.Extension.RuntimeDispatcherTest do
   describe "plug/3" do
     test "calls dispatch_targets with attributes from connection" do
       create_helper_mod(A)
-      conn = %{private: %{routex: %{language: "nl", region: "be"}}}
-      attrs = %{__helper_mod__: A}
+      conn = %{private: %{routex: %{language: "nl", region: "be", __helper_mod__: A}}}
 
-      assert %{private: %{routex: %{language: "nl", region: "be"}}} =
-               RuntimeDispatcher.plug(conn, [], attrs)
+      assert %{private: %{routex: %{language: "nl", region: "be", __helper_mod__: A}}} =
+               RuntimeDispatcher.call(conn, [])
 
       # Verify that put_locale was called.
       assert_received {:put_locale_called, "nl"}
@@ -76,11 +75,10 @@ defmodule Routex.Extension.RuntimeDispatcherTest do
   describe "handle_params/4" do
     test "calls dispatch_targets with attributes from socket" do
       create_helper_mod(B)
-      socket = %{private: %{routex: %{language: "en", region: "uk"}}}
-      attrs = %{__helper_mod__: B}
+      socket = %{private: %{routex: %{language: "en", region: "uk", __helper_mod__: B}}}
 
       assert {:cont, %{private: %{routex: %{language: "en", region: "uk"}}}} =
-               RuntimeDispatcher.handle_params(nil, nil, socket, attrs)
+               RuntimeDispatcher.handle_params(nil, nil, socket)
 
       # Verify that put_locale was called.
       assert_received {:put_locale_called, "en"}

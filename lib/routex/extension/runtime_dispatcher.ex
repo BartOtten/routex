@@ -103,18 +103,18 @@ defmodule Routex.Extension.RuntimeDispatcher do
   @doc """
   A plug fetching the attributes from the connection and calling helper function `dispatch_targets/1`
   """
-  def plug(conn, _opts, attrs) do
-    rt_attrs = conn |> Routex.Attrs.get()
-    attrs.__helper_mod__.dispatch_targets(rt_attrs)
+  def call(conn, _opts) do
+    attrs = conn |> Routex.Attrs.get()
+    attrs.__helper_mod__.dispatch_targets(attrs)
     conn
   end
 
   @doc """
   A Phoenix Lifecycle Hook fetching the attributes from the socket and calling helper function `dispatch_targets/1`
   """
-  def handle_params(_params, _session, socket, attrs) do
-    rt_attrs = socket |> Routex.Attrs.get()
-    attrs.__helper_mod__.dispatch_targets(rt_attrs)
+  def handle_params(_params, _session, socket) do
+    attrs = Routex.Attrs.get(socket)
+    attrs.__helper_mod__.dispatch_targets(attrs)
     {:cont, socket}
   end
 

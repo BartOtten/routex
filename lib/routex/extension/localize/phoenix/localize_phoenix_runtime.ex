@@ -75,6 +75,7 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
 
   @session_key :rtx
   @locale_fields [:locale, :language, :region]
+  @namespace :runtime
 
   # Typespecs
   @type conn :: Plug.Conn.t()
@@ -84,14 +85,34 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   @type plug_opts :: keyword()
 
   @doc """
+  Checks for invalid sources
+  """
+  @impl Routex.Extension
+  @spec configure(T.opts(), T.backend()) :: T.opts()
+  def configure(config, backend) do
+    for field <- @locale_fields do
+      key = (to_string(field) <> "_sources") |> String.to_atom()
+      sources = config |> Keyword.get(key, [])
+      invalid_sources = sources -- Detect.__supported_sources__()
+
+      if invalid_sources != [] do
+        raise "One or more values in #{inspect(key)} are not supported. Invalid: #{inspect(invalid_sources)} (#{inspect(backend)})"
+      end
+    end
+
+    config
+  end
+
+  @doc """
   LiveView `handle_params/4` callback hook.
 
   Detects locale settings based on URL, params, and socket state, then updates
   the socket assigns and Routex attributes.
   """
-  @spec handle_params(params, url, socket, route_attrs :: T.attrs()) :: {:cont, socket()}
-  def handle_params(params, url, socket, route_attrs \\ %{}) do
+  @spec handle_params(params, url, socket) :: {:cont, socket()}
+  def handle_params(params, url, socket) do
     uri = URI.new!(url)
+    route_attrs = socket |> Attrs.get()
 
     conn_map = %{
       path_params: params,
@@ -107,8 +128,8 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
 
     socket =
       socket
-      |> Attrs.merge(detected_attrs)
-      |> assign_module.assign(Map.take(detected_attrs, @locale_fields))
+      |> Attrs.merge(@namespace, detected_attrs)
+      |> assign_module.assign([{@namespace, Map.take(detected_attrs, @locale_fields)}])
 
     {:cont, socket}
   end
@@ -120,8 +141,10 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   `conn.assigns`, merges attributes into `conn.private.routex.attrs`, and
   persists relevant attributes in the session.
   """
-  @spec plug(conn, plug_opts(), route_attrs :: T.attrs()) :: conn()
-  def plug(conn, plug_opts, route_attrs \\ %{}) do
+  @spec call(conn, plug_opts()) :: conn()
+  def call(conn, plug_opts) do
+    route_attrs = Attrs.get(conn)
+
     conn
     |> update_conn_locales(plug_opts, route_attrs)
     |> persist_locales_to_session()
@@ -132,18 +155,9 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   defp update_conn_locales(conn, plug_opts, route_attrs) do
     detected_attrs = Detect.detect_locales(conn, plug_opts, route_attrs)
 
-    conn_with_assigns =
-      detected_attrs
-      |> Map.take(@locale_fields)
-      |> Enum.reduce(conn, fn {key, value}, acc_conn ->
-        if is_nil(value) do
-          acc_conn
-        else
-          Plug.Conn.assign(acc_conn, key, value)
-        end
-      end)
-
-    Attrs.merge(conn_with_assigns, detected_attrs)
+    conn
+    |> Plug.Conn.assign(@namespace, detected_attrs)
+    |> Attrs.merge(@namespace, detected_attrs)
   end
 
   # Persists detected locale fields (:locale, :language, :region) to the session.

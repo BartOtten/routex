@@ -4,18 +4,18 @@ defmodule Routex.Extension.LiveViewHooksTest do
   # A dummy extension that exports hook/3
   defmodule DummyHookExtension1 do
     @moduledoc false
-    def handle_params(params, uri, socket, attrs) do
+    def handle_params(params, uri, socket) do
       # For testing, simply return a tuple indicating it was called.
-      {:called, params, uri, socket, attrs}
+      {:called, params, uri, socket}
     end
   end
 
   # A dummy extension that exports hook/3
   defmodule DummyHookExtension2 do
     @moduledoc false
-    def handle_params(params, uri, socket, attrs) do
+    def handle_params(params, uri, socket) do
       # For testing, simply return a tuple indicating it was called.
-      {:called, params, uri, socket, attrs}
+      {:called, params, uri, socket}
     end
   end
 

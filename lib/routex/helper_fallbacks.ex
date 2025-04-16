@@ -46,9 +46,9 @@ defmodule Routex.HelperFallbacks do
         {:cont, socket}
       end
 
-      @doc "Fallback for plug/2. Assigns :url"
-      @spec plug(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
-      def plug(conn, _opts) do
+      @doc "Fallback for call/2. Assigns :url"
+      @spec call(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
+      def call(conn, _opts) do
         url =
           case {conn.request_path, conn.query_string} do
             {path, ""} -> path
@@ -62,7 +62,7 @@ defmodule Routex.HelperFallbacks do
         |> Plug.Conn.assign(:url, url)
       end
 
-      defoverridable attrs: 1, on_mount: 4, plug: 2
+      defoverridable attrs: 1, on_mount: 4, call: 2
     end
   end
 end

@@ -4,18 +4,18 @@ defmodule Routex.Extension.PlugsTest do
   # A dummy extension that exports plug/3
   defmodule DummyPlugExtension1 do
     @moduledoc false
-    def plug(conn, opts, attrs) do
+    def call(conn, opts) do
       # For testing, simply return a tuple indicating it was called.
-      {:called, conn, opts, attrs}
+      {:called, conn, opts}
     end
   end
 
   # A dummy extension that exports plug/3
   defmodule DummyPlugExtension2 do
     @moduledoc false
-    def plug(conn, opts, attrs) do
+    def call(conn, opts) do
       # For testing, simply return a tuple indicating it was called.
-      {:called, conn, opts, attrs}
+      {:called, conn, opts}
     end
   end
 
@@ -46,7 +46,7 @@ defmodule Routex.Extension.PlugsTest do
 
       plugs = Keyword.get(new_opts, :plugs)
       # We expect that under the key :plug the DummyPlugExtension is accumulated.
-      assert DummyPlugExtension1 in Keyword.get(plugs, :plug)
+      assert DummyPlugExtension1 in Keyword.get(plugs, :call)
     end
 
     test "returns opts with empty :plugs when no extensions provided" do
@@ -70,7 +70,7 @@ defmodule Routex.Extension.PlugsTest do
       helper_str = Macro.to_string(helper_ast)
 
       # The generated code should include the definition of the plug function.
-      assert helper_str =~ "def plug("
+      assert helper_str =~ "def call("
       # It should reference the backend
       assert helper_str =~
                "%{private: %{routex: %{__backend__: Routex.Extension.PlugsTest.DummyBackend1}}} = conn"

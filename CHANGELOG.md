@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](Https://conventionalcommits.org) for commit guidelines.
 
 <!-- changelog -->
+## Upcoming
+
+- RuntimeCallbacks: rename `RuntimeCallbacks` to `RuntimeDispatcher`, the option is renamed from `runtime_callbacks` to `dispatch_targets`)
+- Plugs: renamed `plug` callback to simply `call` for compatibility reasons
+- LiveView Hooks & Plugs: do not pass `Routex.Attrs` as separate argument
+- Localize Extensions: assign runtime detection values in namespace `@runtime` (e.g. `@runtime.region`)
+
 ## v1.2.0-rc.1
 
 ### SimpleLocale has split: Localize.Phoenix.Routes and Localize.Phoenix.Runtime
@@ -284,15 +291,16 @@ end
 
 `Routex.Extension.LiveViewHooks` detects LiveView Lifecycle callbacks and
 inlines their bodies. Each callback receives the standard LiveView parameters
-plus `attrs` containing the current route's Routex attributes.
+after `attrs` containing the current routes' Routex attributes are embedded in
+the `socket`.
 
 **Available Callbacks**
 
-- `handle_params/4`
-- `handle_event/4`
-- `handle_info/4`
-- `handle_async/4`
-- `after_render/4`
+- `handle_params`
+- `handle_event`
+- `handle_info`
+- `handle_async`
+- `after_render`
 
 **Example**
 
@@ -317,9 +325,9 @@ end
 
 **Provide a Plug**
 
-`Routex.Extension.Plugs` detects `plug/3` callbacks and
-inlines their bodies. The callback receives the standard `Plug.call` parameters
-plus `attrs` containing the current routes' Routex attributes.
+`Routex.Extension.Plugs` detects `call/2` callbacks and inlines their bodies.
+The callback receives the standard `Plug.call` parameters after `attrs`
+containing the current routes' Routex attributes are embedded in the `conn`.
 
 **Example**
 
@@ -327,7 +335,7 @@ plus `attrs` containing the current routes' Routex attributes.
 defmodule MyExtension do
   @behaviour Routex.Extension
 
-  def plug(conn, _opts, attrs) do
+  def call(conn, _opts) do
     # Access route-specific attributes
     if attrs.require_auth do
       MyAuth.ensure_authenticated(conn)

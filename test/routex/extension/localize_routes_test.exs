@@ -7,9 +7,9 @@ defmodule Routex.Extension.Localize.Phoenix.RoutesTest do
       do: [
         extensions: [Dummy],
         locales: [
-          {"en-001", %{contact: "english@example.com", language_display_name: "Global"}},
           "fr",
-          {"nl-BE", %{contact: "dutch@example.com", language_display_name: "Custom"}}
+          "en-001": %{contact: "english@example.com", language_display_name: "Global"},
+          "nl-BE": %{contact: "dutch@example.com", language_display_name: "Custom"}
         ],
         default_locale: "en",
         locale_backend: Routex.Test.Support.Gettext,

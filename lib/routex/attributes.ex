@@ -99,6 +99,14 @@ defmodule Routex.Attrs do
     end)
   end
 
+  def merge(route_sock_or_conn, key, value) when is_atom(key) and is_map(value) do
+    update(route_sock_or_conn, key, fn
+      nil -> value
+      old when is_map(old) -> Map.merge(old, value)
+      old when is_list(old) -> old ++ value
+    end)
+  end
+
   @doc """
   Replaces the container's attributes with the provided map.
   """

@@ -8,7 +8,8 @@ defmodule Routex.Extension.Localize.Phoenix.Detect do
   alias Routex.Extension.Localize.Types
   alias Routex.Types, as: T
 
-  @default_sources [:query, :session, :cookie, :accept_language, :path, :assigns, :attrs]
+  @supported_sources [:query, :session, :cookie, :accept_language, :path, :assigns, :route]
+  @default_sources [:query, :session, :cookie, :accept_language, :path, :assigns, :route]
 
   @default_params %{
     region: ["region", "locale"],
@@ -17,6 +18,7 @@ defmodule Routex.Extension.Localize.Phoenix.Detect do
     locale: ["locale"]
   }
 
+  def __supported_sources__, do: @supported_sources
   def __default_sources__, do: @default_sources
   def __default_params__, do: @default_params
 

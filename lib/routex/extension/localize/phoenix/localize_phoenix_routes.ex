@@ -29,19 +29,19 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
 
      Each entry can be:
      - A locale tag (e.g., `"en"`, `"fr-CA"`).
-     - A tuple `{locale, attrs}` with attributes map for that specific locale branch.
+     - A keyword tuple `locale: attrs` with attributes map for that specific locale branch.
 
      **Example:**
      ```elixir
      locales: [
        # Standard English
        "en",
-       # Language: "English", Region: "Global" displayed as "Worldwide"
-       {"en-001", %{region_display_name: "Worldwide"}
-       # Language: "English", Region: "Great Brittain", Compile time route attributes: %{currency: "GBP"}
-       {"en-GB", %{currency: "GBP"}},
        # Standard French
        "fr"
+       # Language: "English", Region: "Global" displayed as "Worldwide"
+       "en-001": %{region_display_name: "Worldwide"},
+       # Language: "English", Region: "Great Brittain", Compile time route attributes: %{currency: "GBP"}
+       "en-GB": %{currency: "GBP"},
      ]
      ```
 

@@ -119,6 +119,7 @@ defmodule Routex.MixProject do
         "RELEASE_NOTES.md": [title: "Release Notes"],
         "USAGE.md": [title: "Getting started"],
         "docs/ROUTEX_AND_PHOENIX_ROUTER.md": [title: "Routex and Phoenix Router"],
+        "docs/HISTORY_OF_ROUTEX.md": [title: "History of Routex"],
         "docs/EXTENSION_DEVELOPMENT.md": [title: "Extensions"],
         "docs/COMPARISON.md": [title: "Routing solutions compared"],
         "CHANGELOG.md": [title: "Changelog"],
@@ -128,14 +129,18 @@ defmodule Routex.MixProject do
         "docs/guides/LOCALIZATION_VS_TRANSLATION.md": [title: "Localization vs Translation"]
       ],
       groups_for_extras: [
-        "The project": ["README.md", "docs/EXTENSIONS.md", "RELEASE_NOTES.md"],
+        "The project": ["README.md", "docs/EXTENSIONS.md", "RELEASE_NOTES.md", "CHANGELOG.md"],
         Guides: ["USAGE.md"] ++ Path.wildcard("docs/guides/*.md"),
-        Development: ["CHANGELOG.md", "CONTRIBUTING.md", "docs/TROUBLESHOOTING.md"],
         Extra: [
           "docs/ROUTEX_AND_PHOENIX_ROUTER.md",
+          "docs/HISTORY_OF_ROUTEX.md",
           "docs/COMPARISON.md"
         ],
-        Development: ["docs/EXTENSION_DEVELOPMENT.md"]
+        Development: [
+          "docs/EXTENSION_DEVELOPMENT.md",
+          "CONTRIBUTING.md",
+          "docs/TROUBLESHOOTING.md"
+        ]
       ],
       filter_modules: ~r"Elixir.Routex.*$",
       groups_for_modules: [

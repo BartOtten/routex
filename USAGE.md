@@ -62,13 +62,9 @@ documentation which specifies how to configure and use them. For a short
 description and links to documentation per extension, refer to [EXTENSIONS.md].
 
 Too speed up setup all extensions are included in the configuration below
-and extensions are configured to act as drop-in replacements. Copy this
-configuration and make modifications. Notably:
+and extensions are configured to act as drop-in replacements.
 
-- the Gettext backend module to use
-- the alternatives configuration
-
-Also note that you might have to rename some `~p` sigils in templates to `~o` to
+Note that you might have to rename some `~p` sigils in templates to `~o` to
 have these routes _not_ be branch aware.
 
 ```elixir
@@ -102,35 +98,14 @@ defmodule ExampleWeb.RoutexBackend do
 
      # optional
      # Routex.Extension.Translations,  # when you want translated routes
-     # Routex.Extension.Interpolation,  # when path prefixes don't cut it
+     # Routex.Extension.Interpolation, # when path prefixes don't cut it
      # Routex.Extension.RouteHelpers,  # when verified routes can't be used
-     # Routex.Extension.Cldr,  # when using Cldr
+     # Routex.Extension.Cldr,          # when coming from the Cldr ecosystem
    ],
-   alternatives: %{
-    "/" => %{
-      attrs: %AltAttrs{contact: "sales@example.com"},
-      branches: %{
-        "/europe" => %{
-          attrs: %AltAttrs{locale: "en-150", contact: "sales.europe@example.com"},
-          branches: %{
-            "/nl" => %{attrs: %AltAttrs{locale: "nl-NL", contact: "verkoop@example.nl"}},
-            "/fr" => %{attrs: %AltAttrs{locale: "fr-FR", contact: "commerce@example.fr"}}
-          }
-        },
-      "/gb" => %{attrs: %AltAttrs{locale: "en-GB", contact: "sales@example.com"}
-     },
-   },
-   alternatives_prefix: true,
-   assigns: %{namespace: :rtx, attrs: [:locale, :contact]},
-   # translations_backend: MyApp.Gettext,
-   translations_domain: "routes",
-   dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}],
+   assigns: %{namespace: :rtx, attrs: [:locale, :language, :region]},
    verified_sigil_routex: "~p",
-   verified_sigil_phoenix: "~o",
    verified_url_routex: :url,
-   verified_url_phoenix: :url_native,
-   verified_path_routex: :path,
-   verified_path_phoenix: :path_native
+   verified_path_routex: :path
 end
 ```
 
@@ -148,14 +123,6 @@ routes)
       plug :put_secure_browser_headers
       plug :fetch_current_user
 +     plug :routex
-  end
-
-  scope "/", ExampleWeb, host: "admin.", as: :admin do
-    pipe_through :browser
-
-+    preprocess_using ExampleWeb.RoutexBackendAdmin do
-      # [...routes...]
-+    end
   end
 
 + preprocess_using ExampleWeb.RoutexBackend do

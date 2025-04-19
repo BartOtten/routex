@@ -1,0 +1,28 @@
+.content-inner :is(a.no-underline, pre a):is(:visited, :active, :focus, :hover) {
+  color: inherit;
+}
+
+.section-heading code {
+  background-color: inherit;
+  border: 0;
+  font-style: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+}
+
+.section-heading code::after {
+  content: "docs" var(--icon-link-m);
+  font-family: remixicon;
+  font-size: 1rem;
+  margin-left: 0.5em;
+}
+
+.hidden-at-hexdocs {
+    display: none;
+}
+
+hr {
+    border-bottom: 0px;
+    border-color: #ddd7d7;
+    border-style: solid;
+}

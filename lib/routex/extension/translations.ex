@@ -69,7 +69,7 @@ defmodule Routex.Extension.Translations do
 
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
-  def configure(config, backend) do
+  def configure(config, _backend) do
     gettext_in_compilers? =
       Mix.Project.get!().project()
       |> Access.get(:compilers, [])
@@ -84,10 +84,13 @@ defmodule Routex.Extension.Translations do
           "When route translations are updated, run `mix compile --force [MyWebApp].Route"
         )
 
-    if !Keyword.get(config, :translations_backend),
-      do: raise("Expected `:translations_backend` to be set in #{to_string(backend)}")
+    default_gettext_mod = (lookup_app_module() <> "Web.Gettext") |> String.to_atom()
 
-    [{:translations_domain, Keyword.get(config, :translations_domain, @default_domain)} | config]
+    [
+      {:translations_domain, Keyword.get(config, :translations_domain, @default_domain)},
+      {:translations_backend, Keyword.get(config, :translations_backend, default_gettext_mod)}
+      | config
+    ]
   end
 
   @impl Routex.Extension
@@ -154,6 +157,15 @@ defmodule Routex.Extension.Translations do
       end)
 
     [prelude | triggers_ast]
+  end
+
+  defp lookup_app_module do
+    suffix =
+      Mix.Project.config()[:app]
+      |> to_string()
+      |> Macro.camelize()
+
+    "Elixir." <> suffix
   end
 
   defp translate(path, locale, backend, domain)

@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: [1.18.1, latest]
-        otp:  [25.3.1, 26.2.0, 27.3.0]
+        elixir: [1.18.1]
+        otp:  [25.3.1, 26.2.0, 27.3.0] # Do not forget to update deploy stage
 
     name: Build and test
     steps:
@@ -107,7 +107,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: doc-26.0.1-1.18.1
+          name: doc-27.3.0-1.18.1
           path: doc
       - name: Force push to gh-pages
         run: |

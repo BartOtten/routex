@@ -13,16 +13,13 @@ defmodule Routex.Extension.TranslationsTest do
   @default_attrs %{__branch__: [0, 1], backend: RtxBackend, locale: "en-US"}
   defp route(rtx \\ @default_attrs), do: %Route{path: "/products/:id", private: %{routex: rtx}}
 
-  test "should raise when no gettext backend is set" do
-    exception =
-      assert_raise RuntimeError, fn ->
-        defmodule RtxErrorBackend do
-          use(Routex.Backend, extensions: [Routex.Extension.Translations])
-        end
-      end
+  test "defaults are set" do
+    defmodule RtxBackendZeroConfig do
+      use(Routex.Backend, extensions: [Routex.Extension.Translations])
+    end
 
-    assert exception.message ==
-             "Expected `:translations_backend` to be set in Elixir.Routex.Extension.TranslationsTest.RtxErrorBackend"
+    assert RtxBackendZeroConfig.config().translations_backend == RoutexWeb.Gettext
+    assert RtxBackendZeroConfig.config().translations_domain == "routes"
   end
 
   test "should raise when neither :language or :locale attribute is set in a route" do

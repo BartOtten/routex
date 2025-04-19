@@ -63,19 +63,20 @@ defmodule ExampleWeb.RoutexBackend do
       Routex.Extension.AttrGetters,         # Base attribute handling
       Routex.Extension.LiveViewHooks,       # Inlines LiveView lifecycle callbacks of other extensions
       Routex.Extension.Plugs,               # Inlines plug callbacks of other extensions
-      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
       # == Used for Localization ==
-      Routex.Extension.Localize.Phoenix     # Localize routes at compile time and detects locale from various sources at runtime
+      Routex.Extension.Localize.Phoenix,    # Localize routes at compile time and detects locale from various sources at runtime
       Routex.Extension.Translations,        # Enables route segment translations
       Routex.Extension.Alternatives,        # Generates locale alternatives set by Localize.Phoenix
       Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
+      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch (alternatives) aware
       Routex.Extension.RuntimeDispatcher,   # Dispatches during runtime (e.g `Gettext.put_locale/{1,2}`)
     ],
 
     # Integration with Gettext for route segment translation.
-    translations_backend: ExampleWeb.Gettext,
+    # Defaults to the standard Gettext module of a Phoenix project.
+    # translations_backend: ExampleWeb.Gettext,
 
-    # Drop-ip replacements: Override Phoenix VerifiedRoutes macros with Routex variants.
+    # Drop-in replacements: Override Phoenix VerifiedRoutes macros with Routex variants.
     verified_sigil_routex: "~p",
     verified_sigil_phoenix: "~o",
     verified_url_routex: :url,
@@ -90,7 +91,8 @@ defmodule ExampleWeb.RoutexBackend do
     # language_sources: [:query, :session, :cookie, :attrs, :accept_language],
 
     # Runtime dispatch targets to set Gettext locale from route attribute :language.
-    dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}]
+    # Shown below is the default.
+    # dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}]
 end
 ```
 

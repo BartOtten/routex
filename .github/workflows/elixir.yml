@@ -12,20 +12,23 @@ on:
 
 env:
   MIX_ENV: test
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for Coveralls
 
 permissions:
-  contents: write
+  contents: write # Needed for gh-pages deployment
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # The matrix strategy below enables parallel execution for each combination
     strategy:
       matrix:
-        elixir: [1.18.1]
-        otp:  [25.3.1, 26.2.0, 27.3.0] # Do not forget to update deploy stage
+        # Include the latest stable Elixir version
+        elixir: [1.18.1, 1.18.3, latest]
+        # Include the latest stable Erlang/OTP version
+        otp:  [25.3.1, 26.2.0, 27.3.0, 27.3.3] # Do not forget to update deploy stage
 
-    name: Build and test
+    name: Build and test (OTP ${{ matrix.otp }} / Elixir ${{ matrix.elixir }})
     steps:
 
     - name: Set up Elixir
@@ -37,46 +40,36 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Restore dependencies cache
+    # Consolidated caching step for both deps and _build
+    # This key ensures a unique cache for each OS, OTP, and Elixir version based on mix.lock
+    - name: Cache dependencies and build artifacts
       uses: actions/cache@v3
-      id: mix-cache
+      id: mix-build-cache # Give the cache step an ID
       with:
-        path: deps
-        key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-
-    - name: Cache deps
-      id: cache-deps
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-elixir-deps
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+        path: |
+          deps
+          _build
+        key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
         restore-keys: |
-          ${{ runner.os }}-mix-${{ env.cache-name }}-
-
-    - name: Cache compiled build
-      id: cache-build
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-compiled-build
-      with:
-        path: _build
-        key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-mix-${{ env.cache-name }}-
-          ${{ runner.os }}-mix-
+          ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}- # Fallback to cache for the same OS, OTP, and Elixir version
+          ${{ runner.os }}-${{ matrix.otp }}- # Fallback to cache for the same OS and OTP version
+          ${{ runner.os }}- # Fallback to cache for the same OS
 
     - name: Install Mix Dependencies
+      # Only run deps.get if the cache was not hit
+      if: steps.mix-build-cache.outputs.cache-hit != 'true'
       run: |
         mix local.rebar --force --if-missing
         mix local.hex --force
         mix deps.get
 
+    # The rest of the steps remain largely the same, leveraging the cached dependencies and build
     - name: Compiles without warnings
       run: mix compile --warnings-as-errors
 
+    # Only run formatting check for the latest OTP and Elixir combination
     - name: Check Formatting
+      if: matrix.otp == '27.3.3' && matrix.elixir == 'latest'
       run: mix format --check-formatted
 
     - name: Run Credo
@@ -89,7 +82,9 @@ jobs:
       run: mix test
 
     - name: Run coverage tool
-      run: mix coveralls.github
+      # Use the matrix variables in the flagname for coveralls
+      # This step reports coverage for this specific parallel job
+      run: mix coveralls.github --parallel --flagname otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
 
     - name: Generate docs
       run: |
@@ -100,15 +95,54 @@ jobs:
       with:
         name: doc-${{ matrix.otp }}-${{ matrix.elixir }}
         path: doc
+        # Optional: Add a retention period for the artifact
+        # retention-days: 5
+
+  coveralls_finalize:
+    runs-on: ubuntu-latest
+    # This job depends on the 'build' job completing successfully
+    needs: build
+    name: Finalize Coveralls Build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up a minimal Elixir environment to run the mix task
+      - name: Set up Elixir (for finalization)
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.18.3' # Use the latest Elixir version for finalization
+          otp-version: '27.3.3'   # Use the latest OTP version for finalization
+
+      - name: Install Mix Dependencies (for finalization)
+        # This might be needed to run the coveralls mix task
+        run: |
+          mix local.rebar --force --if-missing
+          mix local.hex --force
+          mix deps.get
+
+      - name: Finalize Coveralls
+        # This step signals Coveralls that all parallel jobs are done
+        run: mix coveralls.github --push
 
   deploy:
     runs-on: ubuntu-latest
+    # This job depends on the 'build' job completing successfully
+    # It does NOT need to depend on coveralls_finalize
     needs: build
+    name: Deploy Docs
+    # Define the specific OTP and Elixir versions for the docs to deploy
+    env:
+      # Updated to the latest versions
+      DEPLOY_OTP: 'latest'
+      DEPLOY_ELIXIR: 'latest'
     steps:
+      # Download the specific artifact needed for deployment using the defined versions
       - uses: actions/download-artifact@v4
         with:
-          name: doc-27.3.0-1.18.1
+          name: doc-${{ env.DEPLOY_OTP }}-${{ env.DEPLOY_ELIXIR }}
           path: doc
+      # The rest of the deployment steps are unchanged
       - name: Force push to gh-pages
         run: |
           # Setup

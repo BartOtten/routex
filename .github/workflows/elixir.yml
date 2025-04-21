@@ -21,17 +21,12 @@ jobs:
         otp:    [ '25.3.1', '26.2.0', '27.3.0', '27.3.3' ]
     name: Build & Test (OTP ${{ matrix.otp }} / Elixir ${{ matrix.elixir }})
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up BEAM
-        uses: erlef/setup-beam@v1
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ matrix.elixir }}
           otp-version:     ${{ matrix.otp }}
-
-      - name: Cache deps & build
-        uses: actions/cache@v3
+      - uses: actions/cache@v3
         id: mix-cache
         with:
           path: |
@@ -42,43 +37,35 @@ jobs:
             ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-
             ${{ runner.os }}-${{ matrix.otp }}-
             ${{ runner.os }}-
-
-      - name: Install Mix dependencies
+      - name: Install dependencies
         if: steps.mix-cache.outputs.cache-hit != 'true'
         run: |
           mix local.rebar --force --if-missing
           mix local.hex   --force
           mix deps.get
-
-      - name: Compile (warnings as errors)
-        run: mix compile --warnings-as-errors
-
+      - run: mix compile --warnings-as-errors
       - name: Check format
         if: matrix.otp == '27.3.3' && matrix.elixir == 'latest'
         run: mix format --check-formatted
+      - run: mix credo --strict
+      - run: mix dialyzer
+      - run: mix test
 
-      - name: Run Credo
-        run: mix credo --strict
-
-      - name: Run Dialyzer
-        run: mix dialyzer
-
-      - name: Run tests
-        run: mix test
-
+      # === Generate and Upload Coverage ===
+      - name: Generate LCOV report
+        run: mix coveralls.lcov   # writes cover/lcov.info :contentReference[oaicite:13]{index=13}
       - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@v2   # v2.3.6 :contentReference[oaicite:14]{index=14}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel: true
           flag-name: otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
-          build-number: ${{ github.run_id }}
+          build-number: ${{ github.run_id }}    # stable build ID across jobs :contentReference[oaicite:15]{index=15}
+          file: cover/lcov.info
+          format: lcov
 
-      - name: Generate docs
-        run: mix docs
-
-      - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
+      - run: mix docs
+      - uses: actions/upload-artifact@v4
         with:
           name: doc-${{ matrix.otp }}-${{ matrix.elixir }}
           path: doc
@@ -86,11 +73,9 @@ jobs:
   coveralls_finalize:
     needs: build
     runs-on: ubuntu-latest
-    name: Finalize Coveralls
     steps:
       - uses: actions/checkout@v4
-
-      - name: Finalize Coveralls Build
+      - name: Finalize Coveralls
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -100,7 +85,6 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    name: Deploy Docs
     env:
       DEPLOY_OTP:    '27.3.3'
       DEPLOY_ELIXIR: 'latest'
@@ -109,9 +93,7 @@ jobs:
         with:
           name: doc-${{ env.DEPLOY_OTP }}-${{ env.DEPLOY_ELIXIR }}
           path: doc
-
-      - name: Force push to gh-pages
-        run: |
+      - run: |
           cd doc
           git init --initial-branch gh-pages
           git remote add origin git@github.com:BartOtten/routex.git
@@ -122,4 +104,3 @@ jobs:
           git add .
           git commit -m "mix docs"
           git push --force origin gh-pages
-

@@ -134,7 +134,7 @@ jobs:
     # Define the specific OTP and Elixir versions for the docs to deploy
     env:
       # Updated to the latest versions
-      DEPLOY_OTP: 'latest'
+      DEPLOY_OTP: '27.3.3'
       DEPLOY_ELIXIR: 'latest'
     steps:
       # Download the specific artifact needed for deployment using the defined versions

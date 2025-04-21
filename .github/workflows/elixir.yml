@@ -32,10 +32,10 @@ jobs:
     steps:
 
     - name: Set up Elixir
-      uses: erlef/setup-beam@v1
+      uses: erf/setup-beam@v1
       with:
         elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
-        otp-version: ${{ matrix.otp }} # Define the OTP version [required]
+        otp-version: ${{ matrix.otp }}  # Define the OTP version [required]
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -107,23 +107,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up a minimal Elixir environment to run the mix task
-      - name: Set up Elixir (for finalization)
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: '1.18.3' # Use the latest Elixir version for finalization
-          otp-version: '27.3.3'   # Use the latest OTP version for finalization
-
-      - name: Install Mix Dependencies (for finalization)
-        # This might be needed to run the coveralls mix task
-        run: |
-          mix local.rebar --force --if-missing
-          mix local.hex --force
-          mix deps.get
-
+      # Use the dedicated Coveralls GitHub Action to finalize the parallel build
       - name: Finalize Coveralls
-        # This step signals Coveralls that all parallel jobs are done
-        run: mix coveralls.github --push
+        uses: coverallsapp/github-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
 
   deploy:
     runs-on: ubuntu-latest

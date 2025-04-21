@@ -24,18 +24,20 @@ jobs:
     strategy:
       matrix:
         # Include the latest stable Elixir version
-        elixir: [1.18.1, 1.18.3, latest]
+        elixir: ['1.18.1', '1.18.3', 'latest']
         # Include the latest stable Erlang/OTP version
-        otp:  [25.3.1, 26.2.0, 27.3.0, 27.3.3] # Do not forget to update deploy stage
+        otp:  ['25.3.1', '26.2.0', '27.3.0', '27.3.3'] # Do not forget to update deploy stage
 
     name: Build and test (OTP ${{ matrix.otp }} / Elixir ${{ matrix.elixir }})
     steps:
 
     - name: Set up Elixir
-      uses: erf/setup-beam@v1
+      # Corrected action name from erf to erlef
+      uses: erlef/setup-beam@v1
       with:
         elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
         otp-version: ${{ matrix.otp }}  # Define the OTP version [required]
+        version-type: strict # Use strict version matching as recommended
 
     - name: Checkout code
       uses: actions/checkout@v4

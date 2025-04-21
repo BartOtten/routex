@@ -2,13 +2,9 @@ name: Elixir CI
 
 on:
   push:
-    branches:
-      - main
-      - ci-test
+    branches: [ main, ci-test ]
   pull_request:
-    branches:
-      - main
-      - ci-test
+    branches: [ main, ci-test ]
 
 env:
   MIX_ENV: test
@@ -21,22 +17,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: ['1.18.1', '1.18.3', 'latest']
-        otp: ['25.3.1', '26.2.0', '27.3.0', '27.3.3']
-    name: Build and test (OTP ${{ matrix.otp }} / Elixir ${{ matrix.elixir }})
+        elixir: [ '1.18.1', '1.18.3', 'latest' ]
+        otp:    [ '25.3.1', '26.2.0', '27.3.0', '27.3.3' ]
+    name: Build & Test (OTP ${{ matrix.otp }} / Elixir ${{ matrix.elixir }})
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Must checkout before caching or build steps :contentReference[oaicite:5]{index=5}
+        uses: actions/checkout@v4
 
       - name: Set up BEAM
-        uses: erlef/setup-beam@v1  # Correct official action name :contentReference[oaicite:6]{index=6}
+        uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
+          otp-version:     ${{ matrix.otp }}
 
       - name: Cache deps & build
-        uses: actions/cache@v3  # Cache dependencies & build artifacts :contentReference[oaicite:7]{index=7}
-        id: mix-build-cache
+        uses: actions/cache@v3
+        id: mix-cache
         with:
           path: |
             deps
@@ -48,16 +44,16 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install Mix dependencies
-        if: steps.mix-build-cache.outputs.cache-hit != 'true'
+        if: steps.mix-cache.outputs.cache-hit != 'true'
         run: |
           mix local.rebar --force --if-missing
-          mix local.hex --force
+          mix local.hex   --force
           mix deps.get
 
       - name: Compile (warnings as errors)
         run: mix compile --warnings-as-errors
 
-      - name: Check formatting
+      - name: Check format
         if: matrix.otp == '27.3.3' && matrix.elixir == 'latest'
         run: mix format --check-formatted
 
@@ -70,16 +66,19 @@ jobs:
       - name: Run tests
         run: mix test
 
-      - name: Run coverage
-        run: mix coveralls.github --parallel --flagname otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel: true
+          flag-name: otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
+          build-number: ${{ github.run_id }}
 
       - name: Generate docs
         run: mix docs
 
       - name: Upload docs artifact
-        uses: actions/upload-artifact@v4  # Latest artifact action :contentReference[oaicite:8]{index=8}
+        uses: actions/upload-artifact@v4
         with:
           name: doc-${{ matrix.otp }}-${{ matrix.elixir }}
           path: doc
@@ -87,24 +86,26 @@ jobs:
   coveralls_finalize:
     needs: build
     runs-on: ubuntu-latest
-    name: Finalize Coveralls Build
+    name: Finalize Coveralls
     steps:
       - uses: actions/checkout@v4
-      - name: Finalize Coveralls
-        uses: coverallsapp/github-action@v1  # Or bump to @v2 if preferred :contentReference[oaicite:9]{index=9}
+
+      - name: Finalize Coveralls Build
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel-finished: true
+          build-number: ${{ github.run_id }}
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     name: Deploy Docs
     env:
-      DEPLOY_OTP: '27.3.3'
+      DEPLOY_OTP:    '27.3.3'
       DEPLOY_ELIXIR: 'latest'
     steps:
-      - uses: actions/download-artifact@v4  # Use v4 download action :contentReference[oaicite:10]{index=10}
+      - uses: actions/download-artifact@v4
         with:
           name: doc-${{ env.DEPLOY_OTP }}-${{ env.DEPLOY_ELIXIR }}
           path: doc
@@ -114,10 +115,11 @@ jobs:
           cd doc
           git init --initial-branch gh-pages
           git remote add origin git@github.com:BartOtten/routex.git
-          git config user.name "Bart Otten"
+          git config user.name  "Bart Otten"
           git config user.email "bart.otten85@gmail.com"
           eval "$(ssh-agent -s)"
           ssh-add - <<< "${{ secrets.GH_PAGES_SSH }}"
           git add .
           git commit -m "mix docs"
-          git push --set-upstream origin gh-pages --force
+          git push --force origin gh-pages
+

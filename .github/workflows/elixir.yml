@@ -12,7 +12,7 @@ on:
 
 env:
   MIX_ENV: test
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for Coveralls
+  # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This is now passed directly to the actions
 
 permissions:
   contents: write # Needed for gh-pages deployment
@@ -33,7 +33,7 @@ jobs:
 
     - name: Set up Elixir
       # Corrected action name from erf to erlef
-      uses: erlef/setup-beam@v1
+      uses: erflef/setup-beam@v1
       with:
         elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
         otp-version: ${{ matrix.otp }}  # Define the OTP version [required]
@@ -85,6 +85,8 @@ jobs:
       # Use the matrix variables in the flagname for coveralls
       # This step reports coverage for this specific parallel job
       run: mix coveralls.github --parallel --flagname otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pass token here
 
     - name: Generate docs
       run: |
@@ -111,7 +113,7 @@ jobs:
       - name: Finalize Coveralls
         uses: coverallsapp/github-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} # Pass token here
           parallel-finished: true
 
   deploy:

@@ -37,8 +37,6 @@ jobs:
       with:
         elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
         otp-version: ${{ matrix.otp }}  # Define the OTP version [required]
-        version-type: strict # Use strict version matching as recommended
-
     - name: Checkout code
       uses: actions/checkout@v4
 

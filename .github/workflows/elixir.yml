@@ -14,60 +14,93 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        elixir: [ '1.18.1', '1.18.3', 'latest' ]
-        otp:    [ '25.3.1', '26.2.0', '27.3.0', '27.3.3' ]
-    name: Build & Test (OTP ${{ matrix.otp }} / Elixir ${{ matrix.elixir }})
+        combo:
+          - otp: "24.0"
+            rebar3: "3.16.1"
+            os: ubuntu-22.04
+            elixir: "1.15"
+          - otp: "25.0"
+            rebar3: "3.22.1"
+            os: ubuntu-24.04
+            elixir: "1.16"
+          - otp: "26.0"
+            rebar3: "3.22.1"
+            os: ubuntu-24.04
+            elixir: "1.17"
+          - otp: "27.0"
+            rebar3: "3.22.1"
+            os: ubuntu-latest
+            elixir: "1.18"
+          - otp: latest
+            rebar3: latest
+            os: ubuntu-latest
+            elixir: latest
+    runs-on: ${{ matrix.combo.os }}
+    name: Build & Test (OTP ${{ matrix.combo.otp }} / Elixir ${{ matrix.combo.elixir }})
     steps:
       - uses: actions/checkout@v4
+
       - uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version:     ${{ matrix.otp }}
+          elixir-version: ${{ matrix.combo.elixir }}
+          otp-version:     ${{ matrix.combo.otp }}
+          rebar3-version: ${{matrix.combo.rebar3}}
+
+      - name: Install latest tooling
+        run: |
+          mix archive.install --force github hexpm/hex branch latest
+          wget https://s3.amazonaws.com/rebar3/rebar3 && mix local.rebar --force rebar3 ./rebar3
+        if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
+
+      - name: Point Phoenix dependencies to GitHub
+        run: |
+          sed -i 's/{:phoenix, *"[^"]*"}/{:phoenix, git: "https:\/\/github.com\/phoenixframework\/phoenix\/", override: true}/' mix.exs
+          sed -i 's/{:phoenix_live_view, *"[^"]*"}/{:phoenix_live_view, git: "https:\/\/github.com\/phoenixframework\/phoenix_live_view\/", override: true}/' mix.exs
+          mix deps.unlock --all
+        if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
+
       - uses: actions/cache@v3
         id: mix-cache
         with:
           path: |
             deps
             _build
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-
-            ${{ runner.os }}-${{ matrix.otp }}-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-${{ matrix.combo.otp }}-${{ matrix.combo.elixir }}-${{ hashFiles('**/mix.lock') }}
+
       - name: Install dependencies
-        if: steps.mix-cache.outputs.cache-hit != 'true'
         run: |
-          mix local.rebar --force --if-missing
-          mix local.hex   --force
           mix deps.get
-      - run: mix compile --warnings-as-errors
+
+      - name: Compile (check warnings)
+        run: mix compile --warnings-as-errors
+
       - name: Check format
-        if: matrix.otp == '27.3.3' && matrix.elixir == 'latest'
+        if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
         run: mix format --check-formatted
       - run: mix credo --strict
       - run: mix dialyzer
       - run: mix test
 
-      # === Generate and Upload Coverage ===
+
       - name: Generate LCOV report
-        run: mix coveralls.lcov   # writes cover/lcov.info :contentReference[oaicite:13]{index=13}
+        run: mix coveralls.lcov
       - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@v2   # v2.3.6 :contentReference[oaicite:14]{index=14}
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel: true
-          flag-name: otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
-          build-number: ${{ github.run_id }}    # stable build ID across jobs :contentReference[oaicite:15]{index=15}
+          flag-name: otp-${{ matrix.combo.otp }}-elixir-${{ matrix.combo.elixir }}
+          build-number: ${{ github.run_id }}
           file: cover/lcov.info
           format: lcov
 
       - run: mix docs
       - uses: actions/upload-artifact@v4
         with:
-          name: doc-${{ matrix.otp }}-${{ matrix.elixir }}
+          name: doc-${{ matrix.combo.otp }}-${{ matrix.combo.elixir }}
           path: doc
 
   coveralls_finalize:
@@ -86,7 +119,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      DEPLOY_OTP:    '27.3.3'
+      DEPLOY_OTP:    'latest'
       DEPLOY_ELIXIR: 'latest'
     steps:
       - uses: actions/download-artifact@v4

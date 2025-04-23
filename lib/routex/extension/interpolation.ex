@@ -58,8 +58,6 @@ defmodule Routex.Extension.Interpolation do
 
   require Logger
 
-  @interpolate ~r/(\[rtx\.(\w+)\])/
-
   defmodule NonUniqError do
     @moduledoc """
     Raised when a list of routes contains routes with the same path and verb.
@@ -117,16 +115,18 @@ defmodule Routex.Extension.Interpolation do
   end
 
   defp interpolate(route) do
+    regex = ~r/(\[rtx\.(\w+)\])/
+
     origin =
       "/" <>
-        (@interpolate
+        (regex
          |> Regex.replace(route.path, "")
          |> String.trim_leading("/")
          |> String.trim_trailing("/")
          |> String.replace("//", "/"))
 
     interpolated_path =
-      Regex.replace(@interpolate, route.path, fn _full, _interpolation, attr ->
+      Regex.replace(regex, route.path, fn _full, _interpolation, attr ->
         key = attr |> String.to_atom()
 
         error_msg =

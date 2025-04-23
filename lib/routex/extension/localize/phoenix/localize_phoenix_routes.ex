@@ -1,4 +1,8 @@
 defmodule Routex.Extension.Localize.Phoenix.Routes do
+  @compile {:no_warn_undefined, Cldr}
+  @compile {:no_warn_undefined, Fluent}
+  @compile {:no_warn_undefined, Gettext}
+
   @moduledoc """
   Localize Phoenix routes using simple configuration.
 

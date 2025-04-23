@@ -111,7 +111,7 @@ defmodule Routex.Utils do
     """)
 
     {:current_stacktrace, st} = Process.info(self(), :current_stacktrace)
-    st |> tl |> Exception.format_stacktrace() |> Logger.warning()
+    st |> tl() |> Exception.format_stacktrace() |> Logger.warning()
 
     0
   end

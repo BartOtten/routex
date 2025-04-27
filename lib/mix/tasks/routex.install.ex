@@ -40,8 +40,8 @@ if Code.ensure_loaded?(Igniter) do
     def info(_argv, _composing_task) do
       %Igniter.Mix.Task.Info{
         group: :routex,
-        adds_deps: [],
-        installs: [],
+        adds_deps: [{:routex, "~> 1.1"}],
+        installs: [{:routex, "~> 1.1"}],
         example: __MODULE__.Docs.example()
       }
     end
@@ -49,31 +49,12 @@ if Code.ensure_loaded?(Igniter) do
     @impl Igniter.Mix.Task
     def igniter(igniter) do
       web_module = Phoenix.web_module(igniter)
+      dbg(igniter)
 
       igniter
-      |> fetch_dep()
       |> create_routex_backend(web_module)
       |> configure_web(web_module)
       |> configure_router(web_module)
-    end
-
-    defp fetch_dep(igniter) do
-      if Project.Deps.has_dep?(igniter, :routex) do
-        igniter
-      else
-        igniter
-        |> Project.Deps.add_dep({:routex, "~> 1.1"})
-        |> then(fn
-          %{assigns: %{test_mode?: true}} = igniter ->
-            igniter
-
-          igniter ->
-            Igniter.apply_and_fetch_dependencies(igniter,
-              error_on_abort?: true,
-              yes_to_deps: true
-            )
-        end)
-      end
     end
 
     defp configure_web(igniter, module) do

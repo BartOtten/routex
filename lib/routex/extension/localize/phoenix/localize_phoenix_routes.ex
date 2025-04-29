@@ -202,7 +202,7 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
       |> Keyword.get(:locale_prefix_sources, @default_route_prefix_sources)
       |> List.wrap()
 
-    {detected_library, detected_known_locales, detected_default} =
+    {detected_library, detected_lib_backend, detected_known_locales, detected_default} =
       Integrate.auto_detect(locale_backend)
 
     detected_locales = [detected_default | detected_known_locales]
@@ -210,10 +210,14 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
     locales = (opt_locales || detected_locales) |> stringify_locales()
     default_locale = (opt_default_locale || detected_default) |> stringify_locales()
 
-    locale_source_info = determine_source_info(opt_locales, backend, detected_library)
+    locale_source_info =
+      determine_source_info(opt_locales, backend, detected_library, detected_lib_backend)
+
     Routex.Utils.print(__MODULE__, ["using locales ", locale_source_info])
 
-    default_source_info = determine_source_info(opt_default_locale, backend, detected_library)
+    default_source_info =
+      determine_source_info(opt_default_locale, backend, detected_library, detected_lib_backend)
+
     Routex.Utils.print(__MODULE__, ["using default_locale ", default_source_info])
 
     localized_branches =
@@ -236,11 +240,11 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
   end
 
   # Determines the source information string based on whether an option was explicitly provided.
-  defp determine_source_info(option_value, backend, detected_library) do
+  defp determine_source_info(option_value, backend, detected_library, detected_lib_backend) do
     if option_value do
       "as specified in #{to_string(backend)}"
     else
-      "detected via #{to_string(detected_library)}"
+      "detected via #{to_string(detected_library)} (#{detected_lib_backend})"
     end
   end
 

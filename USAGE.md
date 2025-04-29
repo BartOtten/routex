@@ -69,13 +69,6 @@ have these routes _not_ be branch aware.
 
 ```elixir
 # file /lib/example_web/routex_backend.ex
-# This example uses a `Struct` for custom attributes, so there is no attribute inheritance;
-# only struct defaults. When using maps, nested branches will inherit attributes from their parent.
-
-defmodule ExampleWeb.RoutexBackend.AltAttrs do
- @moduledoc false
- defstruct [locale: "en-001"]
-end
 
 defmodule ExampleWeb.RoutexBackend do
  alias ExampleWeb.RoutexBackend.AltAttrs
@@ -91,10 +84,10 @@ defmodule ExampleWeb.RoutexBackend do
      Routex.Extension.Plugs,
      Routex.Extension.RuntimeDispatcher,
      Routex.Extension.VerifiedRoutes,
-     Routex.Extension.AlternativeGetters,
-     Routex.Extension.Alternatives,
-     Routex.Extension.Assigns,
      Routex.Extension.Localize.Phoenix,
+     Routex.Extension.Alternatives,
+     Routex.Extension.AlternativeGetters,
+     Routex.Extension.Assigns,
 
      # optional
      # Routex.Extension.Translations,  # when you want translated routes

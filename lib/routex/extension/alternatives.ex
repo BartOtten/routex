@@ -88,10 +88,17 @@ defmodule Routex.Extension.Alternatives do
   @impl Routex.Extension
   @spec configure(T.config(), T.backend()) :: T.config()
   def configure(config, _backend) do
-    branches_nested = Branches.add_precomputed_values!(config[:alternatives])
-    expansion_config = Config.new!(branches_nested: branches_nested)
+    alternatives = Keyword.get(config, :alternatives)
 
-    [{:branches, expansion_config.branches} | config]
+    if alternatives do
+      branches_nested = Branches.add_precomputed_values!(alternatives)
+      expansion_config = Config.new!(branches_nested: branches_nested)
+
+      [{:branches, expansion_config.branches} | config]
+    else
+      Routex.Utils.print("No alternative routes to generate.")
+      Keyword.update!(config, :extensions, fn existing -> existing -- [__MODULE__] end)
+    end
   end
 
   @impl Routex.Extension

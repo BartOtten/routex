@@ -12,7 +12,7 @@ defmodule Routex.Extension.AlternativesTest do
   end
 
   test "configure adds precomputed values" do
-    config = %{alternatives: branches()}
+    config = [alternatives: branches()]
     result = Alternatives.configure(config, :backend)
 
     assert match?(
@@ -31,7 +31,7 @@ defmodule Routex.Extension.AlternativesTest do
                   },
                   "foo_nested_nested2" => %{}
                 }}
-               | %{
+               | [
                    alternatives: %{
                      "/" => %{
                        branches: %{
@@ -52,7 +52,7 @@ defmodule Routex.Extension.AlternativesTest do
                        attrs: %{}
                      }
                    }
-                 }
+                 ]
              ],
              result
            )

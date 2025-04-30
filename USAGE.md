@@ -82,12 +82,13 @@ defmodule ExampleWeb.RoutexBackend do
      # adviced
      Routex.Extension.LiveViewHooks,
      Routex.Extension.Plugs,
-     Routex.Extension.RuntimeDispatcher,
      Routex.Extension.VerifiedRoutes,
-     Routex.Extension.Localize.Phoenix,
      Routex.Extension.Alternatives,
      Routex.Extension.AlternativeGetters,
      Routex.Extension.Assigns,
+     Routex.Extension.Localize.Phoenix.Routes,
+     Routex.Extension.Localize.Phoenix.Runtime,
+     Routex.Extension.RuntimeDispatcher,
 
      # optional
      # Routex.Extension.Translations,  # when you want translated routes

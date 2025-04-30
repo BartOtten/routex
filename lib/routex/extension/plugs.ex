@@ -39,7 +39,11 @@ defmodule Routex.Extension.Plugs do
         end)
 
       Enum.reduce(valid_callbacks, acc, fn {callback, _params}, inner_acc ->
-        update_in(inner_acc, [:plugs, callback], &([extension | List.wrap(&1)] |> Enum.uniq()))
+        update_in(
+          inner_acc,
+          [:plugs, callback],
+          &(&1 |> List.wrap() |> List.insert_at(-1, extension) |> Enum.uniq())
+        )
       end)
     end)
   end

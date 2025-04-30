@@ -64,12 +64,13 @@ defmodule ExampleWeb.RoutexBackend do
       Routex.Extension.LiveViewHooks,       # Inlines LiveView lifecycle callbacks of other extensions
       Routex.Extension.Plugs,               # Inlines plug callbacks of other extensions
       # == Used for Localization ==
-      Routex.Extension.Localize.Phoenix,    # Localize routes at compile time and detects locale from various sources at runtime
-      Routex.Extension.Translations,        # Enables route segment translations
-      Routex.Extension.Alternatives,        # Generates locale alternatives set by Localize.Phoenix
-      Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
-      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch (alternatives) aware
-      Routex.Extension.RuntimeDispatcher,   # Dispatches during runtime (e.g `Gettext.put_locale/{1,2}`)
+      Routex.Extension.Localize.Phoenix.Routes,     # Localize routes at compile time
+      Routex.Extension.Localize.Phoenix.Runtime,    # Detects locale from various sources at runtime
+      Routex.Extension.Translations,                # Enables route segment translations
+      Routex.Extension.Alternatives,                # Generates locale alternatives set by Localize.Phoenix
+      Routex.Extension.AlternativeGetters,          # Creates a helper function to get the alternatives for a route
+      Routex.Extension.VerifiedRoutes,              # Make Phoenix VerifiedRoutes branch (alternatives) aware
+      Routex.Extension.RuntimeDispatcher,           # Dispatches during runtime (e.g `Gettext.put_locale/{1,2}`)
     ],
 
     # Integration with Gettext for route segment translation.
@@ -125,6 +126,9 @@ priv/
 ```
 
 Translate your route segments using any `.po` file editor (Poedit, OmegaT, etc.).
+
+After you have translated segments, run `mix compile --force` for trigger a
+recompilation with translated routes.
 
 ---
 

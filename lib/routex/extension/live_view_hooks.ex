@@ -45,7 +45,11 @@ defmodule Routex.Extension.LiveViewHooks do
           function_exported?(extension, callback, length(params)),
           reduce: opts do
         acc ->
-          update_in(acc, [:hooks, callback], &([extension | List.wrap(&1)] |> Enum.uniq()))
+          update_in(
+            acc,
+            [:hooks, callback],
+            &(&1 |> List.wrap() |> List.insert_at(-1, extension) |> Enum.uniq())
+          )
       end
   end
 

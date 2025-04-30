@@ -31,7 +31,8 @@ defmodule ExampleWeb.RoutexBackend do
         Routex.Extension.Attrs,
         Routex.Extension.LiveViewHooks,
         Routex.Extension.Plugs,
-        Routex.Extension.Localize.Phoenix,
+        Routex.Extension.Localize.Phoenix.Routes,
+        Routex.Extension.Localize.Phoenix.Runtime,
         Routex.Extension.RuntimeDispatcher
       ]
 ```
@@ -81,11 +82,11 @@ and `region?` validate input.
 
 ```elixir
 # single subtag
-iex> Routex.Extension.SimpleLocale.Registry.region("BE")
+iex> Routex.Extension.Localize.Registry.region("BE")
 %{descriptions: ["Belgium"], type: :region}
 
 # double subtag
-iex> Routex.Extension.SimpleLocale.Registry.language("nl-BE")
+iex> Routex.Extension.Localize.Registry.language("nl-BE")
 %{descriptions: ["Dutch", "Flemish"], type: :language}
 ```
 
@@ -100,8 +101,9 @@ Lifecycle Hook.
 
 ```elixir
 dispatch_targets: [
-    # The default: set Gettext locale using detected :language attribute
+    # Set Gettext locale using detected :language attribute (this is a default)
     {Gettext, :put_locale, [[:attrs, :runtime, :language]]},
+
     # Custom dispatch using routes :region attribute
     {MyModule, :set_region, [[:attrs, :route, :region]]},
 ]
@@ -122,8 +124,6 @@ extensions: [
   Routex.Extension.Plugs,         #  detects and enables Plug calls
 ]
 ```
-
-
 
 
 ## 4. A Better Development Experience
@@ -159,7 +159,6 @@ Routex Error: Missing required implementation of `attrs/1`.
 
        https://hexdocs.pm/routex/Routex.Extension.AttrGetters.html
 ```
-
 
 
 #### AST Inspection Option
@@ -275,12 +274,9 @@ Happy coding, and enjoy the future of Phoenix localization with Routex 1.2.0!
 ## TLDR not your cup of tea? The Localize Suite in more Detail
 
 As Routex demands "Simple by default, powerful when needed", it broads not one,
-not two but three(!) extensions for localization.
+but two extensions for localization.
 
-### 1. **Localize.Phoenix**
-For your conveniences, this one simply enables Localize.Phoenix.Routes and Localize.Phoenix.Runtime.
-
-### 2. Localize.Phoenix.Routes
+### 1. Localize.Phoenix.Routes
 Localize Phoenix routes using simple configuration.
 
   At compile time, this extension generates localized routes based on locale
@@ -339,7 +335,7 @@ Localize Phoenix routes using simple configuration.
 
       ```
 
-### 3. **Localize.Phoenix.Runtime: Advanced Locale Detection**
+### 2. **Localize.Phoenix.Runtime: Advanced Locale Detection**
 
 Routex 1.2.0 automatically detects the user’s locale from multiple independent
 sources:

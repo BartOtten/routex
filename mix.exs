@@ -10,7 +10,7 @@ defmodule Routex.MixProject do
       app: :routex,
       version: @version,
       elixir: "~> 1.11",
-      deps: deps() ++ dev_deps(),
+      deps: deps() ++ dev_deps(Mix.env()),
       aliases: aliases(),
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: compilers(Mix.env()),
@@ -67,29 +67,33 @@ defmodule Routex.MixProject do
     ]
 
   # Run "mix help deps" to learn about dependencies.
+  # We split the dependencies for clarity.
+  # Optional = when projects includes it, force a version match.
+  # Runtime = if the app should be started by the supervisor.
+
   defp deps do
     [
-      {:phoenix, ">= 1.7.0"}
+      {:phoenix, ">= 1.7.0", optional: true},
+      {:gettext, ">= 0.26.0", optional: true},
+      {:phoenix_view, ">= 2.0.0", optional: true},
+      {:phoenix_live_view, "~> 0.18 or ~> 1.0", optional: true},
+      {:phoenix_html_helpers, "~> 1.0", optional: true}
     ]
   end
 
-  defp dev_deps do
+  defp dev_deps(env) when env in [:test, :dev] do
     [
-      {:phoenix_view, ">= 2.0.0", optional: true},
-      {:phoenix_live_view, "~> 0.18 or ~> 1.0", optional: true},
-      {:gettext, ">= 0.26.0", optional: true},
-      {:phoenix_html_helpers, "~> 1.0"},
-      {:jason, "~> 1.0", only: [:dev, :test], optional: true},
-      {:ex_doc, "~> 0.37", only: [:dev, :test]},
+      {:ex_doc, "~> 0.37", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.14", only: :test},
-      {:floki, ">= 0.30.0", only: :test},
+      {:excoveralls, "~> 0.14", only: :test, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:makeup_diff, "~> 0.1.0", only: [:dev]},
-      {:git_ops, "~> 2.6.3", only: [:dev]},
-      {:benchee, "~> 1.0", only: :dev}
+      {:makeup_diff, "~> 0.1.0", only: [:dev], runtime: false},
+      {:git_ops, "~> 2.6.3", only: [:dev], runtime: false},
+      {:benchee, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
+
+  defp dev_deps(_env), do: []
 
   defp package do
     [

@@ -57,9 +57,11 @@ jobs:
 
       - name: Point Phoenix dependencies to GitHub
         run: |
-          sed -i 's/{:phoenix, *"[^"]*"}/{:phoenix, git: "https:\/\/github.com\/phoenixframework\/phoenix\/", override: true}/' mix.exs
-          sed -i 's/{:phoenix_live_view, *"[^"]*"}/{:phoenix_live_view, git: "https:\/\/github.com\/phoenixframework\/phoenix_live_view\/", override: true}/' mix.exs
+          sed -i 's/{:phoenix, *"[^"]*"[^}]*}/{:phoenix, git: "https:\/\/github.com\/phoenixframework\/phoenix\/", override: true}/' mix.exs
+          sed -i 's/{:phoenix_live_view, *"[^"]*"[^}]*}/{:phoenix_live_view, git: "https:\/\/github.com\/phoenixframework\/phoenix_live_view\/", override: true}/' mix.exs
           mix deps.unlock --all
+          mix deps.get
+          mix format mix.exs
         if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
 
       - uses: actions/cache@v3

@@ -150,7 +150,8 @@ defmodule Routex.MixProject do
       filter_modules: ~r"Elixir.Routex.*$",
       groups_for_modules: [
         Routex: ~r"Routex\.?[^.]*$",
-        Extensions: ~r"Routex.Extension\.[^.]*$",
+        Extensions:
+          ~r/Routex\.Extension(?:\.[^.]+)?(?:\.Localize(?:\.Phoenix(?:\.Runtime|\.Routes)?)?)?$/,
         Submodules: ~r"Routex.Extension\..*\.*$"
       ],
       nest_modules_by_prefix: [

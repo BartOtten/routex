@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](Https://conventionalcommits.org) for commit guidelines.
 
 <!-- changelog -->
-## [v1.2.0](https://github.com/BartOtten/routex/compare/v1.1.0...main) (Upcoming)
+## [v1.2.0](https://github.com/BartOtten/routex/compare/v1.1.0...v1.2.0) (2025-05-01)
 
 ### New Extensions:
 

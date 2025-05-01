@@ -145,13 +145,11 @@ defmodule Routex.BackendTest do
         end
       end
 
+      opts = [extensions: [Dummy.ExtensionPrint, Dummy.ExtensionPrint]]
+
       output =
         ExUnit.CaptureIO.capture_io(fn ->
-          Backend.apply_callback_for_extensions(
-            :configure,
-            [Dummy.ExtensionPrint, Dummy.ExtensionPrint],
-            []
-          )
+          Backend.process_extensions(opts, FakeBackend)
         end)
 
       assert output == ":: Do not print me twice\e[0m\n"

@@ -68,6 +68,9 @@ default_locale: "en-US",
 # Customize URL generation: results in /english, /french, /dutch
 locale_prefix_sources: [:language_display_name],
 
+# Customize URL generation: results in "/", "/world", "/france", "/netherlands", "/belgium"
+locale_prefix_sources: :region_display_name
+
 # Customize region detection order: fixed to route attribute, no overrides
 region_sources: [:route],
 
@@ -375,3 +378,28 @@ By automating locale detection, Routex helps you eliminate error‑prone manual
 setup and significantly reduces development time.
 
 
+
+#### Extension Development
+
+**Provide LiveView Lifecycle Hooks**
+
+`Routex.Extension.LiveViewHooks` detects LiveView Lifecycle callbacks and
+inlines their bodies. Each callback receives the standard LiveView parameters
+after `attrs` -containing the current routes' Routex attributes- has been
+embedded in the `socket`.
+
+**Available Callbacks**
+
+- `handle_params`
+- `handle_event`
+- `handle_info`
+- `handle_async`
+- `after_render`
+
+
+**Provide a Plug**
+
+`Routex.Extension.Plugs` detects `call/2` callbacks and inlines their bodies.
+The callback receives the standard `Plug.call` parameters after `attrs`
+-containing the current routes' Routex attributes- has been embedded in the
+`conn`.

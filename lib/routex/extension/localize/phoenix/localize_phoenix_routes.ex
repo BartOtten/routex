@@ -286,6 +286,9 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
           locale_definition :: locale_definition(),
           prefix_sources()
         ) :: locale_attributes()
+  defp put_locale_prefix(%{prefix: _prefix} = attributes, _locale_definition, _prefix_sources),
+    do: attributes
+
   defp put_locale_prefix(attributes, locale_definition, prefix_sources) do
     case extract_locale_string(locale_definition, prefix_sources) do
       nil ->

@@ -37,7 +37,7 @@ to share attributes; allowing extensions to work together without being coupled.
 
 
 ## Localize Phoenix
-**Feature**: A streamlined solution for localizing Phoenix routes with minimal setup. Enables Localize Phoenix Routes and Localize Phoenix Runtime (see below).
+**Feature**: A streamlined solution for localizing Phoenix routes with minimal setup.
 
 [Localize Phoenix Documentation](https://hexdocs.pm/routex/Routex.Extension.Localize.Phoenix.html)
 
@@ -90,7 +90,7 @@ Router              Generated                         Attributes
   * Cldr - Set locale for the Cldr suite
 
 
-**Example**: Call `Gettext.put_locale/1` using the `locale` attribute set by Simple Locale.
+**Example**: Call `Gettext.put_locale/1` using the `locale` attribute set by Localize.Routes or Localize.Runtime.
 
 ```elixir
  dispatch_targets: [

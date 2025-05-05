@@ -21,6 +21,16 @@ defmodule Routex.RouterTest.Dummy do
       get "/routex", FakeController, :new
     end
   end
+
+  defmodule Router2 do
+    use Routex.Router
+    use Phoenix.Router
+
+    preprocess_using RtxBackend do
+      get "/", FakeController, :new
+      get "/routex", FakeController, :new
+    end
+  end
 end
 
 defmodule Routex.RouterTest do
@@ -37,6 +47,10 @@ defmodule Routex.RouterTest do
 
   test "all routes are present" do
     assert [%{path: "/routex"}, %{path: "/"}] = Dummy.Router1.__routes__()
+  end
+
+  test "works when all routes are wrapped" do
+    assert [%{path: "/routex"}, %{path: "/"}] = Dummy.Router2.__routes__()
   end
 
   test "routex plug is injected" do

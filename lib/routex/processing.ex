@@ -65,7 +65,7 @@ defmodule Routex.Processing do
       |> put_initial_attrs(helper_mod_name)
       |> group_by_backend()
 
-    {routes, backend_routes} = Map.pop(grouped_routes, nil)
+    {routes, backend_routes} = Map.pop(grouped_routes, nil, [])
     backend_routes_callbacks = add_callbacks_map(backend_routes)
 
     {ast_per_extension, new_routes} =

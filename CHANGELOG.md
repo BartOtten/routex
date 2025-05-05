@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 See [Conventional Commits](Https://conventionalcommits.org) for commit guidelines.
 
 <!-- changelog -->
+
+## [v1.2.1](https://github.com/BartOtten/routex/compare/v1.2.0...v1.2.1) (2025-05-05)
+
+
+
+
+### Bug Fixes:
+
+* core: reduction error when all routes are wrapped
+
+* localize: custom route prefix ignored
 ## [v1.2.0](https://github.com/BartOtten/routex/compare/v1.1.0...v1.2.0) (2025-05-01)
 
 ### New Extensions:

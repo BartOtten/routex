@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.2.2](https://github.com/BartOtten/routex/compare/v1.2.1...v1.2.2) (2025-05-06)
+
+
+
+
+### Bug Fixes:
+
+* processing: order not fully restored
+
 ## [v1.2.1](https://github.com/BartOtten/routex/compare/v1.2.0...v1.2.1) (2025-05-05)
 
 

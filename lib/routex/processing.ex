@@ -53,8 +53,15 @@ defmodule Routex.Processing do
   Phoenix router module.
   """
   @spec execute_callbacks(T.env()) :: :ok
-  def execute_callbacks(env),
-    do: execute_callbacks(env, Utils.get_attribute(env.module, :phoenix_routes))
+  def execute_callbacks(env) do
+    # routes are returned in reversed order of definition
+    routes =
+      env.module
+      |> Utils.get_attribute(:phoenix_routes)
+      |> Enum.reverse()
+
+    execute_callbacks(env, routes)
+  end
 
   @spec execute_callbacks(T.env(), T.routes()) :: :ok
   def execute_callbacks(env, routes) when is_list(routes) do
@@ -65,17 +72,20 @@ defmodule Routex.Processing do
       |> put_initial_attrs(helper_mod_name)
       |> group_by_backend()
 
-    {routes, backend_routes} = Map.pop(grouped_routes, nil, [])
+    {non_processed_routes, backend_routes} = Map.pop(grouped_routes, nil, [])
     backend_routes_callbacks = add_callbacks_map(backend_routes)
 
-    {ast_per_extension, new_routes} =
+    {ast_per_extension, transformed_routes_per_backend} =
       execute(backend_routes_callbacks, env)
 
     ast_per_extension
     |> generate_helper_ast(helper_mod_name)
     |> create_helper_module(helper_mod_name, env)
 
-    (new_routes ++ routes)
+    processed_routes = flatten_transformed_routes(transformed_routes_per_backend)
+
+    (non_processed_routes ++ processed_routes)
+    |> restore_routes_order()
     |> print_summary()
     |> remove_build_info()
     |> write_routes(env)
@@ -136,8 +146,7 @@ defmodule Routex.Processing do
   defp execute(backend_routes_callbacks, env) do
     transformed_routes_per_backend = transform_routes_per_backend(backend_routes_callbacks, env)
     helpers_ast = generate_helpers_ast(transformed_routes_per_backend, env)
-    new_routes = restore_routes_order(transformed_routes_per_backend)
-    {helpers_ast, new_routes}
+    {helpers_ast, transformed_routes_per_backend}
   end
 
   # Transformations
@@ -183,11 +192,13 @@ defmodule Routex.Processing do
     end)
   end
 
-  defp restore_routes_order(processed_routes_per_backend) do
-    processed_routes_per_backend
-    |> Enum.flat_map(fn {_backend, _callbacks, routes} -> routes end)
-    |> Enum.sort_by(&Attrs.get(&1, :__branch__))
-  end
+  defp restore_routes_order(routes), do: Enum.sort_by(routes, &Attrs.get(&1, :__branch__))
+
+  defp flatten_transformed_routes(transformed_routes_per_backend),
+    do:
+      Enum.flat_map(transformed_routes_per_backend, fn {_backend, _callbacks, routes} ->
+        routes
+      end)
 
   @spec create_helper_module(T.ast(), helper_module, T.env()) ::
           {:module, module, binary, term}

@@ -28,7 +28,8 @@ defmodule Routex.RouterTest.Dummy do
 
     preprocess_using RtxBackend do
       get "/", FakeController, :new
-      get "/routex", FakeController, :new
+      get "/routex/new", FakeController, :new
+      get "/routex/:id", FakeController, :new
     end
   end
 end
@@ -46,14 +47,20 @@ defmodule Routex.RouterTest do
   end
 
   test "all routes are present" do
-    assert [%{path: "/routex"}, %{path: "/"}] = Dummy.Router1.__routes__()
+    assert [%{path: "/"}, %{path: "/routex"}] = Dummy.Router1.__routes__()
   end
 
   test "works when all routes are wrapped" do
-    assert [%{path: "/routex"}, %{path: "/"}] = Dummy.Router2.__routes__()
+    assert [%{path: "/"}, %{path: "/routex/new"}, %{path: "/routex/:id"}] =
+             Dummy.Router2.__routes__()
   end
 
   test "routex plug is injected" do
     assert function_exported?(Dummy.Router1, :routex, 2)
+  end
+
+  test "routes order is preserved" do
+    assert [%{path: "/"}, %{path: "/routex/new"}, %{path: "/routex/:id"}] =
+             Dummy.Router2.__routes__()
   end
 end

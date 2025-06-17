@@ -24,6 +24,7 @@ Modify the entrypoint of your web interface definition.
 ```diff
 # file: lib/example_web.ex
 
+# in router
 +  use Routex.Router  # always before Phoenix Router
    use Phoenix.Router, helpers: false
 

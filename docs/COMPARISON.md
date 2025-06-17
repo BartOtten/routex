@@ -67,7 +67,7 @@ A quick overview before diving into a detailed explanation:
 | **Integration**         | **Routex**            | **Cldr Routes**            |
 | Sigils                  | Customizable          | Fixed                      |
 | Functions               | Customizable          | Fixed                      |
-| Libs integration        | COnfigurable          | None                       |
+| Libs integration        | Configurable          | None                       |
 | Dependencies            | Configurable          | Cldr, Gettext              |
 | Runtime integration     | Automated             | None                       |
 |                         |                       |                            |

@@ -71,9 +71,6 @@ have these routes _not_ be branch aware.
 # file /lib/example_web/routex_backend.ex
 
 defmodule ExampleWeb.RoutexBackend do
- alias ExampleWeb.RoutexBackend.AltAttrs
-
-defmodule ExampleWeb.RoutexBackend do
  use Routex.Backend,
    extensions: [
      # required

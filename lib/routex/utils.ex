@@ -90,7 +90,7 @@ defmodule Routex.Utils do
         require Logger
 
         Logger.warning(
-          "#{caller.module}: No helper AST and no proces key `:rtx_branch` found. Fallback to `0`"
+          "#{caller.module}: No helper AST and no process key `:rtx_branch` found. Fallback to `0`"
         )
 
         0

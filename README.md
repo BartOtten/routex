@@ -66,7 +66,7 @@ stable release, refer to <a href="https://hexdocs.pm/routex/readme.html">HexDocs
   use of Elixirs superb pattern matching.
 
 * **No dependencies, no state**: Routex is unique in not depending on other
-  libraries and works out-of-the-box without proces state. An extension to
+  libraries and works out-of-the-box without process state. An extension to
   control third-party libraries that do rely on state such as Gettext is
   included.
 

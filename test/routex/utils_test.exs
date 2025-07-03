@@ -225,7 +225,7 @@ defmodule Routex.UtilsTest do
           assert result == 0
         end)
 
-      assert log =~ "No helper AST and no proces key `:rtx_branch` found. Fallback to `0`"
+      assert log =~ "No helper AST and no process key `:rtx_branch` found. Fallback to `0`"
     end
   end
 

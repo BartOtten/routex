@@ -1,3 +1,5 @@
+# credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
+
 defmodule Routex.Extension.Plugs do
   @moduledoc """
   Provides integration for plugs defined by Routex extensions.

@@ -1,3 +1,5 @@
+# credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
+
 defmodule Routex.HelperFallbacks do
   @moduledoc """
   Provides fallback functions when `use`'d

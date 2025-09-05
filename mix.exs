@@ -84,7 +84,7 @@ defmodule Routex.MixProject do
   defp dev_deps(env) when env in [:test, :dev] do
     [
       {:ex_doc, "~> 0.37", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:credo, git: "https://github.com/rrrene/credo/", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:makeup_diff, "~> 0.1.0", only: [:dev], runtime: false},

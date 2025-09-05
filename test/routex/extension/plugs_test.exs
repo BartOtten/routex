@@ -67,13 +67,18 @@ defmodule Routex.Extension.PlugsTest do
       assert length(helpers) == 2
 
       helper_ast = List.first(helpers)
-      helper_str = Macro.to_string(helper_ast)
 
-      # The generated code should include the definition of the plug function.
-      assert helper_str =~ "def call("
+      helper_str =
+        helper_ast |> Macro.to_string() |> String.replace(~r/\s+/, " ") |> String.trim()
+
+      # The generated code should include the conn matching definition of the plug function.
+      assert helper_str =~ "def call( %{private: %{routex: %{__backend__:"
       # It should reference the backend
       assert helper_str =~
                "%{private: %{routex: %{__backend__: Routex.Extension.PlugsTest.DummyBackend1}}} = conn"
+
+      # The generated code should include a catchall/passthrough
+      assert helper_str =~ "def call(conn, _opts)"
     end
   end
 end

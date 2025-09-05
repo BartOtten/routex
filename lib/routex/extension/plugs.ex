@@ -81,6 +81,9 @@ defmodule Routex.Extension.Plugs do
             apply(ext, :call, [conn, opts])
           end)
         end
+
+        # Passthrough for routes not in a routex preprocessing block
+        def call(conn, _opts), do: conn
       end
     end)
   end

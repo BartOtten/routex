@@ -18,14 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         combo:
-          - otp: "24.0"
-            rebar3: "3.16.1"
-            os: ubuntu-22.04
-            elixir: "1.15"
-          - otp: "25.0"
-            rebar3: "3.22.1"
-            os: ubuntu-24.04
-            elixir: "1.16"
+
           - otp: "26.0"
             rebar3: "3.22.1"
             os: ubuntu-24.04
@@ -34,6 +27,10 @@ jobs:
             rebar3: "3.22.1"
             os: ubuntu-latest
             elixir: "1.18"
+          - otp: "28.0"
+            rebar3: latest
+            os: ubuntu-latest
+            elixir: "1.19"
           - otp: latest
             rebar3: latest
             os: ubuntu-latest

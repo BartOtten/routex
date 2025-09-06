@@ -111,7 +111,7 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   """
   @spec handle_params(params, url, socket) :: {:cont, socket()}
   def handle_params(params, url, socket) do
-    uri = URI.new!(url)
+    uri = URI.parse(url)
     route_attrs = socket |> Attrs.get()
 
     conn_map = %{

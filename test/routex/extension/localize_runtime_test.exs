@@ -53,6 +53,22 @@ defmodule Routex.Extension.Localize.Phoenix.RuntimeTest do
 
       assert returned_socket.private.routex == expected
     end
+
+    test "works with list query params values with []" do
+      attrs = %{__backend__: DummyBackend, locale: "en-US"}
+      socket = %Phoenix.LiveView.Socket{private: %{routex: %{}}} |> Routex.Attrs.merge(attrs)
+
+      {:cont, returned_socket} =
+        Runtime.handle_params(%{}, "/some_url?items[]=1&items[]=2", socket)
+
+      expected = %{
+        __backend__: DummyBackend,
+        locale: "en-US",
+        runtime: %{language: "en", region: "US", territory: "US", locale: "en-US"}
+      }
+
+      assert returned_socket.private.routex == expected
+    end
   end
 
   describe "plug/3" do

@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.2.4](https://github.com/BartOtten/routex/compare/v1.2.3...v1.2.4) (2025-09-06)
+
+
+
+
+### Bug Fixes:
+
+* plug: use URI.parse to support list query params with brackets
+
 ## [v1.2.3](https://github.com/BartOtten/routex/compare/v1.2.2...v1.2.3) (2025-09-05)
 
 

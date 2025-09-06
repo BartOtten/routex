@@ -143,8 +143,8 @@ defmodule Routex.Extension.VerifiedRoutes do
       Enum.map(routes, fn route ->
         attrs = Attrs.get(route)
 
-        {rtx_attrs, _} = Map.split(attrs, [:__branch__, :__origin__])
-        {phx_attrs, _} = Map.split(route, [:path, :hosts])
+        {rtx_attrs, _rest} = Map.split(attrs, [:__branch__, :__origin__])
+        {phx_attrs, _rest} = Map.split(route, [:path, :hosts])
 
         Map.merge(rtx_attrs, phx_attrs)
       end)
@@ -190,7 +190,7 @@ defmodule Routex.Extension.VerifiedRoutes do
 
   defp print_message(config, config_module) do
     warning_msg =
-      if Enum.any?(config, fn {_, mapping} -> mapping.phoenix == mapping.routex end),
+      if Enum.any?(config, fn {_name, mapping} -> mapping.phoenix == mapping.routex end),
         do: [
           """
           \nIn the `#{inspect(config_module)}` module, the configuration allows

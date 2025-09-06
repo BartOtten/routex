@@ -101,7 +101,7 @@ defmodule Routex.BackendTest do
     test "raise when an extension is missing" do
       opts = [extensions: [NonExisting.Extension]]
 
-      assert_raise(CompileError, "Extension NonExisting.Extension is missing", fn ->
+      assert_raise(CompileError, "Extension NonExisting.Extension not found.", fn ->
         Backend.prepare_unquoted(opts, FakeBackend)
       end)
     end
@@ -145,16 +145,14 @@ defmodule Routex.BackendTest do
         end
       end
 
+      opts = [extensions: [Dummy.ExtensionPrint, Dummy.ExtensionPrint]]
+
       output =
         ExUnit.CaptureIO.capture_io(fn ->
-          Backend.apply_callback_for_extensions(
-            :configure,
-            [Dummy.ExtensionPrint, Dummy.ExtensionPrint],
-            []
-          )
+          Backend.process_extensions(opts, FakeBackend)
         end)
 
-      assert output == ">> Do not print me twice\e[0m\n"
+      assert output == ":: Do not print me twice\e[0m\n"
     end
   end
 end

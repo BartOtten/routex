@@ -86,38 +86,22 @@ defmodule Routex.Backend do
   end
 
   @doc false
-  def process_extensions(opts, backend, reduction \\ 1) do
+  def process_extensions(opts, _backend) do
     extensions = opts[:extensions]
-
-    enforce_reduction_limit!(reduction, backend)
     ensure_extensions_loaded(extensions)
 
-    extensions_per_callback =
-      group_extensions_per_callback(extensions)
+    extensions_per_callback = group_extensions_per_callback(extensions)
 
-    new_opts =
-      apply_callback_for_extensions(:configure, extensions_per_callback[:configure], opts)
-
-    if new_opts[:extensions] == opts[:extensions] do
-      new_opts
-    else
-      process_extensions(new_opts, backend, reduction + 1)
-    end
+    Enum.reduce(extensions_per_callback[:configure], opts, fn ext, acc ->
+      process_extension_callback(acc, :configure, ext)
+    end)
   end
 
   defp ensure_extensions_loaded(extensions) do
     Enum.each(extensions, &ensure_availability!/1)
   end
 
-  @doc false
-  @spec apply_callback_for_extensions(atom, [module], Keyword.t()) :: Keyword.t()
-  def apply_callback_for_extensions(callback, extensions, opts) do
-    Enum.reduce(extensions, opts, fn ext, acc ->
-      process_extension_callback(acc, callback, ext)
-    end)
-  end
-
-  defp process_extension_callback(opts, callback, ext) do
+  defp process_extension_callback(opts, callback, ext, reduction \\ 0) do
     processed? =
       opts
       |> Keyword.get(:__processed__, [])
@@ -131,7 +115,18 @@ defmodule Routex.Backend do
         processed?
       )
 
-    update_processed(new_opts, callback, ext)
+    new_extensions = new_opts[:extensions] -- opts[:extensions]
+
+    if new_extensions != [] do
+      enforce_reduction_limit!(reduction, opts[:__backend__], ext)
+      ensure_extensions_loaded(new_extensions)
+
+      Enum.reduce(new_extensions, new_opts, fn ext, acc ->
+        process_extension_callback(acc, :configure, ext, reduction + 1)
+      end)
+    else
+      update_processed(new_opts, callback, ext)
+    end
   end
 
   defp update_processed(opts, callback, ext) do
@@ -160,7 +155,7 @@ defmodule Routex.Backend do
 
   defp eval_opts(opts, caller) do
     # Using Code.eval_quoted to force compile-time evaluation.
-    {evaluated, _} = Code.eval_quoted(opts, [], caller)
+    {evaluated, _binding} = Code.eval_quoted(opts, [], caller)
     evaluated
   end
 
@@ -183,14 +178,14 @@ defmodule Routex.Backend do
     end
   end
 
-  defp enforce_reduction_limit!(reductions, backend, limit \\ @default_reduction_limit) do
+  defp enforce_reduction_limit!(reductions, backend, extension, limit \\ @default_reduction_limit) do
     if reductions > limit do
       Utils.alert("Reduction limit exceeded", "#{limit} reductions")
 
       Utils.print(
         __MODULE__,
         """
-        This issue appears to be caused by an extension defined
+        This issue appears to be caused by #{extension} defined
         in #{backend} that is repeatedly appending new
         entries to the extension list.
         """
@@ -202,8 +197,8 @@ defmodule Routex.Backend do
   end
 
   defp ensure_availability!(extension) do
-    unless Code.ensure_loaded?(extension) do
-      description = "Extension #{inspect(extension)} is missing"
+    if !Code.ensure_loaded?(extension) do
+      description = "Extension #{inspect(extension)} not found."
       Utils.alert(description)
       raise CompileError, description: description
     end

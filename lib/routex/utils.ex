@@ -10,19 +10,25 @@ defmodule Routex.Utils do
 
   alias Routex.Types, as: T
 
+  @line_indicator ":: "
+
   # credo:disable-for-lines:2
   @spec print(module(), input :: iodata) :: :ok
   def print(module \\ nil, input)
   def print(nil, nil), do: :noop
 
   def print(module, input) do
-    prefix = (module && [inspect(module), " "]) || ""
-    IO.write([prefix, ">> ", sanitize(input), IO.ANSI.reset(), "\n"])
+    prefix = (module && [@line_indicator, inspect(module), " "]) || ""
+    IO.write([prefix, @line_indicator, sanitize(input), IO.ANSI.reset(), "\n"])
   end
 
   defp sanitize(input) when is_atom(input), do: to_string(input)
-  defp sanitize(input) when is_list(input), do: Enum.reject(input, &is_nil/1)
-  defp sanitize(input) when is_binary(input), do: input
+
+  defp sanitize(input) when is_list(input),
+    do: input |> Enum.reject(&is_nil/1) |> Enum.map(&sanitize/1)
+
+  defp sanitize(input) when is_binary(input),
+    do: String.replace(input, "\n", "\n#{@line_indicator}")
 
   @doc """
   Prints an alert. Should be used when printing critical alerts in
@@ -84,7 +90,7 @@ defmodule Routex.Utils do
         require Logger
 
         Logger.warning(
-          "#{caller.module}: No helper AST and no proces key `:rtx_branch` found. Fallback to `0`"
+          "#{caller.module}: No helper AST and no process key `:rtx_branch` found. Fallback to `0`"
         )
 
         0
@@ -105,7 +111,7 @@ defmodule Routex.Utils do
     """)
 
     {:current_stacktrace, st} = Process.info(self(), :current_stacktrace)
-    st |> tl |> Exception.format_stacktrace() |> Logger.warning()
+    st |> tl() |> Exception.format_stacktrace() |> Logger.warning()
 
     0
   end
@@ -132,6 +138,24 @@ defmodule Routex.Utils do
     defdelegate get_attribute(module, key, default \\ nil), to: Module
   end
 
+  defp list_available_module_vars(caller) do
+    caller.versioned_vars
+    |> Enum.filter(fn
+      {{var, _module}, _version} when var in [:socket, :conn, :assigns] ->
+        true
+
+      _other ->
+        false
+    end)
+    |> Enum.map(fn {{var, _module}, _version} -> var end)
+  end
+
+  # =====================
+  # Compatilility Helpers
+  # =====================
+  # credo:disable-for-next-line
+  # TODO: Extract to own module for discoverability?
+
   # credo:disable-for-next-line
   # TODO: remove when we depend on Elixir 1.12+
   @doc """
@@ -153,15 +177,15 @@ defmodule Routex.Utils do
     end
   end
 
-  defp list_available_module_vars(caller) do
-    caller.versioned_vars
-    |> Enum.filter(fn
-      {{var, _}, _} when var in [:socket, :conn, :assigns] ->
-        true
+  @doc """
+  Returns the module to use for LiveView assignments
+  """
+  @spec assign_module :: module()
+  {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
 
-      _other ->
-        false
-    end)
-    |> Enum.map(fn {{var, _}, _} -> var end)
+  if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
+    def assign_module, do: Phoenix.LiveView
+  else
+    def assign_module, do: Phoenix.Component
   end
 end

@@ -6,9 +6,8 @@ defmodule Routex.Extension.LiveViewHooks do
   lifecycle stages. The hooks are built from a set of supported lifecycle
   callbacks provided by extensions.
 
-  The first given arguments given to these callbacks adhere to the official
-  specifications. One additional argument, `attrs` is added with the
-  `Routex.Attrs` of the current route.
+  The arguments given to these callbacks adhere to the official
+  specifications.
   """
 
   @behaviour Routex.Extension
@@ -43,10 +42,14 @@ defmodule Routex.Extension.LiveViewHooks do
     _opts =
       for extension <- extensions,
           {callback, params} <- @supported_lifecycle_stages,
-          function_exported?(extension, callback, length(params) + 1),
+          function_exported?(extension, callback, length(params)),
           reduce: opts do
         acc ->
-          update_in(acc, [:hooks, callback], &[extension | List.wrap(&1)])
+          update_in(
+            acc,
+            [:hooks, callback],
+            &(&1 |> List.wrap() |> List.insert_at(-1, extension) |> Enum.uniq())
+          )
       end
   end
 
@@ -99,11 +102,10 @@ defmodule Routex.Extension.LiveViewHooks do
             do: {backend, extensions}
 
       # credo:disable-for-lines:2
-      hook_vars = Enum.map(args, &Macro.var(&1, __MODULE__))
-      callback_vars = hook_vars ++ [Macro.var(:attrs, __MODULE__)]
+      callback_vars = Enum.map(args, &Macro.var(&1, __MODULE__))
 
       cases = build_cases(callback, callback_vars, per_backend_result)
-      fun = build_functions(hook_vars, cases)
+      fun = build_functions(callback_vars, cases)
 
       hook = if fun, do: build_hook(callback, fun), else: nil
 
@@ -148,33 +150,28 @@ defmodule Routex.Extension.LiveViewHooks do
   # Returns a quoted definition for `handle_params/3` that assigns Routex attributes to the socket.
   @spec build_handle_params :: Macro.output()
   defp build_handle_params do
-    {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
-
-    module =
-      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
-        Phoenix.LiveView
-      else
-        Phoenix.Component
-      end
+    assign_module = Routex.Utils.assign_module()
 
     quote do
       @spec handle_params(map(), binary(), Phoenix.LiveView.Socket.t()) ::
               {:cont, Phoenix.LiveView.Socket.t()}
       def handle_params(_params, uri, socket) do
-        attrs = attrs(uri)
+        attrs =
+          uri
+          |> attrs()
+          |> Map.merge(%{
+            helpers_mod: unquote(nil),
+            url: uri
+          })
 
         merge_rtx_attrs = fn socket ->
-          Routex.Attrs.merge(socket, %{
-            helpers_mod: unquote(nil),
-            url: uri,
-            __branch__: attrs.__branch__
-          })
+          Routex.Attrs.merge(socket, attrs)
         end
 
         socket =
           socket
           |> merge_rtx_attrs.()
-          |> unquote(module).assign(url: uri, __branch__: attrs.__branch__)
+          |> unquote(assign_module).assign(url: uri, __branch__: attrs.__branch__)
 
         {:cont, socket}
       end

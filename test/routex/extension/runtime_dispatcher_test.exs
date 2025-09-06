@@ -1,6 +1,6 @@
-defmodule Routex.Extension.RuntimeCallbacksTest do
+defmodule Routex.Extension.RuntimeDispatcherTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.RuntimeCallbacks
+  alias Routex.Extension.RuntimeDispatcher
 
   # Mock modules for testing
   defmodule MockLocale do
@@ -12,7 +12,7 @@ defmodule Routex.Extension.RuntimeCallbacksTest do
     def config do
       %{
         __struct__: __MODULE__,
-        runtime_callbacks: [
+        dispatch_targets: [
           {MockLocale, :put_locale, [[:attrs, :language]]},
           {MockLocale, :put_locale, [MockBackend, [:attrs, :region]]}
         ]
@@ -22,9 +22,9 @@ defmodule Routex.Extension.RuntimeCallbacksTest do
 
   # Helper function to create halper module
   def create_helper_mod(mod) do
-    result = RuntimeCallbacks.create_helpers([], MockBackend, [])
+    result = RuntimeDispatcher.create_helpers([], MockBackend, [])
 
-    # Evaluate the generated code to test the runtime_callbacks function
+    # Evaluate the generated code to test the dispatch_targets function
     Code.eval_quoted(
       quote do
         defmodule unquote(mod) do
@@ -37,35 +37,34 @@ defmodule Routex.Extension.RuntimeCallbacksTest do
   describe "config/3" do
     test "raises when callback is not exported" do
       opts = [
-        runtime_callbacks: [
+        dispatch_targets: [
           {MockLocale, :non_existing, [[:attrs, :language]]}
         ]
       ]
 
       assert_raise RuntimeError, ~r/does not provide/, fn ->
-        result = RuntimeCallbacks.configure(opts, MockBackend)
+        RuntimeDispatcher.configure(opts, MockBackend)
       end
     end
 
     test "returns the opts unchanged" do
       opts = [
-        runtime_callbacks: [
+        dispatch_targets: [
           {MockLocale, :put_locale, [[:attrs, :language]]}
         ]
       ]
 
-      assert opts == RuntimeCallbacks.configure(opts, MockBackend)
+      assert opts == RuntimeDispatcher.configure(opts, MockBackend)
     end
   end
 
   describe "plug/3" do
-    test "calls runtime_callbacks with attributes from connection" do
+    test "calls dispatch_targets with attributes from connection" do
       create_helper_mod(A)
-      conn = %{private: %{routex: %{language: "nl", region: "be"}}}
-      attrs = %{__helper_mod__: A}
+      conn = %{private: %{routex: %{language: "nl", region: "be", __helper_mod__: A}}}
 
-      assert %{private: %{routex: %{language: "nl", region: "be"}}} =
-               RuntimeCallbacks.plug(conn, [], attrs)
+      assert %{private: %{routex: %{language: "nl", region: "be", __helper_mod__: A}}} =
+               RuntimeDispatcher.call(conn, [])
 
       # Verify that put_locale was called.
       assert_received {:put_locale_called, "nl"}
@@ -74,13 +73,12 @@ defmodule Routex.Extension.RuntimeCallbacksTest do
   end
 
   describe "handle_params/4" do
-    test "calls runtime_callbacks with attributes from socket" do
+    test "calls dispatch_targets with attributes from socket" do
       create_helper_mod(B)
-      socket = %{private: %{routex: %{language: "en", region: "uk"}}}
-      attrs = %{__helper_mod__: B}
+      socket = %{private: %{routex: %{language: "en", region: "uk", __helper_mod__: B}}}
 
       assert {:cont, %{private: %{routex: %{language: "en", region: "uk"}}}} =
-               RuntimeCallbacks.handle_params(nil, nil, socket, attrs)
+               RuntimeDispatcher.handle_params(nil, nil, socket)
 
       # Verify that put_locale was called.
       assert_received {:put_locale_called, "en"}

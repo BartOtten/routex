@@ -16,11 +16,16 @@ defmodule Routex.Attrs do
   * Extensions should add any fallback/default they might use to the attributes.
   """
 
-  @type container :: Phoenix.Router.Route.t() | Phoenix.Socket.t() | Plug.Conn.t()
+  @type container ::
+          Phoenix.Router.Route.t()
+          | Phoenix.Socket.t()
+          | Phoenix.LiveView.Socket.t()
+          | Plug.Conn.t()
   @type key :: atom()
   @type value :: any()
   @type attrs_fun :: (map() -> Enumerable.t())
   @type update_fun :: (value() -> value())
+  @type t :: %{optional(key) => value}
 
   @doc """
   Returns true if the given key or attribute tuple represents a private attribute.
@@ -91,6 +96,14 @@ defmodule Routex.Attrs do
   def merge(route_sock_or_conn, value) when is_map(value) do
     Enum.reduce(value, route_sock_or_conn, fn {k, v}, acc ->
       put(acc, k, v)
+    end)
+  end
+
+  def merge(route_sock_or_conn, key, value) when is_atom(key) and is_map(value) do
+    update(route_sock_or_conn, key, fn
+      nil -> value
+      old when is_map(old) -> Map.merge(old, value)
+      old when is_list(old) -> old ++ value
     end)
   end
 

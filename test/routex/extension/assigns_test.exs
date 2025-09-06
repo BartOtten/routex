@@ -73,10 +73,11 @@ defmodule Routex.Extension.AssignsTest do
   end
 
   test "handle_params/4 assigns attributes to socket" do
-    socket = %Phoenix.LiveView.Socket{assigns: %{__changed__: %{}}}
-    attrs = %{assigns: %{key: "value"}}
+    socket =
+      %Phoenix.LiveView.Socket{assigns: %{__changed__: %{}}}
+      |> Routex.Attrs.merge(%{assigns: %{key: "value"}})
 
-    {:cont, updated_socket} = Assigns.handle_params(%{}, "/", socket, attrs)
+    {:cont, updated_socket} = Assigns.handle_params(%{}, "/", socket)
 
     assert updated_socket.assigns[:key] == "value"
   end

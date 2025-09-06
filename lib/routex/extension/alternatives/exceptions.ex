@@ -1,4 +1,6 @@
 defmodule Routex.Extension.Alternatives.Exceptions do
+  @moduledoc false
+
   defmodule AttrsMismatchError do
     @moduledoc """
     Raised when the custom attributes of branches do not have the same keys.

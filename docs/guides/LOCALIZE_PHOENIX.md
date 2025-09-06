@@ -59,48 +59,41 @@ defmodule ExampleWeb.RoutexBackend do
 
   use Routex.Backend,
     extensions: [
+      # == Base extensions ==
       Routex.Extension.AttrGetters,         # Base attribute handling
       Routex.Extension.LiveViewHooks,       # Inlines LiveView lifecycle callbacks of other extensions
       Routex.Extension.Plugs,               # Inlines plug callbacks of other extensions
-      Routex.Extension.Alternatives,        # Generates locale alternatives
-      Routex.Extension.AlternativeGetters,  # Creates a helper function to get the alternatives for a route
-      Routex.Extension.Translations,        # Enables route segment translations
-      Routex.Extension.VerifiedRoutes,      # Make Phoenix VerifiedRoutes branch aware
-      Routex.Extension.SimpleLocale,        # Detects locale from various sources, adds :language and :region attributes to routes.
-      Routex.Extension.RuntimeCallbacks,    # Supports callbacks during runtime (e.g Gettext.put_locale/{1.2})
+      # == Used for Localization ==
+      Routex.Extension.Localize.Phoenix.Routes,     # Localize routes at compile time
+      Routex.Extension.Localize.Phoenix.Runtime,    # Detects locale from various sources at runtime
+      Routex.Extension.Translations,                # Enables route segment translations
+      Routex.Extension.Alternatives,                # Generates locale alternatives set by Localize.Phoenix
+      Routex.Extension.AlternativeGetters,          # Creates a helper function to get the alternatives for a route
+      Routex.Extension.VerifiedRoutes,              # Make Phoenix VerifiedRoutes branch (alternatives) aware
+      Routex.Extension.RuntimeDispatcher,           # Dispatches during runtime (e.g `Gettext.put_locale/{1,2}`)
     ],
 
-    # Define hierarchical alternatives with associated locale attributes.
-    alternatives: %{
-      "/" => %{
-        attrs: %{locale: "en-001", region_display_name: "Global"},          # Worldwide English, region display name overrides "World".
-        branches: %{
-          "/europe" => %{
-            attrs: %{locale: "en-150"},      # European English
-            branches: %{
-              "/nl" => %{attrs: %{locale: "nl-NL"}},  # Dutch (Netherlands)
-              "/fr" => %{attrs: %{locale: "fr-FR"}}   # French (France)
-            }
-          },
-          "/gb" => %{attrs: %{locale: "en-GB"}}       # British English
-        }
-      }
-    },
-
     # Integration with Gettext for route segment translation.
-    translations_backend: ExampleWeb.Gettext,
+    # Defaults to the standard Gettext module of a Phoenix project.
+    # translations_backend: ExampleWeb.Gettext,
 
-    # Override Phoenix VerifiedRoutes sigils with Routex variants.
+    # Drop-in replacements: Override Phoenix VerifiedRoutes macros with Routex variants.
     verified_sigil_routex: "~p",
     verified_sigil_phoenix: "~o",
     verified_url_routex: :url,
     verified_path_routex: :path,
 
-    # Language detection with custom source priority
-    language_sources: [:query, :session, :cookie, :attrs, :accept_language],
+    # Locales to generate routes for: English (Global), Dutch, French, English (Great Brittain) and English (European)
+    # All optional. `locales` and `default_locale` will be detected using Cldr, Gettext or Fluent when available.
+    # locales: [{"en-001", %{region_display_name: "Worldwide"}}, "nl-NL", "fr-FR", "en-GB", "en-150"],
+    # default_locale: "en-100",
 
-    # Runtime callbacks to set Gettext locale from route attribute :language.
-    runtime_callbacks: [{Gettext, :put_locale, [[:attrs, :language]]}]
+    # Custom language detection source priority
+    # language_sources: [:query, :session, :cookie, :attrs, :accept_language],
+
+    # Runtime dispatch targets to set Gettext locale from route attribute :language.
+    # Shown below is the default.
+    # dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}]
 end
 ```
 
@@ -134,6 +127,9 @@ priv/
 
 Translate your route segments using any `.po` file editor (Poedit, OmegaT, etc.).
 
+After you have translated segments, run `mix compile --force` for trigger a
+recompilation with translated routes.
+
 ---
 
 ## Step 3: Adding a Language Switcher Component
@@ -157,7 +153,7 @@ and accessibility features:
 
 ### Component Highlights:
 - **Looping over Alternatives:** Fetches all localized route variants for the current URL.
-- **User Friendly Language Names:** Uses the `:language_display_name` as set by SimpleLocale.
+- **User Friendly Language Names:** Uses the `:language_display_name` as set by Localize.
 - **Dynamic Styling:** Highlights the current language (using a conditional CSS class).
 - **Accessible Markup:** Uses proper `rel` and `hreflang` attributes.
 
@@ -216,12 +212,12 @@ Happy coding and enjoy creating a multilingual Phoenix application!
   - Associates locales with URL paths
   - Supports `[language|region]_display_name` overrides
 
-**SimpleLocale with custom language sources**:
+**Localize with custom language sources**:
   - Expands route attribute `:locale` into route attributes `:locale, :region, :language, :region_display_name, :language_display_name`
   - Handles locale detection using a variery of sources including `Accept-Language`
   - Sets attributes `:locale`, `:region` and `:language` at runtime
-  - Comes with an reduced IANA registry to validate locale-, region- and language and to convert these to display names
-  - Custom detection source priority to favor the routes' language over the `Accept-Language` browser language.
+  - Comes with an IANA-based locale registry to validate locale-, region- and language and to convert these to display names
+  - Custom detection source priority to favor the routes' language over the `Accept-Language` browser language
 
 **Translation Setup**:
   - Enables path segment translation
@@ -237,6 +233,6 @@ Happy coding and enjoy creating a multilingual Phoenix application!
   - Fetch alternative locale routes using `alternatives(@url)`
   - Use to generate buttons to switch language
 
-**RuntimeCallbacks**:
+**RuntimeDispatcher**:
  - Configured to call `Gettext.put_locale`
- - Uses the runtime detected attribute `:language` which is set by SimpleLocale.
+ - Uses the runtime detected attribute `:language` which is set by Localize.

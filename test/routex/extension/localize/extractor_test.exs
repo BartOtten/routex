@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.ExtractorTest do
+defmodule Routex.Extension.Localize.ExtractorTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.SimpleLocale.Extractor
+  alias Routex.Extension.Localize.Phoenix.Extractor
   alias Plug.Conn
 
   # Mock the Registry module for testing purposes
@@ -16,7 +16,7 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
 
   Code.compiler_options(ignore_module_conflict: true)
 
-  defmodule SimpleLocale.Registry do
+  defmodule Localize.Registry do
     defdelegate region?(value), to: MockRegistry
     defdelegate language?(value), to: MockRegistry
   end
@@ -50,6 +50,20 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
       conn = %{conn | req_headers: [{"accept-language", "invalid"}]}
 
       result = Extractor.extract_from_source(conn, :accept_language, "language", [])
+      assert is_nil(result)
+    end
+  end
+
+  describe "extract_from_source/4 with Plug.Conn - assigns" do
+    test "extracts from assigns", %{conn: conn} do
+      conn = Plug.Conn.assign(conn, :locale, "en-US")
+
+      result = Extractor.extract_from_source(conn, :assigns, "locale", [])
+      assert result == "en-US"
+    end
+
+    test "returns nil for missing assign", %{conn: conn} do
+      result = Extractor.extract_from_source(conn, :assigns, "locale", [])
       assert is_nil(result)
     end
   end
@@ -137,6 +151,13 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
       assert result == "en-US"
     end
 
+    test "extracts from map assigns" do
+      source = %{assigns: %{locale: "en-US"}}
+
+      result = Extractor.extract_from_source(source, :assigns, "locale", [])
+      assert result == "en-US"
+    end
+
     test "extracts from map cookies" do
       source = %{cookies: %{"locale" => "en-US"}}
 
@@ -179,12 +200,12 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
     test "extracts from attrs" do
       attrs = %{locale: "en-US"}
 
-      result = Extractor.extract_from_source(%{}, :attrs, "locale", attrs)
+      result = Extractor.extract_from_source(%{}, :route, "locale", attrs)
       assert result == "en-US"
     end
 
     test "returns nil for missing attrs" do
-      result = Extractor.extract_from_source(%{}, :attrs, "locale", %{})
+      result = Extractor.extract_from_source(%{}, :route, "locale", %{})
       assert is_nil(result)
     end
 
@@ -192,7 +213,7 @@ defmodule Routex.Extension.SimpleLocale.ExtractorTest do
       attrs = %{locale: "en-US"}
 
       assert_raise ArgumentError, fn ->
-        Extractor.extract_from_source(%{}, :attrs, "nonexistent", attrs)
+        Extractor.extract_from_source(%{}, :route, "nonexistent", attrs)
       end
     end
   end

@@ -1,14 +1,15 @@
-defmodule Routex.Extension.SimpleLocale.Detect do
+defmodule Routex.Extension.Localize.Phoenix.Detect do
   @moduledoc """
   Main module for locale detection logic.
   """
 
-  alias Routex.Extension.SimpleLocale
+  alias Routex.Extension.Localize.Normalize
+  alias Routex.Extension.Localize.Phoenix.Extractor
+  alias Routex.Extension.Localize.Types
   alias Routex.Types, as: T
-  alias SimpleLocale.Extractor
-  alias SimpleLocale.Types
 
-  @default_sources [:query, :session, :cookie, :accept_language, :path, :attrs]
+  @supported_sources [:query, :session, :cookie, :accept_language, :path, :assigns, :route]
+  @default_sources [:query, :session, :cookie, :accept_language, :path, :assigns, :route]
 
   @default_params %{
     region: ["region", "locale"],
@@ -17,6 +18,7 @@ defmodule Routex.Extension.SimpleLocale.Detect do
     locale: ["locale"]
   }
 
+  def __supported_sources__, do: @supported_sources
   def __default_sources__, do: @default_sources
   def __default_params__, do: @default_params
 
@@ -64,38 +66,9 @@ defmodule Routex.Extension.SimpleLocale.Detect do
     Enum.reduce_while(sources, nil, fn source, _acc ->
       conn_or_map
       |> Extractor.extract_from_source(source, param, attrs)
-      |> normalize_locale_value(key)
+      |> Normalize.locale_value(key)
       |> handle_detection_result(key)
     end)
-  end
-
-  def normalize_locale_value(nil, _key), do: nil
-  def normalize_locale_value(value, :locale), do: value
-
-  # credo:disable-for-next-line
-  def normalize_locale_value(value, key) when key in [:region, :language] do
-    case value do
-      <<input::binary-size(2)>> ->
-        if(key == :language, do: String.downcase(input), else: String.upcase(input))
-
-      <<input::binary-size(3)>> ->
-        if(key == :language, do: String.downcase(input), else: String.upcase(input))
-
-      <<lang::binary-size(2), ?-, rest::binary>> ->
-        if(key == :language, do: String.downcase(lang), else: String.upcase(rest))
-
-      <<lang::binary-size(3), ?-, rest::binary>> ->
-        if(key == :language, do: String.downcase(lang), else: String.upcase(rest))
-
-      <<lang::binary-size(2), ?_, rest::binary>> ->
-        if(key == :language, do: String.downcase(lang), else: String.upcase(rest))
-
-      <<lang::binary-size(3), ?_, rest::binary>> ->
-        if(key == :language, do: String.downcase(lang), else: String.upcase(rest))
-
-      _other ->
-        nil
-    end
   end
 
   defp handle_detection_result(nil, _key), do: {:cont, nil}

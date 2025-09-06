@@ -1,6 +1,6 @@
-defmodule Routex.Extension.SimpleLocale.DetectTest do
+defmodule Routex.Extension.Localize.Phoenix.DetectTest do
   use ExUnit.Case, async: true
-  alias Routex.Extension.SimpleLocale.Detect
+  alias Routex.Extension.Localize.Phoenix.Detect
   alias Plug.Conn
 
   # Mock backend module for testing
@@ -64,17 +64,27 @@ defmodule Routex.Extension.SimpleLocale.DetectTest do
     end
 
     test "handles three-letter language codes", %{conn: conn, attrs: attrs} do
-      conn = %{conn | query_params: %{"language" => "spa", "region" => "MX"}}
+      conn = %{conn | query_params: %{"language" => "ssp", "region" => "MX"}}
 
       result = Detect.detect_locales(conn, [], attrs)
 
-      assert result.language == "spa"
+      assert result.language == "ssp"
       assert result.region == "MX"
       assert result.territory == "MX"
     end
 
     test "returns nil for invalid format", %{conn: conn, attrs: attrs} do
       conn = %{conn | query_params: %{"locale" => "invalid"}}
+
+      result = Detect.detect_locales(conn, [], attrs)
+
+      assert result.language == nil
+      assert result.region == nil
+      assert result.territory == nil
+    end
+
+    test "returns nil for invalid language", %{conn: conn, attrs: attrs} do
+      conn = %{conn | query_params: %{"language" => "foo"}}
 
       result = Detect.detect_locales(conn, [], attrs)
 
@@ -101,39 +111,6 @@ defmodule Routex.Extension.SimpleLocale.DetectTest do
       assert result.language == "fr"
       assert result.region == "FR"
       assert result.territory == "FR"
-    end
-  end
-
-  describe "normalize_locale_value/2" do
-    test "handles two-letter codes" do
-      assert Detect.normalize_locale_value("en", :language) == "en"
-      assert Detect.normalize_locale_value("US", :region) == "US"
-    end
-
-    test "handles three-letter codes" do
-      assert Detect.normalize_locale_value("eng", :language) == "eng"
-      assert Detect.normalize_locale_value("USA", :region) == "USA"
-    end
-
-    test "handles hyphenated format" do
-      assert Detect.normalize_locale_value("en-US", :language) == "en"
-      assert Detect.normalize_locale_value("en-US", :region) == "US"
-    end
-
-    test "handles underscore format" do
-      assert Detect.normalize_locale_value("pt_BR", :language) == "pt"
-      assert Detect.normalize_locale_value("pt_BR", :region) == "BR"
-    end
-
-    test "returns nil for invalid formats" do
-      assert Detect.normalize_locale_value("invalid", :language) == nil
-      assert Detect.normalize_locale_value("", :region) == nil
-      assert Detect.normalize_locale_value(nil, :language) == nil
-    end
-
-    test "preserves full locale value when key is :locale" do
-      assert Detect.normalize_locale_value("en-US", :locale) == "en-US"
-      assert Detect.normalize_locale_value("pt_BR", :locale) == "pt_BR"
     end
   end
 end

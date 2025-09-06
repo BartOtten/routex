@@ -67,7 +67,7 @@ A quick overview before diving into a detailed explanation:
 | **Integration**         | **Routex**            | **Cldr Routes**            |
 | Sigils                  | Customizable          | Fixed                      |
 | Functions               | Customizable          | Fixed                      |
-| Libs integration        | COnfigurable          | None                       |
+| Libs integration        | Configurable          | None                       |
 | Dependencies            | Configurable          | Cldr, Gettext              |
 | Runtime integration     | Automated             | None                       |
 |                         |                       |                            |
@@ -251,21 +251,21 @@ localization.
 
 
 **Routex** Routex offers virtually unlimited runtime features and integration by
-integrating native extension `Routex.Extension.RuntimeCallbacks` for dynamic
+integrating native extension `Routex.Extension.RuntimeDispatcher` for dynamic
 functionality. This can be combined with other extensions -such as
-`Routex.Extension.SimpleLocale` for highly customizable locale detection and
-behavior during runtime.
+`Routex.Extension.Localize.Phoenix.Runtime` for highly customizable locale
+detection and behavior during runtime.
 
 ```elixir
 defmodule ExampleWeb.RoutexBackend do
 use Routex.Backend,  # makes this a Routex configuration backend
 extensions: [
   Routex.Extension.Attrs,
-     Routex.Extension.SimpleLocale,  # detects locale, and puts it in runtime attributes
-     Routex.Extension.RuntimeCallbacks  # call arbitrary functions during runtime using route attributes
+     Routex.Extension.Localize,  # detects locale, and puts it in runtime attributes
+     Routex.Extension.RuntimeDispatcher  # call arbitrary functions during runtime using route attributes
 ],
 # configuration of arbitrary functions to be called at navigation events.
-runtime_callbacks: [
+dispatch_targets: [
  # Set Gettext locale from :language attribute
  {Gettext, :put_locale, [[:attrs, :language]]},
  # Call arbitrary function using other runtime attribute
@@ -278,7 +278,7 @@ end
 Routex supports extension-provided plugs and hooks that are generated at compile
 time. By leveraging Elixir's powerful pattern matching, these plugs and hooks
 are optimized for performance, ensuring minimal runtime overhead even when
-multiple runtime callbacks are enabled.​
+multiple runtime dispatch targets are enabled.​
 
 ## Conclusion
 
@@ -290,9 +290,10 @@ Cldr and Gettext ecosystems.
 On the other hand, Routex stands out with its modular and extensible
 architecture. It not only replicates the localization features of Cldr Routes
 but also introduces advanced functionalities—such as customizable route
-attributes, runtime callbacks, and seamless integration with Plug and LiveView.
-This flexibility makes Routex a powerful choice for both new projects and those
-looking to integrate dynamic routing features into an existing codebase.
+attributes, runtime dispatching to external libs, and seamless integration with
+Plug and LiveView. This flexibility makes Routex a powerful choice for both new
+projects and those looking to integrate dynamic routing features into an
+existing codebase.
 
 Ultimately, the decision between these libraries will depend on your project’s
 requirements, existing dependencies, and desired level of customization. For

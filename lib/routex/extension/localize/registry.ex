@@ -1,6 +1,27 @@
-defmodule Routex.Extension.SimpleLocale.Registry do
-  @moduledoc "Pre-generated locale registry shipped with Routex.\nGenerated from IANA Language Subtag Registry.\n"
-  alias Routex.Extension.SimpleLocale.Detect
+defmodule Routex.Extension.Localize.Registry do
+  @moduledoc """
+  Pre-generated locale registry shipped with Routex.\nGenerated from IANA Language Subtag Registry.
+
+  It provides validation and  display name lookups.
+
+  **Examples:**
+  ```iex
+  iex> alias Routex.Extension.Localize.Registry
+  iex> Registry.language("nl-BE")
+  %{descriptions: ["Dutch", "Flemish"], type: :language}
+
+  iex> Registry.region("nl-BE")
+  %{descriptions: ["Belgium"], type: :region}
+
+  iex> Registry.language?("zz")
+  false
+
+  iex> Registry.region?("BE")
+  true
+  ```
+  """
+
+  alias Routex.Extension.Localize.Normalize
 
   def language do
     %{
@@ -8408,13 +8429,13 @@ defmodule Routex.Extension.SimpleLocale.Registry do
     end
 
     def language(key, default) do
-      norm_key = Detect.normalize_locale_value(key, :language)
+      norm_key = Normalize.locale_value(key, :language)
       language() |> Map.get(norm_key, default)
     end
   )
 
   def language?(key) do
-    norm_key = Detect.normalize_locale_value(key, :language)
+    norm_key = Normalize.locale_value(key, :language)
     language() |> Map.has_key?(norm_key)
   end
 
@@ -8740,13 +8761,13 @@ defmodule Routex.Extension.SimpleLocale.Registry do
     end
 
     def region(key, default) do
-      norm_key = key |> Detect.normalize_locale_value(:region)
+      norm_key = key |> Normalize.locale_value(:region)
       region() |> Map.get(norm_key, default)
     end
   )
 
   def region?(key) do
-    norm_key = Detect.normalize_locale_value(key, :region)
+    norm_key = Normalize.locale_value(key, :region)
     region() |> Map.has_key?(norm_key)
   end
 

@@ -1,4 +1,4 @@
-defmodule Routex.Extension.SimpleLocale.Types do
+defmodule Routex.Extension.Localize.Types do
   @moduledoc """
   Type definitions for locale detection.
   """
@@ -11,7 +11,6 @@ defmodule Routex.Extension.SimpleLocale.Types do
           language: String.t(),
           region: String.t(),
           territory: String.t(),
-          locale: String.t(),
-          quality: float()
+          locale: String.t()
         }
 end

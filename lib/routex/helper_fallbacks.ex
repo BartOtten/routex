@@ -1,3 +1,5 @@
+# credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
+
 defmodule Routex.HelperFallbacks do
   @moduledoc """
   Provides fallback functions when `use`'d
@@ -31,33 +33,24 @@ defmodule Routex.HelperFallbacks do
          )}
       end
 
-      # credo:disable-for-next-line
-      # TODO: Remove in next major version.
-      {:ok, phx_version} = :application.get_key(:phoenix, :vsn)
-
-      if phx_version |> to_string() |> Version.match?("< 1.7.0-dev") do
-        @assign_mod Phoenix.LiveView
-      else
-        @assign_mod Phoenix.Component
-      end
-
       @spec fallback_handle_params(map(), binary(), Phoenix.LiveView.Socket.t()) ::
               {:cont, Phoenix.LiveView.Socket.t()}
       def fallback_handle_params(_params, url, socket) do
         attrs = attrs(url)
+        assign_mod = Routex.Utils.assign_module()
 
         socket =
           socket
           |> Routex.Attrs.merge(%{url: url, __branch__: attrs.__branch__})
-          |> @assign_mod.assign(url: url)
-          |> @assign_mod.assign(attrs[:assigns] || %{})
+          |> assign_mod.assign(url: url)
+          |> assign_mod.assign(attrs[:assigns] || %{})
 
         {:cont, socket}
       end
 
-      @doc "Fallback for plug/2. Assigns :url"
-      @spec plug(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
-      def plug(conn, _opts) do
+      @doc "Fallback for call/2. Assigns :url"
+      @spec call(Plug.Conn.t(), keyword()) :: Plug.Conn.t()
+      def call(conn, _opts) do
         url =
           case {conn.request_path, conn.query_string} do
             {path, ""} -> path
@@ -71,7 +64,7 @@ defmodule Routex.HelperFallbacks do
         |> Plug.Conn.assign(:url, url)
       end
 
-      defoverridable attrs: 1, on_mount: 4, plug: 2
+      defoverridable attrs: 1, on_mount: 4, call: 2
     end
   end
 end

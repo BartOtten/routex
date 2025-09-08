@@ -6,10 +6,24 @@
 - Phoenix >= 1.6.0
 - Phoenix LiveView >= 0.16 (optional)
 
+## One-shot setup
 
-## Installation
+Routex includes an [Igniter](https://hexdocs.pm/igniter/readme.html) install
+task that automates the setup process, eliminating the need for manual file
+editing.
 
-You can install this library by adding it to your list of dependencies in `mix.exs`. (use `mix hex.info routex` to find the latest version):
+Even though Igniter handles the installation automatically, it's important to
+review the rest of this page to understand how Routex works and how you can
+customize it to fit your specific needs.
+
+```bash
+mix routex.install
+```
+
+## Manual setup
+
+You can install this library by adding it to your list of dependencies in
+`mix.exs`. (use `mix hex.info routex` to find the latest version):
 
 ```diff
 def deps do
@@ -32,6 +46,7 @@ Modify the entrypoint of your web interface definition.
    unquote(verified_routes())
 +  unquote(routex_helpers())
 
+q
 # in live_view
       unquote(html_helpers())
 +     on_mount(unquote(__MODULE__).Router.RoutexHelpers)
@@ -52,21 +67,14 @@ Modify the entrypoint of your web interface definition.
 +  end
 ```
 
+
 ## Configuration
 
 To use `Routex`, a module that calls `use Routex.Backend` (referred to below as a
 "backend") has to be defined. It includes a list with extensions and
 configuration of extensions.
 
-Each extension provides a single feature. The extensions have their own
-documentation which specifies how to configure and use them. For a short
-description and links to documentation per extension, refer to [EXTENSIONS.md].
-
-Too speed up setup all extensions are included in the configuration below
-and extensions are configured to act as drop-in replacements.
-
-Note that you might have to rename some `~p` sigils in templates to `~o` to
-have these routes _not_ be branch aware.
+Too speed up setup all extensions are included in the configuration below.
 
 ```elixir
 # file /lib/example_web/routex_backend.ex
@@ -101,12 +109,15 @@ defmodule ExampleWeb.RoutexBackend do
 end
 ```
 
+
 ## Preprocess routes with Routex
 
-`Routex` will preprocess any route wrapped -either direct or indirect- in a
-`preprocess_using` block. It uses the backend passed as the first argument. This
-allows the use of multiple backends (e.g. to use different extensions for admin
-routes)
+`Routex` will preprocess any route found inside a `preprocess_using` block,
+either directly or nested in other blocks such as `scope`.
+
+`preprocess_using` receives the backend module name as the first argument. This
+allows the use of distinct backends per `preprocess_using` block (e.g. to use
+different extensions for admin routes)
 
 ```diff
 # file: router.ex
@@ -130,4 +141,26 @@ routes)
 + end
 ```
 
-When you run into issues, please have a look at the [Troubleshooting](docs/TROUBLESHOOTING.md)
+
+## Configuring individual extensions
+
+In the configuration above, a number of extensions are enabled with sensible
+defaults to help you get started quickly. Don’t worry though; they’re all highly
+customizable, so you can adjust them to fit your needs.
+
+Each extension focuses on a single feature and comes with its own documentation
+that explains how to set it up and use it. If you’d like a quick overview along
+with links to the docs for each extension, check out
+the [Extensions Overview](docs/EXTENSIONS.md).
+
+> #### Broken paths? {: .warning}
+> The [Verified Routes extension](docs/EXTENSIONS.md#verified-routes) is
+> configured to act as drop-in replacements. As a result you might have to
+> rename some `~p` sigils (verified route paths) in (h)eex templates to `~o`
+> where the default _non-branching_ behaviour is required.
+
+## Help?
+
+When you run into issues, please have a look at the
+[Troubleshooting](docs/TROUBLESHOOTING.md) guide and
+[Elixir Forum](https://elixirforum.com/tag/routex)

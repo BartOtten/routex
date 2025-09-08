@@ -96,7 +96,6 @@ jobs:
       - run: mix dialyzer
       - run: mix test
 
-
       - name: Generate LCOV report
         run: mix coveralls.lcov
       - name: Upload coverage to Coveralls
@@ -149,3 +148,4 @@ jobs:
           git add .
           git commit -m "mix docs"
           git push --force origin gh-pages
+    if: github.ref == 'refs/heads/main'

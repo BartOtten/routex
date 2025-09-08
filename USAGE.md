@@ -6,22 +6,8 @@
 - Phoenix >= 1.6.0
 - Phoenix LiveView >= 0.16 (optional)
 
-## One-shot setup
 
-Routex includes an [Igniter](https://hexdocs.pm/igniter/readme.html) install
-task that automates the setup process, eliminating the need for manual file
-editing.
-
-Even though Igniter handles the installation automatically, it's important to
-review the rest of this page to understand how Routex works and how you can
-customize it to fit your specific needs.
-
-```bash
-mix routex.install
-```
-
-## Manual setup
-
+## Adding Routex to your project
 You can install this library by adding it to your list of dependencies in
 `mix.exs`. (use `mix hex.info routex` to find the latest version):
 
@@ -33,6 +19,41 @@ def deps do
   ]
 end
 ```
+
+Next run:
+```bash
+mix deps.get
+```
+
+## Quick config using Igniter
+
+Routex includes an [Igniter](https://hexdocs.pm/igniter/readme.html) install
+task that automates the setup process, eliminating the need for manual file
+editing.
+
+You can install Igniter adding it to your list of dependencies in
+`mix.exs`. (use `mix hex.info igniter` to find the latest version):
+
+```diff
+def deps do
+  [
+     ...other deps
+     {:routex, "~> 1.0"},
++    {:igniter, "~> 0.6"}
+  ]
+end
+```
+
+Even though Igniter handles the installation automatically, it's recommended to
+review the rest of this page to understand how Routex works and how you can
+customize it to fit your specific needs.
+
+```bash
+mix deps.get
+mix routex.install
+```
+
+## Manual config
 
 Modify the entrypoint of your web interface definition.
 ```diff

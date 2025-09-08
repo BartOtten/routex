@@ -86,13 +86,13 @@ defmodule ExampleWeb.RoutexBackend do
      Routex.Extension.Assigns,
      Routex.Extension.Localize.Phoenix.Routes,
      Routex.Extension.Localize.Phoenix.Runtime,
-     Routex.Extension.RuntimeDispatcher,
+     Routex.Extension.RuntimeDispatcher
 
      # optional
      # Routex.Extension.Translations,  # when you want translated routes
      # Routex.Extension.Interpolation, # when path prefixes don't cut it
      # Routex.Extension.RouteHelpers,  # when verified routes can't be used
-     # Routex.Extension.Cldr,          # when coming from the Cldr ecosystem
+     # Routex.Extension.Cldr,          # when combined with the Cldr ecosystem
    ],
    assigns: %{namespace: :rtx, attrs: [:locale, :language, :region]},
    verified_sigil_routex: "~p",

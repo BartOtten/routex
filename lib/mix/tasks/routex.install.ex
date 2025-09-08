@@ -1,3 +1,5 @@
+# credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
+
 defmodule Mix.Tasks.Routex.Install.Docs do
   @moduledoc false
 

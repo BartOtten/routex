@@ -52,6 +52,19 @@ jobs:
           wget https://s3.amazonaws.com/rebar3/rebar3 && mix local.rebar --force rebar3 ./rebar3
         if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
 
+      - name: Install phx_new for Igniter test project (Hex)
+        run: |
+          mix archive.install --force hex phx_new
+        if: matrix.combo.otp != 'latest'
+
+      - name: Install phx_new for Igniter test project (Git)
+        run: |
+          mix archive.uninstall phx_new
+          git clone https://github.com/phoenixframework/phoenix
+          cd phoenix/installer
+          MIX_ENV=prod mix do archive.build + archive.install --force
+        if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'     
+
       - name: Point Phoenix dependencies to GitHub
         run: |
           sed -i 's/{:phoenix, *"[^"]*"[^}]*}/{:phoenix, git: "https:\/\/github.com\/phoenixframework\/phoenix\/", override: true}/' mix.exs

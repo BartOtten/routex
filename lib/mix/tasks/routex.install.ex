@@ -63,8 +63,7 @@ if Code.ensure_loaded?(Igniter) do
       Project.Module.find_and_update_module!(igniter, module, fn zipper ->
         with {:ok, zipper} <-
                Common.within(zipper, fn zipper ->
-                 with {:ok, zipper} <- Common.move_to_do_block(zipper),
-                      {:ok, zipper} <- Function.move_to_def(zipper, :router, 0),
+                 with {:ok, zipper} <- Function.move_to_def(zipper, :router, 0),
                       {:ok, zipper} <- Common.move_to_do_block(zipper) do
                    line = "use Routex.Router"
                    {:ok, Common.add_code(zipper, line, placement: :before)}
@@ -72,8 +71,7 @@ if Code.ensure_loaded?(Igniter) do
                end),
              {:ok, zipper} <-
                Common.within(zipper, fn zipper ->
-                 with {:ok, zipper} <- Common.move_to_do_block(zipper),
-                      {:ok, zipper} <- Function.move_to_def(zipper, :controller, 0),
+                 with {:ok, zipper} <- Function.move_to_def(zipper, :controller, 0),
                       {:ok, zipper} <- Common.move_to_do_block(zipper) do
                    line = "unquote(routex_helpers())"
                    {:ok, Common.add_code(zipper, line, placement: :after)}
@@ -81,22 +79,14 @@ if Code.ensure_loaded?(Igniter) do
                end),
              {:ok, zipper} <-
                Common.within(zipper, fn zipper ->
-                 with {:ok, zipper} <- Common.move_to_do_block(zipper),
-                      {:ok, zipper} <- Function.move_to_def(zipper, :live_view, 0),
+                 with {:ok, zipper} <- Function.move_to_def(zipper, :live_view, 0),
                       {:ok, zipper} <- Common.move_to_do_block(zipper) do
                    line = "on_mount(unquote(__MODULE__).Router.RoutexHelpers)"
                    {:ok, Common.add_code(zipper, line, placement: :after)}
                  end
                end),
-             {:ok, zipper} <-
-               Common.within(zipper, fn zipper ->
-                 with {:ok, zipper} <- Common.move_to_do_block(zipper),
-                      {:ok, zipper} <- Function.move_to_defp(zipper, :html_helpers, 0),
-                      {:ok, zipper} <- Common.move_to_do_block(zipper) do
-                   line = "unquote(routex_helpers())"
-                   {:ok, Common.add_code(zipper, line, placement: :after)}
-                 end
-               end) do
+             {:ok, zipper} <- update_helper_block(zipper, :html_helpers),
+             {:ok, zipper} <- update_helper_block(zipper, :view_helpers) do
           Common.within(zipper, fn zipper ->
             block = """
             defp routex_helpers do
@@ -112,6 +102,18 @@ if Code.ensure_loaded?(Igniter) do
 
             {:ok, Common.add_code(zipper, block, placement: :after)}
           end)
+        end
+      end)
+    end
+
+    defp update_helper_block(zipper, name) do
+      Common.within(zipper, fn zipper ->
+        with {:ok, zipper} <- Function.move_to_defp(zipper, name, 0),
+             {:ok, zipper} <- Common.move_to_do_block(zipper) do
+          line = "unquote(routex_helpers())"
+          {:ok, Common.add_code(zipper, line, placement: :after)}
+        else
+          :error -> {:ok, zipper}
         end
       end)
     end

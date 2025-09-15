@@ -123,6 +123,7 @@ defmodule Routex.MixProject do
       source_url: @source_url,
       assets: %{"assets" => "assets"},
       before_closing_head_tag: &docs_before_closing_head_tag/1,
+      before_closing_body_tag: &docs_before_closing_body_tag/1,
       extras: [
         "README.md": [title: "Overview"],
         "docs/EXTENSIONS.md": [title: "Included extensions"],
@@ -184,36 +185,19 @@ defmodule Routex.MixProject do
   defp docs_before_closing_head_tag(:html) do
     ~s|
     <link rel="stylesheet" href="assets/doc.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
-    <script>
-      let initialized = false;
-
-      window.addEventListener("exdoc:loaded", () => {
-        if (!initialized) {
-          mermaid.initialize({
-            startOnLoad: false,
-            theme: document.body.className.includes("dark") ? "dark" : "default"
-          });
-          initialized = true;
-        }
-
-        let id = 0;
-        for (const codeEl of document.querySelectorAll("pre code.mermaid")) {
-          const preEl = codeEl.parentElement;
-          const graphDefinition = codeEl.textContent;
-          const graphEl = document.createElement("div");
-          const graphId = "mermaid-graph-" + id++;
-          mermaid.render(graphId, graphDefinition).then(({svg, bindFunctions}) => {
-            graphEl.innerHTML = svg;
-            bindFunctions?.(graphEl);
-            preEl.insertAdjacentElement("afterend", graphEl);
-            preEl.remove();
-          });
-        }
-      });
-    </script>
     |
   end
 
   defp docs_before_closing_head_tag(_other), do: ""
+
+  defp docs_before_closing_body_tag(:html) do
+    ~s|
+    <script type="module">
+    import mermaid from './assets/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+    |
+  end
+
+  defp docs_before_closing_body_tag(_other), do: ""
 end

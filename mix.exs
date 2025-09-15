@@ -123,7 +123,6 @@ defmodule Routex.MixProject do
       source_url: @source_url,
       assets: %{"assets" => "assets"},
       before_closing_head_tag: &docs_before_closing_head_tag/1,
-      before_closing_body_tag: &docs_before_closing_body_tag/1,
       extras: [
         "README.md": [title: "Overview"],
         "docs/EXTENSIONS.md": [title: "Included extensions"],
@@ -185,19 +184,9 @@ defmodule Routex.MixProject do
   defp docs_before_closing_head_tag(:html) do
     ~s|
     <link rel="stylesheet" href="assets/doc.css">
+
     |
   end
 
   defp docs_before_closing_head_tag(_other), do: ""
-
-  defp docs_before_closing_body_tag(:html) do
-    ~s|
-    <script type="module">
-    import mermaid from './assets/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true });
-  </script>
-    |
-  end
-
-  defp docs_before_closing_body_tag(_other), do: ""
 end

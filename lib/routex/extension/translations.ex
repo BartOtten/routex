@@ -84,7 +84,7 @@ defmodule Routex.Extension.Translations do
           "When route translations are updated, run `mix compile --force [MyWebApp].Route"
         )
 
-    default_gettext_mod = (lookup_app_module() <> "Web.Gettext") |> String.to_atom()
+    default_gettext_mod = lookup_gettext_module()
 
     [
       {:translations_domain, Keyword.get(config, :translations_domain, @default_domain)},
@@ -159,13 +159,19 @@ defmodule Routex.Extension.Translations do
     [prelude | triggers_ast]
   end
 
-  defp lookup_app_module do
-    suffix =
-      Mix.Project.config()[:app]
-      |> to_string()
-      |> Macro.camelize()
+  defp lookup_gettext_module do
+    lookup_app_module()
+    |> Atom.to_string()
+    |> Kernel.<>("Web.Gettext")
+    |> List.wrap()
+    |> Module.concat()
+  end
 
-    "Elixir." <> suffix
+  defp lookup_app_module do
+    Mix.Project.get!()
+    |> Module.split()
+    |> :lists.droplast()
+    |> Module.concat()
   end
 
   defp translate(path, locale, backend, domain)

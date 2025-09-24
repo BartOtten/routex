@@ -5,6 +5,23 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.3.0-rc.0](https://github.com/BartOtten/routex/compare/v1.2.4...v1.3.0-rc.0) (2025-09-24)
+
+
+
+
+### Features:
+
+* implement routex.install task
+
+### Bug Fixes:
+
+* mermaid loaded unnecessary
+
+* update default config to match USAGE guide
+
+* igniter installer fails to update Web module
+
 ## [v1.2.4](https://github.com/BartOtten/routex/compare/v1.2.3...v1.2.4) (2025-09-06)
 
 

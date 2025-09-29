@@ -204,7 +204,7 @@ defmodule Routex.Branching do
         end
       end
       |> List.flatten()
-      |> Enum.uniq_by(fn {:->, [],
+      |> Enum.uniq_by(fn {:->, _meta,
                           [
                             [clause],
                             _extra

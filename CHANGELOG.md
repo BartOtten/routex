@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.3.0-rc.1](https://github.com/BartOtten/routex/compare/v1.3.0-rc.0...v1.3.0-rc.1) (2025-09-29)
+
+
+
+
+### Bug Fixes:
+
+* core: no matching function clause due to newline metadata.
+
 ## [v1.3.0-rc.0](https://github.com/BartOtten/routex/compare/v1.2.4...v1.3.0-rc.0) (2025-09-24)
 
 

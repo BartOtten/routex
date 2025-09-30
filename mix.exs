@@ -73,9 +73,9 @@ defmodule Routex.MixProject do
 
   defp deps do
     [
-      {:phoenix, ">= 1.7.0", optional: true},
-      {:gettext, ">= 0.26.0", optional: true},
-      {:phoenix_view, ">= 2.0.0", optional: true},
+      {:phoenix, "~> 1.7", optional: true},
+      {:gettext, "~> 0.26 or ~> 1.0", optional: true},
+      {:phoenix_view, "~> 2.0", optional: true},
       {:phoenix_live_view, "~> 0.18 or ~> 1.0", optional: true},
       {:phoenix_html_helpers, "~> 1.0", optional: true},
       {:igniter, "~> 0.5", optional: true}
@@ -88,8 +88,8 @@ defmodule Routex.MixProject do
       {:credo, git: "https://github.com/rrrene/credo/", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14", only: :test, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:makeup_diff, "~> 0.1.0", only: [:dev], runtime: false},
-      {:git_ops, "~> 2.6.3", only: [:dev], runtime: false},
+      {:makeup_diff, "~> 0.1", only: [:dev], runtime: false},
+      {:git_ops, "~> 2.6", only: [:dev], runtime: false},
       {:benchee, "~> 1.0", only: [:dev], runtime: false}
     ]
   end

@@ -176,7 +176,7 @@ defmodule Routex.Extension.RouteHelpers do
 
     quote do
       case unquote(helper_ast) do
-        [unquote_splicing(cases)]
+        unquote(cases)
       end
     end
   end
@@ -191,9 +191,11 @@ defmodule Routex.Extension.RouteHelpers do
       helper = (route.helper <> suffix) |> String.to_atom()
       helper_module = Module.concat(router, :Helpers)
 
-      quote do
-        unquote(ref) -> apply(unquote(helper_module), unquote(helper), unquote(args))
-      end
+      hd(
+        quote do
+          unquote(ref) -> apply(unquote(helper_module), unquote(helper), unquote(args))
+        end
+      )
     end
     |> List.flatten()
     |> Enum.uniq()

@@ -2,15 +2,15 @@ name: Elixir CI
 
 on:
   push:
-    branches: [ main, ci-test ]
+    branches: [ main, ci-test, docs ]
   pull_request:
-    branches: [ main, ci-test ]
+    branches: [ main, ci-test, docs ]
 
 env:
   MIX_ENV: test
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -23,18 +23,23 @@ jobs:
             rebar3: "3.22.1"
             os: ubuntu-24.04
             elixir: "1.17"
+            deplock: true
           - otp: "27.0"
             rebar3: "3.22.1"
             os: ubuntu-latest
             elixir: "1.18"
+            deplock: true
           - otp: "28.0"
             rebar3: latest
             os: ubuntu-latest
             elixir: "1.19"
+            deplock: true
           - otp: latest
             rebar3: latest
             os: ubuntu-latest
             elixir: latest
+            deplock: false
+            
     runs-on: ${{ matrix.combo.os }}
     name: Build & Test (OTP ${{ matrix.combo.otp }} / Elixir ${{ matrix.combo.elixir }})
     steps:
@@ -43,15 +48,15 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ matrix.combo.elixir }}
-          otp-version:     ${{ matrix.combo.otp }}
-          rebar3-version: ${{matrix.combo.rebar3}}
+          otp-version:    ${{ matrix.combo.otp    }}
+          rebar3-version: ${{ matrix.combo.rebar3 }}
 
       - name: Install latest tooling
         run: |
           mix archive.install --force github hexpm/hex branch latest
           wget https://s3.amazonaws.com/rebar3/rebar3 && mix local.rebar --force rebar3 ./rebar3
         if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
-
+        
       - name: Install phx_new for Igniter test project (Hex)
         run: |
           mix archive.install --force hex phx_new
@@ -69,6 +74,10 @@ jobs:
         run: |
           sed -i 's/{:phoenix, *"[^"]*"[^}]*}/{:phoenix, git: "https:\/\/github.com\/phoenixframework\/phoenix\/", override: true}/' mix.exs
           sed -i 's/{:phoenix_live_view, *"[^"]*"[^}]*}/{:phoenix_live_view, git: "https:\/\/github.com\/phoenixframework\/phoenix_live_view\/", override: true}/' mix.exs
+        if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
+
+      - name: Update unlocked deps
+        run: |
           mix deps.unlock --all
           mix deps.get
           mix format mix.exs
@@ -81,7 +90,7 @@ jobs:
             deps
             _build
           key: ${{ runner.os }}-${{ matrix.combo.otp }}-${{ matrix.combo.elixir }}-${{ hashFiles('**/mix.lock') }}
-
+        
       - name: Install dependencies
         run: |
           mix deps.get
@@ -132,6 +141,12 @@ jobs:
     env:
       DEPLOY_OTP:    'latest'
       DEPLOY_ELIXIR: 'latest'
+
+    # Grant 'write' permission ONLY for this specific job's token,
+    # as it needs to push content to the 'gh-pages' branch.
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -148,4 +163,8 @@ jobs:
           git add .
           git commit -m "mix docs"
           git push --force origin gh-pages
-    if: github.ref == 'refs/heads/main'
+    if: |
+      github.event_name == 'push' && github.ref == 'refs/heads/main' ||
+      github.event_name == 'push' && github.ref == 'refs/heads/docs' ||
+      github.event_name == 'pull_request' && github.ref == 'refs/heads/docs' && github.event.pull_request.head.repo.full_name == github.repository
+

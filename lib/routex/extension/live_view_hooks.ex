@@ -120,13 +120,15 @@ defmodule Routex.Extension.LiveViewHooks do
   # Builds case clauses for a given callback from per-backend extension callbacks.
   @spec build_cases(atom(), Macro.output(), keyword()) :: Macro.output()
   defp build_cases(callback, callback_vars, extensions_per_backend) do
-    Enum.flat_map(extensions_per_backend, fn {backend, extensions} ->
-      quote do
-        unquote(backend) ->
-          reduce_socket(unquote(extensions), socket, fn ext, socket ->
-            ext.unquote(callback)(unquote_splicing(callback_vars))
-          end)
-      end
+    Enum.map(extensions_per_backend, fn {backend, extensions} ->
+      hd(
+        quote do
+          unquote(backend) ->
+            reduce_socket(unquote(extensions), socket, fn ext, socket ->
+              ext.unquote(callback)(unquote_splicing(callback_vars))
+            end)
+        end
+      )
     end)
   end
 
@@ -141,7 +143,7 @@ defmodule Routex.Extension.LiveViewHooks do
         attrs = socket |> Routex.Attrs.get!(:url) |> attrs()
 
         case attrs.__backend__ do
-          [unquote_splicing(cases)]
+          unquote(cases)
         end
       end
     end

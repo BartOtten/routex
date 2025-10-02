@@ -127,13 +127,12 @@ defmodule Routex.Extension.Alternatives do
           route.path
         end
 
-      helper = helper_name(route.helper, branch_opts.branch_alias)
+      helper = helper_name(route.helper, branch_opts.branch_key)
 
       %{route | path: path, helper: helper}
       |> Attrs.merge(branch_opts.attrs)
       |> Attrs.merge(branch_opts |> Map.from_struct() |> Map.delete(:attrs))
       |> Attrs.update(:__branch__, &List.insert_at(&1, -1, suborder))
-      |> Attrs.put(:branch_helper, branch_opts.attrs.branch_helper)
     end
   end
 

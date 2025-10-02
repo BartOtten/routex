@@ -23,10 +23,9 @@ defmodule Routex.Extension.AlternativesTest do
                   "foo" => %{},
                   "foo_nested" => %Routex.Extension.Alternatives.Branch.Flat{
                     attrs: %{
-                      key: :n1,
+                      custom_key: :n1,
                       language: "en",
-                      opt_attr: "default",
-                      branch_helper: "foo_nested"
+                      opt_attr: "default"
                     }
                   },
                   "foo_nested_nested2" => %{}
@@ -87,14 +86,13 @@ defmodule Routex.Extension.AlternativesTest do
         plug_opts: nil,
         private: %{
           routex: %{
-            key: :root,
+            __branch__: [0, 0],
+            branch_key: nil,
+            branch_path: [],
+            branch_prefix: "/",
             language: "en",
             opt_attr: "default",
-            branch_helper: nil,
-            __branch__: [0, 0],
-            branch_alias: nil,
-            branch_path: [],
-            branch_prefix: "/"
+            custom_key: :root
           }
         },
         trailing_slash?: nil,
@@ -114,14 +112,13 @@ defmodule Routex.Extension.AlternativesTest do
         plug_opts: nil,
         private: %{
           routex: %{
-            key: :root,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo",
             __branch__: [0, 1],
-            branch_alias: :foo,
+            branch_key: "foo",
             branch_path: ["foo"],
-            branch_prefix: "/foo"
+            branch_prefix: "/foo",
+            language: "en",
+            opt_attr: "default",
+            custom_key: :root
           }
         },
         trailing_slash?: nil,
@@ -129,277 +126,267 @@ defmodule Routex.Extension.AlternativesTest do
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
+        assigns: nil,
+        helper: nil,
+        hosts: nil,
         kind: nil,
+        line: nil,
+        metadata: nil,
         path: "/foo/nested",
-        hosts: nil,
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :n1,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo_nested",
             __branch__: [0, 2],
-            branch_alias: :foo_nested,
+            branch_key: "foo_nested",
             branch_path: ["foo", "nested"],
-            branch_prefix: "/foo/nested"
+            branch_prefix: "/foo/nested",
+            language: "en",
+            opt_attr: "default",
+            custom_key: :n1
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
+        assigns: nil,
+        helper: nil,
+        hosts: nil,
         kind: nil,
+        line: nil,
+        metadata: nil,
         path: "/foo/nested/nested2",
-        hosts: nil,
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :n2,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo_nested_nested2",
             __branch__: [0, 3],
-            branch_alias: :foo_nested_nested2,
+            branch_key: "foo_nested_nested2",
             branch_path: ["foo", "nested", "nested2"],
-            branch_prefix: "/foo/nested/nested2"
+            branch_prefix: "/foo/nested/nested2",
+            language: "en",
+            opt_attr: "default",
+            custom_key: :n2
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
+        assigns: nil,
+        helper: nil,
+        hosts: nil,
         kind: nil,
+        line: nil,
+        metadata: nil,
         path: "/products/:id",
-        hosts: nil,
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :root,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: nil,
             __branch__: [1, 0],
-            branch_alias: nil,
+            branch_key: nil,
             branch_path: [],
-            branch_prefix: "/"
+            branch_prefix: "/",
+            language: "en",
+            opt_attr: "default",
+            custom_key: :root
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
+        assigns: nil,
+        helper: nil,
+        hosts: nil,
         kind: nil,
+        line: nil,
+        metadata: nil,
         path: "/foo/products/:id",
-        hosts: nil,
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :root,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo",
             __branch__: [1, 1],
-            branch_alias: :foo,
+            branch_key: "foo",
             branch_path: ["foo"],
-            branch_prefix: "/foo"
+            branch_prefix: "/foo",
+            language: "en",
+            opt_attr: "default",
+            custom_key: :root
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
+        assigns: nil,
+        helper: nil,
+        hosts: nil,
         kind: nil,
+        line: nil,
+        metadata: nil,
         path: "/foo/nested/products/:id",
-        hosts: nil,
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :n1,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo_nested",
             __branch__: [1, 2],
-            branch_alias: :foo_nested,
+            branch_key: "foo_nested",
             branch_path: ["foo", "nested"],
-            branch_prefix: "/foo/nested"
+            branch_prefix: "/foo/nested",
+            language: "en",
+            opt_attr: "default",
+            custom_key: :n1
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
+        assigns: nil,
+        helper: nil,
+        hosts: nil,
         kind: nil,
+        line: nil,
+        metadata: nil,
         path: "/foo/nested/nested2/products/:id",
-        hosts: nil,
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :n2,
+            __branch__: [1, 3],
+            branch_key: "foo_nested_nested2",
+            branch_path: ["foo", "nested", "nested2"],
+            branch_prefix: "/foo/nested/nested2",
             language: "en",
             opt_attr: "default",
-            branch_helper: "foo_nested_nested2",
-            __branch__: [1, 3],
-            branch_alias: :foo_nested_nested2,
-            branch_path: ["foo", "nested", "nested2"],
-            branch_prefix: "/foo/nested/nested2"
+            custom_key: :n2
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
-        kind: nil,
-        path: "/posts/:id",
+        assigns: nil,
+        helper: nil,
         hosts: nil,
+        kind: nil,
+        line: nil,
+        metadata: nil,
+        path: "/posts/:id",
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :root,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: nil,
             __branch__: [2, 0],
             alternatives_prefix: false,
-            branch_alias: nil,
             branch_path: [],
-            branch_prefix: "/"
+            branch_prefix: "/",
+            custom_key: :root,
+            language: "en",
+            opt_attr: "default",
+            branch_key: nil
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
-        kind: nil,
-        path: "/posts/:id",
+        assigns: nil,
+        helper: nil,
         hosts: nil,
+        kind: nil,
+        line: nil,
+        metadata: nil,
+        path: "/posts/:id",
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :root,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo",
             __branch__: [2, 1],
             alternatives_prefix: false,
-            branch_alias: :foo,
             branch_path: ["foo"],
-            branch_prefix: "/foo"
+            branch_prefix: "/foo",
+            custom_key: :root,
+            language: "en",
+            opt_attr: "default",
+            branch_key: "foo"
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
-        kind: nil,
-        path: "/posts/:id",
+        assigns: nil,
+        helper: nil,
         hosts: nil,
+        kind: nil,
+        line: nil,
+        metadata: nil,
+        path: "/posts/:id",
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :n1,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo_nested",
             __branch__: [2, 2],
             alternatives_prefix: false,
-            branch_alias: :foo_nested,
             branch_path: ["foo", "nested"],
-            branch_prefix: "/foo/nested"
+            branch_prefix: "/foo/nested",
+            custom_key: :n1,
+            language: "en",
+            opt_attr: "default",
+            branch_key: "foo_nested"
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       },
       %Phoenix.Router.Route{
-        verb: :get,
-        line: nil,
-        kind: nil,
-        path: "/posts/:id",
+        assigns: nil,
+        helper: nil,
         hosts: nil,
+        kind: nil,
+        line: nil,
+        metadata: nil,
+        path: "/posts/:id",
+        pipe_through: nil,
         plug: nil,
         plug_opts: nil,
-        helper: nil,
         private: %{
           routex: %{
-            key: :n2,
-            language: "en",
-            opt_attr: "default",
-            branch_helper: "foo_nested_nested2",
             __branch__: [2, 3],
             alternatives_prefix: false,
-            branch_alias: :foo_nested_nested2,
             branch_path: ["foo", "nested", "nested2"],
-            branch_prefix: "/foo/nested/nested2"
+            branch_prefix: "/foo/nested/nested2",
+            custom_key: :n2,
+            language: "en",
+            opt_attr: "default",
+            branch_key: "foo_nested_nested2"
           }
         },
-        pipe_through: nil,
-        assigns: nil,
-        metadata: nil,
         trailing_slash?: nil,
+        verb: :get,
         warn_on_verify?: nil
       }
     ]

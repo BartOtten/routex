@@ -1,5 +1,5 @@
 defmodule Routex.Test.Fixtures.Assigns do
-  defstruct [:key, language: "en", opt_attr: "default"]
+  defstruct [:custom_key, language: "en", opt_attr: "default"]
 end
 
 defmodule Routex.Test.Fixtures do
@@ -9,18 +9,18 @@ defmodule Routex.Test.Fixtures do
   def branches_with_map_attrs,
     do: %{
       "/" => %{
-        attrs: %{key: :root, language: "en", opt_attr: "default"},
+        attrs: %{custom_key: :root, language: "en", opt_attr: "default"},
         branches: %{
           "/foo" => %{
             attrs: %{
               language: "en",
-              key: :root
+              custom_key: :root
             },
             branches: %{
               "/nested" => %{
-                attrs: %{key: :n1, language: "en"},
+                attrs: %{custom_key: :n1, language: "en"},
                 branches: %{
-                  "/nested2" => %{attrs: %{key: :n2, language: "en"}}
+                  "/nested2" => %{attrs: %{custom_key: :n2, language: "en"}}
                 }
               }
             }
@@ -32,18 +32,18 @@ defmodule Routex.Test.Fixtures do
   def branches,
     do: %{
       "/" => %{
-        attrs: %Assigns{key: :root, language: "en"},
+        attrs: %Assigns{custom_key: :root, language: "en"},
         branches: %{
           "/foo" => %{
             attrs: %Assigns{
               language: "en",
-              key: :root
+              custom_key: :root
             },
             branches: %{
               "/nested" => %{
-                attrs: %Assigns{key: :n1, language: "en"},
+                attrs: %Assigns{custom_key: :n1, language: "en"},
                 branches: %{
-                  "/nested2" => %{attrs: %Assigns{key: :n2, language: "en"}}
+                  "/nested2" => %{attrs: %Assigns{custom_key: :n2, language: "en"}}
                 }
               }
             }
@@ -54,44 +54,34 @@ defmodule Routex.Test.Fixtures do
 
   def branches_precomputed,
     do: %{
-      nil => %Branch.Nested{
-        attrs: %{branch_helper: nil, key: :root, language: "en", opt_attr: "default"},
+      nil: %Branch.Nested{
+        attrs: %{custom_key: :root, language: "en", opt_attr: "default"},
+        branch_key: nil,
         branch_path: [],
-        branch_alias: nil,
         branch_prefix: "/",
         branches: %{
           "foo" => %Branch.Nested{
-            attrs: %{opt_attr: "default", language: "en", key: :root, branch_helper: "foo"},
+            attrs: %{custom_key: :root, language: "en", opt_attr: "default"},
+            branch_key: "foo",
+            branch_path: ["foo"],
+            branch_prefix: "/foo",
             branches: %{
               "nested" => %Branch.Nested{
-                attrs: %{
-                  opt_attr: "default",
-                  language: "en",
-                  key: :n1,
-                  branch_helper: "foo_nested"
-                },
+                attrs: %{custom_key: :n1, language: "en", opt_attr: "default"},
+                branch_key: "nested",
+                branch_path: ["foo", "nested"],
+                branch_prefix: "/nested",
                 branches: %{
                   "nested2" => %Branch.Nested{
-                    attrs: %{
-                      opt_attr: "default",
-                      language: "en",
-                      key: :n2,
-                      branch_helper: "foo_nested_nested2"
-                    },
+                    attrs: %{custom_key: :n2, language: "en", opt_attr: "default"},
+                    branch_key: "nested2",
                     branch_path: ["foo", "nested", "nested2"],
-                    branch_alias: :nested2,
                     branch_prefix: "/nested2",
                     branches: %{}
                   }
-                },
-                branch_path: ["foo", "nested"],
-                branch_alias: :nested,
-                branch_prefix: "/nested"
+                }
               }
-            },
-            branch_path: ["foo"],
-            branch_alias: :foo,
-            branch_prefix: "/foo"
+            }
           }
         }
       }
@@ -100,32 +90,27 @@ defmodule Routex.Test.Fixtures do
   def branches_flat,
     do: %{
       nil => %Branch.Flat{
-        attrs: %{branch_helper: nil, key: :root, language: "en", opt_attr: "default"},
+        attrs: %{custom_key: :root, language: "en", opt_attr: "default"},
+        branch_key: nil,
         branch_path: [],
-        branch_alias: nil,
         branch_prefix: "/"
       },
       "foo" => %Branch.Flat{
+        attrs: %{custom_key: :root, language: "en", opt_attr: "default"},
+        branch_key: "foo",
         branch_path: ["foo"],
-        attrs: %{opt_attr: "default", language: "en", key: :root, branch_helper: "foo"},
-        branch_alias: :foo,
         branch_prefix: "/foo"
       },
       "foo_nested" => %Branch.Flat{
+        attrs: %{custom_key: :n1, language: "en", opt_attr: "default"},
+        branch_key: "foo_nested",
         branch_path: ["foo", "nested"],
-        attrs: %{opt_attr: "default", language: "en", key: :n1, branch_helper: "foo_nested"},
-        branch_alias: :foo_nested,
         branch_prefix: "/foo/nested"
       },
       "foo_nested_nested2" => %Branch.Flat{
-        attrs: %{
-          opt_attr: "default",
-          language: "en",
-          key: :n2,
-          branch_helper: "foo_nested_nested2"
-        },
+        attrs: %{custom_key: :n2, language: "en", opt_attr: "default"},
+        branch_key: "foo_nested_nested2",
         branch_path: ["foo", "nested", "nested2"],
-        branch_alias: :foo_nested_nested2,
         branch_prefix: "/foo/nested/nested2"
       }
     }

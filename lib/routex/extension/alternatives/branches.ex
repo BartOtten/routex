@@ -4,19 +4,17 @@ defmodule Routex.Extension.Alternatives.Branch.Nested do
   """
   @type t :: %__MODULE__{
           attrs: %{atom => any} | nil,
+          branch_key: binary | atom,
           branch_path: list(binary),
           branch_prefix: binary,
-          branch_alias: atom,
           branches: %{(binary | atom) => t} | nil
         }
 
-  defstruct [
-    :branch_alias,
-    attrs: %{},
-    branch_path: [],
-    branch_prefix: "",
-    branches: %{}
-  ]
+  defstruct attrs: %{},
+            branch_key: "",
+            branch_path: [],
+            branch_prefix: "",
+            branches: %{}
 end
 
 defmodule Routex.Extension.Alternatives.Branch.Flat do
@@ -25,17 +23,15 @@ defmodule Routex.Extension.Alternatives.Branch.Flat do
   """
   @type t :: %__MODULE__{
           attrs: %{atom => any} | nil,
+          branch_key: binary | atom,
           branch_path: list(binary),
-          branch_prefix: binary,
-          branch_alias: atom
+          branch_prefix: binary
         }
 
-  defstruct [
-    :branch_alias,
-    attrs: %{},
-    branch_path: [],
-    branch_prefix: ""
-  ]
+  defstruct attrs: %{},
+            branch_key: "",
+            branch_path: [],
+            branch_prefix: ""
 end
 
 defmodule Routex.Extension.Alternatives.Branches do
@@ -84,42 +80,41 @@ defmodule Routex.Extension.Alternatives.Branches do
   def flatten_branch({_branch, branch_opts}, {_p_branch, p_branch_opts})
       when is_nil(p_branch_opts) or is_nil(p_branch_opts.branch_alias) do
     branch_opts = Map.drop(branch_opts, [:branches])
-    branch_key = branch_opts.attrs.branch_helper
+    branch_key = branch_opts.branch_key
     {branch_key, struct(Branch.Flat, Map.from_struct(branch_opts))}
   end
 
   def flatten_branch({_branch, branch_opts}, {_p_branch, p_branch_opts}) do
     flattened_branch_prefix = Path.join(p_branch_opts.branch_prefix, branch_opts.branch_prefix)
 
-    flattened_branch_alias =
-      String.to_atom(
-        "#{Atom.to_string(p_branch_opts.branch_alias)}_#{Atom.to_string(branch_opts.branch_alias)}"
-      )
+    flattened_branch_key =
+      if p_branch_opts.branch_key,
+        do: p_branch_opts.branch_key <> "_" <> branch_opts.branch_key,
+        else: branch_opts.branch_key
 
     branch_opts = %{
       branch_opts
       | branch_prefix: flattened_branch_prefix,
-        branch_alias: flattened_branch_alias
+        branch_key: flattened_branch_key
     }
 
     new_branch_opts = Map.drop(branch_opts, [:branches])
-    new_branch_key = branch_opts.attrs.branch_helper
+    new_branch_key = flattened_branch_key
 
     {new_branch_key, struct(Branch.Flat, Map.from_struct(new_branch_opts))}
   end
 
   @spec get_slug_key(binary) :: binary
-  def get_slug_key(slug), do: slug |> String.replace("/", "_") |> String.replace_prefix("_", "")
+  def get_slug_key(slug),
+    do: slug |> String.replace(["/", "-"], "_") |> String.replace_prefix("_", "")
 
   @spec get_branch_opts(slug :: binary, list(binary)) :: %{
           key: nil | binary,
           path: list,
-          prefix: binary,
-          alias: nil | atom,
-          helper: nil | binary
+          prefix: binary
         }
   def get_branch_opts("/", []) do
-    %{key: nil, path: [], prefix: "", alias: nil, helper: nil}
+    %{key: nil, path: [], prefix: ""}
   end
 
   def get_branch_opts(slug, p_branch_path) when is_list(p_branch_path) do
@@ -129,9 +124,7 @@ defmodule Routex.Extension.Alternatives.Branches do
     %{
       key: key,
       path: path,
-      prefix: slug |> String.replace(" ", "_"),
-      alias: String.to_atom(key),
-      helper: Enum.join(path, "_")
+      prefix: slug |> String.replace(" ", "_")
     }
   end
 
@@ -142,19 +135,15 @@ defmodule Routex.Extension.Alternatives.Branches do
       branch = Map.put_new(branch, :attrs, Map.new())
       branch_opts = get_branch_opts(slug, p_branch.branch_path)
       attrs_map = destruct(branch.attrs)
-
-      new_attrs =
-        p_branch.attrs
-        |> Map.merge(attrs_map)
-        |> Map.put(:branch_helper, branch_opts.helper)
+      new_attrs = Map.merge(p_branch.attrs, attrs_map)
 
       new_opts =
         maybe_compute_nested_branches(
           %Branch.Nested{
             attrs: new_attrs,
+            branch_key: branch_opts.key,
             branch_path: branch_opts.path,
-            branch_prefix: Path.join("/", branch_opts.prefix),
-            branch_alias: branch_opts.alias
+            branch_prefix: Path.join("/", branch_opts.prefix)
           },
           branch
         )

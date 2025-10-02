@@ -84,24 +84,30 @@ defmodule Routex.Extension.AlternativeGetters do
   @impl Routex.Extension
   @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
   def create_helpers(routes, _backend, _env) do
-    quote do
-      def alternatives(url) when is_binary(url) do
-        case pattern = Matchable.new(url) do
-          unquote(build_case_clauses(routes))
-        end
+    guarded_defs =
+      quote do
+        require Record
+        def alternatives(url) when is_binary(url), do: url |> Matchable.new() |> do_alternatives()
+
+        def alternatives(input) when Record.is_record(input, Matchable),
+          do: input |> do_alternatives()
       end
-    end
+
+    unguarded_defs =
+      routes
+      |> Route.group_by_nesting()
+      |> Enum.flat_map(&to_pattern_and_body/1)
+      |> Enum.uniq_by(fn {pattern, _body} -> pattern end)
+      |> Enum.map(fn {pattern, body} ->
+        quote do
+          def do_alternatives(unquote(pattern) = pattern), do: unquote(body)
+        end
+      end)
+
+    [guarded_defs | unguarded_defs]
   end
 
-  def build_case_clauses(routes) do
-    routes
-    |> Route.group_by_nesting()
-    |> Enum.flat_map(&to_pattern_body/1)
-    |> Enum.uniq_by(fn {p, _b} -> p end)
-    |> Enum.flat_map(&to_clause_ast/1)
-  end
-
-  defp to_pattern_body({_nesting, siblings}) do
+  defp to_pattern_and_body({_nesting, siblings}) do
     clause_body_ast = Enum.map(siblings, &clause_body/1)
     siblings |> Enum.map(&clause_pattern_body(&1, clause_body_ast))
   end
@@ -123,12 +129,6 @@ defmodule Routex.Extension.AlternativeGetters do
         slug: unquote(static_slash_pattern) |> to_string(),
         attrs: unquote(dynamic_slash_pattern) |> to_string() |> attrs()
       }
-    end
-  end
-
-  defp to_clause_ast({pattern, body}) do
-    quote do
-      unquote(pattern) -> unquote(body)
     end
   end
 end

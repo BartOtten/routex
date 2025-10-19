@@ -49,7 +49,7 @@ defmodule Routex.Utils do
       ])
 
   @doc """
-  Returns the AST to get the current branch from process dict or from  assigns, conn or socket
+  Returns the AST to get the current branch leaf from process dict or from  assigns, conn or socket
   based on the available variables in the `caller` module.
   """
   @spec get_helper_ast(caller :: T.env()) :: T.ast()
@@ -68,19 +68,30 @@ defmodule Routex.Utils do
 
     cond do
       :assigns in vars ->
+        mod =
+          try do
+            Macro.expand_once({:__aliases__, [], [:Routes]}, caller)
+          rescue
+            e in FunctionClauseError ->
+              if caller.module == Routex.UtilsTest,
+                do: Routex.UtilsTest,
+                else: reraise(e, __STACKTRACE__)
+          end
+
         quote do
-          assigns = var!(assigns)
-          Routex.Utils.get_branch(assigns[:conn] || assigns[:socket])
+          assigns
+          |> var!()
+          |> Routex.Utils.get_branch_leaf_from_assigns(unquote(mod), unquote(caller.module))
         end
 
       :conn in vars ->
         quote do
-          conn |> var!() |> Routex.Utils.get_branch()
+          conn |> var!() |> Routex.Utils.get_branch_leaf()
         end
 
       :socket in vars ->
         quote do
-          socket |> var!() |> Routex.Utils.get_branch()
+          socket |> var!() |> Routex.Utils.get_branch_leaf()
         end
 
       ExUnit.Callbacks in caller.requires ->
@@ -97,17 +108,72 @@ defmodule Routex.Utils do
     end
   end
 
-  @spec get_branch(T.route() | map | Plug.Conn.t() | Phoenix.Socket.t()) :: integer()
-  def get_branch(%{private: %{routex: %{__branch__: branch}}}) do
-    List.last(branch)
-  end
+  @doc """
+  Returns the branch leaf from assigns.
+  """
+  @spec get_branch_leaf_from_assigns(map, module, module) :: integer()
+  def get_branch_leaf_from_assigns(%{conn: conn}, _mod, _caller),
+    do: Routex.Utils.get_branch_leaf(conn)
 
-  def get_branch(_assigns_conn_socket) do
+  def get_branch_leaf_from_assigns(%{socket: socket}, _mod, _caller),
+    do: Routex.Utils.get_branch_leaf(socket)
+
+  def get_branch_leaf_from_assigns(%{url: url}, mod, _caller),
+    do: mod.attrs(url).__branch__ |> Routex.Utils.get_branch_leaf()
+
+  def get_branch_leaf_from_assigns(assigns, _mod, call_mod) do
     require Logger
 
     Logger.warning("""
-    Using branching verified routes in `mount/3` is not supported.
-    Please move the code to the `handle_params/3`.
+    Routex detected a problem in module #{call_mod |> to_string()}:
+    Expected one of :socket, :conn, or :url in assigns, but none was found.
+
+    Assigns do not automatically flow into child components.
+    You need to pass them explicitly, e.g.:
+
+    <Layout.app url={@url}> ... </Layout.app>
+
+    When using a component, make sure :url is a required attribute..
+
+    attr :url, :string,
+       required: true,
+       doc: "Routex pass through: url={@url}"
+
+    Falling back to default route.
+
+    Received assigns:
+    #{inspect(assigns, pretty: true, limit: :infinity, structs: false)}
+    """)
+
+    {:current_stacktrace, st} = Process.info(self(), :current_stacktrace)
+    st |> tl() |> Exception.format_stacktrace() |> Logger.warning()
+
+    0
+  end
+
+  @spec get_branch_leaf(T.route() | map | Plug.Conn.t() | Phoenix.Socket.t()) :: integer()
+  def get_branch_leaf(%{private: %{routex: %{__branch__: branch}}}) do
+    List.last(branch)
+  end
+
+  def get_branch_leaf(branch) when is_list(branch) do
+    List.last(branch)
+  end
+
+  def get_branch_leaf(assigns_conn_socket) do
+    require Logger
+
+    Logger.warning("""
+    Routex detected a problem: could not detect a branch.
+
+    Tips:
+    - Using branching verified routes in `mount/3` is not supported.
+      Please move the code to the `handle_params/3`.
+
+    - Otherwise please report the issue including the information below.
+
+    Assigns, conn or socket:
+    #{inspect(assigns_conn_socket, pretty: true, limit: :infinity, structs: false)}
     """)
 
     {:current_stacktrace, st} = Process.info(self(), :current_stacktrace)

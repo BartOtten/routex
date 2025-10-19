@@ -119,16 +119,16 @@ defmodule Routex.UtilsTest do
     end
   end
 
-  describe "get_branch/1" do
+  describe "get_branch_leaf/1" do
     test "returns the last element of branch from a valid map" do
       input = %{private: %{routex: %{__branch__: [1, 2, 3]}}}
-      assert Utils.get_branch(input) == 3
+      assert Utils.get_branch_leaf(input) == 3
     end
 
     test "logs a warning and returns 0 when input is not a valid branch map" do
       log =
         capture_log(fn ->
-          assert Utils.get_branch(%{}) == 0
+          assert Utils.get_branch_leaf(%{}) == 0
         end)
 
       assert log =~ "Using branching verified routes in `mount/3` is not supported"
@@ -154,7 +154,7 @@ defmodule Routex.UtilsTest do
       Process.delete(:rtx_branch)
     end
 
-    test "returns AST that uses assigns when available" do
+    test "returns AST that uses assigns when available (using conn)" do
       # Simulate a caller with :assigns available
       caller = %{
         module: __MODULE__,
@@ -165,6 +165,26 @@ defmodule Routex.UtilsTest do
       # The AST assigns 'assigns' from the caller.
       # We simulate an assigns variable with a :conn that carries a branch.
       assigns = %{conn: %{private: %{routex: %{__branch__: [100]}}}}
+
+      ast = Utils.get_helper_ast(caller)
+      {result, _bindings} = Code.eval_quoted(ast, assigns: assigns)
+      assert result == 100
+    end
+
+    # used by Utils.get_derived_ast/1 as test fallback
+    def attrs("/foo"), do: %{__branch__: [1, 2, 100]}
+
+    test "returns AST that uses assigns when available (using url)" do
+      # Simulate a caller with :assigns available
+      caller = %{
+        module: __MODULE__,
+        versioned_vars: [{{:assigns, nil}, nil}],
+        requires: []
+      }
+
+      # The AST assigns 'assigns' from the caller.
+      # We simulate an assigns variable with a :conn that carries a branch.
+      assigns = %{url: "/foo"}
 
       ast = Utils.get_helper_ast(caller)
       {result, _bindings} = Code.eval_quoted(ast, assigns: assigns)

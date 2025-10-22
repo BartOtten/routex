@@ -45,6 +45,31 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
   ```
 
+  ## Troubleshoot
+
+  #### Warning about unknown branch
+  The [Verified Routes extension](docs/EXTENSIONS.md#verified-routes) relies on
+  the availability of the `@url` assignment or the key `:rtx_branch`put
+  in the process dictionary.
+
+  Routex assigns `@url` automatically in `conn` and `socket`, but you need to explicitly
+  pass it down to components using Verified Routes (example: `<Layouts.app url={@url}>`)
+
+  When using a component, make sure :url is a required attribute.
+
+  ```
+  attr :url, :string,
+    required: true,
+    doc: "Required for Routex' Verified Routes: url={@url}"
+  ```
+
+  Alternatively, if you don’t mind using process state, you can automatically set the
+  process key with the [Runtime Dispatcher](docs/EXTENSIONS.md#runtime-dispatcher) extension.
+
+  ```
+  + dispatch_targets: [{Routex.Utils, :process_put_branch, [[:attrs, :__branch__]]}]
+  ```
+
   ## Configuration
   ```diff
   # file /lib/example_web/routex_backend.ex

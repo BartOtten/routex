@@ -49,6 +49,22 @@ defmodule Routex.Utils do
       ])
 
   @doc """
+  Helps setting the branch in the process dictionary.
+
+  **Example: As dispatch target**
+
+  ```elixir
+  dispatch_targets: [{Routex.Utils, :process_put_branch, [[:attrs, :__branch__]]}]
+  ```
+
+  """
+  @spec process_put_branch(branch :: list(integer)) :: integer
+  def process_put_branch(branch) do
+    leaf = get_branch_leaf(branch)
+    Process.put(:rtx_branch, leaf)
+  end
+
+  @doc """
   Returns the AST to get the current branch leaf from process dict or from  assigns, conn or socket
   based on the available variables in the `caller` module.
   """
@@ -126,18 +142,22 @@ defmodule Routex.Utils do
 
     Logger.warning("""
     Routex detected a problem in module #{call_mod |> to_string()}:
-    Expected one of :socket, :conn, or :url in assigns, but none was found.
+    Expected one of :socket, :conn, or :url in assigns, or process dictonary key
+    :rtx_branch being set, but none was found.
 
-    Assigns do not automatically flow into child components.
-    You need to pass them explicitly, e.g.:
+    Assigns do not propagate automatically into child components; you must provide
+    them explicitly, for example:
 
     <Layout.app url={@url}> ... </Layout.app>
 
-    When using a component, make sure :url is a required attribute..
+    When using a component, make sure :url is a required attribute.
 
     attr :url, :string,
        required: true,
        doc: "Routex pass through: url={@url}"
+
+    Alternatively, you can set the process key. See the Verified Routes extension
+    documentation for more information: https://hexdocs.pm/routex/Routex.Extension.VerifiedRoutes.html
 
     Falling back to default route.
 

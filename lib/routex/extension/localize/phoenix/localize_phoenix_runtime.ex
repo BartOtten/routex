@@ -74,8 +74,11 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   alias Routex.Utils
 
   @session_key :rtx
-  @locale_fields [:locale, :language, :region]
+  @locale_fields [:locale, :language, :region, :territory]
   @namespace :runtime
+  @default_sources Detect.__default_sources__()
+  @supported_sources Detect.__supported_sources__()
+  @default_params Detect.__default_params__()
 
   # Typespecs
   @type conn :: Plug.Conn.t()
@@ -90,17 +93,31 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(config, backend) do
-    for field <- @locale_fields do
-      key = (to_string(field) <> "_sources") |> String.to_atom()
-      sources = config |> Keyword.get(key, [])
-      invalid_sources = sources -- Detect.__supported_sources__()
-
-      if invalid_sources != [] do
-        raise "One or more values in #{inspect(key)} are not supported. Invalid: #{inspect(invalid_sources)} (#{inspect(backend)})"
-      end
+    fetch_and_validate_sources! = fn key ->
+      config |> Keyword.get(key, @default_sources) |> validate(key, backend)
     end
 
-    config
+    fetch_params = fn key, default -> Keyword.get(config, key, default) end
+
+    config ++
+      [
+        region_sources: :region_sources |> fetch_and_validate_sources!.(),
+        language_sources: :language_sources |> fetch_and_validate_sources!.(),
+        locale_sources: :locale_sources |> fetch_and_validate_sources!.(),
+        region_params: :region_params |> fetch_params.(@default_params.region),
+        language_params: :language_params |> fetch_params.(@default_params.language),
+        locale_params: :locale_params |> fetch_params.(@default_params.locale)
+      ]
+  end
+
+  defp validate(sources, key, backend) do
+    invalid_sources = sources -- @supported_sources
+
+    if invalid_sources != [] do
+      raise "One or more values in #{inspect(key)} are not supported. Invalid: #{inspect(invalid_sources)} (#{inspect(backend)})"
+    end
+
+    sources
   end
 
   @doc """

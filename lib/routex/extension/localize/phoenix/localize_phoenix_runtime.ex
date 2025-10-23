@@ -114,7 +114,11 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
     invalid_sources = sources -- @supported_sources
 
     if invalid_sources != [] do
-      raise "One or more values in #{inspect(key)} are not supported. Invalid: #{inspect(invalid_sources)} (#{inspect(backend)})"
+      raise ArgumentError,
+            """
+            One or more values in #{inspect(key)} are not supported.
+            Invalid: #{inspect(invalid_sources)} (#{inspect(backend)})
+            """
     end
 
     sources

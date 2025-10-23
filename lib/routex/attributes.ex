@@ -99,7 +99,8 @@ defmodule Routex.Attrs do
     end)
   end
 
-  def merge(route_sock_or_conn, key, value) when is_atom(key) and is_map(value) do
+  def merge(route_sock_or_conn, key, value)
+      when (is_atom(key) and is_map(value)) or is_list(value) do
     update(route_sock_or_conn, key, fn
       nil -> value
       old when is_map(old) -> Map.merge(old, value)

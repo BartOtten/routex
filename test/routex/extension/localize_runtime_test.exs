@@ -38,6 +38,48 @@ defmodule Routex.Extension.Localize.Phoenix.RuntimeTest do
     end
   end
 
+  describe "config/2" do
+    test "raises on invalid sources" do
+      opts = Keyword.put(DummyOpts.opts(), :locale_sources, [:route, :invalid, :also_invalid])
+
+      assert_raise(
+        ArgumentError,
+        """
+        One or more values in :locale_sources are not supported.
+        Invalid: [:invalid, :also_invalid] (Routex.Extension.Localize.Phoenix.RuntimeTest.DummyBackend)
+        """,
+        fn ->
+          Runtime.configure(
+            opts,
+            DummyBackend
+          )
+        end
+      )
+    end
+
+    test "sets defaults" do
+      opts = DummyOpts.opts() |> Keyword.drop([:region_params, :region_sources])
+
+      config =
+        Runtime.configure(
+          opts,
+          DummyBackend
+        )
+
+      assert config[:region_sources] == [
+               :query,
+               :session,
+               :cookie,
+               :accept_language,
+               :path,
+               :assigns,
+               :route
+             ]
+
+      assert config[:region_params] == ["region", "locale"]
+    end
+  end
+
   describe "handle_params/4" do
     test "expands the runtime attributes and returns {:cont, socket}" do
       attrs = %{__backend__: DummyBackend, locale: "en-US"}

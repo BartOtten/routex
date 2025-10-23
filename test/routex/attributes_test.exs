@@ -54,6 +54,26 @@ defmodule Routex.AttributesTest do
       assert %Route{private: %{routex: %{__branch__: [5, 6], some: "some", other: "other"}}} =
                result
     end
+
+    test "key + a map value" do
+      route = %Route{private: %{routex: %{my_map: %{some: "some", other: "other"}}}}
+      result = merge(route, :my_map, %{__branch__: [5, 6]})
+
+      assert %Route{
+               private: %{routex: %{my_map: %{__branch__: [5, 6], some: "some", other: "other"}}}
+             } =
+               result
+    end
+
+    test "key + a list value" do
+      route = %Route{private: %{routex: %{my_list: [1, 2, 3]}}}
+      result = merge(route, :my_list, [5, 6])
+
+      assert %Route{
+               private: %{routex: %{my_list: [1, 2, 3, 5, 6]}}
+             } =
+               result
+    end
   end
 
   describe "put" do

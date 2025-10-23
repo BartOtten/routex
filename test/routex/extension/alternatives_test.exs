@@ -11,6 +11,13 @@ defmodule Routex.Extension.AlternativesTest do
     )
   end
 
+  test "removes Alternatives extension when no alternatives are found" do
+    config = [extensions: [Foo, Routex.Extension.Alternatives, Bar], alternatives: nil]
+    result = Alternatives.configure(config, :backend)
+
+    assert result[:extensions] == [Foo, Bar]
+  end
+
   test "configure adds precomputed values" do
     config = [alternatives: branches()]
     result = Alternatives.configure(config, :backend)

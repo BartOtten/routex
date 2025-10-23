@@ -61,6 +61,17 @@ defmodule Routex.Extension.AssignsTest do
     assert assigns == %{rtx: %{rtx_1: "r1"}}
   end
 
+  test "merge with existing route assigns" do
+    route =
+      %Phoenix.Router.Route{assigns: %{native: "assigned"}, private: %{}}
+      |> Routex.Attrs.put(:rtx_1, "r1")
+      |> Routex.Attrs.put(:rtx_2, "r2")
+
+    new = Assigns.post_transform([route], Conf3, nil)
+
+    assert [%{assigns: %{native: "assigned", rtx: %{rtx_1: "r1"}}}] = new
+  end
+
   test "other attributes are preserved" do
     route =
       %Phoenix.Router.Route{private: %{}}

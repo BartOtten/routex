@@ -5,6 +5,11 @@ defmodule Routex.UtilsTest do
 
   alias Routex.Utils
 
+  # used by Utils.get_derived_ast/1 as test fallback
+  defmodule Helpers do
+    def attrs("/foo"), do: %{__branch__: [1, 2, 100]}
+  end
+
   describe "print/1" do
     test "returns :noop input is nil" do
       assert Utils.print(nil) == :noop
@@ -119,9 +124,40 @@ defmodule Routex.UtilsTest do
     end
   end
 
+  describe "get_branch_leaf_from_assigns/3" do
+    test "returns the last element of branch from conn" do
+      input = %{conn: %{private: %{routex: %{__branch__: [1, 2, 3]}}}}
+      assert Utils.get_branch_leaf_from_assigns(input, Helpers, __MODULE__) == 3
+    end
+
+    test "returns the last element of branch from a socket" do
+      input = %{socket: %{private: %{routex: %{__branch__: [1, 2, 3]}}}}
+      assert Utils.get_branch_leaf_from_assigns(input, Helpers, __MODULE__) == 3
+    end
+
+    test "returns the last element of branch from a url" do
+      input = %{url: "/foo"}
+      assert Utils.get_branch_leaf_from_assigns(input, Helpers, __MODULE__) == 100
+    end
+
+    test "logs a warning and returns 0 when input is not a valid branch map" do
+      log =
+        capture_log(fn ->
+          assert Utils.get_branch_leaf(%{}) == 0
+        end)
+
+      assert log =~ "Routex detected a problem: could not detect a branch."
+    end
+  end
+
   describe "get_branch_leaf/1" do
     test "returns the last element of branch from a valid map" do
       input = %{private: %{routex: %{__branch__: [1, 2, 3]}}}
+      assert Utils.get_branch_leaf(input) == 3
+    end
+
+    test "returns the last element of branch from a branch list" do
+      input = [1, 2, 3]
       assert Utils.get_branch_leaf(input) == 3
     end
 
@@ -131,7 +167,7 @@ defmodule Routex.UtilsTest do
           assert Utils.get_branch_leaf(%{}) == 0
         end)
 
-      assert log =~ "Using branching verified routes in `mount/3` is not supported"
+      assert log =~ "Routex detected a problem: could not detect a branch."
     end
   end
 
@@ -170,9 +206,6 @@ defmodule Routex.UtilsTest do
       {result, _bindings} = Code.eval_quoted(ast, assigns: assigns)
       assert result == 100
     end
-
-    # used by Utils.get_derived_ast/1 as test fallback
-    def attrs("/foo"), do: %{__branch__: [1, 2, 100]}
 
     test "returns AST that uses assigns when available (using url)" do
       # Simulate a caller with :assigns available

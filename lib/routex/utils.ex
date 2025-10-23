@@ -58,9 +58,14 @@ defmodule Routex.Utils do
   ```
 
   """
-  @spec process_put_branch(branch :: list(integer)) :: integer
-  def process_put_branch(branch) do
+  @spec process_put_branch(branch :: [integer, ...]) :: integer
+  @spec process_put_branch(branch :: integer) :: integer
+  def process_put_branch(branch) when is_list(branch) do
     leaf = get_branch_leaf(branch)
+    Process.put(:rtx_branch, leaf)
+  end
+
+  def process_put_branch(leaf) when is_integer(leaf) do
     Process.put(:rtx_branch, leaf)
   end
 
@@ -90,7 +95,7 @@ defmodule Routex.Utils do
           rescue
             e in FunctionClauseError ->
               if caller.module == Routex.UtilsTest,
-                do: Routex.UtilsTest,
+                do: Routex.UtilsTest.Helpers,
                 else: reraise(e, __STACKTRACE__)
           end
 
@@ -128,14 +133,14 @@ defmodule Routex.Utils do
   Returns the branch leaf from assigns.
   """
   @spec get_branch_leaf_from_assigns(map, module, module) :: integer()
-  def get_branch_leaf_from_assigns(%{conn: conn}, _mod, _caller),
+  def get_branch_leaf_from_assigns(%{conn: conn}, _helper_mod, _caller),
     do: Routex.Utils.get_branch_leaf(conn)
 
-  def get_branch_leaf_from_assigns(%{socket: socket}, _mod, _caller),
+  def get_branch_leaf_from_assigns(%{socket: socket}, _helper_mod, _caller),
     do: Routex.Utils.get_branch_leaf(socket)
 
-  def get_branch_leaf_from_assigns(%{url: url}, mod, _caller),
-    do: mod.attrs(url).__branch__ |> Routex.Utils.get_branch_leaf()
+  def get_branch_leaf_from_assigns(%{url: url}, helper_mod, _caller),
+    do: helper_mod.attrs(url).__branch__ |> Routex.Utils.get_branch_leaf()
 
   def get_branch_leaf_from_assigns(assigns, _mod, call_mod) do
     require Logger
@@ -171,7 +176,8 @@ defmodule Routex.Utils do
     0
   end
 
-  @spec get_branch_leaf(T.route() | map | Plug.Conn.t() | Phoenix.Socket.t()) :: integer()
+  @spec get_branch_leaf(T.route() | map | Plug.Conn.t() | Phoenix.Socket.t() | [integer, ...]) ::
+          integer()
   def get_branch_leaf(%{private: %{routex: %{__branch__: branch}}}) do
     List.last(branch)
   end

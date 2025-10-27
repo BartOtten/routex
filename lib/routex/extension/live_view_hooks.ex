@@ -12,7 +12,6 @@ defmodule Routex.Extension.LiveViewHooks do
 
   @behaviour Routex.Extension
 
-  alias Routex.Route
   alias Routex.Types, as: T
 
   @supported_lifecycle_stages [
@@ -60,10 +59,9 @@ defmodule Routex.Extension.LiveViewHooks do
   Returns  `on_mount/4` and an initial `handle_params/3`.
   """
   @impl Routex.Extension
-  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(routes, _backend, _env) do
-    backends = Route.get_backends(routes)
 
+  @spec create_shared_helpers(T.routes(), [T.backend(), ...], T.env()) :: T.ast()
+  def create_shared_helpers(_routes, backends, _env) do
     rtx_hook = build_routex_hook()
     extension_hooks = create_liveview_hooks(backends, @supported_lifecycle_stages)
 

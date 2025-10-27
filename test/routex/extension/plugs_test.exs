@@ -59,23 +59,25 @@ defmodule Routex.Extension.PlugsTest do
 
   describe "create_helpers/3" do
     test "generates plug helper code" do
-      helpers = Plugs.create_helpers(@routes, DummyBackend1, %{})
+      helpers = Plugs.create_shared_helpers(@routes, [DummyBackend1, DummyBackend2], %{})
 
       # The helpers function returns a list of quoted expressions.
       assert is_list(helpers)
-      # In our dummy setup we have two backends so we expect two quoted expression.
-      assert length(helpers) == 2
-
-      helper_ast = List.first(helpers)
+      # In our dummy setup we have two backends + fallback so we expect 3 quoted expression.
+      assert length(helpers) == 3
 
       helper_str =
-        helper_ast |> Macro.to_string() |> String.replace(~r/\s+/, " ") |> String.trim()
+        helpers |> Macro.to_string() |> String.replace(~r/\s+/, " ") |> String.trim()
 
       # The generated code should include the conn matching definition of the plug function.
       assert helper_str =~ "def call( %{private: %{routex: %{__backend__:"
-      # It should reference the backend
+      assert helper_str =~ "def call( %{private: %{routex: %{__backend__:"
+      # It should reference the backends
       assert helper_str =~
                "%{private: %{routex: %{__backend__: Routex.Extension.PlugsTest.DummyBackend1}}} = conn"
+
+      assert helper_str =~
+               "%{private: %{routex: %{__backend__: Routex.Extension.PlugsTest.DummyBackend2}}} = conn"
 
       # The generated code should include a catchall/passthrough
       assert helper_str =~ "def call(conn, _opts)"

@@ -59,7 +59,7 @@ defmodule Routex.Extension.LiveViewHooksTest do
 
   describe "create_helpers/3" do
     test "generates hook helper code" do
-      helpers = Hooks.create_helpers(@routes, DummyBackend1, %{})
+      helpers = Hooks.create_shared_helpers(@routes, [DummyBackend1, DummyBackend2], %{})
 
       # The helpers function returns a list of quoted expressions.
       assert is_list(helpers)
@@ -71,8 +71,9 @@ defmodule Routex.Extension.LiveViewHooksTest do
 
       # The generated code should include the definition of the hook function.
       assert helper_str =~ "def on_mount("
-      # It should reference the backend
+      # It should reference both backends
       assert helper_str =~ "Routex.Extension.LiveViewHooksTest.DummyBackend1 ->"
+      assert helper_str =~ "Routex.Extension.LiveViewHooksTest.DummyBackend2 ->"
     end
   end
 end

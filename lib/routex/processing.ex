@@ -145,8 +145,14 @@ defmodule Routex.Processing do
 
   defp execute(backend_routes_callbacks, env) do
     transformed_routes_per_backend = transform_routes_per_backend(backend_routes_callbacks, env)
-    helpers_ast = generate_helpers_ast(transformed_routes_per_backend, env)
-    {helpers_ast, transformed_routes_per_backend}
+
+    helpers_ast =
+      generate_helpers_ast(:create_helpers, transformed_routes_per_backend, env)
+
+    shared_helpers_ast =
+      generate_helpers_ast(:create_shared_helpers, transformed_routes_per_backend, env)
+
+    {helpers_ast ++ shared_helpers_ast, transformed_routes_per_backend}
   end
 
   # Transformations
@@ -172,10 +178,37 @@ defmodule Routex.Processing do
   end
 
   # AST Generation
-  defp generate_helpers_ast(callback_name \\ :create_helpers, transformed_routes_per_backend, env) do
+  defp generate_helpers_ast(
+         :create_helpers = callback_name,
+         transformed_routes_per_backend,
+         env
+       ) do
     Enum.flat_map(transformed_routes_per_backend, fn {backend, callbacks, routes} ->
       extensions = callbacks[callback_name]
       generate_helper_ast(callback_name, extensions, routes, backend, env)
+    end)
+  end
+
+  defp generate_helpers_ast(
+         :create_shared_helpers = callback_name,
+         transformed_routes_per_backend,
+         env
+       ) do
+    routes_per_extension =
+      transformed_routes_per_backend
+      |> Enum.flat_map(fn {_backend, callbacks, routes} ->
+        Enum.map(callbacks[callback_name], fn ext -> {ext, routes} end)
+      end)
+      |> Enum.group_by(
+        fn {ext, _routes} -> ext end,
+        fn {_ext, routes} -> routes end
+      )
+
+    Enum.flat_map(routes_per_extension, fn {ext, routes} ->
+      routes = List.flatten(routes)
+      backends = Routex.Route.get_backends(routes)
+      extensions = [ext]
+      generate_helper_ast(callback_name, extensions, routes, backends, env)
     end)
   end
 

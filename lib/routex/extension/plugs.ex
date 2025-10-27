@@ -13,7 +13,6 @@ defmodule Routex.Extension.Plugs do
 
   @behaviour Routex.Extension
 
-  alias Routex.Route
   alias Routex.Types, as: T
 
   @supported_callbacks [
@@ -57,36 +56,40 @@ defmodule Routex.Extension.Plugs do
   encapsulates all the plug callbacks registered by Routex extension backends.
   """
   @impl Routex.Extension
-  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(routes, _backend, _env) do
-    backends = Route.get_backends(routes)
+  @spec create_shared_helpers(T.routes(), [T.backend(), ...], T.env()) :: T.ast()
+  def create_shared_helpers(_routes, backends, _env) do
+    matchers =
+      Enum.map(backends, fn backend ->
+        plugs = Map.get(backend.config(), :plugs, [])
+        call_extensions = Keyword.get(plugs, :call, [])
 
-    Enum.map(backends, fn backend ->
-      plugs = Map.get(backend.config(), :plugs, [])
-      call_extensions = Keyword.get(plugs, :call, [])
+        quote do
+          @doc "Plug of Routex encapsulating extension plugs for #{unquote(backend)}"
+          @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
+          def call(%{private: %{routex: %{__backend__: unquote(backend)}}} = conn, opts) do
+            url =
+              case {conn.request_path, conn.query_string} do
+                {path, ""} -> path
+                {path, query} -> "#{path}?#{query}"
+              end
 
-      quote do
-        @doc "Plug of Routex encapsulating extension plugs for #{unquote(backend)}"
-        @spec call(Plug.Conn.t(), list()) :: Plug.Conn.t()
-        def call(%{private: %{routex: %{__backend__: unquote(backend)}}} = conn, opts) do
-          url =
-            case {conn.request_path, conn.query_string} do
-              {path, ""} -> path
-              {path, query} -> "#{path}?#{query}"
-            end
+            attrs = attrs(url)
+            conn = conn |> Routex.Attrs.merge(attrs) |> assign(:url, url)
 
-          attrs = attrs(url)
-          conn = conn |> Routex.Attrs.merge(attrs) |> assign(:url, url)
-
-          Enum.reduce(unquote(call_extensions), conn, fn ext, conn ->
-            # credo:disable-for-next-line
-            apply(ext, :call, [conn, opts])
-          end)
+            Enum.reduce(unquote(call_extensions), conn, fn ext, conn ->
+              # credo:disable-for-next-line
+              apply(ext, :call, [conn, opts])
+            end)
+          end
         end
+      end)
 
+    catchall =
+      quote do
         # Passthrough for routes not in a routex preprocessing block
         def call(conn, _opts), do: conn
       end
-    end)
+
+    [catchall | matchers] |> Enum.reverse()
   end
 end

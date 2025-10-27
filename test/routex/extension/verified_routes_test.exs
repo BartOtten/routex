@@ -17,6 +17,13 @@ defmodule RtxBackend do
     verified_sigil_original: "~o"
 end
 
+defmodule RtxBackend2 do
+  use Routex.Backend,
+    extensions: [Routex.Extension.AttrGetters, Routex.Extension.VerifiedRoutes],
+    verified_sigil_routex: "~p",
+    verified_sigil_original: "~o"
+end
+
 defmodule AdminRouter do
   use Phoenix.Router
 
@@ -176,7 +183,12 @@ defmodule Routex.Extension.VerifiedRoutesTest do
     }
   ]
 
-  macros_ast = Routex.Extension.VerifiedRoutes.create_helpers(@routes, RtxBackend, __ENV__)
+  macros_ast =
+    Routex.Extension.VerifiedRoutes.create_shared_helpers(
+      @routes,
+      [RtxBackend, RtxBackend2],
+      __ENV__
+    )
 
   Code.compiler_options(ignore_module_conflict: true)
   Module.create(Router.RoutexHelpers, macros_ast, __ENV__)
@@ -187,6 +199,14 @@ defmodule Routex.Extension.VerifiedRoutesTest do
   # here comes Routex
   import Phoenix.VerifiedRoutes, only: :functions
   import Router.RoutexHelpers
+
+  test "some" do
+    Routex.Extension.VerifiedRoutes.create_shared_helpers(
+      @routes,
+      [RtxBackend, RtxBackend2],
+      nil
+    )
+  end
 
   test "~p preserves path separators from the new route definition" do
     set_branch(2)

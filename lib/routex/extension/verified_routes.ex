@@ -154,13 +154,13 @@ defmodule Routex.Extension.VerifiedRoutes do
   end
 
   @impl Routex.Extension
-  @spec create_helpers(T.routes(), T.backend(), T.env()) :: T.ast()
-  def create_helpers(routes, backend, _env) do
+  @spec create_shared_helpers(T.routes(), [T.backend(), ...], T.env()) :: T.ast()
+  def create_shared_helpers(routes, backends, _env) do
     # print a newline so the branch_macro's can safely print in their own
     # empty space
     IO.write("\n")
 
-    config = backend.config()
+    config = hd(backends).config()
     match_ast = quote do: Routex.Utils.get_helper_ast(__CALLER__)
     to_macro_name = fn "~" <> letter -> String.to_atom("sigil_" <> letter) end
 

@@ -77,8 +77,7 @@ defmodule Routex.MixProject do
       {:gettext, "~> 0.26 or ~> 1.0", optional: true},
       {:phoenix_view, "~> 2.0", optional: true},
       {:phoenix_live_view, "~> 0.18 or ~> 1.0", optional: true},
-      {:phoenix_html_helpers, "~> 1.0", optional: true},
-      {:igniter, "~> 0.5", optional: true}
+      {:phoenix_html_helpers, "~> 1.0", optional: true}
     ]
   end
 
@@ -90,7 +89,8 @@ defmodule Routex.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:makeup_diff, "~> 0.1", only: [:dev], runtime: false},
       {:git_ops, "~> 2.6", only: [:dev], runtime: false},
-      {:benchee, "~> 1.0", only: [:dev], runtime: false}
+      {:benchee, "~> 1.0", only: [:dev], runtime: false},
+      {:igniter, "~> 0.5", only: [:dev, :test], runtime: false}
     ]
   end
 

@@ -79,9 +79,7 @@ defmodule Routex.Extension.RuntimeDispatcher do
 
   alias Routex.Types, as: T
 
-  @default_targets [
-    {Gettext, :put_locale, [[:attrs, :runtime, :language]]}
-  ]
+  @default_targets []
 
   @impl Routex.Extension
   def configure(opts, _backend) do

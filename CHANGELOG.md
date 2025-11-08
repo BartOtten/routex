@@ -5,6 +5,25 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.3.0-rc.2](https://github.com/BartOtten/routex/compare/v1.3.0-rc.1...v1.3.0-rc.2) (2025-11-08)
+
+
+
+
+### Features:
+
+* add callback create_shared_helpers/3 by Bart Otten
+
+* cloak: custom functions for route transformation by Bart Otten
+
+* utils: add helper to set rtx_branch in process dict by Bart Otten
+
+* derive branch from url assignment by Bart Otten
+
+### Bug Fixes:
+
+* locale: compilation issues when locale module is auto detected by Bart Otten
+
 ## [v1.3.0-rc.1](https://github.com/BartOtten/routex/compare/v1.3.0-rc.0...v1.3.0-rc.1) (2025-09-29)
 
 

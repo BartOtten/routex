@@ -12,24 +12,24 @@ defmodule Routex.Extension.Localize.Integrate do
     cond do
       match?({:module, Cldr}, Code.ensure_compiled(Cldr)) and locale_backend ->
         backend = locale_backend
-        Routex.Extension.Localize.Integrate.fetch_backend!(:cldr, backend)
+        fetch_backend!(:cldr, backend)
 
       match?({:module, Cldr}, Code.ensure_compiled(Cldr)) ->
-        Routex.Extension.Localize.Integrate.fetch_backend!(:cldr, nil)
+        fetch_backend!(:cldr, nil)
 
       match?({:module, Gettext}, Code.ensure_compiled(Gettext)) ->
         backend =
           locale_backend ||
             (lookup_app_module() <> "Web.Gettext") |> String.to_atom()
 
-        Routex.Extension.Localize.Integrate.fetch_backend!(:gettext, backend)
+        fetch_backend!(:gettext, backend)
 
       match?({:module, Fluent}, Code.ensure_compiled(Fluent)) ->
         backend =
           locale_backend ||
             (lookup_app_module() <> ".Fluent") |> String.to_atom()
 
-        Routex.Extension.Localize.Integrate.fetch_backend!(:fluent, backend)
+        fetch_backend!(:fluent, backend)
 
       true ->
         {__MODULE__, __MODULE__, [@fallback_locale], @fallback_locale}

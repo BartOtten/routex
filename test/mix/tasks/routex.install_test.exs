@@ -56,7 +56,11 @@ defmodule Mix.Tasks.Routex.InstallTest do
         assigns: %{namespace: :rtx, attrs: [:locale, :language, :region]},
         verified_sigil_routex: "~p",
         verified_url_routex: :url,
-        verified_path_routex: :path
+        verified_path_routex: :path,
+        dispatch_targets: [
+          {Gettext, :put_locale, [[:attrs, :runtime, :language]]}
+          # {Routex.Utils, :process_put_branch, [[:attrs, :__branch__]]}
+        ]
     end
     """)
   end

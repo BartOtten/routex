@@ -87,19 +87,21 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
   @type params :: %{optional(String.t()) => any()}
   @type plug_opts :: keyword()
 
+  @dispatch_target {Gettext, :put_locale, [[:attrs, :runtime, :language]]}
+
   @doc """
   Checks for invalid sources
   """
   @impl Routex.Extension
   @spec configure(T.opts(), T.backend()) :: T.opts()
-  def configure(config, backend) do
+  def configure(opts, backend) do
     fetch_and_validate_sources! = fn key ->
-      config |> Keyword.get(key, @default_sources) |> validate(key, backend)
+      opts |> Keyword.get(key, @default_sources) |> validate(key, backend)
     end
 
-    fetch_params = fn key, default -> Keyword.get(config, key, default) end
+    fetch_params = fn key, default -> Keyword.get(opts, key, default) end
 
-    config ++
+    sources =
       [
         region_sources: :region_sources |> fetch_and_validate_sources!.(),
         language_sources: :language_sources |> fetch_and_validate_sources!.(),
@@ -108,6 +110,25 @@ defmodule Routex.Extension.Localize.Phoenix.Runtime do
         language_params: :language_params |> fetch_params.(@default_params.language),
         locale_params: :locale_params |> fetch_params.(@default_params.locale)
       ]
+
+    new_opts =
+      opts
+      |> Keyword.merge(sources)
+      |> Keyword.update(:dispatch_targets, [@dispatch_target], &maybe_add_dispatch_target/1)
+
+    # this one also triggers wwhen there was no :dispatch_targets in the first place
+    if new_opts != opts,
+      do: Routex.Utils.print(__MODULE__, "Added dispatch target #{inspect(@dispatch_target)}")
+
+    new_opts
+  end
+
+  defp maybe_add_dispatch_target(existing) do
+    if Enum.any?(existing, fn {mod, _f, _a} -> mod == Gettext end) do
+      existing
+    else
+      [@dispatch_target | existing]
+    end
   end
 
   defp validate(sources, key, backend) do

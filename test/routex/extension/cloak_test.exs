@@ -12,6 +12,11 @@ defmodule Routex.Extension.CloakTest do
     use(Routex.Backend, extensions: [Routex.Extension.Cloak], cloak: ".")
   end
 
+  defmodule ConfFun do
+    def cloak(_path, idx), do: to_string(idx)
+    use(Routex.Backend, extensions: [Routex.Extension.Cloak], cloak: {__MODULE__, :cloak, []})
+  end
+
   test "should cloak routes" do
     routes = [
       %Phoenix.Router.Route{path: "/"},
@@ -51,6 +56,21 @@ defmodule Routex.Extension.CloakTest do
         %{path: "/:id/....."},
         %{path: "/:id/......"},
         %{path: "/:id/......."}
+      ],
+      more_transformed_routes
+    )
+
+    more_transformed_routes = Cloak.transform(routes, ConfFun, nil)
+
+    ListAssertions.assert_unordered(
+      [
+        %{path: "/"},
+        %{path: "/1"},
+        %{path: "/:id/2"},
+        %{path: "/3"},
+        %{path: "/:id/4"},
+        %{path: "/:id/5"},
+        %{path: "/:id/6"}
       ],
       more_transformed_routes
     )

@@ -1,39 +1,46 @@
+defmodule RoutexWeb.Gettext do
+  def known_locales, do: ["en"]
+  def __gettext__(:known_locales), do: ["en", "fr"]
+  def __gettext__(:default_locale), do: "en"
+end
+
 defmodule Routex.Extension.Localize.IntegrateTest do
   use ExUnit.Case
 
+  import Routex.Extension.Localize.Integrate
+
   @mix_content """
   defmodule FBar.MixProject do
-  use Mix.Project
-
-  def project do
-    [
-      app: :fbar,
-      version: "0.1.0",
-      elixir: "~> 1.15",
-      elixirc_paths: elixirc_paths(Mix.env()),
-      start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
-      deps: deps(),
-      listeners: [Phoenix.CodeReloader]
-    ]
+    use Mix.Project
   end
+  """
 
-  # Configuration for the OTP application.
-  #
-  # Type `mix help compile.app` for more information.
-  def application do
-    [
-      mod: {FBar.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
-    ]
+  @incorrect_mix_content """
+  defmodule FBar.Mix do
+    use Mix.Project
   end
-
-  # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
   """
 
   test "Base module is extracted from Mixfile content" do
-    assert "FBar" == Routex.Extension.Localize.Integrate.extract_main_module(@mix_content)
+    assert "FBar" == extract_main_module(@mix_content)
+  end
+
+  test "Returns nil when not a MixProject module" do
+    assert nil == extract_main_module(@incorrect_mix_content)
+  end
+
+  test "Auto detect, no backend given" do
+    assert {Gettext, RoutexWeb.Gettext, ["en", "fr"], "en"} == auto_detect(nil)
+  end
+
+  test "Auto detect, correct backend given" do
+    assert {Gettext, RoutexWeb.Gettext, ["en", "fr"], "en"} == auto_detect(RoutexWeb.Gettext)
+  end
+
+  test "Auto detect, non-existing backend given" do
+    exception = assert_raise ArgumentError, fn -> auto_detect(NonExisting) end
+
+    assert exception.message =~
+             "Could not load locale backend: NonExisting"
   end
 end

@@ -64,7 +64,22 @@ defmodule Routex.HelperFallbacks do
         |> Plug.Conn.assign(:url, url)
       end
 
-      defoverridable attrs: 1, on_mount: 4, call: 2
+      defmacro sigil_o(_path, _modifiers), do: raise_import()
+      defmacro sigil_p(_path, _modifiers), do: raise_import()
+
+      defp raise_import do
+        raise("""
+          Routex Error: Missing required implementation of `sigil_p/2`.
+
+          Make sure you have at least one `process_using` block in your router. You might also
+          have disabled the Verified Routes extension but still have to remove the import
+          override in `routex_helpers`.
+
+          https://hexdocs.pm/routex/Routex.Extension.VerifiedRoutes.html
+        """)
+      end
+
+      defoverridable attrs: 1, on_mount: 4, call: 2, sigil_p: 2, sigil_o: 2
     end
   end
 end

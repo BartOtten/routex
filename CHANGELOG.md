@@ -5,6 +5,17 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [1.3.0-rc.3](https://github.com/BartOtten/routex/compare/v1.3.0-rc.1...1.3.0-rc.3) (2025-11-10)
+
+
+
+
+### Bug Fixes:
+
+* verified: undefined sigil_p when no routes are wrapped by Bart Otten
+
+* locale: compilation issues when locale module is auto detected by Bart Otten
+
 ## [v1.3.0-rc.1](https://github.com/BartOtten/routex/compare/v1.3.0-rc.0...v1.3.0-rc.1) (2025-09-29)
 
 

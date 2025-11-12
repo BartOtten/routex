@@ -4,8 +4,17 @@
 defmodule Routex.Extension.Localize.Integrate do
   @moduledoc false
 
+  alias Routex.Utils
+
   @fallback_locale "en"
   @filename "mix.exs"
+
+  @solution """
+    \nSet the locale backend to use explicitly in your Routex backend.
+
+    Example:
+      locale_backend: ExampleWeb.CustomLocation.Gettext
+  """
 
   # Macro to raise properly
   def auto_detect(locale_backend) do
@@ -43,8 +52,10 @@ defmodule Routex.Extension.Localize.Integrate do
         do_fetch!(type, backend)
 
       {:error, _reason} ->
-        Routex.Utils.alert("Could not load locale backend: #{inspect(backend)}")
-        raise ArgumentError, "Could not load locale backend: #{inspect(backend)}"
+        title = "Could not load locale backend: #{inspect(backend)}"
+
+        Utils.alert(title, @solution)
+        raise ArgumentError, title
     end
   end
 
@@ -75,12 +86,10 @@ defmodule Routex.Extension.Localize.Integrate do
       "Elixir." <> module
     else
       false ->
-        Routex.Utils.alert(
-          "No locale backend detected",
-          "Please set it explicitly in your Routex backend."
-        )
+        title = "Could not detect main app module"
 
-        raise "No locale backend detected."
+        Utils.alert(title, @solution)
+        raise ArgumentError, title
     end
   end
 

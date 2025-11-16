@@ -81,15 +81,15 @@ Key principles emerged:
 At the heart of Routex is a processing pipeline: It takes the routes and a list
 of extensions and reduces the list of extensions with the routes as argument.
 
-As a result, the extensions -implementing one or more of four well-defined
-callbacks: `configure/2`, `transform/3`, `post_transform/3`, and
-`create_helpers/3`- receive inspectable route structs and opts, allowing
-transparent, composable modifications.
+As a result, the extensions -implementing one or multiple well-defined
+callbacks: `configure/2`, `transform/3`, `post_transform/3`, `create_helpers/3`
+and `create_shared_helpers/3`- receive inspectable route structs and opts,
+allowing transparent, composable modifications.
 
-Meanwhile, `Routex.Attrs` provides a shared metadata store so extensions like
-`Routex.Extension.Localize.Phoenix.Runtime` (for runtime locale detection) and
-`Routex.Extension.Translations` (for translated route paths) can cooperate
-without stepping on each other’s toes.
+Meanwhile, `Routex.Attrs` provides a unified struct to share route informaton
+so extensions like `Routex.Extension.Localize.Phoenix.Runtime` (for runtime
+locale detection) and `Routex.Extension.Translations` (for translated route paths)
+can cooperate without stepping on each other’s toes.
 
 ## Immutability and Pattern Matching in Action
 

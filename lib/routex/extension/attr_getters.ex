@@ -65,7 +65,7 @@ defmodule Routex.Extension.AttrGetters do
         """
         @spec attrs(url :: binary()) :: T.attrs()
         def attrs(url) when is_binary(url), do: url |> Matchable.new() |> do_attrs()
-        def attrs(input) when Record.is_record(input, Matchable), do: do_attrs(input)
+        def attrs(input) when Record.is_record(input, :matchable), do: do_attrs(input)
       end
 
     unguarded_defs =

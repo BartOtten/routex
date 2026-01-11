@@ -89,7 +89,7 @@ defmodule Routex.Extension.AlternativeGetters do
         require Record
         def alternatives(url) when is_binary(url), do: url |> Matchable.new() |> do_alternatives()
 
-        def alternatives(input) when Record.is_record(input, Matchable),
+        def alternatives(input) when Record.is_record(input, :matchable),
           do: input |> do_alternatives()
       end
 

@@ -9,8 +9,6 @@ defmodule Routex.Branching do
 
   alias Routex.Utils
 
-  require Logger
-
   @type pattern :: any()
   @type match_ast :: Macro.t()
   @type transformer_spec :: function()

@@ -125,10 +125,6 @@ defmodule Routex.Extension.VerifiedRoutes do
   alias Routex.Matchable
   alias Routex.Types, as: T
 
-  require Logger
-  require Phoenix.VerifiedRoutes
-  require Routex.Branching
-
   @cell_width 20
   @defaults %{
     verified_sigil: %{phoenix: "~p", routex: "~l", default_replacement: "~o"},

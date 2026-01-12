@@ -86,10 +86,11 @@ defmodule Routex.Extension.AlternativeGetters do
   def create_helpers(routes, _backend, _env) do
     guarded_defs =
       quote do
-        require Record
+        require Routex.Matchable
+
         def alternatives(url) when is_binary(url), do: url |> Matchable.new() |> do_alternatives()
 
-        def alternatives(input) when Record.is_record(input, :matchable),
+        def alternatives(input) when Routex.Matchable.is_matchable(input),
           do: input |> do_alternatives()
       end
 

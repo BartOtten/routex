@@ -38,6 +38,9 @@ defmodule Routex.Matchable do
 
   defguardp is_ast(input) when is_tuple(input) and tuple_size(input) == 3
 
+  @doc "Returns true if `term` is a Matchable record"
+  defguard is_matchable(term) when is_record(term, :matchable)
+
   @doc """
   Converts a binary URL, `Phoenix.Router.Route` or (sigil) AST argument into a Matchable record.
 

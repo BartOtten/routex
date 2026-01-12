@@ -58,14 +58,14 @@ defmodule Routex.Extension.AttrGetters do
   def create_helpers(routes, _backend, _env) do
     guarded_defs =
       quote do
-        require Record
+        require Routex.Matchable
 
         @doc """
         Returns Routex attributes of given URL
         """
         @spec attrs(url :: binary()) :: T.attrs()
         def attrs(url) when is_binary(url), do: url |> Matchable.new() |> do_attrs()
-        def attrs(input) when Record.is_record(input, Matchable), do: do_attrs(input)
+        def attrs(input) when Routex.Matchable.is_matchable(input), do: do_attrs(input)
       end
 
     unguarded_defs =

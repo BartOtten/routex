@@ -176,37 +176,38 @@ defmodule Routex.Extension.VerifiedRoutes do
 
     macros_ast = [
       branch_macro(
-        routes,
-        match_ast,
         Phoenix.VerifiedRoutes,
         :sigil_p,
-        as: config |> get_value(:verified_sigil, :routex) |> then(&to_macro_name.(&1)),
-        orig: config |> get_value(:verified_sigil, :phoenix) |> then(&to_macro_name.(&1)),
-        arg_pos: fn arity -> arity - 1 end,
-        clause_transformer: {__MODULE__.Transformers, :clause_transformer, []},
-        argument_transformer: {__MODULE__.Transformers, :argument_transformer, []}
+        match_ast,
+        routes,
+        name_branched: config |> get_value(:verified_sigil, :routex) |> then(&to_macro_name.(&1)),
+        name_passthrough:
+          config |> get_value(:verified_sigil, :phoenix) |> then(&to_macro_name.(&1)),
+        param_position: fn arity -> arity - 1 end,
+        clause_transformer: &__MODULE__.Transformers.clause_transformer/2,
+        argument_transformer: &__MODULE__.Transformers.argument_transformer/2
       ),
       branch_macro(
-        routes,
-        match_ast,
         Phoenix.VerifiedRoutes,
         :url,
-        as: config |> get_value(:verified_url, :routex),
-        orig: config |> get_value(:verified_url, :phoenix),
-        arg_pos: fn arity -> arity end,
-        clause_transformer: {__MODULE__.Transformers, :clause_transformer, []},
-        argument_transformer: {__MODULE__.Transformers, :argument_transformer, []}
+        match_ast,
+        routes,
+        name_branched: config |> get_value(:verified_url, :routex),
+        name_passthrough: config |> get_value(:verified_url, :phoenix),
+        param_position: fn arity -> arity end,
+        clause_transformer: &__MODULE__.Transformers.clause_transformer/2,
+        argument_transforme: &__MODULE__.Transformers.argument_transformer/2
       ),
       branch_macro(
-        routes,
-        match_ast,
         Phoenix.VerifiedRoutes,
         :path,
-        as: config |> get_value(:verified_path, :routex),
-        orig: config |> get_value(:verified_path, :phoenix),
-        arg_pos: fn arity -> arity end,
-        clause_transformer: {__MODULE__.Transformers, :clause_transformer, []},
-        argument_transformer: {__MODULE__.Transformers, :argument_transformer, []}
+        match_ast,
+        routes,
+        name_branched: config |> get_value(:verified_path, :routex),
+        name_passthrough: config |> get_value(:verified_path, :phoenix),
+        param_position: fn arity -> arity end,
+        clause_transformer: &__MODULE__.Transformers.clause_transformer/2,
+        argument_transformer: &__MODULE__.Transformers.argument_transformer/2
       )
     ]
 
@@ -308,7 +309,7 @@ defmodule Routex.Extension.VerifiedRoutes do
       if Matchable.match?(orig_record, arg_record) do
         route.__branch__ |> List.last()
       else
-        :skip
+        :noop
       end
     end
 
@@ -347,7 +348,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         {new_segments, _bindings} = Code.eval_quoted(ast)
         Matchable.to_ast_segments(new_segments)
       else
-        :skip
+        :noop
       end
     end
   end

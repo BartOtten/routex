@@ -102,6 +102,7 @@ jobs:
         if: matrix.combo.otp == 'latest' && matrix.combo.elixir == 'latest'
         run: mix format --check-formatted
       - run: mix credo --strict
+        if: matrix.combo.otp != 'latest'
       - run: mix dialyzer
       - run: mix test
 

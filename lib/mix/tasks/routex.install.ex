@@ -1,5 +1,5 @@
 # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
-
+# credo:disable-for-this-file Credo.Refactor.Nesting
 defmodule Mix.Tasks.Routex.Install.Docs do
   @moduledoc false
 

@@ -60,9 +60,6 @@ if Code.ensure_loaded?(Gettext) do
     alias Routex.Attrs
     alias Routex.Types, as: T
 
-    require Logger
-    require Gettext.Macros
-
     @separator "/"
     @interpolate ":"
     @catch_all "*"

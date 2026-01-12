@@ -171,8 +171,6 @@ defmodule Routex.Extension.Localize.Phoenix.Routes do
   # typing
   alias Routex.Types, as: T
 
-  require Integrate
-
   @default_route_prefix_sources [:language, :region, :locale]
 
   @type attributes :: %{optional(atom()) => any()}

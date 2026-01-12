@@ -56,8 +56,6 @@ defmodule Routex.Extension.Interpolation do
   alias Routex.Attrs
   alias Routex.Types, as: T
 
-  require Logger
-
   defmodule NonUniqError do
     @moduledoc """
     Raised when a list of routes contains routes with the same path and verb.

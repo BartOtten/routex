@@ -153,8 +153,6 @@ defmodule Routex.Extension.Cldr do
 
   alias Routex.Types, as: T
 
-  require Logger
-
   @spec configure(T.opts(), T.backend()) :: T.opts()
   def configure(config, _backend) do
     # causes a newline for output printed by Cldr

@@ -1,3 +1,66 @@
+# Routex Release Notes
+
+Listing major (minor) releases and their most notable features.
+
+
+# Routex v1.3.0 Changelog — Developer Experience Improvements
+
+Routex 1.3 focuses once again heavily on improving the developer experience (DX), making installation smoother, configuration clearer, and debugging easier, particularly for projects using internationalization (i18n). This release makes Routex an even more seamless and robust solution for handling advanced routing features, especially localization, within the Phoenix ecosystem.
+
+
+## Quick Setup with `routex.install`
+
+### Simplified Installation
+
+A new task, `mix routex.install`, powered by the optional `Igniter` dependency, significantly automates the initial setup process.
+
+- This eliminates the need for manual file editing, speeding up the integration of Routex into new or existing Phoenix projects.
+- The task performs configuration steps like setting up aliases and including common Routex extensions.
+
+**Contributors:**  
+Special thanks to @ken-kost for the initial `routex.install` commit; not to forget @zachdaniel for Igniter itself. Community support is highly appreciated.
+
+
+## Clearer Error Messaging
+
+Routex 1.3 features improved error messaging.
+
+- **Actionable Error Reports:** Errors related to route compilation or configuration are now more descriptive, guiding developers to the exact issue and making troubleshooting much faster.
+- **Refined Fallbacks:** A few fallbacks have been added in order to print helpful error messages when a configuration error is detected. This was particularly useful in scenarios where developers were mid-way through following the usage guide or had disabled extensions without removing related code modifications.
+
+
+## New Utilities
+
+A new helper function has been added to assist with process dictionary usage:
+
+```elixir
+dispatch_targets: [
+  {Routex.Utils, :process_put_branch, [[:attrs, :__branch__]]}
+]
+```
+
+This can be used as a dispatch target and will be used by Verified Routes once set. It can help avoid property drilling of the `@url` assignment for Verified Routes in components. However, it is still advised to prefer keeping things immutable and simply pass down the `@url` assignment to components.
+
+
+## New Callback
+
+The `create_shared_helpers/3` callback has been introduced.
+
+This callback is called in the final stage of helper generation and differs from `create_helpers/3` in that it is invoked only once per extension with the combined routes of all backends using that extension.
+
+
+## Improved i18n / l10n Detection
+
+The i18n/l10n backend detection process has been improved.
+
+- **Smarter Gettext Detection:** The mechanism for detecting localization backends has been refined, allowing Routex to remove a previously required macro and streamline the detection process.
+
+
+## Other
+
+- Added support for using Verified Routes based on `@url` assignment.
+
+
 # Announcing Routex 1.2.0 – Effortless Phoenix Localization
 
 I’m thrilled to announce **Routex 1.2.0**, a major update that brings

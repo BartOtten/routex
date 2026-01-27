@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Included extensions — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>Routex Extensions</h1>
+
+<a href="extensions.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/docs/EXTENSIONS.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<p>Routex includes a variety of extensions to cover the most common use cases in
+Phoenix applications. Each extension provides a single feature and has no hard
+dependencies on other extensions. Instead, extensions make use of Routex.Attrs
+to share attributes; allowing extensions to work together without being coupled.</p><p><strong>Benefits</strong>:</p><ul><li><strong>Modularity</strong>: Each feature is encapsulated in its own extension, making
+it easier to manage and maintain.</li><li><strong>Flexibility</strong>: Extensions can be enabled or disabled as needed, allowing
+for a customizable and adaptable routing system.</li><li><strong>Interoperability</strong>: By using <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> to share attributes, extensions
+can work together seamlessly without being tightly coupled, promoting a
+decoupled and scalable architecture.</li><li><strong>Customizability</strong>: If you have a rare requirement, you can adapt an existing
+extension or provide your own, without need for a fork or upstream support.</li></ul><h2 id="index" class="section-heading"><a href="#index" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Index</span></h2><ul><li><a href="#localize-phoenix">Localize Phoenix</a>: A streamlined solution for localizing Phoenix routes with minimal setup.</li><li><a href="#localize-phoenix-routes">Localize Phoenix Routes</a>: Generate localized routes at compile time.</li><li><a href="#localize-phoenix-runtime">Localize Phoenix Runtime</a>: Plug and play locale detection (StaticView and LiveView).</li><li><a href="#alternatives">Alternatives</a>: Create (nested) alternative routes.</li><li><a href="#alternative-getters">Alternative Getters</a>: Get alternatives for the current route.</li><li><a href="#verified-routes">Verified Routes</a>: Branch aware variant of Phoenix.VerifiedRoutes.</li><li><a href="#assigns">Assigns</a>: Use route attributes as assigns in templates.</li><li><a href="#interpolation">Interpolation</a>: Use attributes in route definitions.</li><li><a href="#translations">Translations</a>: Translate route segments / full localized URLs.</li><li><a href="#attribute-getters">Attribute Getters</a>: Retrieve <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> for a route.</li><li><a href="#cldr-adapter">Cldr Adapter</a>: Use an existing <code class="inline">:ex_cldr</code>configuration.</li><li><a href="#plugs">Plugs</a>: Integrate plugs provided by extensions.</li><li><a href="#liveview-hooks">LiveView Hooks</a>: Attach LiveView Lifecycle hooks provided by extensions.</li><li><a href="#route-helpers">Route Helpers</a>: Create branch aware Phoenix Helpers.</li><li><a href="#cloak-showcase">Cloak</a>: Showcase to demonsrate extreme route transformations.</li><li><a href="#runtime-dispatcher">Runtime Dispatcher</a>: Dispatch to arbitrary functions using route attributes as argument.</li></ul><h2 id="localize-phoenix" class="section-heading"><a href="#localize-phoenix" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Localize Phoenix</span></h2><p><strong>Feature</strong>: A streamlined solution for localizing Phoenix routes with minimal setup.</p><p><a href="https://hexdocs.pm/routex/Routex.Extension.Localize.Phoenix.html">Localize Phoenix Documentation</a></p><h2 id="localize-phoenix-runtime" class="section-heading"><a href="#localize-phoenix-runtime" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Localize Phoenix Runtime</span></h2><p><strong>Feature</strong>: Plug and play locale detection in StaticViews and LiveViews.</p><p><strong>Benefits</strong>: Being highly customizable this locale detection adapts to your project instead of the other way around.</p><p><strong>Example</strong>: Set the <code class="inline">locale</code> attribute based on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Accept-Language">HTTP accept-language header</a>.</p><pre><code class="makeup elixir" translate="no"><span class="ss">locale_sources</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8898887596-1">[</span><span class="ss">:query</span><span class="p">,</span><span class="w"> </span><span class="ss">:session</span><span class="p">,</span><span class="w"> </span><span class="ss">:accept_language</span><span class="p">,</span><span class="w"> </span><span class="ss">:route</span><span class="p" data-group-id="8898887596-1">]</span><span class="p">,</span><span class="w">
+</span><span class="ss">locale_params</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8898887596-2">[</span><span class="s">&quot;locale&quot;</span><span class="p" data-group-id="8898887596-2">]</span><span class="w">
+</span><span class="ss">language_sources</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8898887596-3">[</span><span class="ss">:query</span><span class="p">,</span><span class="w"> </span><span class="ss">:route</span><span class="p" data-group-id="8898887596-3">]</span><span class="p">,</span><span class="w">
+</span><span class="ss">language_params</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="8898887596-4">[</span><span class="s">&quot;custom_lang&quot;</span><span class="p" data-group-id="8898887596-4">]</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.Localize.Phoenix.Runtime.html">Localize Phoenix Runtime Documentation</a></p><h2 id="localize-phoenix-routes" class="section-heading"><a href="#localize-phoenix-routes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Localize Phoenix Routes</span></h2><p><strong>Feature</strong>: Generate localize routes using automatic configuration base on Cldr, Gettext or Fluent (with options to override).</p><p><strong>Benefits</strong>: Improves SEO, content relevance and user convenience</p><p><strong>Example</strong>: Expand routes to multiple (nested) locale routes with custom attributes.</p><pre><code class="makeup elixir" translate="no"><span class="nc">Router</span><span class="w">              </span><span class="nc">Generated</span><span class="w">                         </span><span class="nc">Attributes</span><span class="w">
+                      </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">              </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">contact</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;rootexample.com&quot;</span><span class="w">
+  </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">nl</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">    </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">contact</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;verkoop@example.nl&quot;</span><span class="w">
+                      </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">europe</span><span class="o">/</span><span class="n">be</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">    </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">contact</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;handel@example.be&quot;</span><span class="w">
+                      </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">gb</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">           </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">contact</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sales@example.com&quot;</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.Localize.Phoenix.Routes.html">Localize Phoenix Routes Documentation</a></p><h2 id="runtime-dispatcher" class="section-heading"><a href="#runtime-dispatcher" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Runtime Dispatcher</span></h2><p><strong>Feature</strong>: Dispatch to arbitrary functions using route attributes as argument.</p><p><strong>Benefits</strong>: This is particularly useful for integrating with internationalization libraries like:</p><ul><li>Gettext - Set language for translations</li><li>Fluent - Set language for translations</li><li>Cldr - Set locale for the Cldr suite</li></ul><p><strong>Example</strong>: Call <a href="https://hexdocs.pm/gettext/1.0.2/Gettext.html#put_locale/1"><code class="inline">Gettext.put_locale/1</code></a> using the <code class="inline">locale</code> attribute set by Localize.Routes or Localize.Runtime.</p><pre><code class="makeup elixir" translate="no"><span class="w"> </span><span class="ss">dispatch_targets</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="5847004464-1">[</span><span class="w">
+  </span><span class="c1"># Set Gettext locale from :language attribute</span><span class="w">
+  </span><span class="p" data-group-id="5847004464-2">{</span><span class="nc">Gettext</span><span class="p">,</span><span class="w"> </span><span class="ss">:put_locale</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="5847004464-3">[</span><span class="p" data-group-id="5847004464-4">[</span><span class="ss">:attrs</span><span class="p">,</span><span class="w"> </span><span class="ss">:locale</span><span class="p" data-group-id="5847004464-4">]</span><span class="p" data-group-id="5847004464-3">]</span><span class="p" data-group-id="5847004464-2">}</span><span class="p">,</span><span class="w">
+ </span><span class="p" data-group-id="5847004464-1">]</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.RuntimeDispatcher.html">Runtime Dispatcher Documentation</a></p><h2 id="alternatives" class="section-heading"><a href="#alternatives" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Alternatives</span></h2><p><strong>Feature</strong>: Create alternative routes based on <code class="inline">branches</code> configured in a
+Routex backend module. Branches can be nested, and each branch can provide its
+own attributes to share with other extensions.</p><p><strong>Benefits</strong>: Enables the definition of alternative routing paths and
+their attributes in a single place.</p><p><strong>Example</strong>: You can configure different branches for different locales or
+versions of your application, providing users with the appropriate routes
+based on their context.</p><p><a href="https://hexdocs.pm/routex/Routex.Extension.Alternatives.html">Alternatives Documentation</a></p><h2 id="alternative-getters" class="section-heading"><a href="#alternative-getters" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Alternative Getters</span></h2><p><strong>Feature</strong>: Creates a helper function <code class="inline">alternatives/1</code> to get a list of
+alternative slugs and their route attributes. Includes the current route with
+<code class="inline">match?: true</code> attribute.</p><p><strong>Benefits</strong>: Simplifies the retrieval and use of alternative routes for the
+current page.</p><p><strong>Example</strong>: Easily display navigation buttons for alternative routes with
+highlighting of the current active route.</p><pre><code class="heex">&lt;.link
+   :for={alternative &lt;- alternatives(@url)}
+   navigate={alternative.slug}
+ &gt;
+   &lt;.button class={alternative.match? &amp;&amp; &quot;active&quot; || &quot;inactive&quot;}&gt;
+     &lt;%= alternative.attrs.display_name %&gt;
+   &lt;/.button&gt;
+ &lt;/.link&gt;</code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.AlternativeGetters.html">Alternative Getters Documentation</a></p><h2 id="verified-routes" class="section-heading"><a href="#verified-routes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Verified Routes</span></h2><p><strong>Feature</strong>: Creates a sigil (default: <code class="inline">~l</code>) that renders a link based on the
+current branch of a user and verifies routes even when transformed by Routex
+extensions. Can be set to <code class="inline">~p</code> to act as a drop-in replacement for the official
+Phoenix sigils.</p><p>Also provides branch-aware variants of <code class="inline">url/{2,3,4}</code> and <code class="inline">path/{2,3}</code>.</p><p><strong>Benefits</strong>: Ensures route integrity and security while supporting dynamic
+route transformations.</p><p><strong>Example</strong>: Use the <code class="inline">~p</code> sigil to generate URLs that adapt to the user's
+current context or locale, ensuring they are always valid.</p><pre><code class="makeup elixir" translate="no"><span class="c1"># given Routex behavior is configured as drop-in replacement using ~p</span><span class="w">
+</span><span class="c1"># giving original ~p is reassigned to ~o</span><span class="w">
+</span><span class="c1"># given another extension has generated branches / alternative routes</span><span class="w">
+
+</span><span class="sx">~o&quot;/products/</span><span class="si" data-group-id="0181383984-1">#{</span><span class="n">product</span><span class="si" data-group-id="0181383984-1">}</span><span class="sx">&quot;</span><span class="w">  </span><span class="err">⇒</span><span class="w">  </span><span class="nc">Phoenix</span><span class="o">.</span><span class="n">sigil_p</span><span class="p" data-group-id="0181383984-2">(</span><span class="s">&quot;/products/</span><span class="si" data-group-id="0181383984-3">#{</span><span class="n">products</span><span class="si" data-group-id="0181383984-3">}</span><span class="s">&quot;</span><span class="p" data-group-id="0181383984-2">)</span><span class="w">
+</span><span class="sx">~p&quot;/products/</span><span class="si" data-group-id="0181383984-4">#{</span><span class="n">product</span><span class="si" data-group-id="0181383984-4">}</span><span class="sx">&quot;</span><span class="w">  </span><span class="err">⇒</span><span class="w">
+        </span><span class="k">case</span><span class="w"> </span><span class="n">current_branch</span><span class="w"> </span><span class="k" data-group-id="0181383984-5">do</span><span class="w">
+          </span><span class="no">nil</span><span class="w">     </span><span class="err">⇒</span><span class="w">  </span><span class="nc">Phoenix</span><span class="o">.</span><span class="n">sigil_p</span><span class="p" data-group-id="0181383984-6">(</span><span class="s">&quot;/products/</span><span class="si" data-group-id="0181383984-7">#{</span><span class="n">product</span><span class="si" data-group-id="0181383984-7">}</span><span class="s">&quot;</span><span class="p" data-group-id="0181383984-6">)</span><span class="w">
+          </span><span class="s">&quot;fr&quot;</span><span class="w">    </span><span class="err">⇒</span><span class="w">  </span><span class="nc">Phoenix</span><span class="o">.</span><span class="n">sigil_p</span><span class="p" data-group-id="0181383984-8">(</span><span class="s">&quot;/produits/</span><span class="si" data-group-id="0181383984-9">#{</span><span class="n">product</span><span class="si" data-group-id="0181383984-9">}</span><span class="s">&quot;</span><span class="p" data-group-id="0181383984-8">)</span><span class="w">
+          </span><span class="s">&quot;es&quot;</span><span class="w">    </span><span class="err">⇒</span><span class="w">  </span><span class="nc">Phoenix</span><span class="o">.</span><span class="n">sigil_p</span><span class="p" data-group-id="0181383984-10">(</span><span class="s">&quot;/productos/</span><span class="si" data-group-id="0181383984-11">#{</span><span class="n">product</span><span class="si" data-group-id="0181383984-11">}</span><span class="s">&quot;</span><span class="p" data-group-id="0181383984-10">)</span><span class="w">
+        </span><span class="k" data-group-id="0181383984-5">end</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.VerifiedRoutes.html">Verified Routes Documentation</a></p><h2 id="assigns" class="section-heading"><a href="#assigns" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Assigns</span></h2><p><strong>Feature</strong>: Adds attributes set by other extensions to Phoenix assigns,
+making them available in components and controllers.</p><p><strong>Benefits</strong>: Provides easy access to route-specific attributes within the
+application's components and controllers.</p><p><strong>Example</strong>: Access route attributes like <code class="inline">@namespace.area</code> or
+<code class="inline">@namespace.contact</code> directly in your templates.</p><pre><code class="makeup elixir" translate="no"><span class="w">     </span><span class="na">@namespace</span><span class="o">.</span><span class="n">area</span><span class="w">      </span><span class="p">=&gt;</span><span class="w">  </span><span class="ss">:eu_nl</span><span class="w">
+     </span><span class="na">@namespace</span><span class="o">.</span><span class="n">contact</span><span class="w">   </span><span class="p">=&gt;</span><span class="w">  </span><span class="s">&quot;contact@example.com&quot;</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.Assigns.html">Assigns Documentation</a></p><h2 id="interpolation" class="section-heading"><a href="#interpolation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Interpolation</span></h2><p><strong>Feature</strong>: Allows -any- attribute assigned to a route to be used at -any-
+place for route interpolation, especially effective with extensions like
+<code class="inline">Alternatives</code>.</p><p><strong>Benefits</strong>: Provides dynamic and customizable URL patterns based on various
+attributes.</p><p><strong>Example</strong>: Generate URLs like <code class="inline">/europe/products/nl/:id</code> where <code class="inline">territory</code> and
+<code class="inline">language</code> are dynamically interpolated.</p><pre><code class="makeup elixir" translate="no"><span class="w">    </span><span class="o">/</span><span class="c1">#{territory/products/#{language}/:id  =&gt; /europe/products/nl/:id</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.Interpolation.html">Interpolation Documentation</a></p><h2 id="translations" class="section-heading"><a href="#translations" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Translations</span></h2><p><strong>Feature</strong>: Extracts segments of a route's path to a <code class="inline">routes.po</code> file for
+translation. At compile-time, it combines the translated segments to translate
+routes, allowing users to enter URLs using localized terms.</p><p><strong>Benefits</strong>: Enhances user engagement and content relevance by supporting
+localized URLs.</p><p><strong>Example</strong>: Users can visit your website using URLs in their own language,
+such as <code class="inline">/productos</code> instead of <code class="inline">/products</code> for Spanish-speaking users.</p><p><a href="https://hexdocs.pm/routex/Routex.Extension.Translations.html">Translations Documentation</a></p><h2 id="attribute-getters" class="section-heading"><a href="#attribute-getters" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Attribute Getters</span></h2><p><strong>Feature</strong>: Creates a helper function <code class="inline">attrs/1</code> to get all <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> of a
+route.</p><p><strong>Benefits</strong>: Allows conditional access to route attributes without affecting
+performance.</p><p><strong>Example</strong>: Retrieve all attributes for the current page with <code class="inline">attrs(@url)</code>.</p><p><a href="https://hexdocs.pm/routex/Routex.Extension.AttrGetters.html">Attribute Getters Documentation</a></p><h2 id="cldr-adapter" class="section-heading"><a href="#cldr-adapter" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Cldr Adapter</span></h2><p><strong>Feature</strong>: Provides integration for projects using <code class="inline">:ex_cldr</code>.</p><p><strong>Benefits</strong>: Seamlessly integrates Routex with <code class="inline">:ex_cldr</code>.</p><p><strong>Example</strong>: Utilize CLDR's localization features within your routing logic.</p><p><a href="https://hexdocs.pm/routex/Routex.Extension.Cldr.html">Cldr Adapter Documentation</a></p><h2 id="plugs" class="section-heading"><a href="#plugs" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Plugs</span></h2><p><strong>Feature</strong>: Detects and registers supported plug callbacks from other
+extensions, encapsulating them in a single plug chain.</p><p><strong>Benefits</strong>: Integrates extension plugs seamlessly, ensuring they are invoked
+in order during the plug pipeline.</p><p><strong>Example</strong>: Provides a unified plug that incorporates functionality from
+multiple extensions, simplifying plug management.</p><h2 id="liveview-hooks" class="section-heading"><a href="#liveview-hooks" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">LiveView Hooks</span></h2><p><strong>Feature</strong>: Attaches LiveView hooks provided by Routex extensions, injecting
+them into LiveView's lifecycle stages.</p><p><strong>Benefits</strong>: Enables extensions to provide hooks for LiveView components,
+enhancing their functionality and integration.</p><p><strong>Example</strong>: Automatically invoke extension hooks during LiveView lifecycle
+events like <code class="inline">handle_params</code>, <code class="inline">handle_event</code>, and <code class="inline">handle_info</code>.</p><h2 id="route-helpers" class="section-heading"><a href="#route-helpers" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Route Helpers</span></h2><p><strong>Feature</strong>: Creates branch aware Phoenix Helpers. Can replace the original
+Phoenix Route Helpers as drop-ins.</p><p><strong>Benefits</strong>: Simplifies route handling and branching within Phoenix
+applications.</p><p><strong>Example</strong>: Use these helpers to generate URLs that adapt to the user's current
+context or locale.</p><p><a href="https://hexdocs.pm/routex/Routex.Extension.RouteHelpers.html">Route Helpers Documentation</a></p><h2 id="cloak-showcase" class="section-heading"><a href="#cloak-showcase" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Cloak (showcase)</span></h2><p><strong>Feature</strong>: Transforms routes to be unrecognizable, demonstrating the
+flexibility of Routex.</p><p><strong>Benefits</strong>: Offers a way to obscure URL patterns for added security or
+experimentation.</p><p><strong>Example</strong>: Converts <code class="inline">/products/:id/edit</code> to <code class="inline">/:id/02</code>.</p><pre><code class="makeup elixir" translate="no"><span class="w"> </span><span class="nc">Original</span><span class="w">                 </span><span class="nc">Rewritten</span><span class="w">     </span><span class="nc">Result</span><span class="w"> </span><span class="p" data-group-id="6919792935-1">(</span><span class="ss">product_id</span><span class="p">:</span><span class="w"> </span><span class="mi">88</span><span class="p">,</span><span class="w"> </span><span class="mi">89</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p" data-group-id="6919792935-1">)</span><span class="w">
+ </span><span class="o">/</span><span class="n">products</span><span class="w">                </span><span class="p">=&gt;</span><span class="w">     </span><span class="o">/</span><span class="mi">01</span><span class="w">     </span><span class="p">=&gt;</span><span class="w">    </span><span class="o">/</span><span class="mi">01</span><span class="w">
+ </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">       </span><span class="p">=&gt;</span><span class="w"> </span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="mi">02</span><span class="w">     </span><span class="p">=&gt;</span><span class="w"> </span><span class="o">/</span><span class="mi">88</span><span class="o">/</span><span class="mi">02</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">89</span><span class="o">/</span><span class="mi">02</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">90</span><span class="o">/</span><span class="mi">02</span><span class="w"> </span><span class="n">etc</span><span class="n">...</span><span class="w">
+ </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="p">=&gt;</span><span class="w"> </span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="mi">03</span><span class="w">     </span><span class="p">=&gt;</span><span class="w"> </span><span class="o">/</span><span class="mi">88</span><span class="o">/</span><span class="mi">03</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">89</span><span class="o">/</span><span class="mi">03</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">90</span><span class="o">/</span><span class="mi">03</span><span class="w"> </span><span class="n">etc</span><span class="n">...</span></code></pre><p><a href="https://hexdocs.pm/routex/Routex.Extension.Cloak.html">Cloak Documentation</a></p>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="readme.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Overview
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="release_notes.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Release Notes
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/docs/EXTENSIONS.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

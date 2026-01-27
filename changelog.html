@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Changelog — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>Change Log</h1>
+
+<a href="changelog.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/CHANGELOG.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<p>All notable changes to this project will be documented in this file.
+See <a href="Https://conventionalcommits.org">Conventional Commits</a> for commit guidelines.</p><!-- changelog --><h2 id="v1-3-2-2026-01-27" class="section-heading"><a href="#v1-3-2-2026-01-27" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.3.1...v1.3.2">v1.3.2</a> (2026-01-27)</span></h2><h3 id="bug-fixes" class="section-heading"><a href="#bug-fixes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li>core: matchable type warning in Elixir 1.20+ (#123) by rubas</li></ul><h3 id="soft-deprecation" class="section-heading"><a href="#soft-deprecation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Soft Deprecation:</span></h3><h4>refactor(core): Routex.Branching overhaul</h4><p>This change is (only) significant for extension developers. Parameter were
+reordered and some option have been renamed (the old names are soft deprecated).
+Please migrate your extensions when seeing deprecation messages.</p><p>IMPROVED:</p><ul><li>Simplified transformer option format for better ergonomics</li><li>Comprehensive documentation with additional real-world examples</li><li>Clearer naming conventions across the API</li><li>Better type specifications and parameter descriptions</li><li>Extended tests</li></ul><p>SOFT DEPRECATIONS:</p><ul><li><p>Transformer return value <code class="inline">:skip</code> is deprecated in favor of <code class="inline">:noop</code> for clarity</p></li><li><p>New parameters order for improved cognitive flow (old order soft deprecated)</p></li><li><p>Options have been renamed for clarity:</p><ul><li>:as -&gt; :name_branched</li><li>:orig -&gt; :name_passthrough</li><li>:arg_pos -&gt; :param_position</li></ul></li></ul><p>MIGRATION GUIDE:</p><ul><li><p>Rename options (see above):
+  Routex.Branching.branch_macro(... , param_position: fn arity -&gt; arity - 1 end)</p></li><li><p>Replace <code class="inline">:skip</code> with <code class="inline">:noop</code> in transformer functions:</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="kd">def</span><span class="w"> </span><span class="nf">my_transformer</span><span class="p" data-group-id="5737586608-1">(</span><span class="n">pattern</span><span class="p">,</span><span class="w"> </span><span class="n">arg</span><span class="p" data-group-id="5737586608-1">)</span><span class="w"> </span><span class="k" data-group-id="5737586608-2">do</span><span class="w">
+    </span><span class="k">if</span><span class="w"> </span><span class="n">should_skip?</span><span class="p" data-group-id="5737586608-3">(</span><span class="n">pattern</span><span class="p" data-group-id="5737586608-3">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:noop</span><span class="p">,</span><span class="w"> </span><span class="ss">else</span><span class="p">:</span><span class="w"> </span><span class="n">arg</span><span class="w">
+  </span><span class="k" data-group-id="5737586608-2">end</span></code></pre></li><li><p>Replace MFA transformer options with the new format, the value of extra arguments should
+be put in the transformer functions themselves:</p></li></ul><pre><code class="makeup elixir" translate="no"><span class="ss">old</span><span class="p">:</span><span class="w">
+</span><span class="o">*</span><span class="ss">_transformer</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7549730450-1">{</span><span class="bp">__MODULE__</span><span class="o">.</span><span class="nc">Transformers</span><span class="p">,</span><span class="w"> </span><span class="ss">:transform_arg</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7549730450-2">[</span><span class="ss">:foo</span><span class="p" data-group-id="7549730450-2">]</span><span class="p" data-group-id="7549730450-1">}</span><span class="w">
+
+</span><span class="ss">new</span><span class="p">:</span><span class="w">
+</span><span class="o">*</span><span class="ss">_transformer</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="bp">__MODULE__</span><span class="o">.</span><span class="nc">Transformers</span><span class="o">.</span><span class="n">transform_clause</span><span class="o">/</span><span class="mi">2</span><span class="w">
+
+</span><span class="kd">def</span><span class="w"> </span><span class="nf">my_transformer</span><span class="p" data-group-id="7549730450-3">(</span><span class="n">pattern</span><span class="p">,</span><span class="w"> </span><span class="n">arg</span><span class="p" data-group-id="7549730450-3">)</span><span class="w"> </span><span class="k" data-group-id="7549730450-4">do</span><span class="w">
+  </span><span class="n">arg</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">to_string</span><span class="p" data-group-id="7549730450-5">(</span><span class="ss">:foo</span><span class="p" data-group-id="7549730450-5">)</span><span class="w">
+</span><span class="k" data-group-id="7549730450-4">end</span></code></pre><h2 id="v1-3-1-2025-11-12" class="section-heading"><a href="#v1-3-1-2025-11-12" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.3.0...v1.3.1">v1.3.1</a> (2025-11-12)</span></h2><h2 id="v1-3-0-2025-11-10" class="section-heading"><a href="#v1-3-0-2025-11-10" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.3.0-rc.3...v1.3.0">v1.3.0</a> (2025-11-10)</span></h2><h3 id="features" class="section-heading"><a href="#features" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Features:</span></h3><ul><li><p>add callback create_shared_helpers/3 by Bart Otten</p></li><li><p>cloak: custom functions for route transformation by Bart Otten</p></li><li><p>utils: add helper to set rtx_branch in process dict by Bart Otten</p></li><li><p>derive branch from url assignment by Bart Otten</p></li></ul><h3 id="bug-fixes-1" class="section-heading"><a href="#bug-fixes-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>verified: undefined sigil_p when no routes are wrapped by Bart Otten</p></li><li><p>locale: compilation issues when locale module is auto detected by Bart Otten</p></li></ul><h2 id="1-3-0-rc-3-2025-11-10" class="section-heading"><a href="#1-3-0-rc-3-2025-11-10" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.3.0-rc.1...1.3.0-rc.3">1.3.0-rc.3</a> (2025-11-10)</span></h2><h3 id="bug-fixes-2" class="section-heading"><a href="#bug-fixes-2" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>verified: undefined sigil_p when no routes are wrapped by Bart Otten</p></li><li><p>locale: compilation issues when locale module is auto detected by Bart Otten</p></li></ul><h2 id="v1-3-0-rc-1-2025-09-29" class="section-heading"><a href="#v1-3-0-rc-1-2025-09-29" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.3.0-rc.0...v1.3.0-rc.1">v1.3.0-rc.1</a> (2025-09-29)</span></h2><h3 id="bug-fixes-3" class="section-heading"><a href="#bug-fixes-3" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li>core: no matching function clause due to newline metadata.</li></ul><h2 id="v1-3-0-rc-0-2025-09-24" class="section-heading"><a href="#v1-3-0-rc-0-2025-09-24" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.2.4...v1.3.0-rc.0">v1.3.0-rc.0</a> (2025-09-24)</span></h2><h3 id="features-1" class="section-heading"><a href="#features-1" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Features:</span></h3><ul><li>implement routex.install task</li></ul><h3 id="bug-fixes-4" class="section-heading"><a href="#bug-fixes-4" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>mermaid loaded unnecessary</p></li><li><p>update default config to match USAGE guide</p></li><li><p>igniter installer fails to update Web module</p></li></ul><h2 id="v1-2-4-2025-09-06" class="section-heading"><a href="#v1-2-4-2025-09-06" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.2.3...v1.2.4">v1.2.4</a> (2025-09-06)</span></h2><h3 id="bug-fixes-5" class="section-heading"><a href="#bug-fixes-5" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li>plug: use URI.parse to support list query params with brackets</li></ul><h2 id="v1-2-3-2025-09-05" class="section-heading"><a href="#v1-2-3-2025-09-05" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.2.2...v1.2.3">v1.2.3</a> (2025-09-05)</span></h2><h3 id="bug-fixes-6" class="section-heading"><a href="#bug-fixes-6" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li>plug pipeline broken for non-routex routes</li></ul><h2 id="v1-2-2-2025-05-06" class="section-heading"><a href="#v1-2-2-2025-05-06" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.2.1...v1.2.2">v1.2.2</a> (2025-05-06)</span></h2><h3 id="bug-fixes-7" class="section-heading"><a href="#bug-fixes-7" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li>processing: order not fully restored</li></ul><h2 id="v1-2-1-2025-05-05" class="section-heading"><a href="#v1-2-1-2025-05-05" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.2.0...v1.2.1">v1.2.1</a> (2025-05-05)</span></h2><h3 id="bug-fixes-8" class="section-heading"><a href="#bug-fixes-8" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>core: reduction error when all routes are wrapped</p></li><li><p>localize: custom route prefix ignored</p></li></ul><h2 id="v1-2-0-2025-05-01" class="section-heading"><a href="#v1-2-0-2025-05-01" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.1.0...v1.2.0">v1.2.0</a> (2025-05-01)</span></h2><h3 id="new-extensions" class="section-heading"><a href="#new-extensions" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">New Extensions:</span></h3><ul><li><p><a href="Routex.Extension.Localize.Phoenix.Routes.html"><code class="inline">Routex.Extension.Localize.Phoenix.Routes</code></a> - compile time localization</p></li><li><p><a href="Routex.Extension.Localize.Phoenix.Runtime.html"><code class="inline">Routex.Extension.Localize.Phoenix.Runtime</code></a> - runtime localization</p></li><li><p><a href="Routex.Extension.RuntimeDispatcher.html"><code class="inline">Routex.Extension.RuntimeDispatcher</code></a> - set state / put locale using route attributes</p></li><li><p><a href="Routex.Extension.LiveViewHooks.html"><code class="inline">Routex.Extension.LiveViewHooks</code></a> - inlines custom LiveView lifecycle hooks provided by other extensions</p></li><li><p><a href="Routex.Extension.Plugs.html"><code class="inline">Routex.Extension.Plugs</code></a> - detects and inlines custom Plugs provided by other extensions</p></li></ul><h3 id="features-2" class="section-heading"><a href="#features-2" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Features</span></h3><ul><li><p>auto detection and usage of existing Cldr, Gettext or Fluent setup.</p></li><li><p>support <code class="inline">locales</code> and <code class="inline">default_locale</code> for auto generated localized routes</p></li><li><p>support attribute overrides for <code class="inline">locale</code> attributes</p></li><li><p><a href="Routex.Extension.Localize.Registry.html"><code class="inline">Routex.Extension.Localize.Registry</code></a> - simple locale registry based on IANA</p></li><li><p>clear error messages when extensions are missing</p></li><li><p>show summary of processed routes</p></li><li><p>new config option to inspect generated helpers code</p></li></ul><h3 id="docs" class="section-heading"><a href="#docs" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Docs</span></h3><ul><li><p>simplified Usage guide</p></li><li><p>improved Localization guide</p></li><li><p>updated Comparison guide</p></li></ul><h3 id="bug-fixes-9" class="section-heading"><a href="#bug-fixes-9" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>core: warnings generated by mix docs</p></li><li><p>core: compilation failure due to uncompiled backends</p></li><li><p>core: compilation lockups / delays</p></li></ul><h3 id="tests" class="section-heading"><a href="#tests" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Tests:</span></h3><ul><li><p>reached &gt; 90% test coverage</p></li><li><p>enforce &gt; 90% test coverage</p></li></ul><h2 id="v1-1-0-2025-02-13" class="section-heading"><a href="#v1-1-0-2025-02-13" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v1.0.0...v1.1.0">v1.1.0</a> (2025-02-13)</span></h2><h3 id="features-3" class="section-heading"><a href="#features-3" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Features:</span></h3><ul><li><p>provide assigns directly in conn</p></li><li><p>core: add function to print critical messages</p></li></ul><h3 id="bug-fixes-10" class="section-heading"><a href="#bug-fixes-10" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>match patterns fail on trailing slash</p></li><li><p>undefined on_mount/4, silent missing attrs/1</p></li></ul><h2 id="v1-0-0-2025-02-03" class="section-heading"><a href="#v1-0-0-2025-02-03" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="https://github.com/BartOtten/routex/compare/v0.3.0-alpha.4...v1.0.0">v1.0.0</a> (2025-02-03)</span></h2><h3 id="features-4" class="section-heading"><a href="#features-4" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Features:</span></h3><ul><li>support Phoenix Liveview &gt;= 1.0</li></ul><h3 id="bug-fixes-11" class="section-heading"><a href="#bug-fixes-11" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Bug Fixes:</span></h3><ul><li><p>ci: upgrade artifact actions in workflow</p></li><li><p>core: comp. error - cannot set :<strong>struct</strong> in struct definition</p></li><li><p>incorrect typespecs</p></li><li><p>cldr: use territory_from_locale for territory resolution</p></li></ul><h2 id="v0-x" class="section-heading"><a href="#v0-x" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">v0.x</span></h2><p>The CHANGELOG for v0.x releases can be found in the <a href="https://github.com/BartOtten/routex/blob/v0.x/CHANGELOG.md">v0.x branch</a>.</p>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="release_notes.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Release Notes
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="usage.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Getting started
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/CHANGELOG.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

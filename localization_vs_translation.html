@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Localization vs Translation — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1><strong>Localization vs. Translation: Why Your Website Should Keep Them Separate</strong></h1>
+
+<a href="localization_vs_translation.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/docs/guides/LOCALIZATION_VS_TRANSLATION.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<p>When expanding a website for a global audience, businesses often confuse
+<strong>translation</strong> with <strong>localization</strong>. While they are related, treating them as
+the same process can lead to usability issues and a poor user experience.
+Additionally, many websites make the mistake of assuming that a user's
+<strong>preferred language</strong> matches their <strong>physical location</strong>, which can cause
+frustration.</p><p>In this post, we’ll break down the differences between translation and
+localization, why your website should separate them, and why <strong>language
+preferences should not be tied to a user's location</strong>.</p><h2 id="the-problem-conflating-location-and-language" class="section-heading"><a href="#the-problem-conflating-location-and-language" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">The Problem: Conflating Location and Language</span></h2><p>Many websites make the mistake of assuming that location dictates language.
+While there's often a correlation, it's far from a perfect match. Think about
+it:</p><ul><li><p><strong>Multilingual Regions:</strong> Countries like Switzerland, Canada, and Belgium have
+multiple official languages. A user in Switzerland might prefer to browse in
+German, French, or Italian. Assuming their language based on their IP address
+(which indicates location) would be inaccurate.</p></li><li><p><strong>Expatriates and Travelers:</strong> Someone living abroad might prefer to browse in
+their native language, even if they're physically located in a different
+country. A German expat in Spain might still want to see the website in
+German.</p></li><li><p><strong>Language Learning:</strong> Some users might prefer to browse in a language they're
+learning, regardless of their location.</p></li><li><p><strong>Shared Computers:</strong> In internet cafes, libraries, or shared family
+computers, users might not have control over the browser's language settings.
+Relying on these settings can lead to an incorrect language selection.</p></li></ul><p><strong>The Problem with <code class="inline">Accept-Language</code> HTTP Header:</strong></p><p>Websites often use the <code class="inline">Accept-Language</code> HTTP header, sent by the browser, to
+determine the user's preferred language. While this can be helpful, it's not
+foolproof. As mentioned above, on shared computers, the <code class="inline">Accept-Language</code> header
+might reflect the preferences of a previous user. Users might also not know how
+to change this setting, or it might be locked by system administrators in
+certain environments. Therefore, relying solely on this header can lead to a
+frustrating experience.</p><p><strong>Examples of What <em>Not</em> to Do:</strong></p><ul><li><p><strong>Automatic Redirection Based on IP:</strong> A user in Canada is automatically
+redirected to the French version of the site, even though their browser and
+system language are set to English. This is a classic example of location
+overriding language preference.</p></li><li><p><strong>Flag Icons as Language Options:</strong> Using flag icons to represent language is
+problematic. Flags represent countries, not languages. What about Spanish
+speakers in the US? Or English speakers in India? This conflates nationality
+with language.</p></li><li><p><strong>Hidden Language Settings:</strong> Language options are buried deep in the footer
+or only appear after navigating through several pages. Users shouldn't have to
+hunt for their preferred language.</p></li><li><p><strong>Sole Reliance on <code class="inline">Accept-Language</code>:</strong> The website assumes the browser's
+language setting is the user's actual preference, ignoring the possibility of
+shared computers or incorrect settings.</p></li></ul><h2 id="the-solution-always-give-users-control" class="section-heading"><a href="#the-solution-always-give-users-control" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">The Solution: Always Give Users Control</span></h2><p>The key is to treat location and language as distinct, yet related, pieces of
+information <em>and always give users explicit control over both</em>. Here's how to do
+it right:</p><ul><li><p><strong>Explicit Language Selection:</strong> Provide clear and prominent language options,
+ideally using the language name itself (e.g., &quot;English,&quot; &quot;Español,&quot; &quot;Deutsch&quot;)
+rather than flags. Place these options in a visible location, such as the
+header or footer, <em>on every page</em>.</p></li><li><p><strong>Location as a Secondary Consideration:</strong> Use location data (IP address) to
+<em>suggest</em> a default language and/or currency, but <em>always</em> allow the user to
+override this suggestion. A simple popup or banner saying &quot;We've detected
+you're in [Location]. Would you like to view the site in [Suggested Language]?
+[Yes/No]&quot; is a good approach. Even if they click &quot;yes,&quot; the language option
+should <em>still</em> be readily available.</p></li><li><p><strong>User Profiles and Preferences:</strong> For returning users, store their language
+and location preferences in their user profile. This ensures a consistent
+experience across sessions.</p></li><li><p><strong>Content Localization, Not Just Translation:</strong> Consider cultural nuances and
+adapt content accordingly. Simply translating text without considering
+cultural context can be ineffective or even offensive. Dates, times, and units
+of measurement should also be localized.</p></li><li><p><strong>Clear Location Settings:</strong> If location-specific content is crucial (e.g.,
+store locator, shipping information), provide a separate and easy-to-use
+location selection mechanism. This could be a dropdown menu or a map
+interface.</p></li></ul><p><strong>Example of How to Do It Right:</strong></p><ul><li><p>A user lands on a website and sees a small popup: &quot;We've detected you're in
+the UK. Would you like to view prices in GBP and the site in English?
+[Yes/No]&quot;</p></li><li><p><em>Regardless</em> of the user's choice in the popup, a language dropdown menu is
+<em>always</em> visible in the header, offering options like &quot;English,&quot; &quot;Français,&quot;
+&quot;Español,&quot; etc.</p></li><li><p>The footer contains a link to &quot;Change Location,&quot; where the user can specify
+their country for location-specific content.</p></li></ul><p>By implementing these best practices, websites can create a more inclusive and
+user-friendly experience for their global audience. Respecting the distinction
+between location and language, and <em>always giving users the control to choose</em>,
+is not just good practice, it's essential for building trust and maximizing your
+online reach.</p><h2 id="how-routex-approach-helps" class="section-heading"><a href="#how-routex-approach-helps" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">How Routex' approach helps</span></h2><p>Routex's approach to localized routing reinforces the principle of keeping
+language and location distinct. No implicit information is embedded in the
+routes.</p><p>When dealing with <strong>region-based pages</strong> changing a user's region (and thus the
+associated region-specific content) doesn't necessitate an automatic language
+switch. And when dealing with <strong>language-based pages</strong> changing a user's
+language doesn't necessitate an automatic region switch.</p><p>Imagine a scenario where a user is browsing a <strong>region-based</strong> site in English
+but wants to see the pricing and product availability for the Indian market.
+With Routex, they can navigate to the India region-specific page (e.g.,
+/in/products) without being forced to switch to another language. The site can
+maintain the user's preferred language (English in this case) while displaying
+the relevant Indian content.</p><p>This is in stark contrast to systems where language and region are implicitly
+linked. In such cases, switching regions might inadvertently trigger a language
+change, leading to a confusing and frustrating user experience.</p><h2 id="conclusion" class="section-heading"><a href="#conclusion" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><strong>Conclusion</strong></span></h2><p>Localization and translation serve different purposes and should be handled
+separately to provide the best user experience. Similarly, <strong>a user's preferred
+language should not be assumed based on their location</strong>. By keeping these
+elements distinct, websites can ensure better usability, compliance, and
+engagement for a global audience.</p><p>By adopting <strong>a user-first approach</strong>, where language is a choice and location
+is used only for relevant regional settings, businesses can create a seamless,
+accessible, and culturally appropriate experience for all users.</p>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="localize_phoenix.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Localize Phoenix
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="routex_and_phoenix_router.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Routex and Phoenix Router
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/docs/guides/LOCALIZATION_VS_TRANSLATION.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

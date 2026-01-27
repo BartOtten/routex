@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Routing solutions compared — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>Routing Solutions for Phoenix: A Developer-Centric Comparison</h1>
+
+<a href="comparison.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/docs/COMPARISON.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<p>When building applications with the Phoenix framework, you might need additional
+routing solutions. Requirements can range from the common internationalization
+and localization to more exotic such as route obfuscation. Selecting the right
+tool is essential. This article compares two libraries that extend the Phoenix
+Router: <strong>Cldr Routes</strong> and <strong>Routex</strong>.</p><p>We’ll examine differences in functionality, extensibility, integration, runtime
+capabilities, and customization. By the end, you’ll have a clearer picture of
+each solution’s strengths and limitations to help you decide which is best for
+your project.</p><h2 id="summary" class="section-heading"><a href="#summary" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Summary</span></h2><p>Both Cldr Routes and Routex extend Phoenix Router in meaningful ways.</p><p><strong>Cldr Routes</strong><br/>Cldr Routes provides route translation and generates localized path and URL
+helpers. While Cldr Routes streamlines the process of creating localized routes,
+it necessitates proper configuration of both Cldr and Gettext. This requirement
+is advantageous for projects already utilizing these libraries but may involve
+additional setup for others.</p><p>Cldr Routes is particularly well-suited for applications that are already part
+of the Cldr ecosystem and require straightforward URL translations.</p><p><strong>Routex</strong><br/>​Routex is a comprehensive routing framework built on Phoenix Router, offering
+extensive internationalization and localization features that encompass all
+capabilities of Cldr Routes. Beyond these, Routex introduces a versatile set of
+functionalities, including runtime support through built-in Plug and LiveView
+lifecycle hooks, as well as customizable function callbacks for navigation
+events. ​</p><p>A key strength of Routex lies in its seamless integration with existing
+codebases, preserving established patterns. Its modular architecture and
+extensive customization options enable developers to incorporate custom route
+attributes and alternative routing strategies with minimal disruption. This
+flexibility ensures that Routex can adapt to the specific needs of any project,
+enhancing routing capabilities without necessitating significant codebase
+modifications. ​</p><p>Routex is recommended for new projects or projects needing to retrofit routing
+features into the existing code bases. Its focus on developer experience means
+you spend less time configuring and more time building innovative
+applications.For projects invested in Cldr it offers <a href="Routex.Extension.Cldr.html"><code class="inline">Routex.Extension.Cldr</code></a> as
+a convenient adapter mimicing Cldr Routes.</p><h2 id="tabular-comparison" class="section-heading"><a href="#tabular-comparison" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Tabular comparison</span></h2><p>A quick overview before diving into a detailed explanation:</p><table><tbody><tr><td style="text-align: left;"><strong>Feature</strong></td><td style="text-align: left;"><strong>Routex</strong></td><td style="text-align: left;"><strong>Cldr Routes</strong></td></tr><tr><td style="text-align: left;">Localized routes</td><td style="text-align: left;">Yes</td><td style="text-align: left;">Yes</td></tr><tr><td style="text-align: left;">Translated routes</td><td style="text-align: left;">Yes</td><td style="text-align: left;">Yes</td></tr><tr><td style="text-align: left;">Verified Routes</td><td style="text-align: left;">Yes</td><td style="text-align: left;">Yes</td></tr><tr><td style="text-align: left;">Route interpolation</td><td style="text-align: left;">Yes</td><td style="text-align: left;">Yes</td></tr><tr><td style="text-align: left;">Alternatives routes</td><td style="text-align: left;">Yes</td><td style="text-align: left;">Limited</td></tr><tr><td style="text-align: left;">Custom attributes</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr><tr><td style="text-align: left;">Custom assigns</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr><tr><td style="text-align: left;">Plug &amp; Hooks</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr><tr><td style="text-align: left;">Navigation callbacks</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr><tr><td style="text-align: left;">Buildin locale registry</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr><tr><td style="text-align: left;">Route Obfuscation</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr><tr><td style="text-align: left;"></td><td style="text-align: left;"></td><td style="text-align: left;"></td></tr><tr><td style="text-align: left;"><strong>Integration</strong></td><td style="text-align: left;"><strong>Routex</strong></td><td style="text-align: left;"><strong>Cldr Routes</strong></td></tr><tr><td style="text-align: left;">Sigils</td><td style="text-align: left;">Customizable</td><td style="text-align: left;">Fixed</td></tr><tr><td style="text-align: left;">Functions</td><td style="text-align: left;">Customizable</td><td style="text-align: left;">Fixed</td></tr><tr><td style="text-align: left;">Libs integration</td><td style="text-align: left;">Configurable</td><td style="text-align: left;">None</td></tr><tr><td style="text-align: left;">Dependencies</td><td style="text-align: left;">Configurable</td><td style="text-align: left;">Cldr, Gettext</td></tr><tr><td style="text-align: left;">Runtime integration</td><td style="text-align: left;">Automated</td><td style="text-align: left;">None</td></tr><tr><td style="text-align: left;"></td><td style="text-align: left;"></td><td style="text-align: left;"></td></tr><tr><td style="text-align: left;"><strong>Development</strong></td><td style="text-align: left;"><strong>Routex</strong></td><td style="text-align: left;"><strong>Cldr Routes</strong></td></tr><tr><td style="text-align: left;">Architecture</td><td style="text-align: left;">Modular</td><td style="text-align: left;">Monolithic</td></tr><tr><td style="text-align: left;">Feature inclusion</td><td style="text-align: left;">Upstream or extension</td><td style="text-align: left;">Upstream or own fork</td></tr><tr><td style="text-align: left;">Internal format</td><td style="text-align: left;">Route structs</td><td style="text-align: left;">Abstract Syntax Tree (AST)</td></tr><tr><td style="text-align: left;">Tooling included</td><td style="text-align: left;">Yes</td><td style="text-align: left;">No</td></tr></tbody></table><h2 id="feature-set-extensibility" class="section-heading"><a href="#feature-set-extensibility" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Feature Set &amp; Extensibility</span></h2><p>Both libraries were inspired by PhxAltRoutes—a pioneering localized
+routing effort by Routex’s creator—but have since taken distinct evolutionary
+paths.</p><p><strong>Cldr Routes</strong><br/>Reduced the feature set to localization features only. Aligning with the goals
+of Cldr.</p><ul><li><strong>Localization:</strong> Translates URL path segments at compile time and generates
+localized helper functions.</li><li><strong>Fixed Integration:</strong> Relies on the Cldr and Gettext libraries for
+localization.</li></ul><p><strong>Routex</strong><br/>Designed to be modular; allowing to grow the feature set beyond localization
+without becoming a large monolithic lib and supporting extension orchestration through
+value passing.</p><ul><li><strong>Comprehensive Feature Set:</strong> Beyond matching the internationalization and
+localization capabilities of Cldr Routes, Routex also offers advanced features
+like custom assigns, alternative route generation, and support for route
+segment reordering —providing unmatched flexibility</li><li><strong>Integrated Extensions:</strong> Built-in support for Plugs and LiveView lifecycle
+hooks automates integrations and speeds up development.</li><li><strong>Integrated locale registry:</strong> Routex comes with a simplified -IANA subtag
+registry based- locale registry . It covers common localisation use cases such as
+translating locale, region and language identifiers to display names and
+validating locale tags.</li><li><strong>Modular Architecture:</strong> Its extension-driven architecture allows you to
+include only the features you need and easily create custom extensions.</li><li><strong>Focus on Customization:</strong> The mantra &quot;Simple by default, powerful when
+needed&quot; drives the development of extensions. Extensions ship with sane
+defaults yet are highly tweakable due to a sheer amount of configuration
+options.</li><li><strong>Tailor-Made Customization:</strong> Its modular architecture and the information
+sharing system <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> lets you extend functionality without having to
+worry about the core of routing or breaking other extensions. Clone an
+extension, tweak it to your needs, or build new ones from scratch.</li></ul><p>Below is a feature comparison summarizing key differences:</p><h3 id="localized-routes" class="section-heading"><a href="#localized-routes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Localized Routes</span></h3><p>While both libraries feature localized routes, Routex offers customization
+options such a customized locale notation and display name overrides for
+languages and regions.</p><h3 id="translated-routes" class="section-heading"><a href="#translated-routes" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Translated Routes</span></h3><p>While both libraries feature translate routes by depending on Gettext, Routex
+only depends on Gettext when the Translations extension is enabled.</p><h3 id="route-manipulation" class="section-heading"><a href="#route-manipulation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Route Manipulation</span></h3><p>Both libraries feature route manipulation in different degrees. Transformations
+by Cldr Routes are limited to localization. Routex, in contrast, allows for any
+kind of transformation including custom attributes, non-locale alternative
+routes, and route segment reordering.</p><h3 id="plug-liveview-integration" class="section-heading"><a href="#plug-liveview-integration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Plug &amp; LiveView Integration</span></h3><p>Only Routex provides native support for Plug and LiveView extensions</p><h3 id="dependencies" class="section-heading"><a href="#dependencies" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Dependencies</span></h3><p>Cldr Routes requires Cldr and Gettext. Although Routex core has no dependencies
+on itself extensions may require additional dependencies. At this moment only
+the Translations extension has a dependency: Gettext.</p><h3 id="integration-with-other-packages" class="section-heading"><a href="#integration-with-other-packages" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Integration with other packages</span></h3><p>Unlike Cldr Routes, Routex is designed to seamlessly integrate with any
+third-party package you choose. This flexibility allows you to combine Routex
+with your existing package stack or custom solutions, tailoring its
+functionality to meet the specific needs of your application.</p><h2 id="developer-experience-integration" class="section-heading"><a href="#developer-experience-integration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Developer Experience &amp; Integration</span></h2><p><strong>Cldr Routes</strong><br/>Streamlines localized route generation. However, its tight integration with the
+Cldr suite and limited configuration options can limit flexibility and often
+necessitates adjustments in templates and code. Requiring the use of a custom
+sigil <code class="inline">~q</code> for verified routers and <code class="inline">q</code> prefixed helper macros, it necessitates
+adjustments in existing templates and newly generated ones. The impact depends
+on the size of the code base and the use of generators.</p><pre><code class="heex"># Example in Cldr Routes:
+
+# Uses custom sigil ~q for localized routes
+&lt;.link navigate=~q&quot;/products/#{product}&quot;&gt;My Link&lt;/.link&gt;</code></pre><p><strong>Routex</strong><br/>In contrast, Routex offers extensive configurability -such as customizable
+sigils and function names. It can be configured to shim the default Phoenix
+sigil <code class="inline">~p</code> and helper macros <code class="inline">url</code> and <code class="inline">path</code> or mimic Cldr Routes for Cldr
+integration by using it's custom sigil and macros names. Meaning you can
+seamlessly incorporate Routex into your existing projects, preserving familiar
+patterns while enjoying cutting-edge features. Support for extensions with
+runtime features reduce manual wiring.</p><pre><code class="heex"># Example in Routex:
+
+# Configurable to use standard Phoenix sigil ~p (as used in Phoenix' generators)
+&lt;.link navigate=~p&quot;/products/#{product}&quot;&gt;My Link&lt;/.link&gt;
+
+# or mimic Cldr Routes using sigil ~q
+&lt;.link navigate=~q&quot;/products/#{product}&quot;&gt;My Link&lt;/.link&gt;</code></pre><p>This flexibility is particularly useful when integrating with existing projects
+and code bases.</p><h2 id="route-processing" class="section-heading"><a href="#route-processing" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Route processing</span></h2><p>Both projects generate routes during compile time. It's the way how they
+do this and their runtime capabilities that makes the difference.</p><p><strong>Cldr Routes</strong><br/>Cldr Routes takes your original route definition Abstract Syntaxt Tree (AST)
+within a localize block and transforms it into a new AST with localized paths.
+There are no points for interception or extension points in this proces.</p><pre><code class="makeup elixir" translate="no"><span class="w"> </span><span class="n">localize</span><span class="w"> </span><span class="k" data-group-id="6586192915-1">do</span><span class="w">
+    </span><span class="n">get</span><span class="w"> </span><span class="s">&quot;/pages/:page&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">PageController</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="w">
+    </span><span class="n">resources</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">UserController</span><span class="w">
+  </span><span class="k" data-group-id="6586192915-1">end</span></code></pre><p><strong>Routex</strong><br/>Routex intercepts your route definitions after they have been converted into
+straightforward Route structs. It's extension processing system uses &quot;value
+passing&quot; so each extension in the pipeline receives the route structs including
+attributes and can modify or augment them before passing the updated routes on
+to the next extension. This approach makes it easier to trace and debug route
+transformations at compile time.</p><p>At the end of the processing Routex passes the route structs to Phoenix Router
+for native compilation.</p><p>This approach leverages the simpler and more predictable structure of Route
+structs and route compilation by Phoenix Router itself, making the system more
+flexible, simpler to extend and easier to understand.</p><pre><code class="makeup elixir" translate="no"><span class="c1"># Routex supports the use of multiple configuration backends in one router. This means</span><span class="w">
+</span><span class="c1"># that routes can have their own transformations, helper functions, or runtime features.</span><span class="w">
+
+</span><span class="c1"># using configuration ExampleWeb.RoutexBackend</span><span class="w">
+</span><span class="n">preprocess_using</span><span class="w"> </span><span class="nc">ExampleWeb.RoutexBackend</span><span class="w"> </span><span class="k" data-group-id="5622885910-1">do</span><span class="w">
+   </span><span class="n">get</span><span class="w"> </span><span class="s">&quot;/pages/:page&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">PageController</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="w">
+   </span><span class="n">resources</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">UserController</span><span class="w">
+</span><span class="k" data-group-id="5622885910-1">end</span><span class="w">
+
+</span><span class="c1"># using ExampleWeb.RoutexBackendAdmin</span><span class="w">
+</span><span class="n">preprocess_using</span><span class="w"> </span><span class="nc">ExampleWeb.RoutexBackendAdmin</span><span class="w"> </span><span class="k" data-group-id="5622885910-2">do</span><span class="w">
+   </span><span class="n">get</span><span class="w"> </span><span class="s">&quot;/admin/:page&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">PageController</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="w">
+</span><span class="k" data-group-id="5622885910-2">end</span></code></pre><h2 id="runtime-capabilities" class="section-heading"><a href="#runtime-capabilities" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Runtime capabilities</span></h2><p><strong>Cldr Routes</strong>
+Cldr Routes features only branching verified routes during runtime. It relies on
+external dependencies (like Cldr Plugs) to manage runtime locale detection,
+which necessitates adjustments in configuration and code for runtime
+localization.</p><p><strong>Routex</strong> Routex offers virtually unlimited runtime features and integration by
+integrating native extension <a href="Routex.Extension.RuntimeDispatcher.html"><code class="inline">Routex.Extension.RuntimeDispatcher</code></a> for dynamic
+functionality. This can be combined with other extensions -such as
+<a href="Routex.Extension.Localize.Phoenix.Runtime.html"><code class="inline">Routex.Extension.Localize.Phoenix.Runtime</code></a> for highly customizable locale
+detection and behavior during runtime.</p><pre><code class="makeup elixir" translate="no"><span class="kd">defmodule</span><span class="w"> </span><span class="nc">ExampleWeb.RoutexBackend</span><span class="w"> </span><span class="k" data-group-id="4764805971-1">do</span><span class="w">
+</span><span class="kn">use</span><span class="w"> </span><span class="nc">Routex.Backend</span><span class="p">,</span><span class="w">  </span><span class="c1"># makes this a Routex configuration backend</span><span class="w">
+</span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4764805971-2">[</span><span class="w">
+  </span><span class="nc">Routex.Extension.Attrs</span><span class="p">,</span><span class="w">
+     </span><span class="nc">Routex.Extension.Localize</span><span class="p">,</span><span class="w">  </span><span class="c1"># detects locale, and puts it in runtime attributes</span><span class="w">
+     </span><span class="nc">Routex.Extension.RuntimeDispatcher</span><span class="w">  </span><span class="c1"># call arbitrary functions during runtime using route attributes</span><span class="w">
+</span><span class="p" data-group-id="4764805971-2">]</span><span class="p">,</span><span class="w">
+</span><span class="c1"># configuration of arbitrary functions to be called at navigation events.</span><span class="w">
+</span><span class="ss">dispatch_targets</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4764805971-3">[</span><span class="w">
+ </span><span class="c1"># Set Gettext locale from :language attribute</span><span class="w">
+ </span><span class="p" data-group-id="4764805971-4">{</span><span class="nc">Gettext</span><span class="p">,</span><span class="w"> </span><span class="ss">:put_locale</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4764805971-5">[</span><span class="p" data-group-id="4764805971-6">[</span><span class="ss">:attrs</span><span class="p">,</span><span class="w"> </span><span class="ss">:language</span><span class="p" data-group-id="4764805971-6">]</span><span class="p" data-group-id="4764805971-5">]</span><span class="p" data-group-id="4764805971-4">}</span><span class="p">,</span><span class="w">
+ </span><span class="c1"># Call arbitrary function using other runtime attribute</span><span class="w">
+ </span><span class="p" data-group-id="4764805971-7">{</span><span class="nc">MyApp</span><span class="p">,</span><span class="w"> </span><span class="ss">:my_function</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4764805971-8">[</span><span class="s">&quot;my value&quot;</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="4764805971-9">[</span><span class="ss">:attrs</span><span class="p">,</span><span class="w"> </span><span class="ss">:runtime_attr_value</span><span class="p" data-group-id="4764805971-9">]</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;other value&quot;</span><span class="p" data-group-id="4764805971-8">]</span><span class="p" data-group-id="4764805971-7">}</span><span class="w">
+</span><span class="p" data-group-id="4764805971-3">]</span><span class="w">
+</span><span class="k" data-group-id="4764805971-1">end</span></code></pre><p>Routex supports extension-provided plugs and hooks that are generated at compile
+time. By leveraging Elixir's powerful pattern matching, these plugs and hooks
+are optimized for performance, ensuring minimal runtime overhead even when
+multiple runtime dispatch targets are enabled.​</p><h2 id="conclusion" class="section-heading"><a href="#conclusion" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Conclusion</span></h2><p>In summary, both Cldr Routes and Routex significantly enhance Phoenix’s routing
+capabilities, but they cater to different project needs. Cldr Routes offers a
+streamlined, localized routing solution ideal for applications already using the
+Cldr and Gettext ecosystems.</p><p>On the other hand, Routex stands out with its modular and extensible
+architecture. It not only replicates the localization features of Cldr Routes
+but also introduces advanced functionalities—such as customizable route
+attributes, runtime dispatching to external libs, and seamless integration with
+Plug and LiveView. This flexibility makes Routex a powerful choice for both new
+projects and those looking to integrate dynamic routing features into an
+existing codebase.</p><p>Ultimately, the decision between these libraries will depend on your project’s
+requirements, existing dependencies, and desired level of customization. For
+developers seeking a robust and adaptive routing framework, Routex offers
+extensive configurability and a richer feature set, while Cldr Routes remains a
+compelling choice for straightforward localization needs.</p><hr class="thin"/><small>The `routex` -formerly known as `route_match`- as used by HandleCommerce
+is not related to the Routex as decribed in this document.</small>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="history_of_routex.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+History of Routex
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="extension_development.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Extensions
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/docs/COMPARISON.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

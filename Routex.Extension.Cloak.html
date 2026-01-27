@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Routex.Extension.Cloak — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-module" id="main" data-type="modules">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no">Routex.Extension.Cloak</span> 
+      <small class="app-vsn" translate="no">(Routex v1.3.2)</small>
+
+    </h1>
+
+<a href="Routex.Extension.Cloak.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/cloak.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+    <section id="moduledoc">
+<p>Transforms routes to be unrecognizable.</p><section role="note" class="admonition warning"><h4 class="admonition-title warning">Warning</h4><p>This extension is intended for testing and demonstration. It may change at
+any given moment to generate other routes without prior notice.</p></section><p>The Cloak extension demonstrates how Routex enables extensions to transform
+routes beyond recognition without breaking Phoenix' native and Routex' routing
+features.</p><p>Currently it numbers all routes. Starting at 1 and incremening the counter for
+each route. It also shifts the parameter to the left; causing a chaotic route
+structure.</p><p>Do note: this still works with the Verified Routes extension. You can use the
+original, non transformed, routes in templates (e.g. <code class="inline">~p&quot;/products/%{product}&quot;</code>)
+and still be sure the transformed routes rendered at runtime (e.g. <code class="inline">/88/2</code> when product.id = 88)
+are valid routes.</p><h2 id="module-do-not-try-this-at-home" class="section-heading"><a href="#module-do-not-try-this-at-home" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Do (not) try this at home</span></h2><ul><li><p>Try this extension with a route generating extension like
+<a href="Routex.Extension.Alternatives.html"><code class="inline">Routex.Extension.Alternatives</code></a> for even more chaos.</p></li><li><p>Adapt this extension to use character repetition instead of numbers. Can you
+guess where <code class="inline">/90/!!</code> brings to?</p></li></ul><h2 id="module-options" class="section-heading"><a href="#module-options" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Options</span></h2><ul><li><code class="inline">cloak</code>: Binary to duplicate or tuple with {module, function, arguments} which will receive a
+index counter as first argument.</li></ul><h2 id="module-configuration" class="section-heading"><a href="#module-configuration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Configuration</span></h2><pre><code class="diff"># file /lib/example_web/routex_backend.ex
+defmodule ExampleWeb.RoutexBackend do
+  use Routex.Backend,
+  extensions: [
+   Routex.Extension.AttrGetters, # required
++  Routex.Extension.Cloak
+],
+cloak: &quot;!&quot;</code></pre><h2 id="module-pseudo-result" class="section-heading"><a href="#module-pseudo-result" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Pseudo result</span></h2><pre><code class="makeup elixir" translate="no"><span class="nc">Original</span><span class="w">                 </span><span class="nc">Rewritten</span><span class="w">    </span><span class="nc">Result</span><span class="w"> </span><span class="p" data-group-id="5447180237-1">(</span><span class="ss">product_id</span><span class="p">:</span><span class="w"> </span><span class="mi">88</span><span class="p">,</span><span class="w"> </span><span class="mi">89</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p" data-group-id="5447180237-1">)</span><span class="w">
+</span><span class="o">/</span><span class="n">products</span><span class="w">                </span><span class="err">⇒</span><span class="w">     </span><span class="o">/</span><span class="mi">1</span><span class="w">     </span><span class="err">⇒</span><span class="w">    </span><span class="o">/</span><span class="mi">1</span><span class="w">
+</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">       </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="mi">2</span><span class="w">     </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="mi">88</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">89</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">90</span><span class="o">/</span><span class="mi">2</span><span class="w"> </span><span class="n">etc</span><span class="n">...</span><span class="w">
+</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">show</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="mi">3</span><span class="w">     </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="mi">88</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">89</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="mi">90</span><span class="o">/</span><span class="mi">3</span><span class="w"> </span><span class="n">etc</span><span class="n">...</span></code></pre><h2 id="module-routex-attrs" class="section-heading"><a href="#module-routex-attrs" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a></span></h2><p><strong>Requires</strong></p><ul><li>none</li></ul><p><strong>Sets</strong></p><ul><li>none</li></ul>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#binary_transform/3" data-no-tooltip="" translate="no">binary_transform(arg1, idx, binary)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#default_transform/3" data-no-tooltip="" translate="no">default_transform(arg1, idx, opt)</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#function_transform/3" data-no-tooltip="" translate="no">function_transform(path, idx, arg3)</a>
+
+      </div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+
+    <div class="functions-list">
+<section class="detail" id="binary_transform/3">
+
+  <div class="detail-header">
+    <a href="#binary_transform/3" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">binary_transform(arg1, idx, binary)</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/cloak.ex#L75" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="default_transform/3">
+
+  <div class="detail-header">
+    <a href="#default_transform/3" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">default_transform(arg1, idx, opt)</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/cloak.ex#L72" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+<section class="detail" id="function_transform/3">
+
+  <div class="detail-header">
+    <a href="#function_transform/3" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">function_transform(path, idx, arg3)</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/cloak.ex#L78" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

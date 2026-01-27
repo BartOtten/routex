@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Localize Phoenix — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>Localize Phoenix</h1>
+
+<a href="localize_phoenix.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/docs/guides/LOCALIZE_PHOENIX.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<p>This tutorial explains how to use <strong>Routex</strong> to localize your <strong>Phoenix</strong>
+application including multilingual, SEO-friendly URLs. In addition to showing
+how to configure Routex, you’ll learn:</p><ul><li><strong>Why localized routes matter:</strong> Enhance user experience, improve SEO, and support regional content.</li><li><strong>How Routex works:</strong> How the battery included framework supports locatization.</li><li><strong>Step-by-step setup:</strong> Configure your backend, set up translations, and add a language switcher.</li></ul><h2 id="what-you-ll-build" class="section-heading"><a href="#what-you-ll-build" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">What You’ll Build</span></h2><p>By the end of this tutorial, you will have:</p><ul><li>A set of locale-specific URLs for your product pages.</li><li>Translated route segments based on your Gettext files.</li><li>A language switcher component that keeps users within their localized scope.</li><li>Guidance on further customization and troubleshooting.</li></ul><p>For example, your routes may look like:</p><pre><code class="makeup elixir" translate="no"><span class="w">                       </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                    </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;en_US&quot;</span><span class="w">
+   </span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">  </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">eu</span><span class="o">/</span><span class="n">nederland</span><span class="o">/</span><span class="n">producten</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">bewerken</span><span class="w">  </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;nl_NL&quot;</span><span class="w">
+                       </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">eu</span><span class="o">/</span><span class="n">france</span><span class="o">/</span><span class="n">produit</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">editar</span><span class="w">         </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;fr_FR&quot;</span><span class="w">
+                       </span><span class="err">⇒</span><span class="w"> </span><span class="o">/</span><span class="n">gb</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="ss">:id</span><span class="o">/</span><span class="n">edit</span><span class="w">                 </span><span class="na">@loc</span><span class="o">.</span><span class="n">locale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;en_GB&quot;</span></code></pre><h2 id="prerequisites" class="section-heading"><a href="#prerequisites" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Prerequisites</span></h2><ul><li>A working Phoenix project with Routex installed. (See <a href="usage.html">Routex Usage
+Guide</a> for installation instructions.)</li><li>Phoenix version ≥ 1.6 and Elixir version ≥ 1.11.</li></ul><h2 id="terminology" class="section-heading"><a href="#terminology" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Terminology</span></h2><p>Slightly simplified for your convenience.</p><ul><li><code class="inline">locale</code>: Formatted as <code class="inline">language</code>-<code class="inline">region</code>. &quot;en-GB&quot; is
+shorthand for language &quot;en&quot; and region &quot;GB&quot;.</li><li><code class="inline">IANA</code>: The Internet Assigned Numbers Authority provides an official list
+of region- and language-identifier including display names</li><li><code class="inline">attribute</code>: custom value assigned to a route</li><li><code class="inline">assign</code>: value accesible using <code class="inline">@key</code> in templates</li><li><code class="inline">Accept-Language</code>: The HTTP Accept-Language request header indicates the
+ natural language and locale that the <em>software client</em> prefers.</li></ul><hr class="thin"/><h2 id="step-1-configuring-the-routex-backend" class="section-heading"><a href="#step-1-configuring-the-routex-backend" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Step 1: Configuring the Routex Backend</span></h2><p>Next, create (or update) your Routex backend module. This configuration
+determines which extensions to use, how to generate alternative routes, and how
+to integrate translations via Gettext.</p><p>An explanation of the configuration is at the bottom of this guide.</p><pre><code class="makeup elixir" translate="no"><span class="kd">defmodule</span><span class="w"> </span><span class="nc">ExampleWeb.RoutexBackend</span><span class="w"> </span><span class="k" data-group-id="9931794538-1">do</span><span class="w">
+  </span><span class="na">@moduledoc</span><span class="w"> </span><span class="s">&quot;&quot;&quot;
+  Configures Routex to enable localized and translated routes.
+  &quot;&quot;&quot;</span><span class="w">
+
+  </span><span class="kn">use</span><span class="w"> </span><span class="nc">Routex.Backend</span><span class="p">,</span><span class="w">
+    </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9931794538-2">[</span><span class="w">
+      </span><span class="c1"># == Base extensions ==</span><span class="w">
+      </span><span class="nc">Routex.Extension.AttrGetters</span><span class="p">,</span><span class="w">         </span><span class="c1"># Base attribute handling</span><span class="w">
+      </span><span class="nc">Routex.Extension.LiveViewHooks</span><span class="p">,</span><span class="w">       </span><span class="c1"># Inlines LiveView lifecycle callbacks of other extensions</span><span class="w">
+      </span><span class="nc">Routex.Extension.Plugs</span><span class="p">,</span><span class="w">               </span><span class="c1"># Inlines plug callbacks of other extensions</span><span class="w">
+      </span><span class="c1"># == Used for Localization ==</span><span class="w">
+      </span><span class="nc">Routex.Extension.Localize.Phoenix.Routes</span><span class="p">,</span><span class="w">     </span><span class="c1"># Localize routes at compile time</span><span class="w">
+      </span><span class="nc">Routex.Extension.Localize.Phoenix.Runtime</span><span class="p">,</span><span class="w">    </span><span class="c1"># Detects locale from various sources at runtime</span><span class="w">
+      </span><span class="nc">Routex.Extension.Translations</span><span class="p">,</span><span class="w">                </span><span class="c1"># Enables route segment translations</span><span class="w">
+      </span><span class="nc">Routex.Extension.Alternatives</span><span class="p">,</span><span class="w">                </span><span class="c1"># Generates locale alternatives set by Localize.Phoenix</span><span class="w">
+      </span><span class="nc">Routex.Extension.AlternativeGetters</span><span class="p">,</span><span class="w">          </span><span class="c1"># Creates a helper function to get the alternatives for a route</span><span class="w">
+      </span><span class="nc">Routex.Extension.VerifiedRoutes</span><span class="p">,</span><span class="w">              </span><span class="c1"># Make Phoenix VerifiedRoutes branch (alternatives) aware</span><span class="w">
+      </span><span class="nc">Routex.Extension.RuntimeDispatcher</span><span class="p">,</span><span class="w">           </span><span class="c1"># Dispatches during runtime (e.g `Gettext.put_locale/{1,2}`)</span><span class="w">
+    </span><span class="p" data-group-id="9931794538-2">]</span><span class="p">,</span><span class="w">
+
+    </span><span class="c1"># Integration with Gettext for route segment translation.</span><span class="w">
+    </span><span class="c1"># Defaults to the standard Gettext module of a Phoenix project.</span><span class="w">
+    </span><span class="c1"># translations_backend: ExampleWeb.Gettext,</span><span class="w">
+
+    </span><span class="c1"># Drop-in replacements: Override Phoenix VerifiedRoutes macros with Routex variants.</span><span class="w">
+    </span><span class="ss">verified_sigil_routex</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~p&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">verified_sigil_phoenix</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~o&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">verified_url_routex</span><span class="p">:</span><span class="w"> </span><span class="ss">:url</span><span class="p">,</span><span class="w">
+    </span><span class="ss">verified_path_routex</span><span class="p">:</span><span class="w"> </span><span class="ss">:path</span><span class="p">,</span><span class="w">
+
+    </span><span class="c1"># Locales to generate routes for: English (Global), Dutch, French, English (Great Brittain) and English (European)</span><span class="w">
+    </span><span class="c1"># All optional. `locales` and `default_locale` will be detected using Cldr, Gettext or Fluent when available.</span><span class="w">
+    </span><span class="c1"># locales: [{&quot;en-001&quot;, %{region_display_name: &quot;Worldwide&quot;}}, &quot;nl-NL&quot;, &quot;fr-FR&quot;, &quot;en-GB&quot;, &quot;en-150&quot;],</span><span class="w">
+    </span><span class="c1"># default_locale: &quot;en-100&quot;,</span><span class="w">
+
+    </span><span class="c1"># Custom language detection source priority</span><span class="w">
+    </span><span class="c1"># language_sources: [:query, :session, :cookie, :attrs, :accept_language],</span><span class="w">
+
+    </span><span class="c1"># Runtime dispatch targets to set Gettext locale from route attribute :language.</span><span class="w">
+    </span><span class="c1"># Shown below is the default.</span><span class="w">
+    </span><span class="c1"># dispatch_targets: [{Gettext, :put_locale, [[:attrs, :language]]}]</span><span class="w">
+</span><span class="k" data-group-id="9931794538-1">end</span></code></pre><hr class="thin"/><h2 id="step-2-translate-route-segments" class="section-heading"><a href="#step-2-translate-route-segments" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Step 2: Translate Route Segments</span></h2><p>Generate the translation files for your routes:</p><pre><code class="makeup bash" translate="no"><span class="">mix gettext.extract
+</span><span class="">mix gettext.merge priv/gettext --locale nl
+</span><span class="">mix gettext.merge priv/gettext --locale fr
+</span></code></pre><p>This creates the following structure:</p><pre><code class="text">priv/
+ gettext/
+   nl/
+     LC_MESSAGES/
+       default.po  # phoenix translations
+       routes.po   # routex translations
+    fr/
+     LC_MESSAGES/
+       default.po  # phoenix translations
+       routes.po   # routex translations</code></pre><p>Translate your route segments using any <code class="inline">.po</code> file editor (Poedit, OmegaT, etc.).</p><p>After you have translated segments, run <code class="inline">mix compile --force</code> for trigger a
+recompilation with translated routes.</p><hr class="thin"/><h2 id="step-3-adding-a-language-switcher-component" class="section-heading"><a href="#step-3-adding-a-language-switcher-component" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Step 3: Adding a Language Switcher Component</span></h2><p>To improve user experience, add a component that lets users switch locales
+seamlessly. Below is an example using a LiveView component with explicit styling
+and accessibility features:</p><pre><code class="heex">&lt;.link
+  :for={alternative &lt;- Routes.alternatives(@url)}
+  class=&quot;button&quot;
+  rel=&quot;alternate&quot;
+  hreflang={alternative.attrs.language}
+  navigate={alternative.slug}&gt;
+  &lt;.button class={if(alternative.match?, do: &quot;bg-[#FD4F00]&quot;, else: &quot;&quot;)}&gt;
+    &lt;%= alternative.attrs.language_display_name %&gt;
+  &lt;/.button&gt;
+&lt;/.link&gt;</code></pre><h3 id="component-highlights" class="section-heading"><a href="#component-highlights" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Component Highlights:</span></h3><ul><li><strong>Looping over Alternatives:</strong> Fetches all localized route variants for the current URL.</li><li><strong>User Friendly Language Names:</strong> Uses the <code class="inline">:language_display_name</code> as set by Localize.</li><li><strong>Dynamic Styling:</strong> Highlights the current language (using a conditional CSS class).</li><li><strong>Accessible Markup:</strong> Uses proper <code class="inline">rel</code> and <code class="inline">hreflang</code> attributes.</li></ul><blockquote><p><strong>Next Steps:</strong> Customize further using Tailwind CSS or your preferred
+framework and ensure it meets accessibility standards.</p></blockquote><hr class="thin"/><h2 id="troubleshooting-testing" class="section-heading"><a href="#troubleshooting-testing" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Troubleshooting &amp; Testing</span></h2><h3 id="common-pitfalls" class="section-heading"><a href="#common-pitfalls" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Common Pitfalls:</span></h3><ul><li><strong>Missing Translation:</strong> Ensure your PO files are updated and merged after any change.</li><li><strong>Route Mismatch:</strong> Run <a href="https://hexdocs.pm/phoenix/1.8.3/Mix.Tasks.Phx.Routes.html"><code class="inline">mix phx.routes</code></a> to verify that all localized routes are generated.</li><li><strong>Cookie/Session Issues:</strong> Double-check your browser settings if locale detection does not work as expected.</li></ul><hr class="thin"/><h2 id="additional-features-customization" class="section-heading"><a href="#additional-features-customization" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Additional Features &amp; Customization</span></h2><ul><li><strong>Extending Functionality:</strong> If you need more complex transformations,
+consider writing your own Routex extension. The <a href="extension_development.html">Extension Development
+Guide</a> offers detailed instructions.</li><li><strong>Combining with Other Extensions:</strong> Routex extensions are designed to work
+seamless together. Other extensions can be found in the <a href="extensions.html">List of Routex
+Extensions</a></li><li><strong>Enhance Usability:</strong> Read our guide <a href="localization_vs_translation.html">Localization vs. Translation: Why Your
+Website Should Keep Them Separate</a></li></ul><hr class="thin"/><h2 id="conclusion" class="section-heading"><a href="#conclusion" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Conclusion</span></h2><p>This tutorial has guided you through localizing your Phoenix routes using Routex by:</p><ul><li>Explaining the benefits of localized routes.</li><li>Providing a detailed configuration example with clear commentary.</li><li>Demonstrating how to extract translations and build a language switcher.</li><li>Offering troubleshooting and testing recommendations.</li></ul><p>By following these steps, you now have a powerful and flexible routing system
+that can adapt to any locale requirement without modifying your templates. For
+further enhancements, check the official Routex documentation and join the
+discussion on the <a href="https://elixirforum.com/tag/routex">Elixir Forum</a>.</p><p>Happy coding and enjoy creating a multilingual Phoenix application!</p><hr class="thin"/><h2 id="the-configuration-explained" class="section-heading"><a href="#the-configuration-explained" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">The Configuration Explained</span></h2><p><strong>AttrGetters, LiveViewHooks, Plugs</strong>:</p><ul><li>Extensions supporting other extensions.</li></ul><p><strong>Alternatives Structure</strong>:</p><ul><li>Creates a hierarchical URL structure</li><li>Supports regional variations (e.g., European vs British English)</li><li>Associates locales with URL paths</li><li>Supports <code class="inline">[language|region]_display_name</code> overrides</li></ul><p><strong>Localize with custom language sources</strong>:</p><ul><li>Expands route attribute <code class="inline">:locale</code> into route attributes <code class="inline">:locale, :region, :language, :region_display_name, :language_display_name</code></li><li>Handles locale detection using a variery of sources including <code class="inline">Accept-Language</code></li><li>Sets attributes <code class="inline">:locale</code>, <code class="inline">:region</code> and <code class="inline">:language</code> at runtime</li><li>Comes with an IANA-based locale registry to validate locale-, region- and language and to convert these to display names</li><li>Custom detection source priority to favor the routes' language over the <code class="inline">Accept-Language</code> browser language</li></ul><p><strong>Translation Setup</strong>:</p><ul><li>Enables path segment translation</li><li>Uses the default translation lib use by Phoenix: Gettext.</li><li>Consistent segment localization</li></ul><p><strong>Verified Routess</strong>:</p><ul><li>Preserves existing Phoenix path sigils (e.g. <code class="inline">~p&quot;/my/path&quot;</code>)</li><li>Adds locale awareness to routes</li><li>Maintains backward compatibility</li></ul><p> <strong>AlternativeGetters</strong>:</p><ul><li>Fetch alternative locale routes using <code class="inline">alternatives(@url)</code></li><li>Use to generate buttons to switch language</li></ul><p><strong>RuntimeDispatcher</strong>:</p><ul><li>Configured to call <code class="inline">Gettext.put_locale</code></li><li>Uses the runtime detected attribute <code class="inline">:language</code> which is set by Localize.</li></ul>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="usage.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Getting started
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="localization_vs_translation.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Localization vs Translation
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/docs/guides/LOCALIZE_PHOENIX.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

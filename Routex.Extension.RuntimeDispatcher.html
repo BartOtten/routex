@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Routex.Extension.RuntimeDispatcher — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-module" id="main" data-type="modules">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no">Routex.Extension.RuntimeDispatcher</span> 
+      <small class="app-vsn" translate="no">(Routex v1.3.2)</small>
+
+    </h1>
+
+<a href="Routex.Extension.RuntimeDispatcher.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/runtime_dispatcher.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+    <section id="moduledoc">
+<p>The <a href="Routex.Extension.RuntimeDispatcher.html"><code class="inline">Routex.Extension.RuntimeDispatcher</code></a> enables the dynamic dispatching of
+functions to external libraries or modules during the Plug pipeline and
+LiveView's <code class="inline">handle_params</code>. This dispatching is configured using a list of
+<code class="inline">{module, function, arguments}</code> tuples and leverages attributes from
+<a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> at runtime.</p><p>This is particularly useful for integrating with libraries that handle
+internationalization or localization, such as:</p><ul><li>Gettext - Set language for translations</li><li>Fluent - Set language for translations</li><li>Cldr - Set locale for the Cldr suite</li></ul><section role="note" class="admonition neutral"><h4 class="admonition-title neutral">In combination with...</h4><p>This extension dispatches functions with values from <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> during
+runtime. These attributes are typically set by other extensions such as:</p><ul><li><a href="Routex.Extension.Alternatives.html"><code class="inline">Routex.Extension.Alternatives</code></a> (compile time)</li><li><a href="Routex.Extension.Localize.Phoenix.html"><code class="inline">Routex.Extension.Localize.Phoenix</code></a> (compile time and runtime)</li><li><a href="Routex.Extension.Localize.Phoenix.Routes.html"><code class="inline">Routex.Extension.Localize.Phoenix.Routes</code></a> (compile time)</li><li><a href="Routex.Extension.Localize.Phoenix.Runtime.html"><code class="inline">Routex.Extension.Localize.Phoenix.Runtime</code></a> (runtime)</li></ul></section><h3 id="module-options" class="section-heading"><a href="#module-options" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Options</span></h3><ul><li><code class="inline">dispatch_targets</code> - A list of <code class="inline">{module, function, arguments}</code> tuples. Any argument
+that is a list starting with <code class="inline">:attrs</code> is transformed into <code class="inline">get_in(attrs(), rest)</code>.
+Defaults to <code class="inline">[{Gettext, :put_locale, [[:attrs, :runtime, :language]]}]</code> for zero-config
+integration with a default Phoenix app.</li></ul><h3 id="module-example-configuration" class="section-heading"><a href="#module-example-configuration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Example Configuration</span></h3><pre><code class="makeup elixir" translate="no"><span class="kd">defmodule</span><span class="w"> </span><span class="nc">MyApp.RoutexBackend</span><span class="w"> </span><span class="k" data-group-id="7314985319-1">do</span><span class="w">
+  </span><span class="kn">use</span><span class="w"> </span><span class="nc">Routex.Backend</span><span class="p">,</span><span class="w">
+    </span><span class="ss">extensions</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7314985319-2">[</span><span class="w">
+      </span><span class="nc">Routex.Extension.Attrs</span><span class="p">,</span><span class="w">
+      </span><span class="nc">Routex.Extension.RuntimeDispatcher</span><span class="w">
+    </span><span class="p" data-group-id="7314985319-2">]</span><span class="p">,</span><span class="w">
+    </span><span class="ss">dispatch_targets</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7314985319-3">[</span><span class="w">
+      </span><span class="c1"># Dispatch Gettext locale from detected :language attribute</span><span class="w">
+      </span><span class="p" data-group-id="7314985319-4">{</span><span class="nc">Gettext</span><span class="p">,</span><span class="w"> </span><span class="ss">:put_locale</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7314985319-5">[</span><span class="p" data-group-id="7314985319-6">[</span><span class="ss">:attrs</span><span class="p">,</span><span class="w"> </span><span class="ss">:runtime</span><span class="p">,</span><span class="w"> </span><span class="ss">:language</span><span class="p" data-group-id="7314985319-6">]</span><span class="p" data-group-id="7314985319-5">]</span><span class="p" data-group-id="7314985319-4">}</span><span class="p">,</span><span class="w">
+
+      </span><span class="c1"># Dispatch CLDR locale from detected :locale attribute</span><span class="w">
+      </span><span class="p" data-group-id="7314985319-7">{</span><span class="nc">Cldr</span><span class="p">,</span><span class="w"> </span><span class="ss">:put_locale</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7314985319-8">[</span><span class="nc">MyApp.Cldr</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="7314985319-9">[</span><span class="ss">:attrs</span><span class="p">,</span><span class="w"> </span><span class="ss">:runtime</span><span class="p">,</span><span class="w"> </span><span class="ss">:locale</span><span class="p" data-group-id="7314985319-9">]</span><span class="p" data-group-id="7314985319-8">]</span><span class="p" data-group-id="7314985319-7">}</span><span class="w">
+    </span><span class="p" data-group-id="7314985319-3">]</span><span class="w">
+</span><span class="k" data-group-id="7314985319-1">end</span></code></pre><h2 id="module-error-handling" class="section-heading"><a href="#module-error-handling" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Error Handling</span></h2><p>The extension validates all dispatch configurations during compilation to
+ensure the specified modules and functions exist:</p><ul><li>Checks if the module is loaded</li><li>Verifies the function exists with the correct arity</li><li>Raises a compile-time error if validation fails</li></ul><p>Example error:</p><pre><code class="makeup elixir" translate="no"><span class="gt">** (RuntimeError) Gettext does not provide put_locale/1.</span><span class="w">
+ </span><span class="nc">Please</span><span class="w"> </span><span class="n">check</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="ss">:dispatch_targets</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="nc">Routex</span><span class="w"> </span><span class="n">backend</span><span class="w"> </span><span class="n">module</span></code></pre><h2 id="module-routex-attrs" class="section-heading"><a href="#module-routex-attrs" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a></span></h2><p><strong>Requires</strong></p><ul><li>none</li></ul><p><strong>Sets</strong></p><ul><li>none</li></ul><h2 id="module-helpers" class="section-heading"><a href="#module-helpers" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Helpers</span></h2><p><code class="inline">dispatch_targets(attrs :: T.attrs) :: :ok</code></p>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#call/2" data-no-tooltip="" translate="no">call(conn, opts)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>A plug fetching the attributes from the connection and calling helper function <code class="inline">dispatch_targets/1</code></p></div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#handle_params/3" data-no-tooltip="" translate="no">handle_params(params, session, socket)</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>A Phoenix Lifecycle Hook fetching the attributes from the socket and calling helper function <code class="inline">dispatch_targets/1</code></p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+
+    <div class="functions-list">
+<section class="detail" id="call/2">
+
+  <div class="detail-header">
+    <a href="#call/2" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">call(conn, opts)</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/runtime_dispatcher.ex#L113" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>A plug fetching the attributes from the connection and calling helper function <code class="inline">dispatch_targets/1</code></p>
+  </section>
+</section>
+<section class="detail" id="handle_params/3">
+
+  <div class="detail-header">
+    <a href="#handle_params/3" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">handle_params(params, session, socket)</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/runtime_dispatcher.ex#L122" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+<p>A Phoenix Lifecycle Hook fetching the attributes from the socket and calling helper function <code class="inline">dispatch_targets/1</code></p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

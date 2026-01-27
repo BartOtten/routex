@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Extensions — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>Routex Extensions</h1>
+
+<a href="extension_development.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/docs/EXTENSION_DEVELOPMENT.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<section role="note" class="admonition info"><h4 class="admonition-title info">List of extensions</h4><p>A <a href="readme.html#extensions">list of included extensions</a> can be found in the README.</p></section><p>Routex Extensions extend the functionality provided by Routex to transform
+routes or generate new route based helper functions. Each extension is a module
+which implements the <a href="Routex.Extension.html"><code class="inline">Routex.Extension</code></a> behaviour.</p><p>Routex will call those callbacks at different stages before Routex handsoff the
+list with routes to <a href="https://hexdocs.pm/phoenix/1.8.3/Phoenix.Router.html"><code class="inline">Phoenix.Router</code></a> for compilation.</p><p>Each extension provides a single feature and should minimize hard dependencies
+on other extensions. Instead, Routex advises to make use of the <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a>
+struct to share attributes; allowing extensions to interoperate without being
+coupled.</p><p>The documentation of each extension lists any provided or required
+<a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a>.</p><h2 id="callbacks-and-stages" class="section-heading"><a href="#callbacks-and-stages" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Callbacks and stages</span></h2><h3 id="stage-1-configure" class="section-heading"><a href="#stage-1-configure" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Stage 1: Configure</span></h3><p>This stage enables extensions to preprocess backend options upfront.</p><p>The <code class="inline">configure/2</code> callback is called with the options provided to
+<a href="Routex.Backend.html"><code class="inline">Routex.Backend</code></a> and the name of the Routex backend. It is expected to return a
+new list of options.</p><p>Routex collects all options in this stage for subsequent stages. Therefore,
+extensions should add any fallback/default they might use themselves to the
+options in this stage.</p><p>To aid in code completion, the final configuration is passed as a struct to
+subsequent stages.</p><h3 id="stage-2-transform" class="section-heading"><a href="#stage-2-transform" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Stage 2: Transform</span></h3><p>This stage is meant to change the properties of routes, which are at that moment
+<code class="inline">Phoenix.Router.Route</code> structs. The routes are grouped by Routex backend and
+processed per group, allowing an extension to use accumulating values within one
+iteration.</p><p>The <code class="inline">transform/3</code> callback is called with a list of routes belonging to a
+Routex backend, the name of the backend and the current environment. It is
+expected to return a list of Phoenix.Router.Route structs.</p><h4>Flattening option values</h4><p>Extensions can make use of <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> provided by Routex itself, Routex
+backends and other extensions.</p><p>To make the availability of the attributes as predictable as possible, Routex
+uses a flat structure which is stored in a routes' <code class="inline">private.routex</code> field.
+However, using a flat structure might conflict with developer experience;
+sometimes a nested structure to provide configuration options might be more
+suitable.</p><p>One responsibility of the <code class="inline">transform/3</code> callback is to flatten the structure of
+attributes they use for each route they receive, so other extensions can use
+attributes set by the current extension without knowledge of the configuration
+structure.</p><p><strong>Example</strong>
+The Alternatives extension uses nested options and allows inheritance
+of attributes from parent branches.</p><pre><code class="makeup elixir" translate="no"><span class="ss">alternatives</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9591727207-1">%{</span><span class="w">
+  </span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w">
+    </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="no">nil</span><span class="p">,</span><span class="w">
+    </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en_GB&quot;</span><span class="p">,</span><span class="w">
+    </span><span class="ss">branches</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="9591727207-2">%{</span><span class="w">
+      </span><span class="s">&quot;nl&quot;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p" data-group-id="9591727207-3">%{</span><span class="w">
+          </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p">,</span><span class="w">
+          </span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nl_NL&quot;</span><span class="w">
+        </span><span class="p" data-group-id="9591727207-3">}</span><span class="p">,</span><span class="w">
+      </span><span class="s">&quot;gb&quot;</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p" data-group-id="9591727207-4">%{</span><span class="w">
+        </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;gb&quot;</span><span class="p">,</span><span class="w">
+        </span><span class="p" data-group-id="9591727207-4">}</span><span class="w">
+    </span><span class="p" data-group-id="9591727207-2">}</span><span class="w">
+</span><span class="p" data-group-id="9591727207-1">}</span></code></pre><p>The Alternatives module is therefor responsible for flattening those for
+(itself and) other extensions to use. To take the route responsible for the
+&quot;gb&quot; branch as an example, the extension should add flattened attributes in the
+Route struct. It can do so using the helper function <a href="Routex.Attrs.html#put/2"><code class="inline">Routex.Attrs.put/2</code></a>.</p><pre><code class="makeup elixir" translate="no"><span class="nc">Routex.Attrs</span><span class="o">.</span><span class="n">put</span><span class="p" data-group-id="8753143069-1">(</span><span class="n">route</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="8753143069-2">[</span><span class="ss">locale</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;en_GB&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">helper</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;gb&quot;</span><span class="p" data-group-id="8753143069-2">]</span><span class="p" data-group-id="8753143069-1">)</span></code></pre><p>Now the <code class="inline">Translation</code> extension can search for the option <code class="inline">:locale</code> in the
+route's attributes, unaware of how that locale was initially configured.</p><h3 id="stage-3-post-transform" class="section-heading"><a href="#stage-3-post-transform" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Stage 3: Post Transform</span></h3><p>The <code class="inline">post_transform</code> stage can be used knowing all other attributes of a route
+are available and no path will be transformed any further.</p><h3 id="stage-4-create-helper-functions" class="section-heading"><a href="#stage-4-create-helper-functions" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Stage 4: Create helper functions</span></h3><p>In this stage helper functions can be generated which will be added to
+<code class="inline">MyAppWeb.Router.RoutexHelpers</code>. As a result the developer only has to
+<code class="inline">import MyAppWeb.Router.RoutexHelpers</code> to include all generated helpers
+in the app.</p><p>The <code class="inline">create_helpers/3</code> callback is called with a list of routes belonging to a
+Routex backend, the name of the Routex backend and the current environment.</p><p>The <code class="inline">create_shared_helpers/3</code> callback is called with all routes affected by
+the extension, the list of Routex backends using the extension and the current
+environment.</p><p>Both are expected to return AST.</p><h2 id="guidelines" class="section-heading"><a href="#guidelines" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Guidelines</span></h2><ul><li>make functions not defined by the <a href="Routex.Extension.html"><code class="inline">Routex.Extension</code></a> behaviour private.</li><li>provide as many options and <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> as possible; other extensions might use the information.</li><li>provide additional options and <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> as flat list(s) so other extensions don't have to guess structure.</li><li>as other extensions might use options set by your extension, try to preserve any previously defined option or <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> in future development</li></ul><h2 id="important-information-about-creating-helpers" class="section-heading"><a href="#important-information-about-creating-helpers" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Important information about creating helpers</span></h2><p>Helpers are created by generating AST. The more AST has to be compiled, the more
+time compilation takes.</p><p><strong>Bad</strong></p><pre><code class="makeup elixir" translate="no"><span class="kd">def</span><span class="w"> </span><span class="nf">foo</span><span class="p" data-group-id="8122342740-1">(</span><span class="p" data-group-id="8122342740-2">%</span><span class="nc" data-group-id="8122342740-2">Struct</span><span class="p" data-group-id="8122342740-2">{</span><span class="ss">foo</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bar&quot;</span><span class="p" data-group-id="8122342740-2">}</span><span class="p" data-group-id="8122342740-1">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:bartender</span><span class="w">
+</span><span class="kd">def</span><span class="w"> </span><span class="nf">foo</span><span class="p" data-group-id="8122342740-3">(</span><span class="p" data-group-id="8122342740-4">%</span><span class="nc" data-group-id="8122342740-4">Struct</span><span class="p" data-group-id="8122342740-4">{</span><span class="ss">foo</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zip&quot;</span><span class="p" data-group-id="8122342740-4">}</span><span class="p" data-group-id="8122342740-3">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:zippy</span><span class="w">
+</span><span class="kd">def</span><span class="w"> </span><span class="nf">foo</span><span class="p" data-group-id="8122342740-5">(</span><span class="p" data-group-id="8122342740-6">%</span><span class="nc" data-group-id="8122342740-6">Struct</span><span class="p" data-group-id="8122342740-6">{</span><span class="ss">foo</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;zelo&quot;</span><span class="p" data-group-id="8122342740-6">}</span><span class="p" data-group-id="8122342740-5">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:zarika</span><span class="w">
+</span><span class="p" data-group-id="8122342740-7">(</span><span class="ow">and</span><span class="w"> </span><span class="n">then</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="n">more</span><span class="p" data-group-id="8122342740-7">)</span></code></pre><p><strong>Good</strong>
+Less AST is generated and the structs in only checked once.</p><pre><code class="makeup elixir" translate="no"><span class="kd">def</span><span class="w"> </span><span class="nf">foo</span><span class="p" data-group-id="1014620714-1">(</span><span class="p" data-group-id="1014620714-2">%</span><span class="nc" data-group-id="1014620714-2">Struct</span><span class="p" data-group-id="1014620714-2">{</span><span class="ss">foo</span><span class="p">:</span><span class="w"> </span><span class="n">my_var</span><span class="p" data-group-id="1014620714-2">}</span><span class="p" data-group-id="1014620714-1">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">do_foo</span><span class="p" data-group-id="1014620714-3">(</span><span class="n">my_var</span><span class="p" data-group-id="1014620714-3">)</span><span class="w">
+
+</span><span class="kd">defp</span><span class="w"> </span><span class="nf">do_foo</span><span class="p" data-group-id="1014620714-4">(</span><span class="s">&quot;bar&quot;</span><span class="p" data-group-id="1014620714-4">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:bartender</span><span class="w">
+</span><span class="kd">defp</span><span class="w"> </span><span class="nf">do_foo</span><span class="p" data-group-id="1014620714-5">(</span><span class="s">&quot;zip&quot;</span><span class="p" data-group-id="1014620714-5">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:zippy</span><span class="w">
+</span><span class="kd">defp</span><span class="w"> </span><span class="nf">do_foo</span><span class="p" data-group-id="1014620714-6">(</span><span class="s">&quot;zelo&quot;</span><span class="p" data-group-id="1014620714-6">)</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="ss">:zarika</span><span class="w">
+</span><span class="p" data-group-id="1014620714-7">(</span><span class="ow">and</span><span class="w"> </span><span class="n">then</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="n">more</span><span class="p" data-group-id="1014620714-7">)</span><span class="w">
+</span><span class="k">end</span></code></pre><p>More info: <a href="https://elixirforum.com/t/compiling-files-with-many-function-heads-is-very-slow-otp-26-issue/57105/25">thread about optimization at Elixir Forum</a></p><h3 id="documentation" class="section-heading"><a href="#documentation" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Documentation</span></h3><pre><code class="makeup elixir" translate="no"><span class="na">@moduledoc</span><span class="w"> </span><span class="s">&quot;&quot;&quot;
+Summary of feature provided.
+
+## Options
+- `name` - description
+
+## Example configuration
+```diff
+# file lib/example_web/routex_backend.ex
+defmodule ExampleWeb.RoutexBackend do
+  use Routex.Backend,
+  extensions: [
++   Routex.Extension.Name
+    Routex.Extension.Attrs
+],
++ name_config: [name_opt: &quot;value&quot;]
+```
+
+## Usage example
+```elixir
+# file lib/example_web/template.ex
+transform_template(&quot;/products/:id/edit&quot;)
+```
+
+## Pseudo result
+```
+/products/:id/edit  ⇒ /products/:id/edit
+```
+
+## `Routex.Attrs`
+**Requires**
+- none
+
+**Sets**
+- none
+
+## Helpers
+function_name(arg1 :: type) :: type
+&quot;&quot;&quot;</span></code></pre>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="comparison.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Routing solutions compared
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="contributing.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Contributing
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/docs/EXTENSION_DEVELOPMENT.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

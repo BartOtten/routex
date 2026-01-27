@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>History of Routex — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-extra" id="main" data-type="extras">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>History of Routex</h1>
+
+<a href="history_of_routex.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/docs/HISTORY_OF_ROUTEX.md#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+<h2 id="summary" class="section-heading"><a href="#summary" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Summary</span></h2><p>From its humble beginnings as PhxAltRoutes—a proof-of-concept for localized
+routing in Phoenix—to the modular, extension-driven framework that Routex is
+today, this is the story of how community feedback, design constraints, and the
+immutable spirit of Elixir shaped a next-generation routing library. Along the
+way, we’ll trace the key design pivots that led to Routex’s pluggable core,
+shim-based integration, and stateless, inspectable architecture.</p><h2 id="origins-phxaltroutes-and-the-rise-of-localized-routing" class="section-heading"><a href="#origins-phxaltroutes-and-the-rise-of-localized-routing" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Origins: PhxAltRoutes and the Rise of Localized Routing</span></h2><p>The concept of compile-time generation of localized and translated routes (using
+Gettext) first emerged back in March 2021 when I, Bart Otten, <a href="https://elixirforum.com/t/reality-check-your-library-idea/32840/30">first posted about
+PhxAltRoutes</a>
+to be followed by a post in Februari 2022 <a href="https://elixirforum.com/t/library-for-localized-multilingual-routes-in-phoenix/46233">asking the community for feedback and
+collaboration</a>.</p><p>The early review phase resulted in PhxAltRoutes being renamed <strong>Phoenix
+Localized Routes (PLR)</strong> to better reflect its main use case and the
+introduction of the PhxAltRoutes-inspired <strong>Cldr-Routes</strong> in late March 2022 by
+the maintainer of Cldr.</p><p>With two libs in production, developers could write:</p><pre><code class="makeup elixir" translate="no"><span class="c1"># Import localized route macros</span><span class="w">
+</span><span class="kn">use</span><span class="w"> </span><span class="nc">Phoenix.LocalizedRoutes</span><span class="w">  </span><span class="c1"># or Cldr.Routes</span><span class="w">
+
+</span><span class="n">localize</span><span class="w"> </span><span class="k" data-group-id="1046118365-1">do</span><span class="w">
+  </span><span class="n">get</span><span class="w"> </span><span class="s">&quot;/pages/:page&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">PageController</span><span class="p">,</span><span class="w"> </span><span class="ss">:show</span><span class="w">
+  </span><span class="n">resources</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="nc">UserController</span><span class="w">
+</span><span class="k" data-group-id="1046118365-1">end</span></code></pre><p>And have their routes expanded to localize routes at compile time. Great!</p><h2 id="localized-routes-promise-and-pain-points" class="section-heading"><a href="#localized-routes-promise-and-pain-points" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Localized Routes: Promise and Pain Points</span></h2><p>But as usage grew, so did the cracks:</p><ol><li><strong>Code Duplication</strong>: PLR and Cldr-Routes forked bits of Phoenix’s router
+internals, making every upstream Phoenix update a potential breaking change.</li><li><strong>Monolithic Design</strong>: Projects needing PLR for one feature faced the full
+library, leading to bloat. Cldr-Routes -being an extension itself- needs the
+Cldr base library to function. If you are not (yet) into the Cldr ecosystem,
+I consider it a heavy weight to pull in and configure.</li><li><strong>One-Size-Fits-All</strong>: From greenfield apps to legacy codebases, each
+project’s needs varied— both PLR and Cldr-Routes don’t or didn't adapt the way
+I envisioned.</li><li><strong>Maintenance Overhead</strong>: Every new route feature forced code changes across
+user projects, straining both library and app maintainers.</li><li><strong>Stateful Routing</strong>: PLR and Cldr-Routes lean on process state, a mismatch
+with Elixir’s immutable ethos.</li></ol><p>These lessons set the stage for a reinvented approach.</p><h2 id="reinventing-localized-routing-birth-of-routex" class="section-heading"><a href="#reinventing-localized-routing-birth-of-routex" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Reinventing (Localized) Routing: Birth of Routex</span></h2><p>In early 2023, I sketched out a fresh vision: a <strong>slim core</strong> with <strong>pluggable
+extensions</strong>, a name that hinted at both routing and extensibility—<strong>Routex</strong>.</p><blockquote><p><em>“Route + Elixir. Route + Extensions. Route + Extendable—pick your flavor.”</em></p></blockquote><p>Key principles emerged:</p><ul><li><strong>Only What You Need</strong>: A minimal core handles just the essentials; extensions
+add features as needed.</li><li><strong>Shim, Don’t Copy</strong>: Rather than replicating Phoenix internals, shim public
+APIs and delegates to the official public Phoenix functions, so upstream
+changes flow through automatically.</li><li><strong>Stateless by Default</strong>: No process state. (Alternative) Route lookup remains
+pure and immutable, fitting Elixir’s design philosophy.</li><li><strong>Inspectability</strong>: Route definitions flow through <strong>opts</strong> and <strong>structs</strong>,
+making callbacks transparent and chainable.</li><li><strong>Configuration-Driven</strong>: Add features by toggling extensions in config—no
+code scattering.</li></ul><h2 id="core-architecture-and-extensibility" class="section-heading"><a href="#core-architecture-and-extensibility" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Core Architecture and Extensibility</span></h2><p>At the heart of Routex is a processing pipeline: It takes the routes and a list
+of extensions and reduces the list of extensions with the routes as argument.</p><p>As a result, the extensions -implementing one or multiple well-defined
+callbacks: <code class="inline">configure/2</code>, <code class="inline">transform/3</code>, <code class="inline">post_transform/3</code>, <code class="inline">create_helpers/3</code>
+and <code class="inline">create_shared_helpers/3</code>- receive inspectable route structs and opts,
+allowing transparent, composable modifications.</p><p>Meanwhile, <a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a> provides a unified struct to share route informaton
+so extensions like <a href="Routex.Extension.Localize.Phoenix.Runtime.html"><code class="inline">Routex.Extension.Localize.Phoenix.Runtime</code></a> (for runtime
+locale detection) and <a href="Routex.Extension.Translations.html"><code class="inline">Routex.Extension.Translations</code></a> (for translated route paths)
+can cooperate without stepping on each other’s toes.</p><h2 id="immutability-and-pattern-matching-in-action" class="section-heading"><a href="#immutability-and-pattern-matching-in-action" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Immutability and Pattern Matching in Action</span></h2><p>Under the hood, Routex uses immutable pattern matching to transform
+normal routes into branch aware (auto-scoping) routes.</p><p>This is different from some other libraries that use mutable (process-bound)
+state. It's a subtle difference, but one that matters.</p><pre><code class="makeup elixir" translate="no"><span class="c1"># Pseudo code: The mutable way (aka: standard Javascript demo)</span><span class="w">
+
+</span><span class="c1"># Somewhere in your templates a link to &#39;products&#39; in the current scope.</span><span class="w">
+</span><span class="o">&lt;</span><span class="n">link</span><span class="w"> </span><span class="n">href</span><span class="o">=~</span><span class="n">p</span><span class="s">&quot;/products&quot;</span><span class="o">&gt;</span><span class="nc">Products</span><span class="o">&lt;</span><span class="o">/</span><span class="n">link</span><span class="o">&gt;</span><span class="w"> </span><span class="c1"># =&gt; /products</span><span class="w">
+
+</span><span class="k">for</span><span class="w"> </span><span class="n">locale</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="p" data-group-id="1255394976-1">[</span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fr&quot;</span><span class="p" data-group-id="1255394976-1">]</span><span class="w"> </span><span class="k" data-group-id="1255394976-2">do</span><span class="w">
+  </span><span class="n">put_locale</span><span class="p" data-group-id="1255394976-3">(</span><span class="n">locale</span><span class="p" data-group-id="1255394976-3">)</span><span class="w">  </span><span class="c1"># setting state</span><span class="w">
+  </span><span class="o">&lt;</span><span class="n">link</span><span class="w"> </span><span class="n">href</span><span class="o">=~</span><span class="n">p</span><span class="s">&quot;/products&quot;</span><span class="o">&gt;</span><span class="p" data-group-id="1255394976-4">{</span><span class="n">locale</span><span class="p" data-group-id="1255394976-4">}</span><span class="o">&lt;</span><span class="o">/</span><span class="n">link</span><span class="o">&gt;</span><span class="w">
+</span><span class="k" data-group-id="1255394976-2">end</span><span class="w">
+
+</span><span class="c1"># Somewhere in a used component a link to products...guess in which scope.</span><span class="w">
+</span><span class="o">&lt;</span><span class="n">link</span><span class="w"> </span><span class="n">href</span><span class="o">=~</span><span class="n">p</span><span class="s">&quot;/products&quot;</span><span class="o">&gt;</span><span class="nc">Products</span><span class="o">&lt;</span><span class="o">/</span><span class="n">link</span><span class="o">&gt;</span><span class="w">
+</span></code></pre><p>Routex does it different, pure. At compile time it generates url pattern
+matching helpers. As a result, no state is involved and Routex is not coupled to
+the current process.</p><pre><code class="makeup elixir" translate="no"><span class="c1"># Pseudo code: The immutable Routex way (simplified)</span><span class="w">
+
+</span><span class="c1"># Somewhere in your templates a link to products in the current scope.</span><span class="w">
+</span><span class="o">&lt;</span><span class="n">link</span><span class="w"> </span><span class="n">href</span><span class="o">=~</span><span class="n">p</span><span class="s">&quot;/products&quot;</span><span class="o">&gt;</span><span class="nc">Products</span><span class="o">&lt;</span><span class="o">/</span><span class="n">link</span><span class="o">&gt;</span><span class="w"> </span><span class="c1"># =&gt; /products</span><span class="w">
+
+</span><span class="c1"># inefficient use for demonstration purpose</span><span class="w">
+</span><span class="k">for</span><span class="w"> </span><span class="n">locale</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="p" data-group-id="7443858411-1">[</span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fr&quot;</span><span class="p" data-group-id="7443858411-1">]</span><span class="w"> </span><span class="k" data-group-id="7443858411-2">do</span><span class="w">
+  </span><span class="n">alt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alternatives</span><span class="p" data-group-id="7443858411-3">(</span><span class="na">@url</span><span class="p" data-group-id="7443858411-3">)</span><span class="p" data-group-id="7443858411-4">[</span><span class="n">locale</span><span class="p" data-group-id="7443858411-4">]</span><span class="w">
+  </span><span class="o">&lt;</span><span class="n">link</span><span class="w"> </span><span class="n">href</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">slug</span><span class="o">&gt;</span><span class="p" data-group-id="7443858411-5">{</span><span class="n">locale</span><span class="p" data-group-id="7443858411-5">}</span><span class="o">&lt;</span><span class="o">/</span><span class="n">link</span><span class="o">&gt;</span><span class="w">
+</span><span class="k" data-group-id="7443858411-2">end</span><span class="w">
+
+</span><span class="c1"># Somewhere in a used component a link to &#39;products&#39; in the current scope.</span><span class="w">
+</span><span class="o">&lt;</span><span class="n">link</span><span class="w"> </span><span class="n">href</span><span class="o">=~</span><span class="n">p</span><span class="s">&quot;/products&quot;</span><span class="o">&gt;</span><span class="nc">Products</span><span class="o">&lt;</span><span class="o">/</span><span class="n">link</span><span class="o">&gt;</span></code></pre><p>No hidden state. No surprises. Just Elixir.</p><h2 id="configuration-above-all-else" class="section-heading"><a href="#configuration-above-all-else" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Configuration above all else</span></h2><p>The development of Routex has a mission credo: &quot;Simple by default, powerful when
+needed&quot;. Setup should be minimal, yet you should be able to adapt Routex to your
+project instead of the other way around like previous attempts.</p><p>For example, the <a href="Routex.Extension.VerifiedRoutes.html"><code class="inline">Routex.Extension.VerifiedRoutes</code></a> lets you customize the sigil
+letter and helper names. These can be set to match Phoenix’s defaults -to avoid
+template churn- or those of Cldr-Routes -to ease migration-. As such, a project
+can opt into (locale) branch aware Verified Routes by Routex seamlessly—no hard
+forks in your code.</p><h2 id="localization-reimagined-with-localize-phoenix" class="section-heading"><a href="#localization-reimagined-with-localize-phoenix" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Localization Reimagined with Localize.Phoenix</span></h2><p>With the groundwork laid, I revisited the original primary use case early 2025:
+localization. This time however, it was just an optional use case out of
+multiple supported by Routex instead of the only one. Its implementation is a
+testament to the design choices made upfront.</p><p><a href="Routex.Extension.Localize.Phoenix.html"><code class="inline">Routex.Extension.Localize.Phoenix</code></a> offers:</p><ul><li>Automated Plug and LiveView integration at runtime.</li><li>A minimal locale registry based on IANA standards.</li><li>Customizable locale detection strategies.</li><li>Support for multiple locale backends.</li><li>All configured via a few entries in config.exs, with no changes to route
+definitions or templates.</li></ul><h2 id="community-feedback-and-the-road-ahead" class="section-heading"><a href="#community-feedback-and-the-road-ahead" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Community Feedback and the Road Ahead</span></h2><p>Looking forward, the vision remains clear: empower developers to craft custom
+routing logic with minimal friction, leverage Elixir’s immutability, and foster
+a vibrant ecosystem of extensions. Routex is designed to grow with your
+application, not weigh it down.</p><blockquote><p><em>“Routing should adapt to every project’s needs, without forcing projects to
+adapt to the router.”</em></p></blockquote><p>And that’s how PhxAltRoutes evolved, lessons were learned, and Routex was
+born—ready to supercharge Phoenix routing with extension-driven superpowers!</p><p><em>— Bart Otten</em></p>
+
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
+  <div class="bottom-actions-item">
+
+      <a href="routex_and_phoenix_router.html" class="bottom-actions-button" rel="prev">
+        <span class="subheader">
+          ← Previous Page
+        </span>
+        <span class="title">
+Routex and Phoenix Router
+        </span>
+      </a>
+
+  </div>
+  <div class="bottom-actions-item">
+
+      <a href="comparison.html" class="bottom-actions-button" rel="next">
+        <span class="subheader">
+          Next Page →
+        </span>
+        <span class="title">
+Routing solutions compared
+        </span>
+      </a>
+
+  </div>
+</div>
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+                (<a href="https://preview.hex.pm/preview/routex/1.3.2/show/docs/HISTORY_OF_ROUTEX.md">current file</a>)
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

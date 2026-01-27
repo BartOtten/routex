@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Routex.Extension.VerifiedRoutes — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-module" id="main" data-type="modules">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no">Routex.Extension.VerifiedRoutes</span> 
+      <small class="app-vsn" translate="no">(Routex v1.3.2)</small>
+
+    </h1>
+
+<a href="Routex.Extension.VerifiedRoutes.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/extension/verified_routes.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+    <section id="moduledoc">
+<p>Supports the use of original route paths in controllers and templates while rendering
+transformed route paths at runtime without performance impact.</p><section role="note" class="admonition info"><h4 class="admonition-title info">Implementation summary</h4><p>Each sigil and function eventualy delegates to the official
+<a href="https://hexdocs.pm/phoenix/1.8.3/Phoenix.VerifiedRoutes.html"><code class="inline">Phoenix.VerifiedRoutes</code></a>.  If a non-branching route is provided it will
+simply delegate to the official Phoenix function. If a branching route is
+provided, it will use a branching mechanism before delegating.</p></section><h4>Alternative Verified Route sigil</h4><p>Provides a sigil (default: <code class="inline">~l</code>) to verify transformed and/or branching routes.
+The sigil to use can be set to <code class="inline">~p</code> to override the default of Phoenix as
+it is a drop-in replacement. If you choose to override the default Phoenix sigil,
+it is renamed (default: <code class="inline">~o</code>) and can be used when unaltered behavior is required.</p><h4>Variants of url/{2,3,4} and path/{2,3}</h4><p>Provides branching variants of (and delegates to) macro's provided by
+<a href="https://hexdocs.pm/phoenix/1.8.3/Phoenix.VerifiedRoutes.html"><code class="inline">Phoenix.VerifiedRoutes</code></a>. Both new macro's detect whether branching should be
+applied.</p><h2 id="module-options" class="section-heading"><a href="#module-options" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Options</span></h2><ul><li><code class="inline">verified_sigil_routex</code>: Sigil to use for Routex verified routes (default <code class="inline">&quot;~l&quot;</code>)</li><li><code class="inline">verified_sigil_phoenix</code>: Replacement for the native (original) sigil when <code class="inline">verified_sigil_routex</code>
+is set to &quot;~p&quot;. (default: <code class="inline">&quot;~o&quot;</code>)</li><li><code class="inline">verified_url_routex</code>: Function name to use for Routex verified routes powered <code class="inline">url</code>. (default: <code class="inline">:rtx_url</code>)</li><li><code class="inline">verified_url_phoenix</code>: Replacement for the native <code class="inline">url</code> function when <code class="inline">verified_url_routex</code>
+is set to <code class="inline">:url</code>. (default: <code class="inline">:phx_url</code>)</li><li><code class="inline">verified_path_routex</code>: Function name to use for Routex verified routes powered <code class="inline">path</code> (default <code class="inline">:rtx_path</code>)</li><li><code class="inline">verified_path_phoenix</code>: Replacement for the native <code class="inline">path</code> function  when <code class="inline">verified_path_routex</code>
+is set to <code class="inline">:path</code>. (default: <code class="inline">:phx_path</code>)</li></ul><p>When <code class="inline">verified_sigil_routex</code> is set to &quot;~p&quot; an additional change must be made.</p><pre><code class="diff"># file /lib/example_web.ex
+defp routex_helpers do
++  import Phoenix.VerifiedRoutes,
++      except: [sigil_p: 2, url: 1, url: 2, url: 3, path: 2, path: 3]
+
+    import unquote(__MODULE__).Router.RoutexHelpers, only: :macros
+    alias unquote(__MODULE__).Router.RoutexHelpers, as: Routes
+end</code></pre><h2 id="module-troubleshoot" class="section-heading"><a href="#module-troubleshoot" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Troubleshoot</span></h2><h4>Warning about unknown branch</h4><p>The <a href="extensions.html#verified-routes">Verified Routes extension</a> relies on
+the availability of the <code class="inline">@url</code> assignment or the key <code class="inline">:rtx_branch</code>put
+in the process dictionary.</p><p>Routex assigns <code class="inline">@url</code> automatically in <code class="inline">conn</code> and <code class="inline">socket</code>, but you need to explicitly
+pass it down to components using Verified Routes (example: <code class="inline">&lt;Layouts.app url={@url}&gt;</code>)</p><p>When using a component, make sure :url is a required attribute.</p><pre><code class="makeup elixir" translate="no"><span class="n">attr</span><span class="w"> </span><span class="ss">:url</span><span class="p">,</span><span class="w"> </span><span class="ss">:string</span><span class="p">,</span><span class="w">
+  </span><span class="ss">required</span><span class="p">:</span><span class="w"> </span><span class="no">true</span><span class="p">,</span><span class="w">
+  </span><span class="ss">doc</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Required for Routex&#39; Verified Routes: url={@url}&quot;</span></code></pre><p>Alternatively, if you don’t mind using process state, you can automatically set the
+process key with the <a href="extensions.html#runtime-dispatcher">Runtime Dispatcher</a> extension.</p><pre><code class="makeup elixir" translate="no"><span class="o">+</span><span class="w"> </span><span class="ss">dispatch_targets</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3249258278-1">[</span><span class="p" data-group-id="3249258278-2">{</span><span class="nc">Routex.Utils</span><span class="p">,</span><span class="w"> </span><span class="ss">:process_put_branch</span><span class="p">,</span><span class="w"> </span><span class="p" data-group-id="3249258278-3">[</span><span class="p" data-group-id="3249258278-4">[</span><span class="ss">:attrs</span><span class="p">,</span><span class="w"> </span><span class="ss">:__branch__</span><span class="p" data-group-id="3249258278-4">]</span><span class="p" data-group-id="3249258278-3">]</span><span class="p" data-group-id="3249258278-2">}</span><span class="p" data-group-id="3249258278-1">]</span></code></pre><h2 id="module-configuration" class="section-heading"><a href="#module-configuration" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Configuration</span></h2><pre><code class="diff"># file /lib/example_web/routex_backend.ex
+defmodule ExampleWeb.RoutexBackend do
+  use Routex.Backend,
+  extensions: [
+    Routex.Extension.AttrGetters, # required
+    Routex.Extension.Alternatives,
+    [...]
++   Routex.Extension.VerifiedRoutes
+],
++ verified_sigil_routex: &quot;~p&quot;,
++ verified_sigil_phoenix: &quot;~o&quot;,
++ verified_url_routex: :url,
++ verified_url_phoenix: :url_native,
++ verified_path_routex: :path,
++ verified_path_phoenix: :path_native,</code></pre><h2 id="module-pseudo-result" class="section-heading"><a href="#module-pseudo-result" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Pseudo result</span></h2><pre><code class="makeup elixir" translate="no"><span class="c1"># given Routex behavior is assigned ~l</span><span class="w">
+</span><span class="c1"># given the default behavior is assigned ~o</span><span class="w">
+</span><span class="c1"># given the official macro of Phoenix is assigned ~p</span><span class="w">
+
+</span><span class="c1"># given another extension has transformed the route</span><span class="w">
+</span><span class="sx">~o&quot;/products/</span><span class="si" data-group-id="3163072739-1">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-1">}</span><span class="sx">&quot;</span><span class="w">   </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/products/</span><span class="si" data-group-id="3163072739-2">#{</span><span class="n">products</span><span class="si" data-group-id="3163072739-2">}</span><span class="sx">&quot;</span><span class="w">
+</span><span class="sx">~l&quot;/products/</span><span class="si" data-group-id="3163072739-3">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-3">}</span><span class="sx">&quot;</span><span class="w">   </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/transformed/products/</span><span class="si" data-group-id="3163072739-4">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-4">}</span><span class="sx">&quot;</span><span class="w">
+
+</span><span class="c1"># given another extension has generated branches / alternative routes</span><span class="w">
+</span><span class="sx">~o&quot;/products/</span><span class="si" data-group-id="3163072739-5">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-5">}</span><span class="sx">&quot;</span><span class="w">  </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/products/</span><span class="si" data-group-id="3163072739-6">#{</span><span class="n">products</span><span class="si" data-group-id="3163072739-6">}</span><span class="sx">&quot;</span><span class="w">
+</span><span class="sx">~l&quot;/products/</span><span class="si" data-group-id="3163072739-7">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-7">}</span><span class="sx">&quot;</span><span class="w">  </span><span class="err">⇒</span><span class="w">
+        </span><span class="k">case</span><span class="w"> </span><span class="n">current_branch</span><span class="w"> </span><span class="k" data-group-id="3163072739-8">do</span><span class="w">
+          </span><span class="no">nil</span><span class="w">     </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/products/</span><span class="si" data-group-id="3163072739-9">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-9">}</span><span class="sx">&quot;</span><span class="w">
+          </span><span class="s">&quot;en&quot;</span><span class="w">    </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/products/en/</span><span class="si" data-group-id="3163072739-10">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-10">}</span><span class="sx">&quot;</span><span class="w">
+          </span><span class="s">&quot;eu_nl&quot;</span><span class="w"> </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/europe/nl/products/</span><span class="si" data-group-id="3163072739-11">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-11">}</span><span class="sx">&quot;</span><span class="w">
+          </span><span class="s">&quot;eu_be&quot;</span><span class="w"> </span><span class="err">⇒</span><span class="w">  </span><span class="sx">~p&quot;/europe/be/products/</span><span class="si" data-group-id="3163072739-12">#{</span><span class="n">product</span><span class="si" data-group-id="3163072739-12">}</span><span class="sx">&quot;</span><span class="w">
+        </span><span class="k" data-group-id="3163072739-8">end</span></code></pre><h2 id="module-routex-attrs" class="section-heading"><a href="#module-routex-attrs" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text"><a href="Routex.Attrs.html"><code class="inline">Routex.Attrs</code></a></span></h2><p><strong>Requires</strong></p><ul><li>none</li></ul><p><strong>Sets</strong></p><ul><li>none</li></ul>
+    </section>
+
+</div>
+
+
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

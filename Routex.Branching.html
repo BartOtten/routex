@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.40.0">
+    <meta name="project" content="Routex v1.3.2">
+
+
+    <title>Routex.Branching — Routex v1.3.2</title>
+
+    <link rel="stylesheet" href="dist/html-elixir-PEPNOX6A.css" />
+
+    <script defer src="dist/sidebar_items-F1153462.js"></script>
+    <script defer src="docs_config.js"></script>
+    <script defer src="dist/html-E23W6NAF.js"></script>
+
+    <link rel="stylesheet" href="assets/doc.css">
+
+    
+  </head>
+  <body>
+    <script>(() => {
+  // js/constants.js
+  var t = "ex_doc:settings", e = "dark";
+  var o = "dark", s = "light";
+
+  // js/sidebar/constants.js
+  var E = "sidebar_state", n = "closed";
+  var r = "sidebar_width";
+  var a = "sidebar-open";
+
+  // js/entry/inline_html.js
+  var i = new URLSearchParams(window.location.search), S = i.get("theme") || JSON.parse(localStorage.getItem(t) || "{}").theme;
+  (S === o || S !== s && window.matchMedia("(prefers-color-scheme: dark)").matches) && document.body.classList.add(e);
+  var d = sessionStorage.getItem(E), A = d !== n && !window.matchMedia(`screen and (max-width: ${768}px)`).matches;
+  document.body.classList.toggle(a, A);
+  var c = sessionStorage.getItem(r);
+  c && document.body.style.setProperty("--sidebarWidth", `${c}px`);
+  var p = /(Macintosh|iPhone|iPad|iPod)/.test(window.navigator.userAgent);
+  document.documentElement.classList.toggle("apple-os", p);
+})();
+</script>
+
+<div class="body-wrapper">
+
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
+  <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
+</button>
+
+<nav id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
+
+        <a href="readme.html" class="sidebar-projectImage">
+          <img src="assets/logo.png" alt="Routex" />
+        </a>
+
+      <div>
+        <a href="readme.html" class="sidebar-projectName" translate="no">
+Routex
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v1.3.2
+        </div>
+      </div>
+    </div>
+    <ul id="sidebar-list-nav" class="sidebar-list-nav" role="tablist" data-extras="Pages"></ul>
+  </div>
+</nav>
+
+<output role="status" id="toast"></output>
+
+<main class="content page-module" id="main" data-type="modules">
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of Routex</span>
+            <div class="search-input-wrapper">
+              <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+                <i class="ri-close-line ri-lg" title="Cancel search"></i>
+              </button>
+            </div>
+          </label>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <div class="engine-selector" data-multiple="false">
+          <button type="button" class="engine-button" aria-label="Select search engine" aria-haspopup="true" aria-expanded="false">
+            <i class="ri-search-2-line" aria-hidden="true"></i>
+            <span class="engine-name">Default</span>
+            <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+          </button>
+          <div class="engine-dropdown" hidden role="menu">
+
+              <button type="button"
+                      class="engine-option"
+                      data-engine-url="search.html?q="
+                      role="menuitemradio"
+                      aria-checked="true">
+                <span class="name">Default</span>
+                <span class="help">In-browser search</span>
+              </button>
+
+          </div>
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <div class="heading-with-actions top-heading">
+    <h1>
+      <span translate="no">Routex.Branching</span> 
+      <small class="app-vsn" translate="no">(Routex v1.3.2)</small>
+
+    </h1>
+
+<a href="Routex.Branching.md" title="Copy Markdown (hold Ctrl/Cmd and click it to open as Markdown)" class="copy-markdown icon-action" rel="help">
+  <i class="ri-markdown-line" aria-hidden="true"></i>
+  <span class="sr-only">Copy Markdown</span>
+</a>
+
+
+
+      <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/branching.ex#L1" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
+
+  </div>
+
+
+    <section id="moduledoc">
+<p>Builds branched variants of macros by wrapping them in case statements.</p><p>This module helps create alternative implementations of macros that dispatch
+based on runtime patterns, useful for multi-locale routes, feature flags,
+and other branching logic.</p>
+    </section>
+
+</div>
+
+  <section id="summary" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#summary">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Summary</span>
+    </h1>
+<div class="summary-types summary">
+  <h2>
+    <a href="#types">Types</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:match_ast/0" data-no-tooltip="" translate="no">match_ast()</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:pattern/0" data-no-tooltip="" translate="no">pattern()</a>
+
+      </div>
+
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#t:transformer_spec/0" data-no-tooltip="" translate="no">transformer_spec()</a>
+
+      </div>
+
+    </div>
+
+</div>
+<div class="summary-functions summary">
+  <h2>
+    <a href="#functions">Functions</a>
+  </h2>
+
+    <div class="summary-row">
+      <div class="summary-signature">
+        <a href="#branch_macro/5" data-no-tooltip="" translate="no">branch_macro(module, macro_name, match_binding, patterns, opts \\ [])</a>
+
+      </div>
+
+        <div class="summary-synopsis"><p>  Creates branched variants of a macro for all or specified arities.</p></div>
+
+    </div>
+
+</div>
+
+  </section>
+
+
+  <section id="types" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#types">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Types</span>
+    </h1>
+
+    <div class="types-list">
+<section class="detail" id="t:match_ast/0">
+
+  <div class="detail-header">
+    <a href="#t:match_ast/0" class="detail-link" data-no-tooltip="" aria-label="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">match_ast()</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/branching.ex#L13" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> match_ast() :: <a href="https://hexdocs.pm/elixir/Macro.html#t:t/0">Macro.t</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="t:pattern/0">
+
+  <div class="detail-header">
+    <a href="#t:pattern/0" class="detail-link" data-no-tooltip="" aria-label="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">pattern()</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/branching.ex#L12" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> pattern() :: <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">any</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+<section class="detail" id="t:transformer_spec/0">
+
+  <div class="detail-header">
+    <a href="#t:transformer_spec/0" class="detail-link" data-no-tooltip="" aria-label="Link to this type">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">transformer_spec()</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/branching.ex#L14" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@type</span> transformer_spec() :: <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">function</a>()</pre>
+
+      </div>
+
+
+  </section>
+</section>
+
+    </div>
+  </section>
+
+  <section id="functions" class="details-list">
+    <h1 class="section-heading">
+      <a class="hover-link" href="#functions">
+        <i class="ri-link-m" aria-hidden="true"></i>
+      </a>
+      <span class="text">Functions</span>
+    </h1>
+
+    <div class="functions-list">
+<section class="detail" id="branch_macro/5">
+
+    <span id="branch_macro/4"></span>
+
+  <div class="detail-header">
+    <a href="#branch_macro/5" class="detail-link" data-no-tooltip="" aria-label="Link to this function">
+      <i class="ri-link-m" aria-hidden="true"></i>
+    </a>
+    <div class="heading-with-actions">
+      <h1 class="signature" translate="no">branch_macro(module, macro_name, match_binding, patterns, opts \\ [])</h1>
+
+
+        <a href="https://github.com/BartOtten/routex/blob/v1.3.2/lib/routex/branching.ex#L163" class="icon-action" rel="help" aria-label="View Source">
+          <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        </a>
+
+    </div>
+  </div>
+
+  <section class="docstring">
+
+      <div class="specs">
+
+          <pre translate="no"><span class="attribute">@spec</span> branch_macro(<a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">module</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="#t:match_ast/0">match_ast</a>(), [<a href="#t:pattern/0">pattern</a>()], <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0">Keyword.t</a>()) :: [
+  <a href="https://hexdocs.pm/elixir/Macro.html#t:t/0">Macro.t</a>()
+]</pre>
+
+          <pre translate="no"><span class="attribute">@spec</span> branch_macro([<a href="#t:pattern/0">pattern</a>()], <a href="#t:match_ast/0">match_ast</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#built-in-types">module</a>(), <a href="https://hexdocs.pm/elixir/typespecs.html#basic-types">atom</a>(), <a href="https://hexdocs.pm/elixir/Keyword.html#t:t/0">Keyword.t</a>()) :: [
+  <a href="https://hexdocs.pm/elixir/Macro.html#t:t/0">Macro.t</a>()
+]</pre>
+
+      </div>
+
+<p>  Creates branched variants of a macro for all or specified arities.</p><p>  Generates new macros that wrap the original macro in a case statement,
+  allowing different behavior based on match patterns.</p><h2 id="branch_macro/5-arguments" class="section-heading"><a href="#branch_macro/5-arguments" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Arguments</span></h2><ul><li><code class="inline">module</code> - Module containing the original macro</li><li><code class="inline">macro</code> - Name of the original macro</li><li><code class="inline">match_binding</code> - AST that evaluates to the value or AST pattern being matched</li><li><code class="inline">patterns</code> - List of values or AST patterns to match in the case statement</li><li><code class="inline">opts</code> - Configuration options</li></ul><h2 id="branch_macro/5-options" class="section-heading"><a href="#branch_macro/5-options" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Options</span></h2><ul><li><code class="inline">arities</code> - List of specific arities to generate (default: all arities)</li><li><code class="inline">name_branched</code> - Name of the generated branching macro (default: same as <code class="inline">:macro_name</code>)</li><li><code class="inline">name_passthrough</code> - Name of passthrough macro that defers to the original macro (default: same as <code class="inline">:macro_name</code>)</li><li><code class="inline">param_position</code> - Function <code class="inline">(arity) -&gt; position</code> determining which param to branch on (default: 0)</li></ul><h2 id="branch_macro/5-transformers" class="section-heading"><a href="#branch_macro/5-transformers" class="hover-link"><i class="ri-link-m" aria-hidden="true"></i></a><span class="text">Transformers</span></h2><p>  The transformer functions receive the <code class="inline">pattern</code> and the <code class="inline">branched_arg</code> as arguments.</p><ul><li><p><code class="inline">pattern</code> - The current item from the <code class="inline">patterns</code> list being processed in this branch - <code class="inline">branched_arg</code> - The argument at position <code class="inline">param_position</code> from the macro invocation (the value being branched on)</p></li><li><p><code class="inline">clause_transformer</code> - Function signature: <code class="inline">(pattern, branched_arg) -&gt; pattern | :noop</code></p><ul><li>Return a transformed clause pattern to include it in the case statement</li></ul></li><li><p><code class="inline">argument_transformer</code> - Function signature: <code class="inline">(pattern, branched_arg) -&gt; transformed_arg | :noop</code></p><ul><li>Return the transformed argument to pass to the original macro</li></ul></li></ul><p>  If either transformer returns <code class="inline">:noop</code>, the case clause (branch) is not generated.</p><p>  ## Examples</p><p>  ### Basic Example:  Inserting locale into path segments</p><p>  Transform path segments to include locale after the first segment:</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">MyApp</span><span class="o">.</span><span class="w"> </span><span class="nc">Transformers</span><span class="w"> </span><span class="k" data-group-id="9053125293-1">do</span><span class="w">
+    </span><span class="c1"># Insert locale after first segment:  /products/categories -&gt; /products/[locale]/categories</span><span class="w">
+    </span><span class="kd">def</span><span class="w"> </span><span class="nf">insert_locale</span><span class="p" data-group-id="9053125293-2">(</span><span class="n">locale_pattern</span><span class="p">,</span><span class="w"> </span><span class="n">branched_arg</span><span class="p">,</span><span class="w"> </span><span class="c">_extra</span><span class="p" data-group-id="9053125293-2">)</span><span class="w"> </span><span class="k" data-group-id="9053125293-3">do</span><span class="w">
+      </span><span class="k">case</span><span class="w"> </span><span class="n">branched_arg</span><span class="w"> </span><span class="k" data-group-id="9053125293-4">do</span><span class="w">
+        </span><span class="p" data-group-id="9053125293-5">[</span><span class="n">first</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">rest</span><span class="p" data-group-id="9053125293-5">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p" data-group-id="9053125293-6">[</span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">locale_pattern</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">rest</span><span class="p" data-group-id="9053125293-6">]</span><span class="w">
+        </span><span class="bp">_</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">branched_arg</span><span class="w">
+      </span><span class="k" data-group-id="9053125293-4">end</span><span class="w">
+    </span><span class="k" data-group-id="9053125293-3">end</span><span class="w">
+  </span><span class="k" data-group-id="9053125293-1">end</span><span class="w">
+
+  </span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">MyApp.Routes</span><span class="w"> </span><span class="k" data-group-id="9053125293-7">do</span><span class="w">
+    </span><span class="kn">require</span><span class="w"> </span><span class="nc">Routex.Branching</span><span class="w">
+
+    </span><span class="n">patterns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="9053125293-8">[</span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fr&quot;</span><span class="p" data-group-id="9053125293-8">]</span><span class="w">
+    </span><span class="n">match_binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">quote</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w">  </span><span class="n">var!</span><span class="p" data-group-id="9053125293-9">(</span><span class="n">locale</span><span class="p" data-group-id="9053125293-9">)</span><span class="w">
+
+    </span><span class="n">ast</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Routex</span><span class="o">.</span><span class="w"> </span><span class="nc">Branching</span><span class="o">.</span><span class="n">branch_macro</span><span class="p" data-group-id="9053125293-10">(</span><span class="w">
+      </span><span class="nc">Phoenix</span><span class="o">.</span><span class="w"> </span><span class="nc">VerifiedRoutes</span><span class="p">,</span><span class="w">
+      </span><span class="ss">:url</span><span class="p">,</span><span class="w">
+      </span><span class="n">match_binding</span><span class="p">,</span><span class="w">
+      </span><span class="n">patterns</span><span class="p">,</span><span class="w">
+      </span><span class="ss">name_branched</span><span class="p">:</span><span class="w"> </span><span class="ss">:url</span><span class="p">,</span><span class="w">
+      </span><span class="ss">name_passthrough</span><span class="p">:</span><span class="w"> </span><span class="ss">:original_url</span><span class="p">,</span><span class="w">
+      </span><span class="ss">argument_transformer</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nc">MyApp.Transformers</span><span class="o">.</span><span class="n">insert_locale</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="p" data-group-id="9053125293-10">)</span><span class="w">
+
+    </span><span class="nc">Module</span><span class="o">.</span><span class="n">create</span><span class="p" data-group-id="9053125293-11">(</span><span class="bp">__MODULE__</span><span class="p">,</span><span class="w"> </span><span class="n">ast</span><span class="p">,</span><span class="w"> </span><span class="nc">Macro</span><span class="o">.</span><span class="w"> </span><span class="nc">Env</span><span class="o">.</span><span class="w"> </span><span class="n">location</span><span class="p" data-group-id="9053125293-12">(</span><span class="bp">__ENV__</span><span class="p" data-group-id="9053125293-12">)</span><span class="p" data-group-id="9053125293-11">)</span><span class="w">
+  </span><span class="k" data-group-id="9053125293-7">end</span></code></pre><p>  Input: <code class="inline">[&quot;/products&quot;, &quot;/categories&quot;]</code></p><p>  The generated macro becomes:</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="kd">defmacro</span><span class="w"> </span><span class="nf">url</span><span class="p" data-group-id="3912897924-1">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="w"> </span><span class="err">\</span><span class="w"> </span><span class="p" data-group-id="3912897924-2">[</span><span class="p" data-group-id="3912897924-2">]</span><span class="p" data-group-id="3912897924-1">)</span><span class="w"> </span><span class="k" data-group-id="3912897924-3">do</span><span class="w">
+    </span><span class="k">quote</span><span class="w"> </span><span class="k" data-group-id="3912897924-4">do</span><span class="w">
+      </span><span class="k">case</span><span class="w"> </span><span class="n">var!</span><span class="p" data-group-id="3912897924-5">(</span><span class="n">locale</span><span class="p" data-group-id="3912897924-5">)</span><span class="w"> </span><span class="k" data-group-id="3912897924-6">do</span><span class="w">
+        </span><span class="s">&quot;en&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nc">Phoenix.VerifiedRoutes</span><span class="o">.</span><span class="n">url</span><span class="p" data-group-id="3912897924-7">(</span><span class="p" data-group-id="3912897924-8">[</span><span class="s">&quot;/products&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/categories&quot;</span><span class="p" data-group-id="3912897924-8">]</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p" data-group-id="3912897924-7">)</span><span class="w">
+        </span><span class="s">&quot;nl&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nc">Phoenix.VerifiedRoutes</span><span class="o">.</span><span class="n">url</span><span class="p" data-group-id="3912897924-9">(</span><span class="p" data-group-id="3912897924-10">[</span><span class="s">&quot;/products&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/nl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/categories&quot;</span><span class="p" data-group-id="3912897924-10">]</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p" data-group-id="3912897924-9">)</span><span class="w">
+        </span><span class="s">&quot;fr&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nc">Phoenix.VerifiedRoutes</span><span class="o">.</span><span class="n">url</span><span class="p" data-group-id="3912897924-11">(</span><span class="p" data-group-id="3912897924-12">[</span><span class="s">&quot;/products&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/fr&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/categories&quot;</span><span class="p" data-group-id="3912897924-12">]</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p" data-group-id="3912897924-11">)</span><span class="w">
+      </span><span class="k" data-group-id="3912897924-6">end</span><span class="w">
+    </span><span class="k" data-group-id="3912897924-4">end</span><span class="w">
+  </span><span class="k" data-group-id="3912897924-3">end</span></code></pre><p>  Output paths: <code class="inline">/products/en/categories</code>, <code class="inline">/products/nl/categories</code>, <code class="inline">/products/fr/categories</code></p><p>  ### Advanced Example: With clause and argument transformers</p><p>  Transform both the match clause and the argument:</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="kd">defmodule</span><span class="w"> </span><span class="nc">MyApp</span><span class="o">.</span><span class="w"> </span><span class="nc">Advanced</span><span class="w"> </span><span class="k" data-group-id="9347982164-1">do</span><span class="w">
+    </span><span class="n">allowed_locales</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="9347982164-2">[</span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p" data-group-id="9347982164-2">]</span><span class="w">
+
+    </span><span class="c1"># Filter which patterns to include</span><span class="w">
+    </span><span class="kd">def</span><span class="w"> </span><span class="nf">transform_clause</span><span class="p" data-group-id="9347982164-3">(</span><span class="n">pattern</span><span class="p">,</span><span class="w"> </span><span class="c">_arg</span><span class="p" data-group-id="9347982164-3">)</span><span class="w"> </span><span class="k" data-group-id="9347982164-4">do</span><span class="w">
+      </span><span class="k">if</span><span class="w"> </span><span class="n">pattern</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">allowed_locales</span><span class="p">,</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">pattern</span><span class="p">,</span><span class="w"> </span><span class="ss">else</span><span class="p">:</span><span class="w"> </span><span class="ss">:noop</span><span class="w">
+    </span><span class="k" data-group-id="9347982164-4">end</span><span class="w">
+
+    </span><span class="c1"># Insert locale as second segment with prefix</span><span class="w">
+    </span><span class="kd">def</span><span class="w"> </span><span class="nf">transform_argument</span><span class="p" data-group-id="9347982164-5">(</span><span class="n">locale_pattern</span><span class="p">,</span><span class="w"> </span><span class="n">branched_arg</span><span class="p" data-group-id="9347982164-5">)</span><span class="w"> </span><span class="k" data-group-id="9347982164-6">do</span><span class="w">
+      </span><span class="k">case</span><span class="w"> </span><span class="n">branched_arg</span><span class="w"> </span><span class="k" data-group-id="9347982164-7">do</span><span class="w">
+        </span><span class="p" data-group-id="9347982164-8">[</span><span class="n">first</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">rest</span><span class="p" data-group-id="9347982164-8">]</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p" data-group-id="9347982164-9">[</span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;locale_&quot;</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">locale_pattern</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">rest</span><span class="p" data-group-id="9347982164-9">]</span><span class="w">
+        </span><span class="bp">_</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">branched_arg</span><span class="w">
+      </span><span class="k" data-group-id="9347982164-7">end</span><span class="w">
+    </span><span class="k" data-group-id="9347982164-6">end</span><span class="w">
+  </span><span class="k" data-group-id="9347982164-1">end</span><span class="w">
+
+  </span><span class="n">patterns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="9347982164-10">[</span><span class="s">&quot;en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;nl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;de&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;es&quot;</span><span class="p" data-group-id="9347982164-10">]</span><span class="w">
+  </span><span class="n">match_binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">quote</span><span class="w"> </span><span class="ss">do</span><span class="p">:</span><span class="w"> </span><span class="n">var!</span><span class="p" data-group-id="9347982164-11">(</span><span class="n">locale</span><span class="p" data-group-id="9347982164-11">)</span><span class="w">
+  </span><span class="n">prefix</span><span class="o">=</span><span class="s">&quot;/locale_&quot;</span><span class="w">
+
+  </span><span class="n">ast</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Routex</span><span class="o">.</span><span class="w"> </span><span class="nc">Branching</span><span class="o">.</span><span class="n">branch_macro</span><span class="p" data-group-id="9347982164-12">(</span><span class="w">
+    </span><span class="nc">SomeModule</span><span class="p">,</span><span class="w">
+    </span><span class="ss">:some_macro</span><span class="p">,</span><span class="w">
+    </span><span class="n">match_binding</span><span class="p">,</span><span class="w">
+    </span><span class="n">patterns</span><span class="p">,</span><span class="w">
+    </span><span class="ss">name_branched</span><span class="p">:</span><span class="w"> </span><span class="ss">:branched_macro</span><span class="p">,</span><span class="w">
+    </span><span class="ss">clause_transformer</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nc">MyApp.Transformers</span><span class="o">.</span><span class="n">transform_clause</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="ss">argument_transformer</span><span class="p">:</span><span class="w"> </span><span class="o">&amp;</span><span class="nc">MyApp.Transformers</span><span class="o">.</span><span class="n">transform_argument</span><span class="o">/</span><span class="mi">2</span><span class="w">
+  </span><span class="p" data-group-id="9347982164-12">)</span></code></pre><p>  Input: <code class="inline">[&quot;/api&quot;, &quot;/users&quot;]</code></p><p>  This generates:</p><pre><code class="makeup elixir" translate="no"><span class="w">  </span><span class="kd">defmacro</span><span class="w"> </span><span class="nf">branched_macro</span><span class="p" data-group-id="0575184223-1">(</span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="w"> </span><span class="err">\</span><span class="w"> </span><span class="p" data-group-id="0575184223-2">[</span><span class="p" data-group-id="0575184223-2">]</span><span class="p" data-group-id="0575184223-1">)</span><span class="w"> </span><span class="k" data-group-id="0575184223-3">do</span><span class="w">
+    </span><span class="k">quote</span><span class="w"> </span><span class="k" data-group-id="0575184223-4">do</span><span class="w">
+      </span><span class="k">case</span><span class="w"> </span><span class="n">var!</span><span class="p" data-group-id="0575184223-5">(</span><span class="n">locale</span><span class="p" data-group-id="0575184223-5">)</span><span class="w"> </span><span class="k" data-group-id="0575184223-6">do</span><span class="w">
+        </span><span class="s">&quot;en&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nc">SomeModule</span><span class="o">.</span><span class="n">some_macro</span><span class="p" data-group-id="0575184223-7">(</span><span class="p" data-group-id="0575184223-8">[</span><span class="s">&quot;/api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/locale_en&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="0575184223-8">]</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p" data-group-id="0575184223-7">)</span><span class="w">
+        </span><span class="s">&quot;nl&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nc">SomeModule</span><span class="o">.</span><span class="n">some_macro</span><span class="p" data-group-id="0575184223-9">(</span><span class="p" data-group-id="0575184223-10">[</span><span class="s">&quot;/api&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/locale_nl&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;/users&quot;</span><span class="p" data-group-id="0575184223-10">]</span><span class="p">,</span><span class="w"> </span><span class="n">opts</span><span class="p" data-group-id="0575184223-9">)</span><span class="w">
+      </span><span class="k" data-group-id="0575184223-6">end</span><span class="w">
+    </span><span class="k" data-group-id="0575184223-4">end</span><span class="w">
+  </span><span class="k" data-group-id="0575184223-3">end</span></code></pre><p>  Output paths: <code class="inline">/api/locale_en/users</code>, <code class="inline">/api/locale_nl/users</code></p><p>  Note: &quot;de&quot; and &quot;es&quot; are filtered out by <code class="inline">transform_clause</code> returning <code class="inline">:noop</code>.</p><p>  For more examples, please see the test module <code class="inline">Routex.BranchingTest</code>.</p>
+  </section>
+</section>
+
+    </div>
+  </section>
+
+    <footer class="footer">
+
+        <p>
+
+            <span class="line">
+              <a href="https://hex.pm/packages/routex/1.3.2">Hex Package</a>
+
+              <a href="https://preview.hex.pm/preview/routex/1.3.2">Hex Preview</a>
+
+            </span>
+
+          <span class="line">
+            <button class="a-main footer-button display-quick-switch" title="Go to package docs">
+              Go to package docs
+            </button>
+
+              <a href="llms.txt" target="_blank">
+                View llms.txt
+              </a>
+
+
+              <a href="Routex.epub">
+                Download ePub version
+              </a>
+
+          </span>
+        </p>
+
+        <p class="built-using">
+          Built using
+          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.40.0) for the
+
+            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+        </p>
+
+
+    </footer>
+  </div>
+</main>
+</div>
+
+  </body>
+</html>

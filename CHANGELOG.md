@@ -5,6 +5,64 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v1.3.2](https://github.com/BartOtten/routex/compare/v1.3.1...v1.3.2) (2026-01-27)
+
+### Bug Fixes:
+
+* core: matchable type warning in Elixir 1.20+ (#123) by rubas
+
+### Soft Deprecation:
+
+#### refactor(core): Routex.Branching overhaul
+
+This change is (only) significant for extension developers. Parameter were
+reordered and some option have been renamed (the old names are soft deprecated).
+Please migrate your extensions when seeing deprecation messages.
+
+IMPROVED:
+- Simplified transformer option format for better ergonomics
+- Comprehensive documentation with additional real-world examples
+- Clearer naming conventions across the API
+- Better type specifications and parameter descriptions
+- Extended tests
+
+SOFT DEPRECATIONS:
+- Transformer return value `:skip` is deprecated in favor of `:noop` for clarity
+- New parameters order for improved cognitive flow (old order soft deprecated)
+- Options have been renamed for clarity:
+
+    * :as -> :name_branched
+    * :orig -> :name_passthrough
+    * :arg_pos -> :param_position
+
+MIGRATION GUIDE:
+
+- Rename options (see above):
+    Routex.Branching.branch_macro(... , param_position: fn arity -> arity - 1 end)
+
+- Replace `:skip` with `:noop` in transformer functions:
+    ```elixir
+    def my_transformer(pattern, arg) do
+      if should_skip?(pattern), do: :noop, else: arg
+    end
+    ```
+
+- Replace MFA transformer options with the new format, the value of extra arguments should
+be put in the transformer functions themselves:
+
+````
+old:
+*_transformer: {__MODULE__.Transformers, :transform_arg, [:foo]}
+
+new:
+*_transformer: &__MODULE__.Transformers.transform_clause/2
+
+def my_transformer(pattern, arg) do
+  arg <> to_string(:foo)
+end
+````
+
+
 ## [v1.3.1](https://github.com/BartOtten/routex/compare/v1.3.0...v1.3.1) (2025-11-12)
 
 

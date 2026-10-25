@@ -77,7 +77,7 @@ defmodule Routex.Extension.Localize.RegistryTest do
     end
 
     test "handles nil input" do
-      assert_raise(RuntimeError, fn -> Registry.region(nil) == nil end)
+      assert_raise(RuntimeError, fn -> Registry.region(nil) end)
       assert Registry.region(nil, :default) == :default
     end
 

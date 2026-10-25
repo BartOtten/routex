@@ -16,8 +16,6 @@ end
 defmodule Routex.Extension.AttrGettersTest do
   use ExUnit.Case, async: true
 
-  require Routex.Extension.AttrGettersTest.HelpersModule
-
   @path "/foo/bar"
 
   test "by default includes all attrs" do

@@ -33,12 +33,6 @@ defmodule Routex.Branching do
     :argument_transformer
   ]
 
-  @migrate_options [
-    {:as, :name_branched},
-    {:orig, :name_passthrough},
-    {:arg_pos, :param_position}
-   ]
-  
   @doc """
     Creates branched variants of a macro for all or specified arities.
 
@@ -190,8 +184,8 @@ defmodule Routex.Branching do
              is_atom(macro) and
              is_list(patterns) and
              is_list(opts) do
-    opts = migrate_deprecated(opts)
     Keyword.validate!(opts, @allowed_opts)
+
     escaped_patterns = Enum.map(patterns, &Macro.escape/1)
     name_branched_macro = Keyword.get(opts, :name_branched)
     name_passthrough_macro = Keyword.get(opts, :name_passthrough)
@@ -213,46 +207,6 @@ defmodule Routex.Branching do
       )
 
     [prelude | macros]
-  end
-
-  # credo:disable-for-next-line
-  # TODO: Remove in newer version, deprecated param order
-  @spec branch_macro([pattern()], match_ast(), module(), atom(), Keyword.t()) :: [Macro.t()]
-  def branch_macro(
-        patterns,
-        match_binding,
-        module,
-        macro,
-        opts
-      )
-      when is_list(patterns) and
-             is_atom(module) and
-             is_atom(macro) and
-             is_list(opts) do
-    Routex.Utils.alert(
-      "Deprecated",
-      "Using deprecated order of argument while using `Routex.Branching.branch_macro/{4,5}`"
-    )
-
-    branch_macro(module, macro, match_binding, patterns, opts)
-  end
-
-  defp migrate_deprecated(opts) do
-    for {old, new} <- @migrate_options, reduce: opts do
-      opts ->
-        {old_value, new_opts} = Keyword.pop(opts, old)
-
-        if new_opts != opts do
-          Routex.Utils.alert(
-            "Deprecated",
-            "An extension is using deprecated option #{inspect(old)} while calling `Routex.Branching.branch_macro/{4,5}`"
-          )
-
-          Keyword.put(new_opts, new, old_value)
-        else
-          opts
-        end
-    end
   end
 
   defp build_macro_definitions(
@@ -313,8 +267,7 @@ defmodule Routex.Branching do
     argument_transformer = Keyword.get(opts, :argument_transformer)
 
     # credo:disable-for-next-line
-    # TODO: Remove :arg_pos in newer version, deprecated param order
-    branched_param_position = Keyword.get(opts, :arg_pos) || Keyword.get(opts, :param_position, 0)
+    branched_param_position = Keyword.get(opts, :param_position, 0)
     branched_arg = Enum.at(args, branched_param_position)
 
     case build_clauses(
@@ -405,46 +358,15 @@ defmodule Routex.Branching do
     fun.(pattern, branched_arg)
   end
 
-  # credo:disable-for-next-line
-  # TODO: Remove in newer version
-  defp transform_clause(pattern, branched_arg, {module, function, extra_args}) do
-    warn_deprecated_transform(module, function, extra_args)
-    apply(module, function, [pattern, branched_arg])
-  end
-
   defp transform_argument(_pattern, branched_arg, nil), do: branched_arg
 
   defp transform_argument(pattern, branched_arg, fun) when is_function(fun) do
     fun.(pattern, branched_arg)
   end
 
-  # credo:disable-for-next-line
-  # TODO: Remove in newer version
-  defp transform_argument(pattern, branched_arg, {module, function, extra_args}) do
-    warn_deprecated_transform(module, function, extra_args)
-    apply(module, function, [pattern, branched_arg])
-  end
-
   defp deduplicate_clauses(clauses) do
     clauses
     |> Enum.uniq_by(&extract_clause_pattern/1)
-  end
-
-  defp warn_deprecated_transform(module, function, extra_args) do
-    Routex.Utils.alert("Deprecated", """
-    Please use the new notation for the transformer options
-    when using Routex.Branching in your extensions.
-
-    old: {#{inspect(module)}, #{inspect(function)}, #{inspect(extra_args)}}
-    new:  &#{inspect(module)}.#{function}/2
-    """)
-
-    if extra_args != [],
-      do:
-        Routex.Utils.print("""
-        The extra args #{inspect(extra_args)} should be put static in the transformer instead
-        of passing them as extra arguments.
-        """)
   end
 
   defp extract_clause_pattern({:->, _meta, [[clause], _body]}), do: clause

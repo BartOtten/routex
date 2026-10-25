@@ -51,22 +51,7 @@ defmodule Routex.BranchingTest.Routex do
       name_branched: :branched_macro,
       param_position: fn arity -> arity - 1 end,
       clause_transformer: &__MODULE__.Transformers.transform_clause/2,
-      # deprecated variant
-      argument_transformer: {__MODULE__.Transformers, :transform_arg, [:foo]}
-    )
-
-  _deprecated =
-    Routex.Branching.branch_macro(
-      ExternalPackage.Macros,
-      :test_macro,
-      match_binding,
-      ["en", "nl", "de"],
-      orig: :depr_passthrough_key,
-      as: :test_branched_key,
-      arg_pos: fn arity -> arity - 1 end,
-      clause_transformer: &__MODULE__.Transformers.transform_clause/2,
-      # deprecated variant
-      argument_transformer: {__MODULE__.Transformers, :transform_arg, [:foo]}
+      argument_transformer: &__MODULE__.Transformers.transform_arg/2
     )
 
   Module.create(Routex.BranchingTest.Branched, ast, Macro.Env.location(__ENV__))

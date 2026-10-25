@@ -7,7 +7,7 @@ defmodule Routex.Route do
   alias Routex.Types, as: T
   alias Routex.Utils
 
-  @default_nesting_offset 0
+  @default_nesting_offset -1
 
   @doc """
   Returns a list of unique backends
@@ -18,22 +18,22 @@ defmodule Routex.Route do
   end
 
   @doc """
-  Returns the nesting level of an (ancestor) route. By default
-  the parent. This can be adjusted by providing an negative depth offset.
+  Returns the nesting level of an (ancestor) route. By default the parent
+  (offset: -1). This can be adjusted by providing an negative depth offset.
   """
   @spec get_nesting(T.route(), integer) :: list(integer())
   def get_nesting(route, offset \\ @default_nesting_offset) when offset <= 0 do
-    slice_end = -2 + offset
+    slice_end = -1 + offset
     route |> Attrs.get(:__branch__) |> Enum.slice(0..slice_end//1)
   end
 
   @doc """
   Returns routes grouped by nesting level of an (ancestor) route. By default
-  groups by parent. This can be adjusted by providing an negative depth offset
+  groups by parent (offset: -1).
   """
-  @spec group_by_nesting(T.routes(), integer) :: %{list(integer()) => T.routes()}
+  @spec group_by_nesting(T.routes(), neg_integer) :: %{list(integer()) => T.routes()}
   def group_by_nesting(routes, offset \\ @default_nesting_offset) when offset <= 0 do
-    slice_end = -2 + offset
+    slice_end = -1 + offset
     root = &(&1 |> Attrs.get(:__branch__) |> Enum.slice(0..slice_end//1))
 
     routes
@@ -45,7 +45,7 @@ defmodule Routex.Route do
   # route. By default groups by parent. This can be adjusted by providing a
   # negative depth offset.
   # """
-  @spec group_by_method_and_path(T.routes(), integer) :: %{{atom, binary()} => T.routes()}
+  @spec group_by_method_and_path(T.routes(), neg_integer) :: %{{atom, binary()} => T.routes()}
   def group_by_method_and_path(routes, offset \\ @default_nesting_offset) when offset <= 0 do
     routes
     |> group_by_nesting(offset)

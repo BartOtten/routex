@@ -11,7 +11,10 @@ defmodule Routex.RouteTest do
     assert [0] == Route.get_nesting(route)
 
     route = %Phoenix.Router.Route{private: %{routex: %{__branch__: [0, 1]}}}
-    assert [] == Route.get_nesting(route, -1)
+    assert [0] == Route.get_nesting(route, -1)
+
+    route = %Phoenix.Router.Route{private: %{routex: %{__branch__: [0, 1]}}}
+    assert [] == Route.get_nesting(route, -2)
   end
 
   test "group_by_nesting within a branch" do

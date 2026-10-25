@@ -313,7 +313,6 @@ defmodule Routex.Matchable do
     end
   end
 
-  defp split_path(input) when is_nil(input), do: []
   defp split_path([]), do: ["/"]
 
   defp split_path(input) when is_binary(input) do

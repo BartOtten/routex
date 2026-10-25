@@ -192,7 +192,7 @@ defmodule Routex.Extension.VerifiedRoutes do
         name_passthrough: config |> get_value(:verified_url, :phoenix),
         param_position: fn arity -> arity end,
         clause_transformer: &__MODULE__.Transformers.clause_transformer/2,
-        argument_transforme: &__MODULE__.Transformers.argument_transformer/2
+        argument_transformer: &__MODULE__.Transformers.argument_transformer/2
       ),
       branch_macro(
         Phoenix.VerifiedRoutes,

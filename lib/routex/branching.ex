@@ -11,14 +11,34 @@ defmodule Routex.Branching do
 
   @type pattern :: any()
   @type match_ast :: Macro.t()
-  @type transformer_spec :: function()
+  @type branched_arg :: Macro.t()
+  @type clause_result :: Macro.t() | :noop | :skip | nil
+  @type arg_result :: Macro.t() | :noop | :skip | nil
+
+  @type opts :: [
+          name_branched: atom(),
+          name_passthrough: atom(),
+          param_position: pos_integer() | (pos_integer -> pos_integer),
+          arities: [pos_integer(), ...],
+          clause_transformer: (pattern(), branched_arg() -> clause_result()),
+          argument_transformer: (pattern(), branched_arg() -> arg_result())
+        ]
+
+  @allowed_opts [
+    :name_branched,
+    :name_passthrough,
+    :param_position,
+    :ariries,
+    :clause_transformer,
+    :argument_transformer
+  ]
 
   @migrate_options [
     {:as, :name_branched},
     {:orig, :name_passthrough},
     {:arg_pos, :param_position}
-  ]
-
+   ]
+  
   @doc """
     Creates branched variants of a macro for all or specified arities.
 
@@ -38,18 +58,15 @@ defmodule Routex.Branching do
     - `name_branched` - Name of the generated branching macro (default: same as `:macro_name`)
     - `name_passthrough` - Name of passthrough macro that defers to the original macro (default: same as `:macro_name`)
     - `param_position` - Function `(arity) -> position` determining which param to branch on (default: 0)
+    - `clause_transformer` - Function returnnig a transformed clause pattern to be used in a case statement.
+    - `argument_transformer` - Function returning the transformed argument to pass into the original macro.
 
   ## Transformers
 
     The transformer functions receive the `pattern` and the `branched_arg` as arguments.
 
-    - `pattern` - The current item from the `patterns` list being processed in this branch - `branched_arg` - The argument at position `param_position` from the macro invocation (the value being branched on)
-
-    - `clause_transformer` - Function signature: `(pattern, branched_arg) -> pattern | :noop`
-      - Return a transformed clause pattern to include it in the case statement
-
-    - `argument_transformer` - Function signature: `(pattern, branched_arg) -> transformed_arg | :noop`
-      - Return the transformed argument to pass to the original macro
+    - `pattern` - The current item from the `patterns` list being processed in this branch
+    - `branched_arg` - The argument at position `param_position` from the macro invocation (the value being branched on)
 
     If either transformer returns `:noop`, the case clause (branch) is not generated.
 
@@ -159,7 +176,7 @@ defmodule Routex.Branching do
     For more examples, please see the test module `Routex.BranchingTest`.
   """
 
-  @spec branch_macro(module(), atom(), match_ast(), [pattern()], Keyword.t()) :: [Macro.t()]
+  @spec branch_macro(module(), atom(), match_ast(), [pattern()], opts()) :: [Macro.t()]
   def branch_macro(module, macro_name, match_binding, patterns, opts \\ [])
 
   def branch_macro(
@@ -174,6 +191,7 @@ defmodule Routex.Branching do
              is_list(patterns) and
              is_list(opts) do
     opts = migrate_deprecated(opts)
+    Keyword.validate!(opts, @allowed_opts)
     escaped_patterns = Enum.map(patterns, &Macro.escape/1)
     name_branched_macro = Keyword.get(opts, :name_branched)
     name_passthrough_macro = Keyword.get(opts, :name_passthrough)

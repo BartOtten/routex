@@ -77,8 +77,6 @@ defmodule Routex.BranchingTest.MyModule do
   Module mimicking real app module adapted for branched macro support
   """
 
-  require Routex.BranchingTest.Routex
-
   import ExternalPackage.Macros
   import Routex.BranchingTest.Branched
 
@@ -122,7 +120,6 @@ end
 defmodule Routex.BranchingTest do
   @moduledoc false
   use ExUnit.Case
-  require __MODULE__.Routex
 
   alias Routex.BranchingTest.MyModule
 
@@ -163,5 +160,20 @@ defmodule Routex.BranchingTest do
     # returned without transformation.
     assert MyModule.branched_noop_arg() == "/my/macro/arg/causing_transform_noop"
     assert MyModule.branched_noop_arg() == "/my/macro/arg/causing_transform_noop"
+  end
+
+  test "calling branched macro with an unknown keyword raises" do
+    assert_raise ArgumentError, ~r/^unknown keys \[:unknown_option\] in \[.*\]/, fn ->
+      Routex.Branching.branch_macro(
+        ExternalPackage.Macros,
+        :original_macro,
+        nil,
+        ["en", "nl", "de"],
+        name_passthrough: :passthrough_macro,
+        name_branched: :branched_macro,
+        param_position: fn arity -> arity - 1 end,
+        unknown_option: :value
+      )
+    end
   end
 end

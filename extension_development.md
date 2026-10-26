@@ -1,0 +1,202 @@
+# Routex Extensions
+
+> #### List of extensions {: .info}
+> A [list of included extensions](README.md#extensions) can be found in the README.
+
+Routex Extensions extend the functionality provided by Routex to transform
+routes or generate new route based helper functions. Each extension is a module
+which implements the `Routex.Extension` behaviour.
+
+Routex will call those callbacks at different stages before Routex handsoff the
+list with routes to `Phoenix.Router` for compilation.
+
+Each extension provides a single feature and should minimize hard dependencies
+on other extensions. Instead, Routex advises to make use of the `Routex.Attrs`
+struct to share attributes; allowing extensions to interoperate without being
+coupled.
+
+The documentation of each extension lists any provided or required
+`Routex.Attrs`.
+
+
+## Callbacks and stages
+
+### Stage 1: Configure
+
+This stage enables extensions to preprocess backend options upfront.
+
+The `configure/2` callback is called with the options provided to
+`Routex.Backend` and the name of the Routex backend. It is expected to return a
+new list of options.
+
+Routex collects all options in this stage for subsequent stages. Therefore,
+extensions should add any fallback/default they might use themselves to the
+options in this stage.
+
+To aid in code completion, the final configuration is passed as a struct to
+subsequent stages.
+
+
+### Stage 2: Transform
+
+This stage is meant to change the properties of routes, which are at that moment
+`Phoenix.Router.Route` structs. The routes are grouped by Routex backend and
+processed per group, allowing an extension to use accumulating values within one
+iteration.
+
+The `transform/3` callback is called with a list of routes belonging to a
+Routex backend, the name of the backend and the current environment. It is
+expected to return a list of Phoenix.Router.Route structs.
+
+
+#### Flattening option values
+
+Extensions can make use of `Routex.Attrs` provided by Routex itself, Routex
+backends and other extensions.
+
+To make the availability of the attributes as predictable as possible, Routex
+uses a flat structure which is stored in a routes' `private.routex` field.
+However, using a flat structure might conflict with developer experience;
+sometimes a nested structure to provide configuration options might be more
+suitable.
+
+One responsibility of the `transform/3` callback is to flatten the structure of
+attributes they use for each route they receive, so other extensions can use
+attributes set by the current extension without knowledge of the configuration
+structure.
+
+**Example**
+The Alternatives extension uses nested options and allows inheritance
+of attributes from parent branches.
+
+```
+alternatives: %{
+  "/" =>
+    helper: nil,
+    locale: "en_GB",
+    branches: %{
+      "nl" => %{
+          helper: "nl",
+          locale: "nl_NL"
+        },
+      "gb" => %{
+        helper: "gb",
+        }
+    }
+}
+```
+The Alternatives module is therefor responsible for flattening those for
+(itself and) other extensions to use. To take the route responsible for the
+"gb" branch as an example, the extension should add flattened attributes in the
+Route struct. It can do so using the helper function `Routex.Attrs.put/2`.
+
+```
+Routex.Attrs.put(route, [locale: "en_GB", helper: "gb"])
+```
+
+Now the `Translation` extension can search for the option `:locale` in the
+route's attributes, unaware of how that locale was initially configured.
+
+
+### Stage 3: Post Transform
+
+The `post_transform` stage can be used knowing all other attributes of a route
+are available and no path will be transformed any further.
+
+
+### Stage 4: Create helper functions
+
+In this stage helper functions can be generated which will be added to
+`MyAppWeb.Router.RoutexHelpers`. As a result the developer only has to
+`import MyAppWeb.Router.RoutexHelpers` to include all generated helpers
+in the app.
+
+
+The `create_helpers/3` callback is called with a list of routes belonging to a
+Routex backend, the name of the Routex backend and the current environment.
+
+The `create_shared_helpers/3` callback is called with all routes affected by
+the extension, the list of Routex backends using the extension and the current
+environment.
+
+Both are expected to return AST.
+
+
+## Guidelines
+
+* make functions not defined by the `Routex.Extension` behaviour private.
+* provide as many options and `Routex.Attrs` as possible; other extensions might use the information.
+* provide additional options and `Routex.Attrs` as flat list(s) so other extensions don't have to guess structure.
+* as other extensions might use options set by your extension, try to preserve any previously defined option or `Routex.Attrs` in future development
+
+
+## Important information about creating helpers
+
+Helpers are created by generating AST. The more AST has to be compiled, the more
+time compilation takes.
+
+**Bad**
+```elixir
+def foo(%Struct{foo: "bar"}), do: :bartender
+def foo(%Struct{foo: "zip"}), do: :zippy
+def foo(%Struct{foo: "zelo"}), do: :zarika
+(and then 1000 more)
+```
+
+**Good**
+Less AST is generated and the structs in only checked once.
+
+```elixir
+def foo(%Struct{foo: my_var}), do: do_foo(my_var)
+
+defp do_foo("bar"), do: :bartender
+defp do_foo("zip"), do: :zippy
+defp do_foo("zelo"), do: :zarika
+(and then 1000 more)
+end
+```
+
+More info: [thread about optimization at Elixir Forum](https://elixirforum.com/t/compiling-files-with-many-function-heads-is-very-slow-otp-26-issue/57105/25)
+
+
+### Documentation
+
+    @moduledoc """
+    Summary of feature provided.
+
+    ## Options
+    - `name` - description
+
+    ## Example configuration
+    ```diff
+    # file lib/example_web/routex_backend.ex
+    defmodule ExampleWeb.RoutexBackend do
+      use Routex.Backend,
+      extensions: [
+    +   Routex.Extension.Name
+        Routex.Extension.Attrs
+    ],
+    + name_config: [name_opt: "value"]
+    ```
+
+    ## Usage example
+    ```elixir
+    # file lib/example_web/template.ex
+    transform_template("/products/:id/edit")
+    ```
+
+    ## Pseudo result
+    ```
+    /products/:id/edit  ⇒ /products/:id/edit
+    ```
+
+    ## `Routex.Attrs`
+    **Requires**
+    - none
+
+    **Sets**
+    - none
+
+    ## Helpers
+    function_name(arg1 :: type) :: type
+    """

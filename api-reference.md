@@ -1,0 +1,102 @@
+# Routex v1.3.2 - API Reference
+
+## Modules
+
+- [Routex.Test.Fixtures](Routex.Test.Fixtures.md)
+- [Routex.Test.Fixtures.Assigns](Routex.Test.Fixtures.Assigns.md)
+- [Routex.Test.Support.Gettext](Routex.Test.Support.Gettext.md)
+
+- Routex
+  - [Routex](Routex.md):   Routex enhances the Phoenix Router by providing an extension-driven framework
+  for advanced routing capabilities. It simplifies route manipulation, offering
+  features such as internationalization (i18n), localization (l10n), translated
+  (multilingual) URLs, and alternative route generation.
+  - [Routex.Attrs](Routex.Attrs.md): Provides an interface to access and update Routex attributes
+in routes, sockets, or connections (hereinafter `containers`).
+  - [Routex.Backend](Routex.Backend.md): > #### `use Routex.Backend`
+> When used, this module generates a Routex backend module and a configuration struct
+> by running the `configure/2` callbacks of the extensions provided in `opts`.
+>
+> See also: [Routex Extensions](EXTENSION_DEVELOPMENT.md).
+
+  - [Routex.Branching](Routex.Branching.md): Builds branched variants of macros by wrapping them in case statements.
+  - [Routex.Dev](Routex.Dev.md): Provides functions to aid during development
+
+  - [Routex.Extension](Routex.Extension.md): Specification for composable Routex extensions.
+  - [Routex.HelperFallbacks](Routex.HelperFallbacks.md): Provides fallback functions when `use`'d
+
+  - [Routex.Matchable](Routex.Matchable.md): Matchables are an essential part of Routex. They are used to match run time
+routes with compile time routes and enable reordered route segments.
+  - [Routex.Processing](Routex.Processing.md): This module provides everything needed to process Phoenix routes. It executes
+the `transform` callbacks from extensions to transform `Phoenix.Router.Route`
+structs and `create_helpers` callbacks to create one unified Helper module.
+  - [Routex.Route](Routex.Route.md): Function for working with Routex augmented Phoenix Routes
+
+  - [Routex.Router](Routex.Router.md): Provides macro (callbacks) to alter route definition before
+compilation.
+  - [Routex.Types](Routex.Types.md): Types shared by Routex core and extensions.
+
+  - [Routex.Utils](Routex.Utils.md): Provides an interface to functions which can be used in extensions.
+
+- Extensions
+  - [Routex.Extension.AlternativeGetters](Routex.Extension.AlternativeGetters.md): Creates helper functions to get a list of maps alternative slugs and their `Routex.Attrs`
+by providing a binary url. Sets `match?: true` for the url matching record.
+  - [Routex.Extension.Alternatives](Routex.Extension.Alternatives.md): Creates alternative routes based on `branches` configured in a Routex backend
+module. Branches can be nested and each branch can provide `Routex.Attrs` to be shared
+with other extensions.
+  - [Routex.Extension.Assigns](Routex.Extension.Assigns.md): Extracts `Routex.Attrs` from a route and makes them available in components
+and controllers with the assigns operator `@` (optionally under a namespace).
+  - [Routex.Extension.AttrGetters](Routex.Extension.AttrGetters.md): Access route attributes at runtime within your controllers, plugs, or LiveViews
+based on the matched route's properties. Uses pattern matching for optimal
+performance during runtime.
+  - [Routex.Extension.Cldr](Routex.Extension.Cldr.md): Adapter for projects using :ex_cldr. It generates configuration for locale routes
+based on your existing Cldr setup for a seamless experience.
+  - [Routex.Extension.Cloak](Routex.Extension.Cloak.md): Transforms routes to be unrecognizable.
+  - [Routex.Extension.Interpolation](Routex.Extension.Interpolation.md): A route may be defined with a routes `Routex.Attrs` interpolated
+into it. These interpolations are specified using the usual `#{variable}`
+interpolation syntax. Unlike some other routing solutions, interpolation
+is *not* restricted to the beginning of routes.
+  - [Routex.Extension.LiveViewHooks](Routex.Extension.LiveViewHooks.md): Attach LiveView hooks provided by Routex extensions.
+  - [Routex.Extension.Localize.Phoenix](Routex.Extension.Localize.Phoenix.md): Localize your Phoenix with minimal configuration.
+  - [Routex.Extension.Localize.Phoenix.Routes](Routex.Extension.Localize.Phoenix.Routes.md): Localize Phoenix routes using simple configuration.
+  - [Routex.Extension.Localize.Phoenix.Runtime](Routex.Extension.Localize.Phoenix.Runtime.md): This extension provides
+  - [Routex.Extension.Plugs](Routex.Extension.Plugs.md): Provides integration for plugs defined by Routex extensions.
+  - [Routex.Extension.RouteHelpers](Routex.Extension.RouteHelpers.md): This module provides route helpers that support the automatic selection of
+alternative routes. These helpers can serve as drop-in replacements for
+Phoenix's default route helpers.
+  - [Routex.Extension.RuntimeDispatcher](Routex.Extension.RuntimeDispatcher.md): The `Routex.Extension.RuntimeDispatcher` enables the dynamic dispatching of
+functions to external libraries or modules during the Plug pipeline and
+LiveView's `handle_params`. This dispatching is configured using a list of
+`{module, function, arguments}` tuples and leverages attributes from
+`Routex.Attrs` at runtime.
+  - [Routex.Extension.Translations](Routex.Extension.Translations.md): Enables users to enter URLs using localized terms which can enhance user engagement
+and content relevance.
+  - [Routex.Extension.VerifiedRoutes](Routex.Extension.VerifiedRoutes.md): Supports the use of original route paths in controllers and templates while rendering
+transformed route paths at runtime without performance impact.
+
+- Submodules
+  - [Routex.Extension.Interpolation.NonUniqError](Routex.Extension.Interpolation.NonUniqError.md): Raised when a list of routes contains routes with the same path and verb.
+  - [Routex.Extension.Localize.Parser](Routex.Extension.Localize.Parser.md): Handles parsing of locale strings.
+Uses efficient binary pattern matching and follows RFC 5646 BCP 47 language tag format.
+
+  - [Routex.Extension.Localize.Phoenix.Detect](Routex.Extension.Localize.Phoenix.Detect.md): Main module for locale detection logic.
+
+  - [Routex.Extension.Localize.Phoenix.Extractor](Routex.Extension.Localize.Phoenix.Extractor.md): 
+Extracts locale information from various sources. Handles both `Plug.Conn`
+structs and map inputs.
+  - [Routex.Extension.Localize.Phoenix.Parser](Routex.Extension.Localize.Phoenix.Parser.md): Handles parsing of accept-language headers.
+Uses efficient binary pattern matching and follows RFC 5646 BCP 47 language tag format.
+
+  - [Routex.Extension.Localize.Registry](Routex.Extension.Localize.Registry.md): Pre-generated locale registry shipped with Routex.
+Generated from IANA Language Subtag Registry.
+  - [Routex.Extension.Localize.Types](Routex.Extension.Localize.Types.md): Type definitions for locale detection.
+
+  - [Routex.Extension.Alternatives.Branch.Flat](Routex.Extension.Alternatives.Branch.Flat.md): Struct for flattened branch
+
+  - [Routex.Extension.Alternatives.Branch.Nested](Routex.Extension.Alternatives.Branch.Nested.md): Struct for branch with optionally nested branches
+
+  - [Routex.Extension.Alternatives.Config](Routex.Extension.Alternatives.Config.md): Module to create and validate a Config struct
+
+  - [Routex.Extension.Alternatives.Exceptions.AttrsMismatchError](Routex.Extension.Alternatives.Exceptions.AttrsMismatchError.md): Raised when the custom attributes of branches do not have the same keys.
+  - [Routex.Extension.Alternatives.Exceptions.MissingRootSlugError](Routex.Extension.Alternatives.Exceptions.MissingRootSlugError.md): Raised when the branch map does not start with the root branch "/".
+

@@ -25,6 +25,7 @@ defmodule Routex.Extension.Localize.Phoenix.Extractor do
   fallback to `locale`.
   """
 
+  alias Plug.Conn
   alias Routex.Extension.Localize.Phoenix.Parser
   alias Routex.Extension.Localize.Registry
 
@@ -37,25 +38,25 @@ defmodule Routex.Extension.Localize.Phoenix.Extractor do
     do: conn_like |> do_extract_from_source(source, param, attrs) |> validate_locale_value()
 
   # Handle Plug.Conn specific extractions
-  def do_extract_from_source(%Plug.Conn{} = conn, :accept_language, param, _attrs) do
+  def do_extract_from_source(%Conn{} = conn, :accept_language, param, _attrs) do
     conn
-    |> Plug.Conn.get_req_header("accept-language")
+    |> Conn.get_req_header("accept-language")
     |> Parser.parse_accept_language()
     |> Enum.sort_by(& &1.quality, :desc)
     |> find_first_valid_locale(param)
   end
 
-  def do_extract_from_source(%Plug.Conn{cookies: %{}} = conn, :cookie, param, _attrs) do
+  def do_extract_from_source(%Conn{cookies: %{}} = conn, :cookie, param, _attrs) do
     conn
     |> Map.get(:cookies)
     |> Map.get(param)
   end
 
-  def do_extract_from_source(%Plug.Conn{} = conn, :cookie, param, attrs) do
-    conn |> Plug.Conn.fetch_cookies() |> do_extract_from_source(:cookie, param, attrs)
+  def do_extract_from_source(%Conn{} = conn, :cookie, param, attrs) do
+    conn |> Conn.fetch_cookies() |> do_extract_from_source(:cookie, param, attrs)
   end
 
-  def do_extract_from_source(%Plug.Conn{} = conn, :query, param, _attrs) do
+  def do_extract_from_source(%Conn{} = conn, :query, param, _attrs) do
     conn
     |> ensure_query_params_fetched()
     |> Map.get(:query_params)
@@ -63,21 +64,21 @@ defmodule Routex.Extension.Localize.Phoenix.Extractor do
   end
 
   def do_extract_from_source(
-        %Plug.Conn{private: %{plug_session: _session_data}} = conn,
+        %Conn{private: %{plug_session: _session_data}} = conn,
         :session,
         param,
         _attrs
       ) do
-    case Plug.Conn.get_session(conn, @session_key) do
+    case Conn.get_session(conn, @session_key) do
       data when is_map(data) -> Map.get(data, param)
       _other -> nil
     end
   end
 
-  def do_extract_from_source(%Plug.Conn{} = conn, :session, param, attrs),
-    do: conn |> Plug.Conn.fetch_session() |> do_extract_from_source(:session, param, attrs)
+  def do_extract_from_source(%Conn{} = conn, :session, param, attrs),
+    do: conn |> Conn.fetch_session() |> do_extract_from_source(:session, param, attrs)
 
-  def do_extract_from_source(%Plug.Conn{} = conn, :path, param, _attrs) do
+  def do_extract_from_source(%Conn{} = conn, :path, param, _attrs) do
     Map.get(conn.path_params || %{}, param)
   end
 
@@ -150,8 +151,8 @@ defmodule Routex.Extension.Localize.Phoenix.Extractor do
   def do_extract_from_source(_source, _type, _param, _attrs), do: nil
 
   # Private helper functions
-  defp ensure_query_params_fetched(%Plug.Conn{query_params: %Plug.Conn.Unfetched{}} = conn) do
-    Plug.Conn.fetch_query_params(conn)
+  defp ensure_query_params_fetched(%Conn{query_params: %Conn.Unfetched{}} = conn) do
+    Conn.fetch_query_params(conn)
   end
 
   defp ensure_query_params_fetched(conn), do: conn

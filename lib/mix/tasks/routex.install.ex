@@ -1,5 +1,5 @@
 # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
-# credo:disable-for-this-file Credo.Refactor.Nesting
+# credo:disable-for-this-file Credo.Check.Refactor.Nesting
 defmodule Mix.Tasks.Routex.Install.Docs do
   @moduledoc false
 
@@ -35,12 +35,13 @@ if Code.ensure_loaded?(Igniter) do
     alias Igniter.Code.Common
     alias Igniter.Code.Function
     alias Igniter.Libs.Phoenix
+    alias Igniter.Mix.Task
     alias Igniter.Project
     alias Igniter.Util.Debug
 
-    @impl Igniter.Mix.Task
+    @impl Task
     def info(_argv, _composing_task) do
-      %Igniter.Mix.Task.Info{
+      %Task.Info{
         group: :routex,
         adds_deps: [{:routex, "~> 1.1"}],
         installs: [{:routex, "~> 1.1"}],
@@ -48,7 +49,7 @@ if Code.ensure_loaded?(Igniter) do
       }
     end
 
-    @impl Igniter.Mix.Task
+    @impl Task
     def igniter(igniter) do
       web_module = Phoenix.web_module(igniter)
       dbg(igniter)

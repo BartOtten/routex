@@ -87,6 +87,7 @@ defmodule Routex.Extension.AlternativeGetters do
     guarded_defs =
       quote do
         require Routex.Matchable
+        alias Routex.Extension.AlternativeGetters
 
         def alternatives(url) when is_binary(url), do: url |> Matchable.new() |> do_alternatives()
 
@@ -125,7 +126,7 @@ defmodule Routex.Extension.AlternativeGetters do
       route |> Matchable.new() |> Matchable.to_pattern(strict_trailing?: true)
 
     quote do
-      %Routex.Extension.AlternativeGetters{
+      %AlternativeGetters{
         match?: unquote(dynamic_slash_pattern) == pattern,
         slug: unquote(static_slash_pattern) |> to_string(),
         attrs: unquote(dynamic_slash_pattern) |> to_string() |> attrs()

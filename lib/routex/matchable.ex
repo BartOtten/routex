@@ -10,6 +10,7 @@ defmodule Routex.Matchable do
 
   import Record
 
+  alias Phoenix.Router.Route
   alias Routex.Types, as: T
 
   require Record
@@ -255,7 +256,7 @@ defmodule Routex.Matchable do
     end
   end
 
-  def to_func(%Phoenix.Router.Route{} = route, name, other_args, body) do
+  def to_func(%Route{} = route, name, other_args, body) do
     to_func(new(route), name, other_args, body)
   end
 
@@ -281,7 +282,7 @@ defmodule Routex.Matchable do
   @spec to_pattern(T.route() | t()) :: T.ast()
   def to_pattern(input, opts \\ [])
 
-  def to_pattern(%Phoenix.Router.Route{} = route, opts),
+  def to_pattern(%Route{} = route, opts),
     do: route |> new() |> to_pattern(opts)
 
   def to_pattern(record, opts) when is_tuple(record) do
